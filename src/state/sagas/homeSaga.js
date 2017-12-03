@@ -15,7 +15,6 @@ import API, { getAPIByFilter } from 'api/api';
 const fetchTags = function*(action) {
   try {
     const result = yield call(API.getTags);
-    debugger;
     yield put(fetchTagsSuccess(result));
   } catch (error) {
     yield put(fetchTagsFail(error));

@@ -63,7 +63,9 @@ const AppNavigation = TabNavigator(
     },
   },
   {
+    tabBarPosition: 'bottom',
     tabBarOptions: {
+      showIcon: true,
       showLabel: false,
     },
   },

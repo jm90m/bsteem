@@ -22,6 +22,7 @@ const HomeHeader = styled.View`
   background-color: ${COLORS.WHITE.WHITE};
   border-bottom-color: ${COLORS.WHITE.GAINSBORO};
   border-bottom-width: 1px;
+  padding-top: 10px;
   width: 100%;
   height: 45px;
   justify-content: center;
@@ -104,7 +105,7 @@ class HomeScreen extends Component {
   render() {
     const { menuVisible, currentFilter, dataSource } = this.state;
     return (
-      <View style={{ backgroundColor: 'white' }}>
+      <View>
         <HomeHeader>
           <TouchableMenu onPress={() => this.setMenuVisibile(!menuVisible)}>
             <MaterialIcons name={currentFilter.icon} size={20} color={COLORS.BLUE.MARINER} />

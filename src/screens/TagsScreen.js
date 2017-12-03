@@ -9,9 +9,6 @@ const Container = styled.ScrollView`
   flex: 1;
 `;
 
-const TagText = styled.Text`
-`;
-
 const Tag = styled.Text`
 
 `;
@@ -43,7 +40,6 @@ class TagsScreen extends Component {
 
   render() {
     const { tags } = this.props;
-    console.log('TAGS', tags);
     return (
       <Container>
         {tags.map((tag, index) => (
