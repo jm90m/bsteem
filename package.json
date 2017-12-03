@@ -1,0 +1,40 @@
+{
+  "main": "node_modules/expo/AppEntry.js",
+  "private": true,
+  "dependencies": {
+    "expo": "^23.0.0",
+    "react": "16.0.0",
+    "react-native": "https://github.com/expo/react-native/archive/sdk-23.0.0.tar.gz",
+    "cross-fetch": "^1.1.0",
+    "embedjs": "0.0.10",
+    "events": "^1.1.1",
+    "filesize": "^3.5.11",
+    "isomorphic-fetch": "^2.2.1",
+    "lodash": "^4.17.4",
+    "moment": "^2.19.1",
+    "path": "^0.12.7",
+    "react-dom": "^16.1.1",
+    "react-native-htmlview": "^0.12.1",
+    "react-navigation": "^1.0.0-beta.13",
+    "react-redux": "^5.0.6",
+    "redux": "^3.7.2",
+    "redux-saga": "^0.15.6",
+    "remarkable": "^1.7.1",
+    "sanitize-html": "^1.16.1",
+    "showdown": "^1.7.6",
+    "steem": "^0.6.4",
+    "stream": "0.0.2",
+    "styled-components": "^2.2.1",
+    "url": "^0.11.0",
+    "xmldom": "^0.1.27"
+  },
+  "devDependencies": {
+    "babel": "^6.23.0",
+    "babel-eslint": "^8.0.2",
+    "babel-plugin-module-alias": "^1.6.0",
+    "babel-preset-react-native": "^3.0.2",
+    "eslint": "^4.11.0",
+    "eslint-config-airbnb": "^16.1.0",
+    "eslint-plugin-react": "^7.4.0"
+  }
+}
