@@ -37,6 +37,14 @@ class API {
     //{tag: "terrycraft", limit: 10}
     return steem.api.getDiscussionsByBlogAsync(query);
   }
+
+  static async getDiscussionsByComments(query) {
+    return steem.api.getDiscussionsByCommentsAsync(query);
+  }
+
+  static async getFollowCount(username) {
+    return steem.api.getFollowCountAsync(username)
+  }
 }
 
 export const getAPIByFilter = filterId => {

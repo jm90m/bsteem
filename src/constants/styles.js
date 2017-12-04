@@ -4,6 +4,11 @@ export const COLORS = {
     BOTICELLI: '#99AAB5',
     LINK_WATER: '#C2CCD3',
     MEDIUM_AQUAMARINE: '#54D2A0',
+    SOLITUDE: '#f5f6f9'
+  },
+
+  GREY: {
+    GONDOLA: '#353535',
   },
 
   WHITE: {

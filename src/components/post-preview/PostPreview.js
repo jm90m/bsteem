@@ -1,14 +1,13 @@
 import React, { Component } from 'react';
-import { Dimensions, Image, View } from 'react-native';
+import { Dimensions, Image } from 'react-native';
 import styled from 'styled-components/native';
 import _ from 'lodash';
-import Remarkable from 'remarkable';
-
-const { width, height } = Dimensions.get('screen');
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import Footer from './Footer';
 import Header from './Header';
-import { striptags } from '../../util/stripTags';
+import BodyShort from './BodyShort';
+
+const { width } = Dimensions.get('screen');
 
 const Container = styled.View`
   background-color: #fff;
@@ -36,33 +35,7 @@ const PreviewImage = styled.Image`
   max-height: 400px;
 `;
 
-const Body = styled.Text`
-  padding: 5px;
-`;
-
 const Touchable = styled.TouchableOpacity``;
-
-const decodeEntities = body => {
-  return body.replace(/&lt;/g, '<').replace(/&gt;/g, '>');
-};
-
-const BodyShort = props => {
-  const remarkable = new Remarkable({ html: true });
-  let body = striptags(remarkable.render(striptags(decodeEntities(props.body))));
-  body = body.replace(/(?:https?|ftp):\/\/[\S]+/g, '');
-  body = body.replace(/&quot;|&amp;/g, '');
-  body = body.replace(/(?:\r\n|\r|\n)/g, ' ');
-  // If body consists of whitespace characters only skip it.
-  if (!body.replace(/\s/g, '').length) {
-    return null;
-  }
-
-  return (
-    <Body numberOfLines={4} ellipsizeMode="tail">
-      {body}
-    </Body>
-  );
-};
 
 class PostPreview extends Component {
   static defaultProps = {
@@ -100,7 +73,7 @@ class PostPreview extends Component {
                 source={{ uri: _.head(images) }}
                 resizeMode={Image.resizeMode.contain}
               />}
-            <BodyShort body={body} />
+            <BodyShort content={body} />
           </Touchable>
         </Content>
         <Footer postData={postData} />

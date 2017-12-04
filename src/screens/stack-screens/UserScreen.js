@@ -1,14 +1,17 @@
 import React, { Component } from 'react';
 import styled from 'styled-components/native';
-import { ListView, Modal } from 'react-native';
+import steem from 'steem';
+import { ListView, Modal, Text, ScrollView } from 'react-native';
 import { connect } from 'react-redux';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import _ from 'lodash';
 import { fetchUser } from 'state/actions/usersActions';
 import { COLORS, MATERIAL_ICONS, MATERIAL_COMMUNITY_ICONS, ICON_SIZES } from 'constants/styles';
+import * as userMenuConstants from 'constants/userMenu';
 import { BLOG } from 'constants/userMenu';
 import API from 'api/api';
 import PostPreview from 'components/post-preview/PostPreview';
+import CommentsPreview from 'components/user/CommentsPreview';
 import UserHeader from 'components/user/UserHeader';
 import UserMenu from 'components/user/UserMenu';
 
@@ -69,64 +72,140 @@ class UserScreen extends Component {
 
   constructor(props) {
     super(props);
+
     this.state = {
       userPostsDataSource: ds.cloneWithRows([]),
       userPosts: [],
+      userComments: [],
+      userCommentsDataSource: ds.cloneWithRows([]),
       menuVisible: false,
       currentMenuOption: BLOG,
+      followingCount: 0,
+      followerCount: 0,
     };
+
+    this.fetchMoreUserPosts = this.fetchMoreUserPosts.bind(this);
+    this.setMenuVisible = this.setMenuVisible.bind(this);
+    this.handleHideMenu = this.handleHideMenu.bind(this);
+    this.handleChangeUserMenu = this.handleChangeUserMenu.bind(this);
+    this.renderUserPostRow = this.renderUserPostRow.bind(this);
+    this.renderUserCommentsRow = this.renderUserCommentsRow.bind(this);
   }
 
   componentDidMount() {
     const { username } = this.props.navigation.state.params;
     this.props.fetchUser(username);
     const query = { tag: username, limit: 10 };
+    const commentsQuery = { start_author: username, limit: 10 };
+
     API.getDiscussionsByBlog(query).then(result => {
       this.setState({
         userPostsDataSource: ds.cloneWithRows(result),
         userPosts: result,
       });
     });
+
+    API.getDiscussionsByComments(commentsQuery).then(result => {
+      this.setState({
+        userCommentsDataSource: ds.cloneWithRows(result),
+        userComments: result,
+      });
+    });
+
+    API.getFollowCount(username).then(result => {
+      this.setState({
+        followingCount: result.following_count,
+        followerCount: result.follower_count,
+      });
+    });
   }
 
-  fetchMoreUserPosts = () => {
+  fetchMoreUserPosts() {
     const { username } = this.props.navigation.state.params;
     const { userPosts } = this.state;
     const lastPost = _.last(userPosts);
-    const query = {
-      tag: username,
-      limit: 11,
-      start_permlink: lastPost.permlink,
-      start_author: lastPost.author,
-    };
-    API.getDiscussionsByBlog(query).then(result => {
-      const posts = this.state.userPosts.concat(_.slice(result, 1, result.length - 1));
-      this.setState({
-        userPostsDataSource: ds.cloneWithRows(posts),
-        userPosts: posts,
-      });
-    });
-  };
+    if (!_.isEmpty(lastPost)) {
+      const query = {
+        tag: username,
+        limit: 11,
+        start_permlink: lastPost.permlink,
+        start_author: lastPost.author,
+      };
 
-  setMenuVisible = menuVisible => this.setState({ menuVisible });
-  handleHideMenu = () => this.setMenuVisible(false);
-  handleChangeUserMenu = option =>
+      API.getDiscussionsByBlog(query).then(result => {
+        const posts = this.state.userPosts.concat(_.slice(result, 1, result.length - 1));
+        this.setState({
+          userPostsDataSource: ds.cloneWithRows(posts),
+          userPosts: posts,
+        });
+      });
+    }
+  }
+
+  setMenuVisible(menuVisible) {
+    this.setState({ menuVisible });
+  }
+
+  handleHideMenu() {
+    this.setMenuVisible(false);
+  }
+
+  handleChangeUserMenu(option) {
     this.setState({
       currentMenuOption: option,
       menuVisible: false,
     });
-  renderRow = rowData => {
+  }
+
+  renderUserPostRow(rowData) {
     return <PostPreview postData={rowData} navigation={this.props.navigation} />;
-  };
+  }
+
+  renderUserCommentsRow(rowData) {
+    return <CommentsPreview commentData={rowData} navigation={this.props.navigation} />;
+  }
 
   navigateBack = () => this.props.navigation.goBack();
+
+  renderUserContent() {
+    const { currentMenuOption, userPostsDataSource, userCommentsDataSource } = this.state;
+    switch (currentMenuOption.id) {
+      case userMenuConstants.COMMENTS.id:
+        return (
+          <StyledListView
+            dataSource={userCommentsDataSource}
+            renderRow={this.renderUserCommentsRow}
+            enableEmptySections={true}
+          />
+        );
+      case userMenuConstants.FOLLOWING.id:
+        return <Text>Following</Text>;
+      case userMenuConstants.WALLET.id:
+        return <Text>Wallet</Text>;
+      case userMenuConstants.BLOG.id:
+      default:
+        return (
+          <StyledListView
+            dataSource={userPostsDataSource}
+            renderRow={this.renderUserPostRow}
+            enableEmptySections={true}
+            onEndReached={this.fetchMoreUserPosts}
+          />
+        );
+    }
+  }
 
   render() {
     const { usersMap } = this.props;
     const { username } = this.props.navigation.state.params;
+    const userDetails = usersMap[username] || {};
+    const userJsonMetaData = _.attempt(JSON.parse, userDetails.json_metadata);
+    const userProfile = _.isError(userJsonMetaData) ? {} : userJsonMetaData.profile;
+    const hasCover = _.has(userProfile, 'cover_image');
     const { menuVisible, currentMenuOption } = this.state;
-
-    console.log(usersMap[username]);
+    const userReputation = _.has(userDetails, 'reputation')
+      ? steem.formatter.reputation(userDetails.reputation)
+      : 0;
 
     return (
       <Container>
@@ -149,7 +228,6 @@ class UserScreen extends Component {
             />
           </TouchableMenu>
         </Header>
-        <UserHeader username={username} />
         <Modal
           animationType="slide"
           transparent
@@ -161,12 +239,10 @@ class UserScreen extends Component {
             handleChangeUserMenu={this.handleChangeUserMenu}
           />
         </Modal>
-        <StyledListView
-          dataSource={this.state.userPostsDataSource}
-          renderRow={this.renderRow}
-          enableEmptySections={true}
-          onEndReached={this.fetchMoreUserPosts}
-        />
+        <ScrollView>
+          <UserHeader username={username} hasCover={hasCover} userReputation={userReputation} />
+          {this.renderUserContent()}
+        </ScrollView>
       </Container>
     );
   }

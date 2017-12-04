@@ -1,12 +1,14 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { View } from 'react-native';
+import { View, Dimensions } from 'react-native';
 import styled from 'styled-components/native';
 import { MaterialIcons } from '@expo/vector-icons';
 import Avatar from 'components/common/Avatar';
 import { getUserBackgroundCoverUrl } from 'util/busyImageUtils';
 import { COLORS, MATERIAL_ICONS } from 'constants/styles';
 import ReputationScore from 'components/post/ReputationScore';
+
+const { width } = Dimensions.get('screen');
 
 const Container = styled.View`
   height: 75px;
@@ -22,11 +24,12 @@ const UserHeaderContents = styled.View`
 
 const BackgroundImage = styled.Image`
   flex: 1;
+  position: absolute;
 `;
 
 const UsernameText = styled.Text`
   font-size: 20px;
-  color: ${COLORS.WHITE.WHITE};
+  color: ${props => (props.hasCover ? COLORS.WHITE.WHITE : COLORS.GREY.GONDOLA)};
   background-color: transparent;
   margin-right: 5px;
   font-weight: bold;
@@ -45,7 +48,8 @@ const HandleContainer = styled.View`
 const Handle = styled.Text`
   font-size: 14px;
   background-color: transparent;
-  color: ${COLORS.WHITE.WHITE};
+  color: ${props => (props.hasCover ? COLORS.WHITE.WHITE : COLORS.BLUE.BOTICELLI)};
+  font-weight: 500; 
  `;
 
 const FollowButton = styled.TouchableOpacity`
@@ -59,30 +63,57 @@ const FollowButton = styled.TouchableOpacity`
 class UserHeader extends Component {
   static propTypes = {
     username: PropTypes.string,
+    userReputation: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   };
 
   static defaultProps = {
     username: '',
+    userReputation: '0',
   };
 
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      hasCover: props.hasCover,
+    };
+
+    this.handleBackgroundCoverError = this.handleBackgroundCoverError.bind(this);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    this.setState({
+      hasCover: nextProps.hasCover,
+    });
+  }
+
+  handleBackgroundCoverError() {
+    this.setState({
+      hasCover: false,
+    });
+  }
+
   render() {
-    const { username } = this.props;
+    const { username, userReputation } = this.props;
+    const { hasCover } = this.state;
+
     return (
       <Container>
         <BackgroundImage
           resizeMode="cover"
           source={{ uri: getUserBackgroundCoverUrl(username) }}
-          style={{ width: null, height: null }}
+          onError={this.handleBackgroundCoverError}
+          style={{ width, height: 75 }}
         />
         <UserHeaderContents>
           <Avatar username={username} size={50} />
           <View>
             <UsernameContainer>
-              <UsernameText>{username}</UsernameText>
-              <ReputationScore reputation={10} />
+              <UsernameText hasCover={hasCover}>{username}</UsernameText>
+              <ReputationScore reputation={userReputation} />
             </UsernameContainer>
             <HandleContainer>
-              <Handle>
+              <Handle hasCover={hasCover}>
                 {`@${username}`}
               </Handle>
             </HandleContainer>

@@ -2,10 +2,10 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components/native';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS } from '../../constants/styles';
-import { sortVotes } from '../../util/sortUtils';
-import { getUpvotes } from '../../util/voteUtils';
-import { calculatePayout } from '../../util/steemitUtils';
+import { COLORS } from 'constants/styles';
+import { sortVotes } from 'util/sortUtils';
+import { getUpvotes } from 'util/voteUtils';
+import { calculatePayout } from 'util/steemitUtils';
 
 const Container = styled.View`
   flex-direction: row;
@@ -29,20 +29,20 @@ const Payout = styled.Text`
   align-self: center;
 `;
 
-class Footer extends Component {
+class CommentsFooter extends Component {
   static propTypes = {
-    postData: PropTypes.shape(),
+    commentData: PropTypes.shape(),
   };
 
   static defaultProps = {
-    postData: {},
+    commentData: {},
   };
 
   render() {
-    const { postData } = this.props;
-    const { active_votes, children } = postData;
+    const { commentData } = this.props;
+    const { active_votes, children } = commentData;
     const upVotes = getUpvotes(active_votes).sort(sortVotes);
-    const payout = calculatePayout(postData);
+    const payout = calculatePayout(commentData);
 
     return (
       <Container>
@@ -54,11 +54,10 @@ class Footer extends Component {
           color={COLORS.BLUE.LINK_WATER}
         />
         <FooterValue>{children}</FooterValue>
-        <MaterialCommunityIcons name="tumblr-reblog" size={24} color={COLORS.BLUE.LINK_WATER} />
         <Payout>${payout.cashoutInTime ? payout.potentialPayout : payout.pastPayouts}</Payout>
       </Container>
     );
   }
 }
 
-export default Footer;
+export default CommentsFooter;

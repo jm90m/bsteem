@@ -2,7 +2,9 @@ import React from 'react';
 import { View } from 'react-native';
 import { TabNavigator, StackNavigator } from 'react-navigation';
 import sc2 from './src/api/sc2';
+import { Provider } from 'react-redux';
 import Expo from 'expo';
+import { COLORS } from 'constants/styles';
 import HomeScreen from 'screens/HomeScreen';
 import TagsScreen from 'screens/TagsScreen';
 import LoginScreen from 'screens/LoginScreen';
@@ -11,7 +13,6 @@ import PostScreen from 'screens/stack-screens/PostScreen';
 import FeedScreen from 'screens/stack-screens/FeedScreen';
 import CommentsScreen from 'screens/stack-screens/CommentsScreen';
 import configureStore from 'state/configureStore';
-import { Provider } from 'react-redux';
 
 const HomeNavigator = StackNavigator(
   {
@@ -67,6 +68,14 @@ const AppNavigation = TabNavigator(
     tabBarOptions: {
       showIcon: true,
       showLabel: false,
+      activeTintColor: COLORS.BLUE.MARINER,
+      inactiveTintColor: COLORS.BLUE.BOTICELLI,
+      style: {
+        backgroundColor: COLORS.WHITE.WHITE,
+      },
+      indicatorStyle: {
+        backgroundColor: COLORS.BLUE.MARINER,
+      },
     },
   },
 );

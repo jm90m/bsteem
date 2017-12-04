@@ -67,12 +67,10 @@ class PostScreen extends Component {
       category,
       postData,
     } = this.props.navigation.state.params;
-    const busyLink = `https://nd.busy.org/${category}/@${author}/${permlink}`;
     const htmlPostTitle = `<h1>${postData.title}</h1>`;
     const htmlBody = `<body>${htmlPostTitle}<div class="Body">${getHtml(body, parsedJsonMetadata)}</div></body>`;
     const htmlHead = `<head>${postBodyStyles}</head>`;
     const html = `<html>${htmlHead}${htmlBody}</html>`;
-    console.log(html);
 
     return (
       <Container>
