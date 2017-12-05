@@ -15,6 +15,9 @@ const rootSaga = function*() {
 
     // User Sagas
     spawn(usersSaga.watchFetchUser),
+    spawn(usersSaga.watchFetchUserBlog),
+    spawn(usersSaga.watchFetchUserComments),
+    spawn(usersSaga.watchFetchUserFollowCount),
   ]);
 };
 

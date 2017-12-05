@@ -4,7 +4,7 @@ export const COLORS = {
     BOTICELLI: '#99AAB5',
     LINK_WATER: '#C2CCD3',
     MEDIUM_AQUAMARINE: '#54D2A0',
-    SOLITUDE: '#f5f6f9'
+    SOLITUDE: '#f5f6f9',
   },
 
   GREY: {
@@ -42,7 +42,6 @@ export const MATERIAL_ICONS = {
   following: 'supervisor-account',
   wallet: 'account-balance-wallet',
   activity: 'grade',
-
 };
 
 export const MATERIAL_COMMUNITY_ICONS = {

@@ -1,12 +1,18 @@
 import { combineReducers } from 'redux';
-import home from './reducers/homeReducer';
-import auth from './reducers/authReducer';
-import comments from './reducers/commentsReducer';
-import users from './reducers/usersReducer';
+import homeReducer, * as fromHome from './reducers/homeReducer';
+import authReducer, * as fromAuth from './reducers/authReducer';
+import commentsReducer, * as fromComments from './reducers/commentsReducer';
+import usersReducer, * as fromUsers from './reducers/usersReducer';
 
 export default combineReducers({
-  home,
-  auth,
-  comments,
-  users,
+  home: homeReducer,
+  auth: authReducer,
+  comments: commentsReducer,
+  users: usersReducer,
 });
+
+// selectors
+export const getUsersDetails = state => fromUsers.getUsersDetails(state.users);
+export const getUsersComments = state => fromUsers.getUsersComments(state.users);
+export const getUsersBlog = state => fromUsers.getUsersBlog(state.users);
+export const getUsersFollowCount = state => fromUsers.getUsersFollowCount(state.users);

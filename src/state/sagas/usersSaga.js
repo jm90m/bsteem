@@ -1,18 +1,77 @@
-import { FETCH_USER } from 'state/actions/actionTypes';
-import API from 'api/api';
 import { takeLatest, call, put } from 'redux-saga/effects';
-import { fetchUserFail, fetchUserSuccess } from 'state/actions/usersActions';
+import API from 'api/api';
+import {
+  FETCH_USER,
+  FETCH_USER_COMMENTS,
+  FETCH_USER_BLOG,
+  FETCH_USER_FOLLOW_COUNT,
+} from 'state/actions/actionTypes';
+import * as userActions from 'state/actions/usersActions';
 
 const fetchUser = function*(action) {
   try {
     const { username } = action.payload;
     const result = yield call(API.getAccount, username);
-    yield put(fetchUserSuccess(result));
+    yield put(userActions.fetchUser.success(result));
   } catch (error) {
-    yield put(fetchUserFail(errror));
+    yield put(userActions.fetchUser.fail(error));
+  }
+};
+
+const fetchUserBlog = function*(action) {
+  try {
+    const { username, query } = action.payload;
+    const result = yield call(API.getDiscussionsByBlog, query);
+    const payload = {
+      result,
+      username,
+    };
+    yield put(userActions.fetchUserBlog.success(payload));
+  } catch (error) {
+    yield put(userActions.fetchUserBlog.fail(error));
+  }
+};
+
+const fetchUserComments = function*(action) {
+  try {
+    const { username, query } = action.payload;
+    const result = yield call(API.getDiscussionsByComments, query);
+    const payload = {
+      result,
+      username,
+    };
+    yield put(userActions.fetchUserComments.success(payload));
+  } catch (error) {
+    yield put(userActions.fetchUserComments.fail(error));
+  }
+};
+
+const fetchUserFollowCount = function*(action) {
+  try {
+    const { username } = action.payload;
+    const result = yield call(API.getFollowCount, username);
+    const payload = {
+      result,
+      username,
+    };
+    yield put(userActions.fetchUserFollowCount.success(payload));
+  } catch (error) {
+    yield put(userActions.fetchUserFollowCount.fail(error));
   }
 };
 
 export const watchFetchUser = function*() {
-  yield takeLatest(FETCH_USER.PENDING, fetchUser);
+  yield takeLatest(FETCH_USER.ACTION, fetchUser);
+};
+
+export const watchFetchUserComments = function*() {
+  yield takeLatest(FETCH_USER_COMMENTS.ACTION, fetchUserComments);
+};
+
+export const watchFetchUserBlog = function*() {
+  yield takeLatest(FETCH_USER_BLOG.ACTION, fetchUserBlog);
+};
+
+export const watchFetchUserFollowCount = function*() {
+  yield takeLatest(FETCH_USER_FOLLOW_COUNT.ACTION, fetchUserFollowCount);
 };

@@ -34,7 +34,6 @@ class API {
   }
 
   static async getDiscussionsByBlog(query) {
-    //{tag: "terrycraft", limit: 10}
     return steem.api.getDiscussionsByBlogAsync(query);
   }
 

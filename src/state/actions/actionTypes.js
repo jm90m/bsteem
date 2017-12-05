@@ -1,8 +1,4 @@
-const createAsyncActionType = type => ({
-  PENDING: `${type}_PENDING`,
-  SUCCESS: `${type}_SUCCESS`,
-  ERROR: `${type}_ERROR`,
-});
+import { createAsyncActionType } from 'util/reduxUtils';
 
 // Home Actions
 export const FETCH_DISCUSSIONS = createAsyncActionType('@fetch-discussions');
@@ -14,3 +10,6 @@ export const FETCH_COMMENTS = createAsyncActionType('@fetch-comments');
 
 // User Actions
 export const FETCH_USER = createAsyncActionType('@fetch-user');
+export const FETCH_USER_COMMENTS = createAsyncActionType('@fetch-user-comments');
+export const FETCH_USER_BLOG = createAsyncActionType('@fetch-user-blog');
+export const FETCH_USER_FOLLOW_COUNT = createAsyncActionType('@fetch-user-follow-count');

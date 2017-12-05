@@ -1,15 +1,25 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components/native';
 import steem from 'steem';
 import { ListView, Modal, Text, ScrollView } from 'react-native';
 import { connect } from 'react-redux';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import _ from 'lodash';
-import { fetchUser } from 'state/actions/usersActions';
+import {
+  fetchUser,
+  fetchUserComments,
+  fetchUserBlog,
+  fetchUserFollowCount,
+} from 'state/actions/usersActions';
 import { COLORS, MATERIAL_ICONS, MATERIAL_COMMUNITY_ICONS, ICON_SIZES } from 'constants/styles';
 import * as userMenuConstants from 'constants/userMenu';
-import { BLOG } from 'constants/userMenu';
-import API from 'api/api';
+import {
+  getUsersDetails,
+  getUsersComments,
+  getUsersBlog,
+  getUsersFollowCount,
+} from 'state/rootReducer';
 import PostPreview from 'components/post-preview/PostPreview';
 import CommentsPreview from 'components/user/CommentsPreview';
 import UserHeader from 'components/user/UserHeader';
@@ -55,11 +65,17 @@ const CurrentUserDisplayText = styled.Text`
 `;
 
 const mapStateToProps = state => ({
-  usersMap: state.users.usersMap,
+  usersDetails: getUsersDetails(state),
+  usersComments: getUsersComments(state),
+  usersBlog: getUsersBlog(state),
+  usersFollowCount: getUsersFollowCount(state),
 });
 
 const mapDispatchToProps = dispatch => ({
-  fetchUser: username => dispatch(fetchUser(username)),
+  fetchUser: username => dispatch(fetchUser.action({ username })),
+  fetchUserComments: (username, query) => dispatch(fetchUserComments.action({ username, query })),
+  fetchUserBlog: (username, query) => dispatch(fetchUserBlog.action({ username, query })),
+  fetchUserFollowCount: username => dispatch(fetchUserFollowCount.action({ username })),
 });
 
 const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
@@ -70,18 +86,18 @@ class UserScreen extends Component {
     tabBarVisible: false,
   };
 
+  static propTypes = {
+    navigation: PropTypes.shape().isRequired,
+  };
+
   constructor(props) {
     super(props);
 
     this.state = {
       userPostsDataSource: ds.cloneWithRows([]),
-      userPosts: [],
-      userComments: [],
       userCommentsDataSource: ds.cloneWithRows([]),
       menuVisible: false,
-      currentMenuOption: BLOG,
-      followingCount: 0,
-      followerCount: 0,
+      currentMenuOption: userMenuConstants.BLOG,
     };
 
     this.fetchMoreUserPosts = this.fetchMoreUserPosts.bind(this);
@@ -94,52 +110,62 @@ class UserScreen extends Component {
 
   componentDidMount() {
     const { username } = this.props.navigation.state.params;
-    this.props.fetchUser(username);
-    const query = { tag: username, limit: 10 };
-    const commentsQuery = { start_author: username, limit: 10 };
+    const { usersDetails, usersComments, usersBlog, usersFollowCount } = this.props;
+    const userDetails = usersDetails[username];
+    const userComments = usersComments[username];
+    const userBlog = usersBlog[username];
+    const userFollowCount = usersFollowCount[username];
 
-    API.getDiscussionsByBlog(query).then(result => {
-      this.setState({
-        userPostsDataSource: ds.cloneWithRows(result),
-        userPosts: result,
-      });
-    });
+    if (_.isEmpty(userDetails)) {
+      this.props.fetchUser(username);
+    }
 
-    API.getDiscussionsByComments(commentsQuery).then(result => {
-      this.setState({
-        userCommentsDataSource: ds.cloneWithRows(result),
-        userComments: result,
-      });
-    });
+    if (_.isEmpty(userBlog)) {
+      const query = { tag: username, limit: 10 };
+      this.props.fetchUserBlog(username, query);
+    }
 
-    API.getFollowCount(username).then(result => {
-      this.setState({
-        followingCount: result.following_count,
-        followerCount: result.follower_count,
-      });
+    if (_.isEmpty(userComments)) {
+      const query = { start_author: username, limit: 10 };
+      this.props.fetchUserComments(username, query);
+    }
+
+    if (_.isEmpty(userFollowCount)) {
+      this.props.fetchUserFollowCount(username);
+    }
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const { username } = this.props.navigation.state.params;
+    const { usersComments, usersBlog } = nextProps;
+    const userComments = usersComments[username] || [];
+    const userBlog = usersBlog[username] || [];
+    this.setState({
+      userPostsDataSource: ds.cloneWithRows(userBlog),
+      userCommentsDataSource: ds.cloneWithRows(userComments),
     });
   }
 
   fetchMoreUserPosts() {
     const { username } = this.props.navigation.state.params;
-    const { userPosts } = this.state;
-    const lastPost = _.last(userPosts);
-    if (!_.isEmpty(lastPost)) {
-      const query = {
-        tag: username,
-        limit: 11,
-        start_permlink: lastPost.permlink,
-        start_author: lastPost.author,
-      };
-
-      API.getDiscussionsByBlog(query).then(result => {
-        const posts = this.state.userPosts.concat(_.slice(result, 1, result.length - 1));
-        this.setState({
-          userPostsDataSource: ds.cloneWithRows(posts),
-          userPosts: posts,
-        });
-      });
-    }
+    // const { userPosts } = this.state;
+    // const lastPost = _.last(userPosts);
+    // if (!_.isEmpty(lastPost)) {
+    //   const query = {
+    //     tag: username,
+    //     limit: 11,
+    //     start_permlink: lastPost.permlink,
+    //     start_author: lastPost.author,
+    //   };
+    //
+    //   API.getDiscussionsByBlog(query).then(result => {
+    //     const posts = this.state.userPosts.concat(_.slice(result, 1, result.length - 1));
+    //     this.setState({
+    //       userPostsDataSource: ds.cloneWithRows(posts),
+    //       userPosts: posts,
+    //     });
+    //   });
+    // }
   }
 
   setMenuVisible(menuVisible) {
@@ -169,13 +195,18 @@ class UserScreen extends Component {
 
   renderUserContent() {
     const { currentMenuOption, userPostsDataSource, userCommentsDataSource } = this.state;
+    const { username } = this.props.navigation.state.params;
+    const { usersComments, usersBlog } = this.props;
+    const userComments = usersComments[username] || [];
+    const userBlog = usersBlog[username] || [];
+    console.log('RENDER USER CONTENT', currentMenuOption.id, userComments, userBlog);
     switch (currentMenuOption.id) {
       case userMenuConstants.COMMENTS.id:
         return (
           <StyledListView
             dataSource={userCommentsDataSource}
             renderRow={this.renderUserCommentsRow}
-            enableEmptySections={true}
+            enableEmptySections
           />
         );
       case userMenuConstants.FOLLOWING.id:
@@ -188,7 +219,7 @@ class UserScreen extends Component {
           <StyledListView
             dataSource={userPostsDataSource}
             renderRow={this.renderUserPostRow}
-            enableEmptySections={true}
+            enableEmptySections
             onEndReached={this.fetchMoreUserPosts}
           />
         );
@@ -196,9 +227,9 @@ class UserScreen extends Component {
   }
 
   render() {
-    const { usersMap } = this.props;
+    const { usersDetails } = this.props;
     const { username } = this.props.navigation.state.params;
-    const userDetails = usersMap[username] || {};
+    const userDetails = usersDetails[username] || {};
     const userJsonMetaData = _.attempt(JSON.parse, userDetails.json_metadata);
     const userProfile = _.isError(userJsonMetaData) ? {} : userJsonMetaData.profile;
     const hasCover = _.has(userProfile, 'cover_image');
