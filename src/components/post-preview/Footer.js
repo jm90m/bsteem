@@ -45,7 +45,7 @@ class Footer extends Component {
     const upVotes = getUpvotes(active_votes).sort(sortVotes);
     const payout = calculatePayout(postData);
     const displayedPayout = payout.cashoutInTime ? payout.potentialPayout : payout.pastPayouts;
-    const formattedDisplayedPayout = _.isNaN(displayedPayout)
+    const formattedDisplayedPayout = _.isUndefined(displayedPayout)
       ? '0.00'
       : parseFloat(displayedPayout).toFixed(2);
     console.log(displayedPayout);
