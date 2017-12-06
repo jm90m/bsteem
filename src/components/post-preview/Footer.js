@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import _ from 'lodash';
 import styled from 'styled-components/native';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '../../constants/styles';
@@ -44,7 +45,10 @@ class Footer extends Component {
     const upVotes = getUpvotes(active_votes).sort(sortVotes);
     const payout = calculatePayout(postData);
     const displayedPayout = payout.cashoutInTime ? payout.potentialPayout : payout.pastPayouts;
-    const formattedDisplayedPayout = parseFloat(displayedPayout).toFixed(2);
+    const formattedDisplayedPayout = _.isNaN(displayedPayout)
+      ? '0.00'
+      : parseFloat(displayedPayout).toFixed(2);
+    console.log(displayedPayout);
 
     return (
       <Container>

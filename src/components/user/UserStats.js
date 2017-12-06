@@ -1,14 +1,18 @@
-import React from 'react';
-import PropTypes from 'propTypes';
-import { View } from 'react-native';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components/native';
+import { COLORS } from 'constants/styles';
+import { abbreviateLargeNumber } from 'util/numberFormatter';
 
 const Container = styled.View`
   flex-direction: row;
   justify-content: space-between;
+  background: ${COLORS.WHITE.WHITE};
+  padding: 5px 16px;
 `;
 
-const FollowContainer = styled.View`
+const ValueLabelContainer = styled.View`
+  align-items: center;
 `;
 
 const Value = styled.Text`
@@ -36,30 +40,30 @@ class UserStats extends Component {
     const { followerCount, followingCount, postCount } = this.props;
     return (
       <Container>
-        <View>
+        <ValueLabelContainer>
           <Value>
-            {postCount}
+            {abbreviateLargeNumber(postCount)}
           </Value>
           <Label>
             {'posts'}
           </Label>
-        </View>
-        <View>
+        </ValueLabelContainer>
+        <ValueLabelContainer>
           <Value>
-            {followingCount}
+            {abbreviateLargeNumber(followingCount)}
           </Value>
           <Label>
-            {'Following'}
+            {'following'}
           </Label>
-        </View>
-        <View>
+        </ValueLabelContainer>
+        <ValueLabelContainer>
           <Value>
-            {followerCount}
+            {abbreviateLargeNumber(followerCount)}
           </Value>
           <Label>
             {'followers'}
           </Label>
-        </View>
+        </ValueLabelContainer>
       </Container>
     );
   }

@@ -272,11 +272,9 @@ class UserScreen extends Component {
     const userReputation = _.has(userDetails, 'reputation')
       ? steem.formatter.reputation(userDetails.reputation)
       : 0;
-
     const followerCount = _.get(userFollowCount, 'follower_count', 0);
     const followingCount = _.get(userFollowCount, 'following_count', 0);
-
-    console.log('RENDER USER SCREEN', usersFollowCount);
+    const postCount = _.get(userDetails, 'post_count', 0);
 
     return (
       <Container>
@@ -311,12 +309,9 @@ class UserScreen extends Component {
           />
         </Modal>
         <ScrollView>
-          <UserHeader
-            username={username}
-            hasCover={hasCover}
-            userReputation={userReputation}
-          />
+          <UserHeader username={username} hasCover={hasCover} userReputation={userReputation} />
           <UserStats
+            postCount={postCount}
             followerCount={followerCount}
             followingCount={followingCount}
           />
