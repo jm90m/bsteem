@@ -19,6 +19,10 @@ import {
   getUsersComments,
   getUsersBlog,
   getUsersFollowCount,
+  getLoadingUsersBlog,
+  getLoadingUsersComments,
+  getLoadingUsersDetails,
+  getLoadingUsersFollowCount,
 } from 'state/rootReducer';
 import PostPreview from 'components/post-preview/PostPreview';
 import CommentsPreview from 'components/user/CommentsPreview';
@@ -27,6 +31,10 @@ import UserMenu from 'components/user/UserMenu';
 
 const Container = styled.View`
   flex: 1;
+`;
+
+const Loading = styled.ActivityIndicator`
+  margin-top: 10px;
 `;
 
 const Header = styled.View`
@@ -69,6 +77,10 @@ const mapStateToProps = state => ({
   usersComments: getUsersComments(state),
   usersBlog: getUsersBlog(state),
   usersFollowCount: getUsersFollowCount(state),
+  loadingUsersBlog: getLoadingUsersBlog(state),
+  loadingUsersComments: getLoadingUsersComments(state),
+  loadingUsersDetails: getLoadingUsersDetails(state),
+  loadingUsersFollowCount: getLoadingUsersFollowCount(state),
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -94,8 +106,6 @@ class UserScreen extends Component {
     super(props);
 
     this.state = {
-      userPostsDataSource: ds.cloneWithRows([]),
-      userCommentsDataSource: ds.cloneWithRows([]),
       menuVisible: false,
       currentMenuOption: userMenuConstants.BLOG,
     };
@@ -106,6 +116,8 @@ class UserScreen extends Component {
     this.handleChangeUserMenu = this.handleChangeUserMenu.bind(this);
     this.renderUserPostRow = this.renderUserPostRow.bind(this);
     this.renderUserCommentsRow = this.renderUserCommentsRow.bind(this);
+    this.navigateBack = this.navigateBack.bind(this);
+    this.fetchMoreUserComments = this.fetchMoreUserComments.bind(this);
   }
 
   componentDidMount() {
@@ -122,12 +134,12 @@ class UserScreen extends Component {
 
     if (_.isEmpty(userBlog)) {
       const query = { tag: username, limit: 10 };
-      this.props.fetchUserBlog(username, query);
+      this.props.fetchUserBlog(username, query, true);
     }
 
     if (_.isEmpty(userComments)) {
       const query = { start_author: username, limit: 10 };
-      this.props.fetchUserComments(username, query);
+      this.props.fetchUserComments(username, query, true);
     }
 
     if (_.isEmpty(userFollowCount)) {
@@ -135,37 +147,24 @@ class UserScreen extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
-    const { username } = this.props.navigation.state.params;
-    const { usersComments, usersBlog } = nextProps;
-    const userComments = usersComments[username] || [];
-    const userBlog = usersBlog[username] || [];
-    this.setState({
-      userPostsDataSource: ds.cloneWithRows(userBlog),
-      userCommentsDataSource: ds.cloneWithRows(userComments),
-    });
-  }
-
   fetchMoreUserPosts() {
     const { username } = this.props.navigation.state.params;
-    // const { userPosts } = this.state;
-    // const lastPost = _.last(userPosts);
-    // if (!_.isEmpty(lastPost)) {
-    //   const query = {
-    //     tag: username,
-    //     limit: 11,
-    //     start_permlink: lastPost.permlink,
-    //     start_author: lastPost.author,
-    //   };
-    //
-    //   API.getDiscussionsByBlog(query).then(result => {
-    //     const posts = this.state.userPosts.concat(_.slice(result, 1, result.length - 1));
-    //     this.setState({
-    //       userPostsDataSource: ds.cloneWithRows(posts),
-    //       userPosts: posts,
-    //     });
-    //   });
-    // }
+    const { usersBlog, usersDetails } = this.props;
+    const userBlog = usersBlog[username];
+
+    if (_.isEmpty(userBlog)) {
+      const query = { tag: username, limit: 10 };
+      this.props.fetchUserBlog(username, query, true);
+    } else {
+      const lastPost = _.last(userBlog);
+      const query = {
+        tag: username,
+        start_author: lastPost.author,
+        start_permlink: lastPost.permlink,
+        limit: 10,
+      };
+      this.props.fetchUserBlog(username, query);
+    }
   }
 
   setMenuVisible(menuVisible) {
@@ -174,6 +173,21 @@ class UserScreen extends Component {
 
   handleHideMenu() {
     this.setMenuVisible(false);
+  }
+
+  fetchMoreUserComments() {
+    const { username } = this.props.navigation.state.params;
+    const { usersComments } = this.props;
+    const userComments = usersComments[username];
+
+    if (_.isEmpty(usersComments)) {
+      const query = { start_author: username, limit: 10 };
+      this.props.fetchUserComments(username, query, true);
+    } else {
+      const lastComment = _.last(userComments);
+      const query = { start_author: username, limit: 10, start_permlink: lastComment.permlink };
+      this.props.fetchUserComments(username, query);
+    }
   }
 
   handleChangeUserMenu(option) {
@@ -191,24 +205,29 @@ class UserScreen extends Component {
     return <CommentsPreview commentData={rowData} navigation={this.props.navigation} />;
   }
 
-  navigateBack = () => this.props.navigation.goBack();
+  navigateBack() {
+    this.props.navigation.goBack();
+  }
 
   renderUserContent() {
-    const { currentMenuOption, userPostsDataSource, userCommentsDataSource } = this.state;
+    const { currentMenuOption } = this.state;
     const { username } = this.props.navigation.state.params;
     const { usersComments, usersBlog } = this.props;
     const userComments = usersComments[username] || [];
     const userBlog = usersBlog[username] || [];
-    console.log('RENDER USER CONTENT', currentMenuOption.id, userComments, userBlog);
+
     switch (currentMenuOption.id) {
       case userMenuConstants.COMMENTS.id:
         return (
           <StyledListView
-            dataSource={userCommentsDataSource}
+            dataSource={ds.cloneWithRows(userComments)}
             renderRow={this.renderUserCommentsRow}
             enableEmptySections
+            onEndReached={this.fetchMoreUserComments}
           />
         );
+      case userMenuConstants.FOLLOWERS.id:
+        return <Text>Followers</Text>;
       case userMenuConstants.FOLLOWING.id:
         return <Text>Following</Text>;
       case userMenuConstants.WALLET.id:
@@ -217,12 +236,26 @@ class UserScreen extends Component {
       default:
         return (
           <StyledListView
-            dataSource={userPostsDataSource}
+            dataSource={ds.cloneWithRows(userBlog)}
             renderRow={this.renderUserPostRow}
             enableEmptySections
             onEndReached={this.fetchMoreUserPosts}
           />
         );
+    }
+  }
+
+  renderLoader() {
+    const { currentMenuOption } = this.state;
+    const { loadingUsersComments, loadingUsersBlog } = this.props;
+
+    switch (currentMenuOption.id) {
+      case userMenuConstants.COMMENTS.id:
+        return loadingUsersComments && <Loading color={COLORS.BLUE.MARINER} size="large" />;
+      case userMenuConstants.BLOG.id:
+        return loadingUsersBlog && <Loading color={COLORS.BLUE.MARINER} size="large" />;
+      default:
+        return null;
     }
   }
 
@@ -237,6 +270,8 @@ class UserScreen extends Component {
     const userReputation = _.has(userDetails, 'reputation')
       ? steem.formatter.reputation(userDetails.reputation)
       : 0;
+
+    console.log('RENDER USER SCREEN', userDetails);
 
     return (
       <Container>
@@ -273,6 +308,7 @@ class UserScreen extends Component {
         <ScrollView>
           <UserHeader username={username} hasCover={hasCover} userReputation={userReputation} />
           {this.renderUserContent()}
+          {this.renderLoader()}
         </ScrollView>
       </Container>
     );

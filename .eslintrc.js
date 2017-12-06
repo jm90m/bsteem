@@ -20,5 +20,8 @@ module.exports = {
     'import/extensions': 'off',
     'import/no-extraneous-dependencies': 'off',
     'generator-star-spacing': 'off',
+    'react/jsx-indent-props': 'off',
+    'react/jsx-closing-bracket-location': 'off',
+    'indent': 'off',
   },
 };

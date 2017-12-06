@@ -16,3 +16,8 @@ export const getUsersDetails = state => fromUsers.getUsersDetails(state.users);
 export const getUsersComments = state => fromUsers.getUsersComments(state.users);
 export const getUsersBlog = state => fromUsers.getUsersBlog(state.users);
 export const getUsersFollowCount = state => fromUsers.getUsersFollowCount(state.users);
+export const getLoadingUsersBlog = state => fromUsers.getLoadingUsersBlog(state.users);
+export const getLoadingUsersComments = state => fromUsers.getLoadingUsersComments(state.users);
+export const getLoadingUsersDetails = state => fromUsers.getLoadingUsersDetails(state.users);
+export const getLoadingUsersFollowCount = state =>
+  fromUsers.getLoadingUsersFollowCount(state.users);

@@ -43,6 +43,8 @@ class Footer extends Component {
     const { active_votes, children } = postData;
     const upVotes = getUpvotes(active_votes).sort(sortVotes);
     const payout = calculatePayout(postData);
+    const displayedPayout = payout.cashoutInTime ? payout.potentialPayout : payout.pastPayouts;
+    const formattedDisplayedPayout = parseFloat(displayedPayout).toFixed(2);
 
     return (
       <Container>
@@ -55,7 +57,7 @@ class Footer extends Component {
         />
         <FooterValue>{children}</FooterValue>
         <MaterialCommunityIcons name="tumblr-reblog" size={24} color={COLORS.BLUE.LINK_WATER} />
-        <Payout>${payout.cashoutInTime ? payout.potentialPayout : payout.pastPayouts}</Payout>
+        <Payout>${formattedDisplayedPayout}</Payout>
       </Container>
     );
   }

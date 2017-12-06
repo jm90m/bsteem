@@ -1,10 +1,11 @@
-import { takeLatest, call, put } from 'redux-saga/effects';
+import { takeLatest, call, put, all } from 'redux-saga/effects';
 import API from 'api/api';
 import {
   FETCH_USER,
   FETCH_USER_COMMENTS,
   FETCH_USER_BLOG,
   FETCH_USER_FOLLOW_COUNT,
+  FETCH_ALL_USER_DETAILS,
 } from 'state/actions/actionTypes';
 import * as userActions from 'state/actions/usersActions';
 
@@ -20,6 +21,7 @@ const fetchUser = function*(action) {
 
 const fetchUserBlog = function*(action) {
   try {
+    console.log('FETCH USER BLOG');
     const { username, query } = action.payload;
     const result = yield call(API.getDiscussionsByBlog, query);
     const payload = {
@@ -28,6 +30,7 @@ const fetchUserBlog = function*(action) {
     };
     yield put(userActions.fetchUserBlog.success(payload));
   } catch (error) {
+    console.log('fetchUserBlog- ERROR', error);
     yield put(userActions.fetchUserBlog.fail(error));
   }
 };
@@ -42,6 +45,7 @@ const fetchUserComments = function*(action) {
     };
     yield put(userActions.fetchUserComments.success(payload));
   } catch (error) {
+    console.log(error);
     yield put(userActions.fetchUserComments.fail(error));
   }
 };
@@ -60,6 +64,15 @@ const fetchUserFollowCount = function*(action) {
   }
 };
 
+const fetchAllUserDetails = function*(action) {
+  try {
+    // const { username } = action.payload;
+    // yield all([
+    //   call(fetchUserComments({ }))
+    // ])
+  } catch (error) {}
+};
+
 export const watchFetchUser = function*() {
   yield takeLatest(FETCH_USER.ACTION, fetchUser);
 };
@@ -74,4 +87,8 @@ export const watchFetchUserBlog = function*() {
 
 export const watchFetchUserFollowCount = function*() {
   yield takeLatest(FETCH_USER_FOLLOW_COUNT.ACTION, fetchUserFollowCount);
+};
+
+export const watchFetchAllUserDetails = function*() {
+  yield takeLatest(FETCH_ALL_USER_DETAILS.ACTION, fetchAllUserDetails);
 };

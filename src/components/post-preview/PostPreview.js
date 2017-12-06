@@ -71,7 +71,7 @@ class PostPreview extends Component {
               <PreviewImage
                 style={{ height: null, width }}
                 source={{ uri: _.head(images) }}
-                resizeMode={Image.resizeMode.contain}
+                resizeMode={Image.resizeMode.cover}
               />}
             <BodyShort content={body} />
           </Touchable>
