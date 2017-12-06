@@ -28,6 +28,7 @@ import PostPreview from 'components/post-preview/PostPreview';
 import CommentsPreview from 'components/user/CommentsPreview';
 import UserHeader from 'components/user/UserHeader';
 import UserMenu from 'components/user/UserMenu';
+import UserStats from 'components/user/UserStats';
 
 const Container = styled.View`
   flex: 1;
@@ -260,18 +261,22 @@ class UserScreen extends Component {
   }
 
   render() {
-    const { usersDetails } = this.props;
+    const { usersDetails, usersFollowCount } = this.props;
     const { username } = this.props.navigation.state.params;
     const userDetails = usersDetails[username] || {};
     const userJsonMetaData = _.attempt(JSON.parse, userDetails.json_metadata);
     const userProfile = _.isError(userJsonMetaData) ? {} : userJsonMetaData.profile;
+    const userFollowCount = usersFollowCount[username];
     const hasCover = _.has(userProfile, 'cover_image');
     const { menuVisible, currentMenuOption } = this.state;
     const userReputation = _.has(userDetails, 'reputation')
       ? steem.formatter.reputation(userDetails.reputation)
       : 0;
 
-    console.log('RENDER USER SCREEN', userDetails);
+    const followerCount = _.get(userFollowCount, 'follower_count', 0);
+    const followingCount = _.get(userFollowCount, 'following_count', 0);
+
+    console.log('RENDER USER SCREEN', usersFollowCount);
 
     return (
       <Container>
@@ -306,7 +311,15 @@ class UserScreen extends Component {
           />
         </Modal>
         <ScrollView>
-          <UserHeader username={username} hasCover={hasCover} userReputation={userReputation} />
+          <UserHeader
+            username={username}
+            hasCover={hasCover}
+            userReputation={userReputation}
+          />
+          <UserStats
+            followerCount={followerCount}
+            followingCount={followingCount}
+          />
           {this.renderUserContent()}
           {this.renderLoader()}
         </ScrollView>

@@ -64,11 +64,13 @@ class UserHeader extends Component {
   static propTypes = {
     username: PropTypes.string,
     userReputation: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    hasCover: PropTypes.bool,
   };
 
   static defaultProps = {
     username: '',
     userReputation: '0',
+    hasCover: false,
   };
 
   constructor(props) {
