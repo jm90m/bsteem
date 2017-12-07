@@ -8,7 +8,7 @@ import { COLORS } from 'constants/styles';
 import HomeScreen from 'screens/HomeScreen';
 import TagsScreen from 'screens/TagsScreen';
 import LoginScreen from 'screens/LoginScreen';
-import UserScreen from 'screens/stack-screens/UserScreen';
+import UserScreen from 'screens/user-screen/UserScreen';
 import PostScreen from 'screens/stack-screens/PostScreen';
 import FeedScreen from 'screens/stack-screens/FeedScreen';
 import CommentsScreen from 'screens/stack-screens/CommentsScreen';
@@ -45,6 +45,9 @@ const TagsNavigator = StackNavigator(
     },
     [navigation.FEED]: {
       screen: FeedScreen,
+    },
+    [navigation.USER]: {
+      screen: UserScreen,
     },
   },
   {

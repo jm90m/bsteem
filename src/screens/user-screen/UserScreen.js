@@ -57,7 +57,7 @@ const BackTouchable = styled.TouchableOpacity`
 `;
 
 const TouchableMenu = styled.TouchableOpacity`
-  flex-direction: row;
+  padding: 5px;
 `;
 
 const StyledListView = styled.ListView`

@@ -20,9 +20,6 @@ const UserContainer = styled.View`
 
 const Username = styled.Text``;
 
-
-
-
 const mapStateToProps = state => ({
   accessToken: getAccessToken(state),
   expiresIn: getExpiresIn(state),
@@ -85,10 +82,9 @@ class LoginScreen extends Component {
         <UserContainer>
           <Username>{this.props.username}</Username>
         </UserContainer>
-      )
+      );
     }
   }
-
 
   render() {
     return (
