@@ -9,6 +9,7 @@ const MenuWrapper = styled.View`
   border-top-width: 1px;
   border-radius: 4px;
   background-color: ${COLORS.WHITE.WHITE};
+  border-top-color: ${COLORS.WHITE.GAINSBORO};
   z-index: 1;
 `;
 

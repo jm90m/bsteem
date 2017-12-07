@@ -7,9 +7,9 @@ import MenuModalButton from '../common/menu/MenuModalButton';
 import MenuWrapper from '../common/menu/MenuWrapper';
 
 const Container = styled.View`
-  flex: 1;
-  flex-direction: column-reverse;
   align-items: center;
+  flex-direction: column-reverse;
+  flex: 1;
 `;
 
 const MenuText = styled.Text`
