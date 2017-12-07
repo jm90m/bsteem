@@ -1,6 +1,6 @@
+import { takeLatest, call, put } from 'redux-saga/effects';
 import { FETCH_COMMENTS } from '../actions/actionTypes';
 import API from '../../api/api';
-import { takeLatest, call, put } from 'redux-saga/effects';
 import { fetchCommentsSuccess, fetchCommentsFail } from '../actions/postActions';
 
 /**

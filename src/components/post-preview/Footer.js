@@ -48,7 +48,6 @@ class Footer extends Component {
     const formattedDisplayedPayout = _.isUndefined(displayedPayout)
       ? '0.00'
       : parseFloat(displayedPayout).toFixed(2);
-    console.log(displayedPayout);
 
     return (
       <Container>

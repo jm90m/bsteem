@@ -23,9 +23,16 @@ class Avatar extends Component {
     size: 34,
   };
 
-  state = {
-    imageUrl: defaultImage,
-  };
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      imageUrl: defaultImage,
+    };
+
+    this.handleOnError = this.handleOnError.bind(this);
+    this.setImageUrl = this.setImageUrl.bind(this);
+  }
 
   componentDidMount() {
     const { username, size } = this.props;
@@ -38,18 +45,17 @@ class Avatar extends Component {
       this.setImageUrl(nextProps.username, nextProps.size);
     }
   }
-
-  handleOnError = () => {
-    this.setState({
-      imageUrl: defaultImage,
-    });
-  };
-
-  setImageUrl = (username, size) => {
+  setImageUrl(username, size) {
     this.setState({
       imageUrl: getAvatarImageUrl(username, size),
     });
-  };
+  }
+
+  handleOnError() {
+    this.setState({
+      imageUrl: defaultImage,
+    });
+  }
 
   render() {
     const { size } = this.props;

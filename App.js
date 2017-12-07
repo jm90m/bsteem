@@ -1,7 +1,7 @@
 import React from 'react';
 import { View } from 'react-native';
 import { TabNavigator, StackNavigator } from 'react-navigation';
-import sc2 from './src/api/sc2';
+import sc2 from 'api/sc2';
 import { Provider } from 'react-redux';
 import Expo from 'expo';
 import { COLORS } from 'constants/styles';
@@ -13,22 +13,23 @@ import PostScreen from 'screens/stack-screens/PostScreen';
 import FeedScreen from 'screens/stack-screens/FeedScreen';
 import CommentsScreen from 'screens/stack-screens/CommentsScreen';
 import configureStore from 'state/configureStore';
+import * as navigation from 'constants/navigation';
 
 const HomeNavigator = StackNavigator(
   {
-    HOME: {
+    [navigation.HOME]: {
       screen: HomeScreen,
     },
-    POST: {
+    [navigation.POST]: {
       screen: PostScreen,
     },
-    FEED: {
+    [navigation.FEED]: {
       screen: FeedScreen,
     },
-    COMMENTS: {
+    [navigation.COMMENTS]: {
       screen: CommentsScreen,
     },
-    USER: {
+    [navigation.USER]: {
       screen: UserScreen,
     },
   },
@@ -39,10 +40,10 @@ const HomeNavigator = StackNavigator(
 
 const TagsNavigator = StackNavigator(
   {
-    TAGS: {
+    [navigation.TAGS]: {
       screen: TagsScreen,
     },
-    FEED: {
+    [navigation.FEED]: {
       screen: FeedScreen,
     },
   },
@@ -53,13 +54,13 @@ const TagsNavigator = StackNavigator(
 
 const AppNavigation = TabNavigator(
   {
-    HOME: {
+    [navigation.HOME]: {
       screen: HomeNavigator,
     },
-    TAGS: {
+    [navigation.TAGS]: {
       screen: TagsNavigator,
     },
-    LOGIN: {
+    [navigation.LOGIN]: {
       screen: LoginScreen,
     },
   },

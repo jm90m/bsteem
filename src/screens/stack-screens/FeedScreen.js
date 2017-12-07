@@ -38,6 +38,10 @@ const TouchableMenu = styled.TouchableOpacity`
   flex-direction: row;
 `;
 
+const Loading = styled.ActivityIndicator`
+  padding: 10px;
+`;
+
 const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
 
 class FeedScreen extends Component {
@@ -108,9 +112,7 @@ class FeedScreen extends Component {
 
   handleHideMenu = () => this.setMenuVisible(false);
 
-  renderRow = rowData => {
-    return <PostPreview postData={rowData} navigation={this.props.navigation} />;
-  };
+  renderRow = rowData => <PostPreview postData={rowData} navigation={this.props.navigation} />;
 
   handleSortPost = filter => {
     this.setState(
@@ -125,7 +127,7 @@ class FeedScreen extends Component {
   renderLoadingOrEmptyText = () => {
     const { dataSource, loading } = this.state;
     if (loading) {
-      return <Text>Loading...</Text>;
+      return <Loading color={COLORS.BLUE.MARINER} size="large" />;
     } else if (dataSource.getRowCount() === 0) {
       return <Text>Feed is currently empty</Text>;
     }
@@ -160,7 +162,7 @@ class FeedScreen extends Component {
           <StyledListView
             dataSource={this.state.dataSource}
             renderRow={this.renderRow}
-            enableEmptySections={true}
+            enableEmptySections
             onEndReached={this.fetchMorePosts}
           />}
         {this.renderLoadingOrEmptyText()}

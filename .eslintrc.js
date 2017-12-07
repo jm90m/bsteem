@@ -23,5 +23,6 @@ module.exports = {
     'react/jsx-indent-props': 'off',
     'react/jsx-closing-bracket-location': 'off',
     'indent': 'off',
+    'arrow-parens': 'off',
   },
 };

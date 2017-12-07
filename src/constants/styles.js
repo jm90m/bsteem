@@ -9,6 +9,7 @@ export const COLORS = {
 
   GREY: {
     GONDOLA: '#353535',
+    CHARCOAL: '#454545',
   },
 
   WHITE: {
@@ -42,6 +43,10 @@ export const MATERIAL_ICONS = {
   following: 'supervisor-account',
   wallet: 'account-balance-wallet',
   activity: 'grade',
+
+  // user profile
+  location: 'location-on',
+  reply: 'reply',
 };
 
 export const MATERIAL_COMMUNITY_ICONS = {
@@ -50,6 +55,8 @@ export const MATERIAL_COMMUNITY_ICONS = {
   menuVertical: 'dots-vertical',
   chevronDown: 'chevron-down',
   active: 'run-fast',
+  linkVariant: 'link-variant',
+  clock: 'clock',
 };
 
 export const ICON_SIZES = {

@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components/native';
 import { View } from 'react-native';
 import steem from 'steem';
@@ -6,15 +7,11 @@ import moment from 'moment';
 import { COLORS } from 'constants/styles';
 import Tag from 'components/post/Tag';
 import ReputationScore from 'components/post/ReputationScore';
+import Avatar from 'components/common/Avatar';
 
 const Container = styled.View`
   flex-direction: row;
   padding: 16px;
-`;
-
-const Avatar = styled.Image`
-  height: 40px;
-  width: 40px;
 `;
 
 const Author = styled.View`
@@ -36,6 +33,11 @@ const PostCreated = styled.Text`
 const Touchable = styled.TouchableOpacity``;
 
 class Header extends Component {
+  static propTypes = {
+    navigation: PropTypes.shape().isRequired,
+    postData: PropTypes.shape().isRequired,
+  };
+
   handleUserNavigation = () => {
     const { navigation, postData } = this.props;
     const { author } = postData;
@@ -56,7 +58,7 @@ class Header extends Component {
     const { category, author, author_reputation, created } = postData;
     return (
       <Container>
-        <Avatar source={{ uri: `https://img.busy.org/@${author}?s=40` }} />
+        <Avatar username={author} size={40} />
         <HeaderContents>
           <Author>
             <View>

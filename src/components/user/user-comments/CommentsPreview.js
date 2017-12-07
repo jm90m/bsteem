@@ -2,9 +2,9 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components/native';
 import { COLORS } from 'constants/styles';
-import Header from '../post-preview/Header';
+import Header from '../../post-preview/Header';
 import CommentFooter from './CommentsFooter';
-import BodyShort from '../post-preview/BodyShort';
+import BodyShort from '../../post-preview/BodyShort';
 
 const Container = styled.View`
   background-color: ${COLORS.WHITE.WHITE};
@@ -14,17 +14,37 @@ const Container = styled.View`
   border-width: 2px;
 `;
 
-const Content = styled.View`
-  padding: 10px;
-  padding-left: 0;
-  padding-right: 0;
-`;
-
 const Title = styled.Text`
-  padding: 5px;
   padding-bottom: 10px;
   font-weight: 700;
   font-size: 20px;
+  align-items: center;
+  flex-wrap: wrap;
+  flex: 1;
+`;
+
+const TitleContainer = styled.View`
+  flex-direction: row;
+`;
+
+const CommentTag = styled.View`
+  background-color: ${COLORS.GREY.GONDOLA};
+  padding: 3px;
+  width: 30px;
+  height: 20px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  margin-top: 3px;
+  margin-right: 5px;
+`;
+
+const CommentTagText = styled.Text`
+  color: ${COLORS.WHITE.WHITE};
+  line-height: 20px;
+  font-size: 12px;
+  justify-content: center;
+  border-radius: 4px;
 `;
 
 class CommentsPreview extends Component {
@@ -43,7 +63,14 @@ class CommentsPreview extends Component {
     return (
       <Container>
         <Header postData={commentData} navigation={navigation} />
-        <Title>{commentData.root_title}</Title>
+        <TitleContainer>
+          <CommentTag>
+            <CommentTagText>{'RE'}</CommentTagText>
+          </CommentTag>
+          <Title>
+            {commentData.root_title}
+          </Title>
+        </TitleContainer>
         <BodyShort content={commentData.body} />
         <CommentFooter commentData={commentData} />
       </Container>

@@ -1,14 +1,9 @@
 import React, { Component } from 'react';
-import { ListView, View, Modal } from 'react-native';
+import { ListView, View, Modal, NetInfo } from 'react-native';
 import { connect } from 'react-redux';
 import styled from 'styled-components/native';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
-import {
-  fetchTrending,
-  fetchMoreTrending,
-  fetchDiscussions,
-  fetchMoreDiscussions,
-} from '../state/actions/homeActions';
+import { fetchDiscussions, fetchMoreDiscussions } from '../state/actions/homeActions';
 import { MATERIAL_COMMUNITY_ICONS, COLORS } from '../constants/styles';
 import { TRENDING } from '../constants/feedFilters';
 import PostPreview from '../components/post-preview/PostPreview';
@@ -91,6 +86,14 @@ class HomeScreen extends Component {
   }
 
   componentDidMount() {
+    NetInfo.getConnectionInfo().then(connectionInfo => {
+      console.log(
+        'Initial, type: ' +
+          connectionInfo.type +
+          ', effectiveType: ' +
+          connectionInfo.effectiveType,
+      );
+    });
     this.props.fetchDiscussions(this.state.currentFilter);
   }
 
@@ -130,7 +133,7 @@ class HomeScreen extends Component {
         <StyledListView
           dataSource={dataSource}
           renderRow={this.renderRow}
-          enableEmptySections={true}
+          enableEmptySections
           onEndReached={this.onEndReached}
         />
       </View>

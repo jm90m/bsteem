@@ -25,10 +25,11 @@ import {
   getLoadingUsersFollowCount,
 } from 'state/rootReducer';
 import PostPreview from 'components/post-preview/PostPreview';
-import CommentsPreview from 'components/user/CommentsPreview';
+import CommentsPreview from 'components/user/user-comments/CommentsPreview';
 import UserHeader from 'components/user/UserHeader';
 import UserMenu from 'components/user/UserMenu';
 import UserStats from 'components/user/UserStats';
+import UserProfile from 'components/user/user-profile/UserProfile';
 
 const Container = styled.View`
   flex: 1;
@@ -315,6 +316,7 @@ class UserScreen extends Component {
             followerCount={followerCount}
             followingCount={followingCount}
           />
+          <UserProfile userProfile={userProfile} />
           {this.renderUserContent()}
           {this.renderLoader()}
         </ScrollView>

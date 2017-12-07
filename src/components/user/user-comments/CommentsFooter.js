@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components/native';
+import _ from 'lodash';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from 'constants/styles';
 import { sortVotes } from 'util/sortUtils';
@@ -43,6 +44,10 @@ class CommentsFooter extends Component {
     const { active_votes, children } = commentData;
     const upVotes = getUpvotes(active_votes).sort(sortVotes);
     const payout = calculatePayout(commentData);
+    const displayedPayout = payout.cashoutInTime ? payout.potentialPayout : payout.pastPayouts;
+    const formattedDisplayedPayout = _.isUndefined(displayedPayout)
+      ? '0.00'
+      : parseFloat(displayedPayout).toFixed(2);
 
     return (
       <Container>
@@ -54,7 +59,7 @@ class CommentsFooter extends Component {
           color={COLORS.BLUE.LINK_WATER}
         />
         <FooterValue>{children}</FooterValue>
-        <Payout>${payout.cashoutInTime ? payout.potentialPayout : payout.pastPayouts}</Payout>
+        <Payout>${formattedDisplayedPayout}</Payout>
       </Container>
     );
   }
