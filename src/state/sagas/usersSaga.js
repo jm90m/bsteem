@@ -1,4 +1,4 @@
-import { takeLatest, call, put, all } from 'redux-saga/effects';
+import { takeEvery, takeLatest, call, put, all } from 'redux-saga/effects';
 import API from 'api/api';
 import {
   FETCH_USER,
@@ -74,21 +74,21 @@ const fetchAllUserDetails = function*(action) {
 };
 
 export const watchFetchUser = function*() {
-  yield takeLatest(FETCH_USER.ACTION, fetchUser);
+  yield takeEvery(FETCH_USER.ACTION, fetchUser);
 };
 
 export const watchFetchUserComments = function*() {
-  yield takeLatest(FETCH_USER_COMMENTS.ACTION, fetchUserComments);
+  yield takeEvery(FETCH_USER_COMMENTS.ACTION, fetchUserComments);
 };
 
 export const watchFetchUserBlog = function*() {
-  yield takeLatest(FETCH_USER_BLOG.ACTION, fetchUserBlog);
+  yield takeEvery(FETCH_USER_BLOG.ACTION, fetchUserBlog);
 };
 
 export const watchFetchUserFollowCount = function*() {
-  yield takeLatest(FETCH_USER_FOLLOW_COUNT.ACTION, fetchUserFollowCount);
+  yield takeEvery(FETCH_USER_FOLLOW_COUNT.ACTION, fetchUserFollowCount);
 };
 
 export const watchFetchAllUserDetails = function*() {
-  yield takeLatest(FETCH_ALL_USER_DETAILS.ACTION, fetchAllUserDetails);
+  yield takeEvery(FETCH_ALL_USER_DETAILS.ACTION, fetchAllUserDetails);
 };

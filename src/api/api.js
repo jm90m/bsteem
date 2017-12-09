@@ -1,6 +1,18 @@
 import steem from 'steem';
 import * as feedFilters from 'constants/feedFilters';
 
+async function sendRequest(url, requestParams) {
+  let response = await fetch(url, requestParams);
+  let result;
+
+  try {
+    result = await response.json();
+  } catch (e) {
+    result = { error: e };
+  }
+  return result;
+}
+
 class API {
   static async getTrending(query) {
     return steem.api.getDiscussionsByTrendingAsync(query);
@@ -42,7 +54,11 @@ class API {
   }
 
   static async getFollowCount(username) {
-    return steem.api.getFollowCountAsync(username)
+    return steem.api.getFollowCountAsync(username);
+  }
+
+  static async getAskSteemSearch(search) {
+    return sendRequest(`https://api.asksteem.com/search?q=${search}`);
   }
 }
 

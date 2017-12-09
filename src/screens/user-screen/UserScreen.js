@@ -57,6 +57,9 @@ const BackTouchable = styled.TouchableOpacity`
 `;
 
 const TouchableMenu = styled.TouchableOpacity`
+`;
+
+const TouchableMenuContainer = styled.View`
   padding: 5px;
 `;
 
@@ -147,6 +150,11 @@ class UserScreen extends Component {
     if (_.isEmpty(userFollowCount)) {
       this.props.fetchUserFollowCount(username);
     }
+  }
+
+  componentWillReceiveProps(nextProps, nextState) {
+    console.log('USER SCREEN WILL RECEIVE PROPS');
+    console.log(nextProps);
   }
 
   fetchMoreUserPosts() {
@@ -292,10 +300,12 @@ class UserScreen extends Component {
             <CurrentUserDisplayText>{currentMenuOption.label}</CurrentUserDisplayText>
           </CurrentUserDisplay>
           <TouchableMenu onPress={() => this.setMenuVisible(!menuVisible)}>
-            <MaterialCommunityIcons
-              size={ICON_SIZES.menuIcon}
-              name={MATERIAL_COMMUNITY_ICONS.menuVertical}
-            />
+            <TouchableMenuContainer>
+              <MaterialCommunityIcons
+                size={ICON_SIZES.menuIcon}
+                name={MATERIAL_COMMUNITY_ICONS.menuVertical}
+              />
+            </TouchableMenuContainer>
           </TouchableMenu>
         </Header>
         <Modal

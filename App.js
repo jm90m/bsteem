@@ -6,30 +6,30 @@ import { Provider } from 'react-redux';
 import Expo from 'expo';
 import { COLORS } from 'constants/styles';
 import HomeScreen from 'screens/HomeScreen';
-import TagsScreen from 'screens/TagsScreen';
+import SearchScreen from 'screens/SearchScreen';
 import LoginScreen from 'screens/LoginScreen';
 import UserScreen from 'screens/user-screen/UserScreen';
 import PostScreen from 'screens/stack-screens/PostScreen';
 import FeedScreen from 'screens/stack-screens/FeedScreen';
 import CommentsScreen from 'screens/stack-screens/CommentsScreen';
 import configureStore from 'state/configureStore';
-import * as navigation from 'constants/navigation';
+import * as navigationConstants from 'constants/navigation';
 
 const HomeNavigator = StackNavigator(
   {
-    [navigation.HOME]: {
+    [navigationConstants.HOME]: {
       screen: HomeScreen,
     },
-    [navigation.POST]: {
+    [navigationConstants.POST]: {
       screen: PostScreen,
     },
-    [navigation.FEED]: {
+    [navigationConstants.FEED]: {
       screen: FeedScreen,
     },
-    [navigation.COMMENTS]: {
+    [navigationConstants.COMMENTS]: {
       screen: CommentsScreen,
     },
-    [navigation.USER]: {
+    [navigationConstants.USER]: {
       screen: UserScreen,
     },
   },
@@ -40,13 +40,13 @@ const HomeNavigator = StackNavigator(
 
 const TagsNavigator = StackNavigator(
   {
-    [navigation.TAGS]: {
-      screen: TagsScreen,
+    [navigationConstants.TAGS]: {
+      screen: SearchScreen,
     },
-    [navigation.FEED]: {
+    [navigationConstants.FEED]: {
       screen: FeedScreen,
     },
-    [navigation.USER]: {
+    [navigationConstants.USER]: {
       screen: UserScreen,
     },
   },
@@ -57,13 +57,13 @@ const TagsNavigator = StackNavigator(
 
 const AppNavigation = TabNavigator(
   {
-    [navigation.HOME]: {
+    [navigationConstants.HOME]: {
       screen: HomeNavigator,
     },
-    [navigation.TAGS]: {
+    [navigationConstants.TAGS]: {
       screen: TagsNavigator,
     },
-    [navigation.LOGIN]: {
+    [navigationConstants.LOGIN]: {
       screen: LoginScreen,
     },
   },

@@ -3,15 +3,17 @@ import homeReducer, * as fromHome from './reducers/homeReducer';
 import authReducer, * as fromAuth from './reducers/authReducer';
 import commentsReducer, * as fromComments from './reducers/commentsReducer';
 import usersReducer, * as fromUsers from './reducers/usersReducer';
+import searchReducer, * as fromSearch from './reducers/searchReducer';
 
 export default combineReducers({
   home: homeReducer,
   auth: authReducer,
   comments: commentsReducer,
   users: usersReducer,
+  search: searchReducer,
 });
 
-// selectors
+// User Selectors
 export const getUsersDetails = state => fromUsers.getUsersDetails(state.users);
 export const getUsersComments = state => fromUsers.getUsersComments(state.users);
 export const getUsersBlog = state => fromUsers.getUsersBlog(state.users);
@@ -21,3 +23,7 @@ export const getLoadingUsersComments = state => fromUsers.getLoadingUsersComment
 export const getLoadingUsersDetails = state => fromUsers.getLoadingUsersDetails(state.users);
 export const getLoadingUsersFollowCount = state =>
   fromUsers.getLoadingUsersFollowCount(state.users);
+
+// Search Selectors
+export const getSearchLoading = state => fromSearch.getSearchLoading(state.search);
+export const getSearchResults = state => fromSearch.getSearchResults(state.search);
