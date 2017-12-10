@@ -38,9 +38,9 @@ const HomeNavigator = StackNavigator(
   },
 );
 
-const TagsNavigator = StackNavigator(
+const SearchNavigator = StackNavigator(
   {
-    [navigationConstants.TAGS]: {
+    [navigationConstants.SEARCH]: {
       screen: SearchScreen,
     },
     [navigationConstants.FEED]: {
@@ -60,8 +60,8 @@ const AppNavigation = TabNavigator(
     [navigationConstants.HOME]: {
       screen: HomeNavigator,
     },
-    [navigationConstants.TAGS]: {
-      screen: TagsNavigator,
+    [navigationConstants.SEARCH]: {
+      screen: SearchNavigator,
     },
     [navigationConstants.LOGIN]: {
       screen: LoginScreen,
