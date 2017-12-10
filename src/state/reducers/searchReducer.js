@@ -7,6 +7,12 @@ const INITIAL_STATE = {
   searchResults: [],
 };
 
+const defaultInitialSearchPage = {
+  current: 1,
+  has_next: false,
+  has_previous: false,
+};
+
 export default function(state = INITIAL_STATE, action) {
   switch (action.type) {
     case SEARCH_ASK_STEEM.ACTION:
@@ -18,10 +24,11 @@ export default function(state = INITIAL_STATE, action) {
     case SEARCH_ASK_STEEM.SUCCESS: {
       console.log('SEARCH_ASK_STEEM.SUCCESS');
       console.log(action.payload);
+      debugger;
       const results = _.get(action.payload, 'results', []);
+      const pages = _.get(action.payload, 'pages', defaultInitialSearchPage);
       console.log('SEARCH RESULTS', results);
       return {
-        ...state,
         searchResults: results,
         loading: false,
       };

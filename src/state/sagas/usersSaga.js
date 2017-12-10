@@ -92,3 +92,4 @@ export const watchFetchUserFollowCount = function*() {
 export const watchFetchAllUserDetails = function*() {
   yield takeEvery(FETCH_ALL_USER_DETAILS.ACTION, fetchAllUserDetails);
 };
+

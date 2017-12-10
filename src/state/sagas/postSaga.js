@@ -45,3 +45,5 @@ const fetchComments = function*(action) {
 export const watchFetchComments = function*() {
   yield takeLatest(FETCH_COMMENTS.PENDING, fetchComments);
 };
+
+export default null;

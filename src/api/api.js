@@ -58,7 +58,7 @@ class API {
   }
 
   static async getAskSteemSearch(search) {
-    return sendRequest(`https://api.asksteem.com/search?q=${search}`);
+    return sendRequest(`https://api.asksteem.com/search?q=${search}&types=user,post`);
   }
 }
 
