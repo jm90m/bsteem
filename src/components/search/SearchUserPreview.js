@@ -39,9 +39,8 @@ class SearchUserPreview extends Component {
   }
 
   handleNavigateToUserScreen() {
-    const { username, handleNavigateToUserScreen } = this.props;
-
-    handleNavigateToUserScreen(username);
+    const { username } = this.props;
+    this.props.handleNavigateToUserScreen(username);
   }
 
   render() {

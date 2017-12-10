@@ -112,6 +112,7 @@ class SearchScreen extends Component {
             summary={rowData.summary}
             tags={rowData.tags}
             title={rowData.title}
+            handleNavigateToUserScreen={this.handleNavigateToUserScreen}
           />
         );
       }
