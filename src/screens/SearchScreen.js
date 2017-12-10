@@ -10,6 +10,8 @@ import { fetchTags } from 'state/actions/homeActions';
 import { searchAskSteem } from 'state/actions/searchActions';
 import { COLORS } from 'constants/styles';
 import { getSearchResults, getSearchLoading } from 'state/rootReducer';
+import SearchPostPreview from 'components/search/SearchPostPreview';
+import SearchUserPreview from '../components/search/SearchUserPreview';
 
 const Container = styled.View`
   flex: 1;
@@ -18,15 +20,8 @@ const Container = styled.View`
 
 const ScrollView = styled.ScrollView``;
 
-const Tag = styled.Text`
-`;
-
 const Loading = styled.ActivityIndicator`
   margin-top: 10px;
-`;
-
-const TouchableTag = styled.TouchableOpacity`
-  padding: 5px;
 `;
 
 const SearchResult = styled.View``;
@@ -50,6 +45,11 @@ class SearchScreen extends Component {
     fetchTags: PropTypes.func.isRequired,
     searchAskSteem: PropTypes.func.isRequired,
     searchLoading: PropTypes.bool.isRequired,
+    searchResults: PropTypes.array,
+  };
+
+  static defaultProps = {
+    searchResults: [],
   };
 
   static navigationOptions = {
@@ -80,15 +80,38 @@ class SearchScreen extends Component {
 
   renderSearchResults() {
     const { searchResults } = this.props;
-
-    return _.map(searchResults, result => (
-      <SearchResult key={`${result.author}/${result.permlink}`}>
-        <SearchResultText>{result.title}</SearchResultText>
-      </SearchResult>
-    ));
+    return _.map(searchResults, (result, index) => {
+      switch (result.type) {
+        case 'user': {
+          const userKey = `${result.name}${index}`;
+          return (
+            <SearchUserPreview
+              followersCount={result.followers_count}
+              followingCount={result.following_count}
+              key={userKey}
+              postCount={result.post_count}
+              username={result.name}
+            />
+          );
+        }
+        case 'post':
+          const postKey = `${result.author}/${result.permlink}`;
+          return (
+            <SearchPostPreview
+              author={result.author}
+              key={postKey}
+              summary={result.summary}
+              tags={result.tags}
+              title={result.title}
+            />
+          );
+        default:
+          return null;
+      }
+    });
   }
   render() {
-    const { tags, searchLoading, searchResults } = this.props;
+    const { searchLoading } = this.props;
     return (
       <Container>
         <SearchBar

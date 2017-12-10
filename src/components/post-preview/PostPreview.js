@@ -6,14 +6,14 @@ import * as navigationConstants from 'constants/navigation';
 import Footer from './Footer';
 import Header from './Header';
 import BodyShort from './BodyShort';
-
+import { COLORS } from 'constants/styles';
 const { width } = Dimensions.get('screen');
 
 const Container = styled.View`
-  background-color: #fff;
+  background-color: ${COLORS.WHITE.WHITE};
   margin-top: 5px;
   margin-bottom: 5px;
-  border-color: #eee;
+  border-color: ${COLORS.WHITE.WHITE_SMOKE};
   border-width: 2px;
 `;
 
