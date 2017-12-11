@@ -1,13 +1,16 @@
 import _ from 'lodash';
-import { SEARCH_ASK_STEEM } from 'state/actions/actionTypes';
+import { SEARCH_ASK_STEEM, SEARCH_FETCH_POST_DETAILS } from 'state/actions/actionTypes';
 
 const INITIAL_STATE = {
   loading: false,
   searchError: false,
   searchResults: [],
+  currentSearchPageOptions: {},
+  currentSearchedPosts: {}, //postID -> postDetails
+  searchFetchPostLoading: false,
 };
 
-const defaultInitialSearchPage = {
+const defaultInitialSearchPageOptions = {
   current: 1,
   has_next: false,
   has_previous: false,
@@ -22,15 +25,16 @@ export default function(state = INITIAL_STATE, action) {
         searchError: false,
       };
     case SEARCH_ASK_STEEM.SUCCESS: {
-      console.log('SEARCH_ASK_STEEM.SUCCESS');
-      console.log(action.payload);
-      debugger;
       const results = _.get(action.payload, 'results', []);
-      const pages = _.get(action.payload, 'pages', defaultInitialSearchPage);
-      console.log('SEARCH RESULTS', results);
+      const currentSearchPageOptions = _.get(
+        action.payload,
+        'pages',
+        defaultInitialSearchPageOptions,
+      );
       return {
         searchResults: results,
         loading: false,
+        currentSearchPageOptions,
       };
     }
     case SEARCH_ASK_STEEM.ERROR:
@@ -39,6 +43,30 @@ export default function(state = INITIAL_STATE, action) {
         loading: false,
         searchError: true,
       };
+
+    case SEARCH_FETCH_POST_DETAILS.ACTION:
+      return {
+        ...state,
+        searchFetchPostLoading: true,
+      };
+    case SEARCH_FETCH_POST_DETAILS.SUCCESS: {
+      const { author, permlink } = action.payload;
+      const postKey = `${author}/${permlink}`;
+
+      return {
+        ...state,
+        searchFetchPostLoading: false,
+        currentSearchedPosts: {
+          ...state.currentSearchedPosts,
+          [postKey]: action.payload,
+        },
+      };
+    }
+    case SEARCH_FETCH_POST_DETAILS.ERROR:
+      return {
+        ...state,
+        searchFetchPostLoading: false,
+      };
     default:
       return state;
   }
@@ -46,3 +74,5 @@ export default function(state = INITIAL_STATE, action) {
 
 export const getSearchLoading = state => state.loading;
 export const getSearchResults = state => state.searchResults;
+export const getCurrentSearchedPosts = state => state.currentSearchedPosts;
+export const getSearchFetchPostLoading = state => state.searchFetchPostLoading;

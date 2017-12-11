@@ -60,6 +60,10 @@ class API {
   static async getAskSteemSearch(search) {
     return sendRequest(`https://api.asksteem.com/search?q=${search}&types=user,post`);
   }
+
+  static async getContent(author, permlink) {
+    return steem.api.getContentAsync(author, permlink);
+  }
 }
 
 export const getAPIByFilter = filterId => {

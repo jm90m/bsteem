@@ -5,6 +5,8 @@ import sc2 from 'api/sc2';
 import { Provider } from 'react-redux';
 import Expo from 'expo';
 import { COLORS } from 'constants/styles';
+import * as navigationConstants from 'constants/navigation';
+import configureStore from 'state/configureStore';
 import HomeScreen from 'screens/HomeScreen';
 import SearchScreen from 'screens/SearchScreen';
 import LoginScreen from 'screens/LoginScreen';
@@ -12,8 +14,7 @@ import UserScreen from 'screens/user-screen/UserScreen';
 import PostScreen from 'screens/stack-screens/PostScreen';
 import FeedScreen from 'screens/stack-screens/FeedScreen';
 import CommentsScreen from 'screens/stack-screens/CommentsScreen';
-import configureStore from 'state/configureStore';
-import * as navigationConstants from 'constants/navigation';
+import SearchPostScreen from 'components/search/SearchPostScreen';
 
 const HomeNavigator = StackNavigator(
   {
@@ -48,6 +49,9 @@ const SearchNavigator = StackNavigator(
     },
     [navigationConstants.USER]: {
       screen: UserScreen,
+    },
+    [navigationConstants.SEARCH_POST]: {
+      screen: SearchPostScreen,
     },
   },
   {

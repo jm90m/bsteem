@@ -1,7 +1,8 @@
 import { SEARCH_ASK_STEEM } from 'state/actions/actionTypes';
 import { takeLatest, call, put } from 'redux-saga/effects';
-import { searchAskSteem } from 'state/actions/searchActions';
+import { searchAskSteem, searchFetchPostDetails } from 'state/actions/searchActions';
 import API from 'api/api';
+import { SEARCH_FETCH_POST_DETAILS } from '../actions/actionTypes';
 
 const fetchAskSteemSearchResults = function*(action) {
   try {
@@ -13,8 +14,22 @@ const fetchAskSteemSearchResults = function*(action) {
   }
 };
 
+const fetchSearchPostDetails = function*(action) {
+  try {
+    const { author, permlink } = action.payload;
+    const result = yield call(API.getContent, author, permlink);
+    yield put(searchFetchPostDetails.success(result));
+  } catch (error) {
+    yield put(searchFetchPostDetails.fail(error));
+  }
+};
+
 export const watchSearchAskSteem = function*() {
   yield takeLatest(SEARCH_ASK_STEEM.ACTION, fetchAskSteemSearchResults);
+};
+
+export const watchSearchFetchPostDetails = function*() {
+  yield takeLatest(SEARCH_FETCH_POST_DETAILS.ACTION, fetchSearchPostDetails);
 };
 
 export default null;

@@ -27,3 +27,6 @@ export const getLoadingUsersFollowCount = state =>
 // Search Selectors
 export const getSearchLoading = state => fromSearch.getSearchLoading(state.search);
 export const getSearchResults = state => fromSearch.getSearchResults(state.search);
+export const getCurrentSearchedPosts = state => fromSearch.getCurrentSearchedPosts(state.search);
+export const getSearchFetchPostLoading = state =>
+  fromSearch.getSearchFetchPostLoading(state.search);

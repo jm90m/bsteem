@@ -17,3 +17,4 @@ export const FETCH_ALL_USER_DETAILS = createAsyncActionType('@fetch-all-user-det
 
 // Tag/Search Screen Actions
 export const SEARCH_ASK_STEEM = createAsyncActionType('@search-ask-steem');
+export const SEARCH_FETCH_POST_DETAILS = createAsyncActionType('@search-fetch-post-details');

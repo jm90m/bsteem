@@ -20,8 +20,9 @@ const Container = styled.View`
   background-color: ${COLORS.WHITE.WHITE};
 `;
 
-const ScrollView = styled.ScrollView`
-  background-color: ${COLORS.WHITE.WHITE_SMOKE};
+const NoResultsFoundText = styled.Text`
+  padding: 10px;
+  justify-content: center;
 `;
 
 const StyledListView = styled.ListView`
@@ -69,6 +70,7 @@ class SearchScreen extends Component {
     this.handleSearchOnChangeText = this.handleSearchOnChangeText.bind(this);
     this.handleNavigateToFeed = this.handleNavigateToFeed.bind(this);
     this.handleNavigateToUserScreen = this.handleNavigateToUserScreen.bind(this);
+    this.handleNavigateToPostScreen = this.handleNavigateToPostScreen.bind(this);
     this.renderSearchResultRow = this.renderSearchResultRow.bind(this);
     this.searchResultEndReached = this.searchResultEndReached.bind(this);
   }
@@ -93,6 +95,10 @@ class SearchScreen extends Component {
     this.props.navigation.navigate(navigationConstants.USER, { username });
   }
 
+  handleNavigateToPostScreen(author, permlink) {
+    this.props.navigation.navigate(navigationConstants.SEARCH_POST, { author, permlink });
+  }
+
   searchResultEndReached() {}
 
   renderSearchResultRow(rowData) {
@@ -112,7 +118,10 @@ class SearchScreen extends Component {
             summary={rowData.summary}
             tags={rowData.tags}
             title={rowData.title}
+            permlink={rowData.permlink}
             handleNavigateToUserScreen={this.handleNavigateToUserScreen}
+            handleNavigateToFeedScreen={this.handleNavigateToFeed}
+            handleNavigateToPostScreen={this.handleNavigateToPostScreen}
           />
         );
       }
@@ -123,9 +132,14 @@ class SearchScreen extends Component {
 
   renderSearchDefaultView() {
     const { searchResults, tags } = this.props;
+    const { currentSearchValue } = this.state;
+    const hasNoSearchValue = _.isEmpty(currentSearchValue);
+    const hasNoSearchResults = !_.isEmpty(currentSearchValue) && _.isEmpty(searchResults);
 
-    if (_.isEmpty(searchResults)) {
+    if (hasNoSearchValue) {
       return <SearchDefaultView handleNavigateToFeed={this.handleNavigateToFeed} tags={tags} />;
+    } else if (hasNoSearchResults) {
+      return <NoResultsFoundText>No results found for your search</NoResultsFoundText>;
     }
 
     return null;
@@ -142,8 +156,8 @@ class SearchScreen extends Component {
           onChangeText={this.handleSearchOnChangeText}
           placeholder=""
           value={currentSearchValue}
-          containerStyle={{ backgroundColor: 'white', marginTop: 10 }}
-          inputStyle={{ backgroundColor: 'white' }}
+          containerStyle={{ backgroundColor: COLORS.WHITE.WHITE, marginTop: 10 }}
+          inputStyle={{ backgroundColor: COLORS.WHITE.WHITE }}
           showLoadingIcon={searchLoading}
           autoCorrect={false}
           autoCapitalize="none"

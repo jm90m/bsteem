@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
-import { Modal, WebView, Dimensions } from 'react-native';
+import { Modal, WebView } from 'react-native';
 import styled from 'styled-components/native';
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
-import { getHtml } from '../../util/postUtils';
-import PostHeader from '../../components/post-preview/Header';
-import postBodyStyles from '../../constants/postBodyStyles';
-import PostMenu from '../../components/post-menu/PostMenu';
-import { MATERIAL_ICONS, MATERIAL_COMMUNITY_ICONS } from '../../constants/styles';
+import { getHtml } from 'util/postUtils';
+import PostHeader from 'components/post-preview/Header';
+import postBodyStyles from 'constants/postBodyStyles';
+import PostMenu from 'components/post-menu/PostMenu';
+import { MATERIAL_ICONS, MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
 
 const Container = styled.View`
   flex: 1;

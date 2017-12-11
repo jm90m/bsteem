@@ -14,3 +14,6 @@ export const USER_FOLLOWERS = 'USER_FOLLOWERS';
 export const USER_FOLLOWING = 'USER_FOLLOWING';
 export const USER_WALLET = 'USER_WALLET';
 export const USER_ACTIVITY = 'USER_ACTIVITY';
+
+// search navigatiosn
+export const SEARCH_POST = 'SEARCH_POST';

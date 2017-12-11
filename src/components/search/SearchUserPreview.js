@@ -23,6 +23,11 @@ const TouchableOpacity = styled.TouchableOpacity`
 `;
 
 class SearchUserPreview extends Component {
+  static navigationOptions = {
+    headerMode: 'none',
+    tabBarVisible: false,
+  };
+
   static propTypes = {
     username: PropTypes.string,
     handleNavigateToUserScreen: PropTypes.func,

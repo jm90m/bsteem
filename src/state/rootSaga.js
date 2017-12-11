@@ -22,6 +22,7 @@ const rootSaga = function*() {
 
     // Search Sagas
     spawn(searchSaga.watchSearchAskSteem),
+    spawn(searchSaga.watchSearchFetchPostDetails),
   ]);
 };
 

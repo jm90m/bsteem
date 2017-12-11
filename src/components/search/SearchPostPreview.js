@@ -35,8 +35,8 @@ const TagsContainer = styled.View`
   flex-wrap: wrap;
 `;
 
-const TagContainer = styled.View`
-  margin: 3px 0;
+const TagContainer = styled.TouchableOpacity`
+  margin: 3px 5px;
 `;
 
 class SearchPostPreview extends Component {
@@ -44,22 +44,30 @@ class SearchPostPreview extends Component {
     author: PropTypes.string,
     title: PropTypes.string,
     summary: PropTypes.string,
+    permlink: PropTypes.string,
     tags: PropTypes.arrayOf(PropTypes.string),
     handleNavigateToUserScreen: PropTypes.func,
+    handleNavigateToFeedScreen: PropTypes.func,
+    handleNavigateToPostScreen: PropTypes.func,
   };
 
   static defaultProps = {
     author: '',
     title: '',
     summary: '',
+    permlink: '',
     tags: [],
     handleNavigateToUserScreen: () => {},
+    handleNavigateToFeedScreen: () => {},
+    handleNavigateToPostScreen: () => {},
   };
 
   constructor(props) {
     super(props);
 
     this.handleNavigateToUserScreen = this.handleNavigateToUserScreen.bind(this);
+    this.handleNavigateToFeedScreen = this.handleNavigateToFeedScreen.bind(this);
+    this.handleNavigateToPostScreen = this.handleNavigateToPostScreen.bind(this);
   }
 
   handleNavigateToUserScreen() {
@@ -67,18 +75,35 @@ class SearchPostPreview extends Component {
     this.props.handleNavigateToUserScreen(author);
   }
 
+  handleNavigateToFeedScreen(tag) {
+    this.props.handleNavigateToFeedScreen(tag);
+  }
+
+  handleNavigateToPostScreen() {
+    const { author, permlink } = this.props;
+    this.props.handleNavigateToPostScreen(author, permlink);
+  }
+
   render() {
     const { author, title, summary, tags } = this.props;
 
     return (
       <Container>
-        <PostTitle>{title}</PostTitle>
+        <TouchableOpacity onPress={this.handleNavigateToPostScreen}>
+          <PostTitle>{title}</PostTitle>
+        </TouchableOpacity>
         <TouchableOpacity onPress={this.handleNavigateToUserScreen}>
           <AuthorText>{`@${author}`}</AuthorText>
         </TouchableOpacity>
-        <BodyShort content={summary} />
+        <TouchableOpacity onPRess={this.handleNavigateToPostScreen}>
+          <BodyShort content={summary} />
+        </TouchableOpacity>
         <TagsContainer>
-          {_.map(tags, tag => <TagContainer key={tag}><Tag tag={tag} /></TagContainer>)}
+          {_.map(tags, tag => (
+            <TagContainer onPress={() => this.handleNavigateToFeedScreen(tag)} key={tag}>
+              <Tag tag={tag} />
+            </TagContainer>
+          ))}
         </TagsContainer>
       </Container>
     );
