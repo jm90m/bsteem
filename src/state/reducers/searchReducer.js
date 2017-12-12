@@ -20,7 +20,7 @@ export default function(state = INITIAL_STATE, action) {
       };
     case SEARCH_ASK_STEEM.SUCCESS: {
       return {
-        searchResults: action.payload,
+        searchResults: _.compact(action.payload),
         loading: false,
       };
     }

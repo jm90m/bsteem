@@ -59,14 +59,7 @@ class PostScreen extends Component {
   };
 
   render() {
-    const {
-      author,
-      body,
-      permlink,
-      parsedJsonMetadata,
-      category,
-      postData,
-    } = this.props.navigation.state.params;
+    const { body, parsedJsonMetadata, postData } = this.props.navigation.state.params;
     const htmlPostTitle = `<h1>${postData.title}</h1>`;
     const htmlBody = `<body>${htmlPostTitle}<div class="Body">${getHtml(body, parsedJsonMetadata)}</div></body>`;
     const htmlHead = `<head>${postBodyStyles}</head>`;
@@ -93,7 +86,7 @@ class PostScreen extends Component {
         >
           <PostMenu hideMenu={this.handleHideModal} />
         </Modal>
-        <WebView source={{ html }} javaScriptEnabled={true} />
+        <WebView source={{ html }} javaScriptEnabled />
       </Container>
     );
   }
