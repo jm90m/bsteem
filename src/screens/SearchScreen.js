@@ -119,6 +119,7 @@ class SearchScreen extends Component {
             tags={rowData.tags}
             title={rowData.title}
             permlink={rowData.permlink}
+            created={rowData.created}
             handleNavigateToUserScreen={this.handleNavigateToUserScreen}
             handleNavigateToFeedScreen={this.handleNavigateToFeed}
             handleNavigateToPostScreen={this.handleNavigateToPostScreen}

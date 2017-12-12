@@ -18,7 +18,6 @@ const Username = styled.Text`
 
 const TouchableOpacity = styled.TouchableOpacity`
   flex-direction: row;
-  padding: 0 16px;
   align-items: center;
 `;
 
@@ -54,7 +53,7 @@ class SearchUserPreview extends Component {
     return (
       <Container>
         <TouchableOpacity onPress={this.handleNavigateToUserScreen}>
-          <Avatar username={username} />
+          <Avatar username={username} size={40} />
           <Username>{`@${username}`}</Username>
         </TouchableOpacity>
       </Container>

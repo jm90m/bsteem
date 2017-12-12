@@ -5,7 +5,9 @@ import styled from 'styled-components/native';
 import { COLORS } from 'constants/styles';
 import BodyShort from 'components/post-preview/BodyShort';
 import _ from 'lodash';
+import moment from 'moment';
 import Tag from 'components/post/Tag';
+import Avatar from 'components/common/Avatar';
 
 const Container = styled.View`
   background-color: ${COLORS.WHITE.WHITE};
@@ -13,13 +15,20 @@ const Container = styled.View`
   margin-bottom: 5px;
   border-color: ${COLORS.WHITE.WHITE_SMOKE};
   border-width: 2px;
-  padding: 5px;
+  padding: 10px;
+`;
+
+const AuthorContainer = styled.View`
+  flex-direction: row;
+`;
+
+const AuthorContents = styled.View`
+  margin-left: 5px;
 `;
 
 const AuthorText = styled.Text`
   font-weight: 700;
   color: ${COLORS.BLUE.MARINER};
-  padding: 0 5px;
 `;
 
 const PostTitle = styled.Text`
@@ -31,12 +40,16 @@ const PostTitle = styled.Text`
 
 const TagsContainer = styled.View`
   flex-direction: row;
-  justify-content: space-between;
   flex-wrap: wrap;
 `;
 
 const TagContainer = styled.TouchableOpacity`
   margin: 3px 5px;
+`;
+
+const PostCreated = styled.Text`
+  color: ${COLORS.BLUE.BOTICELLI};
+  font-size: 14px;
 `;
 
 class SearchPostPreview extends Component {
@@ -45,6 +58,7 @@ class SearchPostPreview extends Component {
     title: PropTypes.string,
     summary: PropTypes.string,
     permlink: PropTypes.string,
+    created: PropTypes.string,
     tags: PropTypes.arrayOf(PropTypes.string),
     handleNavigateToUserScreen: PropTypes.func,
     handleNavigateToFeedScreen: PropTypes.func,
@@ -56,6 +70,7 @@ class SearchPostPreview extends Component {
     title: '',
     summary: '',
     permlink: '',
+    created: '',
     tags: [],
     handleNavigateToUserScreen: () => {},
     handleNavigateToFeedScreen: () => {},
@@ -85,15 +100,25 @@ class SearchPostPreview extends Component {
   }
 
   render() {
-    const { author, title, summary, tags } = this.props;
+    const { author, title, summary, tags, created } = this.props;
 
     return (
       <Container>
+        <AuthorContainer>
+          <TouchableOpacity onPress={this.handleNavigateToUserScreen}>
+            <Avatar username={author} size={40} />
+          </TouchableOpacity>
+          <AuthorContents>
+            <TouchableOpacity onPress={this.handleNavigateToUserScreen}>
+              <AuthorText>{`@${author}`}</AuthorText>
+            </TouchableOpacity>
+            <PostCreated>
+              {moment(created).fromNow()}
+            </PostCreated>
+          </AuthorContents>
+        </AuthorContainer>
         <TouchableOpacity onPress={this.handleNavigateToPostScreen}>
           <PostTitle>{title}</PostTitle>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={this.handleNavigateToUserScreen}>
-          <AuthorText>{`@${author}`}</AuthorText>
         </TouchableOpacity>
         <TouchableOpacity onPRess={this.handleNavigateToPostScreen}>
           <BodyShort content={summary} />
