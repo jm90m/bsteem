@@ -57,8 +57,8 @@ class API {
     return steem.api.getFollowCountAsync(username);
   }
 
-  static async getAskSteemSearch(search) {
-    return sendRequest(`https://api.asksteem.com/search?q=${search}&types=user,post`);
+  static async getAskSteemSearch(search, page) {
+    return sendRequest(`https://api.asksteem.com/search?q=${search}&types=user,post&pg=${page}`);
   }
 
   static async getContent(author, permlink) {

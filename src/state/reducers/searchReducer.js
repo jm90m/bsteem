@@ -10,12 +10,6 @@ const INITIAL_STATE = {
   searchFetchPostLoading: false,
 };
 
-const defaultInitialSearchPageOptions = {
-  current: 1,
-  has_next: false,
-  has_previous: false,
-};
-
 export default function(state = INITIAL_STATE, action) {
   switch (action.type) {
     case SEARCH_ASK_STEEM.ACTION:
@@ -25,16 +19,9 @@ export default function(state = INITIAL_STATE, action) {
         searchError: false,
       };
     case SEARCH_ASK_STEEM.SUCCESS: {
-      const results = _.get(action.payload, 'results', []);
-      const currentSearchPageOptions = _.get(
-        action.payload,
-        'pages',
-        defaultInitialSearchPageOptions,
-      );
       return {
-        searchResults: results,
+        searchResults: action.payload,
         loading: false,
-        currentSearchPageOptions,
       };
     }
     case SEARCH_ASK_STEEM.ERROR:
