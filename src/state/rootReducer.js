@@ -30,3 +30,8 @@ export const getSearchResults = state => fromSearch.getSearchResults(state.searc
 export const getCurrentSearchedPosts = state => fromSearch.getCurrentSearchedPosts(state.search);
 export const getSearchFetchPostLoading = state =>
   fromSearch.getSearchFetchPostLoading(state.search);
+
+// Auth Selectors
+export const getAuthUsername = state => fromAuth.getUsername(state.auth);
+export const getAuthAccessToken = state => fromAuth.getAccessToken(state.auth);
+export const getAuthExpiresIn = state => fromAuth.getExpiresIn(state.auth);

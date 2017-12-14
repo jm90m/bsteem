@@ -157,9 +157,17 @@ class UserScreen extends Component {
     console.log(nextProps);
   }
 
+  setMenuVisible(menuVisible) {
+    this.setState({ menuVisible });
+  }
+
+  handleHideMenu() {
+    this.setMenuVisible(false);
+  }
+
   fetchMoreUserPosts() {
     const { username } = this.props.navigation.state.params;
-    const { usersBlog, usersDetails } = this.props;
+    const { usersBlog } = this.props;
     const userBlog = usersBlog[username];
 
     if (_.isEmpty(userBlog)) {
@@ -175,14 +183,6 @@ class UserScreen extends Component {
       };
       this.props.fetchUserBlog(username, query);
     }
-  }
-
-  setMenuVisible(menuVisible) {
-    this.setState({ menuVisible });
-  }
-
-  handleHideMenu() {
-    this.setMenuVisible(false);
   }
 
   fetchMoreUserComments() {

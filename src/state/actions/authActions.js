@@ -1,4 +1,4 @@
-import { AUTHENTICATE_USER } from './actionTypes';
+import { AUTHENTICATE_USER, LOGOUT_USER } from './actionTypes';
 
 export const authenticateUserSuccess = payload => ({
   type: AUTHENTICATE_USER.SUCCESS,
@@ -10,3 +10,6 @@ export const authenticateUserError = error => ({
   error,
 });
 
+export const logoutUser = () => ({
+  type: LOGOUT_USER,
+});

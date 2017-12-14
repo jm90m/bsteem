@@ -9,7 +9,7 @@ import * as navigationConstants from 'constants/navigation';
 import configureStore from 'state/configureStore';
 import HomeScreen from 'screens/HomeScreen';
 import SearchScreen from 'screens/SearchScreen';
-import LoginScreen from 'screens/LoginScreen';
+import LoginScreen from 'screens/login-screen/LoginScreen';
 import UserScreen from 'screens/user-screen/UserScreen';
 import PostScreen from 'screens/stack-screens/PostScreen';
 import FeedScreen from 'screens/stack-screens/FeedScreen';
@@ -59,6 +59,26 @@ const SearchNavigator = StackNavigator(
   },
 );
 
+const LoginNavigator = StackNavigator(
+  {
+    [navigationConstants.LOGIN]: {
+      screen: LoginScreen,
+    },
+    [navigationConstants.POST]: {
+      screen: PostScreen,
+    },
+    [navigationConstants.FEED]: {
+      screen: FeedScreen,
+    },
+    [navigationConstants.COMMENTS]: {
+      screen: CommentsScreen,
+    },
+  },
+  {
+    headerMode: 'none',
+  },
+);
+
 const AppNavigation = TabNavigator(
   {
     [navigationConstants.HOME]: {
@@ -68,7 +88,7 @@ const AppNavigation = TabNavigator(
       screen: SearchNavigator,
     },
     [navigationConstants.LOGIN]: {
-      screen: LoginScreen,
+      screen: LoginNavigator,
     },
   },
   {

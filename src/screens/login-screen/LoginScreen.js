@@ -1,38 +1,44 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import _ from 'lodash';
 import { MaterialIcons } from '@expo/vector-icons';
+import { connect } from 'react-redux';
 import styled from 'styled-components/native';
 import Expo, { AuthSession } from 'expo';
-import sc2 from '../api/sc2';
-import { connect } from 'react-redux';
-import { getAccessToken, getExpiresIn, getUsername } from '../state/reducers/authReducer';
-import { authenticateUserError, authenticateUserSuccess } from '../state/actions/authActions';
-import _ from 'lodash';
+import sc2 from 'api/sc2';
+import { getAuthAccessToken, getAuthExpiresIn, getAuthUsername } from 'state/rootReducer';
+import {
+  authenticateUserError,
+  authenticateUserSuccess,
+  logoutUser,
+} from 'state/actions/authActions';
+import CurrentUserScreen from './CurrentUserScreen';
 
 const Container = styled.View`
-  margin-top: 10px;
+  flex: 1;
 `;
 
 const Button = styled.Button``;
 
-const UserContainer = styled.View`
-  margin-top: 10px;
-`;
-
-const Username = styled.Text``;
-
 const mapStateToProps = state => ({
-  accessToken: getAccessToken(state),
-  expiresIn: getExpiresIn(state),
-  username: getUsername(state),
+  accessToken: getAuthAccessToken(state),
+  expiresIn: getAuthExpiresIn(state),
+  username: getAuthUsername(state),
 });
 
 const mapDispatchToProps = dispatch => ({
   authenticateUserSuccess: payload => dispatch(authenticateUserSuccess(payload)),
   authenticateUserError: error => dispatch(authenticateUserError(error)),
+  logoutUser: () => dispatch(logoutUser()),
 });
 
 @connect(mapStateToProps, mapDispatchToProps)
 class LoginScreen extends Component {
+  static propTypes = {
+    authenticateUserSuccess: PropTypes.func.isRequired,
+    authenticateUserError: PropTypes.func.isRequired,
+  };
+
   static navigationOptions = {
     headerMode: 'none',
     tabBarIcon: ({ tintColor }) => (
@@ -49,12 +55,17 @@ class LoginScreen extends Component {
     });
 
     if (result.type === 'success') {
+      const accessToken = result.params.access_token;
+      const expiresIn = result.params.expires_in;
+      const username = result.params.username;
+      const maxAge = result.params.expires_in * 1000;
       const response = {
-        accessToken: result.params.access_token,
-        expiresIn: result.params.expires_in,
-        username: result.params.username,
+        accessToken,
+        expiresIn,
+        username,
+        maxAge,
       };
-      sc2.setAccessToken(result.params.access_token);
+      sc2.setAccessToken(accessToken);
       this.props.authenticateUserSuccess(response);
     } else {
       this.props.authenticateUserError();
@@ -74,16 +85,14 @@ class LoginScreen extends Component {
     if (_.isEmpty(accessToken)) {
       return <Button onPress={this._handlePressAsync} title={'Login'} />;
     }
+    return null;
   }
 
   renderUser() {
     if (!_.isEmpty(this.props.username)) {
-      return (
-        <UserContainer>
-          <Username>{this.props.username}</Username>
-        </UserContainer>
-      );
+      return <CurrentUserScreen navigation={this.props.navigation} />;
     }
+    return null;
   }
 
   render() {

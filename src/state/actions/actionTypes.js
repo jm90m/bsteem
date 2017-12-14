@@ -5,7 +5,6 @@ export const FETCH_DISCUSSIONS = createAsyncActionType('@fetch-discussions');
 export const FETCH_MORE_DISCUSSIONS = createAsyncActionType('@fetch-more-discussions');
 
 export const FETCH_TAGS = createAsyncActionType('@fetch-tags');
-export const AUTHENTICATE_USER = createAsyncActionType('@authenticate-user');
 export const FETCH_COMMENTS = createAsyncActionType('@fetch-comments');
 
 // User Actions
@@ -18,3 +17,7 @@ export const FETCH_ALL_USER_DETAILS = createAsyncActionType('@fetch-all-user-det
 // Tag/Search Screen Actions
 export const SEARCH_ASK_STEEM = createAsyncActionType('@search-ask-steem');
 export const SEARCH_FETCH_POST_DETAILS = createAsyncActionType('@search-fetch-post-details');
+
+// Auth Actions
+export const AUTHENTICATE_USER = createAsyncActionType('@authenticate-user');
+export const LOGOUT_USER = '@logout-user';

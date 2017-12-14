@@ -1,9 +1,10 @@
-import { AUTHENTICATE_USER } from '../actions/actionTypes';
+import { AUTHENTICATE_USER, LOGOUT_USER } from '../actions/actionTypes';
 
 const INITIAL_STATE = {
   accessToken: '',
   expiresIn: '',
   username: '',
+  maxAge: null,
 };
 
 export default (state = INITIAL_STATE, action) => {
@@ -15,12 +16,17 @@ export default (state = INITIAL_STATE, action) => {
         accessToken: action.payload.accessToken,
         expiresIn: action.payload.expiresIn,
         username: action.payload.username,
+        maxAge: action.payload.maxAge,
+      };
+    case LOGOUT_USER:
+      return {
+        ...INITIAL_STATE,
       };
     default:
       return state;
   }
 };
 
-export const getAccessToken = state => state.auth.accessToken;
-export const getExpiresIn = state => state.auth.expiresIn;
-export const getUsername = state => state.auth.username;
+export const getAccessToken = state => state.accessToken;
+export const getExpiresIn = state => state.expiresIn;
+export const getUsername = state => state.username;

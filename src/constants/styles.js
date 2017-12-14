@@ -44,6 +44,9 @@ export const MATERIAL_ICONS = {
   wallet: 'account-balance-wallet',
   activity: 'grade',
 
+  // auth
+  logout: 'person-outline',
+
   // user profile
   location: 'location-on',
   reply: 'reply',

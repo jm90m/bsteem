@@ -36,4 +36,11 @@ export const ACTIVITY = {
   label: 'Activity',
 };
 
+export const LOGOUT = {
+  icon: MATERIAL_ICONS.logout,
+  id: 'logout',
+  label: 'Logout',
+};
+
 export const USER_MENU = [BLOG, COMMENTS, FOLLOWERS, FOLLOWING, WALLET, ACTIVITY];
+export const CURRENT_USER_MENU = [BLOG, COMMENTS, FOLLOWERS, FOLLOWING, WALLET, ACTIVITY, LOGOUT];
