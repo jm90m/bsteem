@@ -5,7 +5,7 @@ import styled from 'styled-components/native';
 import { connect } from 'react-redux';
 import _ from 'lodash';
 import { COLORS } from 'constants/styles';
-import { getIsAuthenticated } from 'state/reducers/authReducer';
+import { getIsAuthenticated } from 'state/rootReducer';
 import * as navigationConstants from 'constants/navigation';
 import Footer from './Footer';
 import Header from './Header';
