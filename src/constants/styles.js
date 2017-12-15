@@ -25,6 +25,11 @@ export const FONT_SIZES = {
 };
 
 export const MATERIAL_ICONS = {
+  // tab bar nav
+  home: 'home',
+  login: 'account-circle',
+
+
   follow: 'person-add',
   followed: 'person',
   like: 'thumb-up',
@@ -65,4 +70,5 @@ export const MATERIAL_COMMUNITY_ICONS = {
 
 export const ICON_SIZES = {
   menuIcon: 24,
+  tabBarIcon: 20,
 };

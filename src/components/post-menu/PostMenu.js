@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { TouchableWithoutFeedback } from 'react-native';
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import styled from 'styled-components/native';
@@ -25,18 +26,39 @@ const MenuModalContents = styled.View`
 `;
 
 class PostMenu extends Component {
-  handleFollowUser = () => {};
-  handleLikePost = () => {};
-  handleNavigateToComments = () => {};
-  handleReblog = () => {};
-  handleReportPost = () => {};
+  static propTypes = {
+    handleFollowUser: PropTypes.func,
+    handleLikePost: PropTypes.func,
+    handleNavigateToComments: PropTypes.func,
+    handleReblog: PropTypes.func,
+    handleReportPost: PropTypes.func,
+    hideMenu: PropTypes.func,
+  };
+
+  static defaultProps = {
+    hideMenu: () => {},
+    handleFollowUser: () => {},
+    handleLikePost: () => {},
+    handleNavigateToComments: () => {},
+    handleReblog: () => {},
+    handleReportPost: () => {},
+  };
 
   render() {
+    const {
+      hideMenu,
+      handleFollowUser,
+      handleLikePost,
+      handleNavigateToComments,
+      handleReblog,
+      handleReportPost,
+    } = this.props;
+
     return (
-      <TouchableWithoutFeedback onPress={this.props.hideMenu}>
+      <TouchableWithoutFeedback onPress={hideMenu}>
         <Container>
           <MenuWrapper>
-            <MenuModalButton onPress={this.handleFollowUser}>
+            <MenuModalButton onPress={handleFollowUser}>
               <MenuModalContents>
                 <MaterialIcons size={20} name={MATERIAL_ICONS.follow} color={COLORS.BLUE.MARINER} />
                 <MenuText>
@@ -44,7 +66,7 @@ class PostMenu extends Component {
                 </MenuText>
               </MenuModalContents>
             </MenuModalButton>
-            <MenuModalButton onPress={this.handleNavigateToComments}>
+            <MenuModalButton onPress={handleNavigateToComments}>
               <MenuModalContents>
                 <MaterialCommunityIcons
                   size={20}
@@ -56,7 +78,7 @@ class PostMenu extends Component {
                 </MenuText>
               </MenuModalContents>
             </MenuModalButton>
-            <MenuModalButton onPress={this.handleLikePost}>
+            <MenuModalButton onPress={handleLikePost}>
               <MenuModalContents>
                 <MaterialIcons size={20} color={COLORS.BLUE.MARINER} name={MATERIAL_ICONS.like} />
                 <MenuText>
@@ -64,7 +86,7 @@ class PostMenu extends Component {
                 </MenuText>
               </MenuModalContents>
             </MenuModalButton>
-            <MenuModalButton onPress={this.handleReblog}>
+            <MenuModalButton onPress={handleReblog}>
               <MenuModalContents>
                 <MaterialCommunityIcons
                   size={20}
@@ -76,7 +98,7 @@ class PostMenu extends Component {
                 </MenuText>
               </MenuModalContents>
             </MenuModalButton>
-            <MenuModalButton onPress={this.handleReportPost}>
+            <MenuModalButton onPress={handleReportPost}>
               <MenuModalContents>
                 <MaterialIcons size={20} color={COLORS.BLUE.MARINER} name={MATERIAL_ICONS.report} />
                 <MenuText>

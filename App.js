@@ -4,7 +4,8 @@ import { TabNavigator, StackNavigator } from 'react-navigation';
 import sc2 from 'api/sc2';
 import { Provider } from 'react-redux';
 import { Constants, AppLoading, Asset } from 'expo';
-import { COLORS } from 'constants/styles';
+import { MaterialIcons } from '@expo/vector-icons';
+import { COLORS, MATERIAL_ICONS, ICON_SIZES } from 'constants/styles';
 import * as navigationConstants from 'constants/navigation';
 import configureStore from 'state/configureStore';
 import HomeScreen from 'screens/HomeScreen';
@@ -23,6 +24,15 @@ const HomeNavigator = StackNavigator(
     },
     [navigationConstants.POST]: {
       screen: PostScreen,
+      navigationOptions: {
+        tabBarIcon: ({ tintColor }) => (
+          <MaterialIcons
+            name={MATERIAL_ICONS.home}
+            size={ICON_SIZES.tabBarIcon}
+            color={tintColor}
+          />
+        ),
+      },
     },
     [navigationConstants.FEED]: {
       screen: FeedScreen,
@@ -66,6 +76,15 @@ const LoginNavigator = StackNavigator(
     },
     [navigationConstants.POST]: {
       screen: PostScreen,
+      navigationOptions: {
+        tabBarIcon: ({ tintColor }) => (
+          <MaterialIcons
+            name={MATERIAL_ICONS.login}
+            size={ICON_SIZES.tabBarIcon}
+            color={tintColor}
+          />
+        ),
+      },
     },
     [navigationConstants.FEED]: {
       screen: FeedScreen,

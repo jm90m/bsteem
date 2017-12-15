@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { Modal, WebView } from 'react-native';
+import { connect } from 'react-redux';
 import styled from 'styled-components/native';
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import { getHtml } from 'util/postUtils';
@@ -7,6 +9,8 @@ import PostHeader from 'components/post-preview/Header';
 import postBodyStyles from 'constants/postBodyStyles';
 import PostMenu from 'components/post-menu/PostMenu';
 import { MATERIAL_ICONS, MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
+import * as navigationConstants from 'constants/navigation';
+import { getIsAuthenticated } from 'state/rootReducer';
 
 const Container = styled.View`
   flex: 1;
@@ -32,31 +36,71 @@ const Menu = styled.View`
   padding: 10px;
 `;
 
+const mapStateToProps = state => ({
+  authenticated: getIsAuthenticated(state),
+});
+
+@connect(mapStateToProps)
 class PostScreen extends Component {
   static navigationOptions = {
     headerMode: 'none',
-    tabBarVisible: false,
   };
 
-  state = {
-    modalVisible: false,
+  static propTypes = {
+    authenticated: PropTypes.bool.isRequired,
+    navigation: PropTypes.shape().isRequired,
   };
 
-  setModalVisible = visible => this.setState({ modalVisible: visible });
+  constructor(props) {
+    super(props);
 
-  handleHideModal = () => this.setModalVisible(false);
+    this.state = {
+      modalVisible: false,
+    };
 
-  navigateBack = () => this.props.navigation.goBack();
+    this.setModalVisible = this.setModalVisible.bind(this);
+    this.handleHideModal = this.handleHideModal.bind(this);
+    this.navigateBack = this.navigateBack.bind(this);
+    this.navigateToComments = this.navigateToComments.bind(this);
+    this.navigateToLoginTab = this.navigateToLoginTab.bind(this);
+    this.handleLikePost = this.handleLikePost.bind(this);
+  }
 
-  navigateToComments = () => {
+  setModalVisible(visible) {
+    this.setState({ modalVisible: visible });
+  }
+
+  handleHideModal() {
+    this.setModalVisible(false);
+  }
+
+  handleLikePost() {
+    const { authenticated } = this.props;
+    if (authenticated) {
+      // like post
+    } else {
+      this.navigateToLoginTab();
+    }
+    this.handleHideModal();
+  }
+
+  navigateToLoginTab() {
+    this.props.navigation.navigate(navigationConstants.LOGIN);
+  }
+
+  navigateBack() {
+    this.props.navigation.goBack();
+  }
+
+  navigateToComments() {
     const { author, category, permlink, postId } = this.props.navigation.state.params;
-    this.props.navigation.navigate('COMMENTS', {
+    this.props.navigation.navigate(navigationConstants.COMMENTS, {
       author,
       category,
       permlink,
       postId,
     });
-  };
+  }
 
   render() {
     const { body, parsedJsonMetadata, postData } = this.props.navigation.state.params;
@@ -84,7 +128,7 @@ class PostScreen extends Component {
           visible={this.state.modalVisible}
           onRequestClose={this.handleHideModal}
         >
-          <PostMenu hideMenu={this.handleHideModal} />
+          <PostMenu hideMenu={this.handleHideModal} handleLikePost={this.handleLikePost} />
         </Modal>
         <WebView source={{ html }} javaScriptEnabled />
       </Container>

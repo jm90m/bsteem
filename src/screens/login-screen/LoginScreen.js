@@ -2,8 +2,13 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { AsyncStorage } from 'react-native';
 import _ from 'lodash';
-import { STEEM_ACCESS_TOKEN, AUTH_EXPIRATION, AUTH_USERNAME } from 'constants/asyncStorageKeys';
-import { COLORS } from 'constants/styles';
+import {
+  STEEM_ACCESS_TOKEN,
+  AUTH_EXPIRATION,
+  AUTH_USERNAME,
+  AUTH_MAX_EXPIRATION_AGE,
+} from 'constants/asyncStorageKeys';
+import { COLORS, MATERIAL_ICONS, ICON_SIZES } from 'constants/styles';
 import { MaterialIcons } from '@expo/vector-icons';
 import { connect } from 'react-redux';
 import styled from 'styled-components/native';
@@ -12,7 +17,6 @@ import { getAuthAccessToken } from 'state/rootReducer';
 import { authenticateUserSuccess } from 'state/actions/authActions';
 import SteemConnectLogin from './SteemConnectLogin';
 import CurrentUserScreen from './CurrentUserScreen';
-import { AUTH_MAX_EXPIRATION_AGE } from '../../constants/asyncStorageKeys';
 
 const Container = styled.View`
   flex: 1;
@@ -51,7 +55,7 @@ class LoginScreen extends Component {
   static navigationOptions = {
     headerMode: 'none',
     tabBarIcon: ({ tintColor }) => (
-      <MaterialIcons name={'account-circle'} size={20} color={tintColor} />
+      <MaterialIcons name={MATERIAL_ICONS.login} size={ICON_SIZES.tabBarIcon} color={tintColor} />
     ),
   };
 
