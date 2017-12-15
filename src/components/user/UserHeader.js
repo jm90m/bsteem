@@ -65,12 +65,14 @@ class UserHeader extends Component {
     username: PropTypes.string,
     userReputation: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     hasCover: PropTypes.bool,
+    displayFollowButton: PropTypes.bool,
   };
 
   static defaultProps = {
     username: '',
     userReputation: '0',
     hasCover: false,
+    displayFollowButton: true,
   };
 
   constructor(props) {
@@ -93,6 +95,18 @@ class UserHeader extends Component {
     this.setState({
       hasCover: false,
     });
+  }
+
+  renderFollowButton() {
+    const { displayFollowButton } = this.props;
+    if (displayFollowButton) {
+      return (
+        <FollowButton>
+          <MaterialIcons size={24} name={MATERIAL_ICONS.follow} color={COLORS.WHITE.WHITE} />
+        </FollowButton>
+      );
+    }
+    return null;
   }
 
   render() {
@@ -120,9 +134,7 @@ class UserHeader extends Component {
               </Handle>
             </HandleContainer>
           </View>
-          <FollowButton>
-            <MaterialIcons size={24} name={MATERIAL_ICONS.follow} color={COLORS.WHITE.WHITE} />
-          </FollowButton>
+          {this.renderFollowButton()}
         </UserHeaderContents>
       </Container>
     );

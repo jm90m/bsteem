@@ -5,6 +5,7 @@ const INITIAL_STATE = {
   expiresIn: '',
   username: '',
   maxAge: null,
+  authenticated: false,
 };
 
 export default (state = INITIAL_STATE, action) => {
@@ -17,6 +18,7 @@ export default (state = INITIAL_STATE, action) => {
         expiresIn: action.payload.expiresIn,
         username: action.payload.username,
         maxAge: action.payload.maxAge,
+        authenticated: true
       };
     case LOGOUT_USER:
       return {
@@ -30,3 +32,4 @@ export default (state = INITIAL_STATE, action) => {
 export const getAccessToken = state => state.accessToken;
 export const getExpiresIn = state => state.expiresIn;
 export const getUsername = state => state.username;
+export const getIsAuthenticated = state => state.authenticated;

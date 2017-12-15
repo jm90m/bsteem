@@ -5,6 +5,7 @@ export const COLORS = {
     LINK_WATER: '#C2CCD3',
     MEDIUM_AQUAMARINE: '#54D2A0',
     SOLITUDE: '#f5f6f9',
+    HAVELOCK_BLUE: '#4A80BE',
   },
 
   GREY: {

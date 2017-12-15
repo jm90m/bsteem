@@ -1,42 +1,51 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { AsyncStorage } from 'react-native';
 import _ from 'lodash';
+import { STEEM_ACCESS_TOKEN, AUTH_EXPIRATION, AUTH_USERNAME } from 'constants/asyncStorageKeys';
+import { COLORS } from 'constants/styles';
 import { MaterialIcons } from '@expo/vector-icons';
 import { connect } from 'react-redux';
 import styled from 'styled-components/native';
-import Expo, { AuthSession } from 'expo';
 import sc2 from 'api/sc2';
-import { getAuthAccessToken, getAuthExpiresIn, getAuthUsername } from 'state/rootReducer';
-import {
-  authenticateUserError,
-  authenticateUserSuccess,
-  logoutUser,
-} from 'state/actions/authActions';
+import { getAuthAccessToken } from 'state/rootReducer';
+import { authenticateUserSuccess } from 'state/actions/authActions';
+import SteemConnectLogin from './SteemConnectLogin';
 import CurrentUserScreen from './CurrentUserScreen';
+import { AUTH_MAX_EXPIRATION_AGE } from '../../constants/asyncStorageKeys';
 
 const Container = styled.View`
   flex: 1;
 `;
 
-const Button = styled.Button``;
+const LoadingContainer = styled.View`
+  flex; 1;
+  justify-content: center;
+  align-items: center;
+`;
+
+const Loading = styled.ActivityIndicator`
+  padding: 10px;
+`;
 
 const mapStateToProps = state => ({
   accessToken: getAuthAccessToken(state),
-  expiresIn: getAuthExpiresIn(state),
-  username: getAuthUsername(state),
 });
 
 const mapDispatchToProps = dispatch => ({
   authenticateUserSuccess: payload => dispatch(authenticateUserSuccess(payload)),
-  authenticateUserError: error => dispatch(authenticateUserError(error)),
-  logoutUser: () => dispatch(logoutUser()),
 });
 
 @connect(mapStateToProps, mapDispatchToProps)
 class LoginScreen extends Component {
   static propTypes = {
+    accessToken: PropTypes.string,
+    navigation: PropTypes.shape().isRequired,
     authenticateUserSuccess: PropTypes.func.isRequired,
-    authenticateUserError: PropTypes.func.isRequired,
+  };
+
+  static defaultProps = {
+    accessToken: '',
   };
 
   static navigationOptions = {
@@ -46,31 +55,13 @@ class LoginScreen extends Component {
     ),
   };
 
-  _handlePressAsync = async () => {
-    let redirectUrl = AuthSession.getRedirectUrl();
-    const url = sc2.getLoginURL({ authenticated: true });
-    let result = await AuthSession.startAsync({
-      authUrl: url,
-      returnUrl: `${Expo.Constants.linkingUri}/redirect`,
-    });
-
-    if (result.type === 'success') {
-      const accessToken = result.params.access_token;
-      const expiresIn = result.params.expires_in;
-      const username = result.params.username;
-      const maxAge = result.params.expires_in * 1000;
-      const response = {
-        accessToken,
-        expiresIn,
-        username,
-        maxAge,
-      };
-      sc2.setAccessToken(accessToken);
-      this.props.authenticateUserSuccess(response);
-    } else {
-      this.props.authenticateUserError();
-    }
+  state = {
+    loading: true,
   };
+
+  componentDidMount() {
+    this.setAccessToken();
+  }
 
   componentWillReceiveProps(nextProps) {
     if (!_.isEmpty(nextProps.accessToken)) {
@@ -80,22 +71,57 @@ class LoginScreen extends Component {
     }
   }
 
+  setAccessToken = async () => {
+    try {
+      const accessToken = await AsyncStorage.getItem(STEEM_ACCESS_TOKEN);
+      const username = await AsyncStorage.getItem(AUTH_USERNAME);
+      const expiresIn = await AsyncStorage.getItem(AUTH_EXPIRATION);
+      const maxAge = await AsyncStorage.getItem(AUTH_MAX_EXPIRATION_AGE);
+      const isAuthenticated = !_.isEmpty(accessToken) && !_.isEmpty(username);
+      if (isAuthenticated) {
+        const payload = {
+          accessToken,
+          expiresIn,
+          username,
+          maxAge,
+        };
+        sc2.setAccessToken(accessToken);
+        this.props.authenticateUserSuccess(payload);
+      }
+    } catch (e) {
+      this.setState({
+        loading: false,
+      });
+    } finally {
+      this.setState({
+        loading: false,
+      });
+    }
+  };
+
   renderLoginButton() {
     const { accessToken } = this.props;
     if (_.isEmpty(accessToken)) {
-      return <Button onPress={this._handlePressAsync} title={'Login'} />;
+      return <SteemConnectLogin />;
     }
     return null;
   }
 
   renderUser() {
-    if (!_.isEmpty(this.props.username)) {
+    if (!_.isEmpty(this.props.accessToken)) {
       return <CurrentUserScreen navigation={this.props.navigation} />;
     }
     return null;
   }
 
   render() {
+    if (this.state.loading) {
+      return (
+        <LoadingContainer>
+          <Loading color={COLORS.BLUE.MARINER} size="large" />
+        </LoadingContainer>
+      );
+    }
     return (
       <Container>
         {this.renderUser()}

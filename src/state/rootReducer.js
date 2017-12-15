@@ -35,3 +35,4 @@ export const getSearchFetchPostLoading = state =>
 export const getAuthUsername = state => fromAuth.getUsername(state.auth);
 export const getAuthAccessToken = state => fromAuth.getAccessToken(state.auth);
 export const getAuthExpiresIn = state => fromAuth.getExpiresIn(state.auth);
+export const getIsAuthentictaed = state => fromAuth.getIsAuthenticated(state.auth);

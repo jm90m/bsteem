@@ -3,7 +3,7 @@ import { View } from 'react-native';
 import { TabNavigator, StackNavigator } from 'react-navigation';
 import sc2 from 'api/sc2';
 import { Provider } from 'react-redux';
-import Expo from 'expo';
+import { Constants, AppLoading, Asset } from 'expo';
 import { COLORS } from 'constants/styles';
 import * as navigationConstants from 'constants/navigation';
 import configureStore from 'state/configureStore';
@@ -111,18 +111,44 @@ const AppNavigation = TabNavigator(
 const store = configureStore();
 
 export default class App extends React.Component {
+  state = {
+    assetsAreLoaded: false,
+  };
+
+  componentWillMount() {
+    this.loadAssetsAsync();
+  }
+
   componentDidMount() {
     sc2.init({
       app: 'busy-mobile',
-      callbackURL: `${Expo.Constants.linkingUri}/redirect`,
+      callbackURL: `${Constants.linkingUri}/redirect`,
       scope: ['vote', 'comment'],
     });
   }
 
+  async loadAssetsAsync() {
+    try {
+      // await Promise.all([Asset.loadAsync([require('./src/images/sc2-logo-white.svg')])]);
+    } catch (e) {
+      // console.warn(
+      //   'There was an error caching assets network timeout, so we skipped caching. Reload the app to try again.',
+      // );
+      //
+      // console.log(e);
+    } finally {
+      this.setState({ assetsAreLoaded: true });
+    }
+  }
+
   render() {
+    if (!this.state.assetsAreLoaded) {
+      return <AppLoading />;
+    }
+
     return (
       <Provider store={store}>
-        <View style={{ flex: 1, paddingTop: 10, backgroundColor: 'white' }}>
+        <View style={{ flex: 1 }}>
           <AppNavigation />
         </View>
       </Provider>

@@ -1,12 +1,15 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { Dimensions, Image } from 'react-native';
 import styled from 'styled-components/native';
+import { connect } from 'react-redux';
 import _ from 'lodash';
+import { COLORS } from 'constants/styles';
+import { getIsAuthenticated } from 'state/reducers/authReducer';
 import * as navigationConstants from 'constants/navigation';
 import Footer from './Footer';
 import Header from './Header';
 import BodyShort from './BodyShort';
-import { COLORS } from 'constants/styles';
 const { width } = Dimensions.get('screen');
 
 const Container = styled.View`
@@ -37,10 +40,37 @@ const PreviewImage = styled.Image`
 
 const Touchable = styled.TouchableOpacity``;
 
+const mapStateToProps = state => ({
+  authenticated: getIsAuthenticated(state),
+});
+
+@connect(mapStateToProps)
 class PostPreview extends Component {
+  static propTypes = {
+    navigation: PropTypes.shape().isRequired,
+    authenticated: PropTypes.bool,
+  };
+
   static defaultProps = {
     postData: {},
+    authenticated: false,
   };
+
+  constructor(props) {
+    super(props);
+
+    this.handleOnPressVote = this.handleOnPressVote.bind(this);
+  }
+
+  handleOnPressVote() {
+    const { navigation, authenticated } = this.props;
+    if (authenticated) {
+      console.log('AUTH VOTE');
+    } else {
+      console.log('NOT AUTHENTICATED');
+      navigation.navigate(navigationConstants.LOGIN);
+    }
+  }
 
   render() {
     const { postData, navigation } = this.props;
@@ -77,7 +107,7 @@ class PostPreview extends Component {
             <BodyShort content={body} />
           </Touchable>
         </Content>
-        <Footer postData={postData} />
+        <Footer postData={postData} onPressVote={this.handleOnPressVote} />
       </Container>
     );
   }

@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { TouchableOpacity } from 'react-native';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 import styled from 'styled-components/native';
@@ -33,14 +34,16 @@ const Payout = styled.Text`
 class Footer extends Component {
   static propTypes = {
     postData: PropTypes.shape(),
+    onPressVote: PropTypes.func,
   };
 
   static defaultProps = {
     postData: {},
+    onPressVote: () => {},
   };
 
   render() {
-    const { postData } = this.props;
+    const { postData, onPressVote } = this.props;
     const { active_votes, children } = postData;
     const upVotes = getUpvotes(active_votes).sort(sortVotes);
     const payout = calculatePayout(postData);
@@ -51,7 +54,9 @@ class Footer extends Component {
 
     return (
       <Container>
-        <MaterialIcons name="thumb-up" size={24} color={COLORS.BLUE.LINK_WATER} />
+        <TouchableOpacity onPress={onPressVote}>
+          <MaterialIcons name="thumb-up" size={24} color={COLORS.BLUE.LINK_WATER} />
+        </TouchableOpacity>
         <FooterValue>{upVotes.length}</FooterValue>
         <MaterialCommunityIcons
           name="comment-processing"

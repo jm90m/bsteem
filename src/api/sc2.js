@@ -176,10 +176,11 @@ sc2.claimRewardBalance = (account, rewardSteem, rewardSbd, rewardVests, cb) => {
   return sc2.broadcast([['claim_reward_balance', params]], cb);
 };
 
-sc2.revokeToken = cb =>
-  sc2
+sc2.revokeToken = cb => {
+  return sc2
     .send('oauth2/token/revoke', 'POST', { token: sc2.accessToken }, cb)
     .then(() => sc2.removeAccessToken());
+};
 
 sc2.updateUserMetadata = (metadata = {}, cb) =>
   sc2.send('me', 'PUT', { user_metadata: metadata }, cb);

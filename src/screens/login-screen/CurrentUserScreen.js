@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Modal, ListView } from 'react-native';
+import { Modal, ListView, AsyncStorage } from 'react-native';
 import _ from 'lodash';
 import sc2 from 'api/sc2';
 import steem from 'steem';
@@ -23,6 +23,12 @@ import {
   getLoadingUsersDetails,
   getLoadingUsersFollowCount,
 } from 'state/rootReducer';
+import {
+  STEEM_ACCESS_TOKEN,
+  AUTH_EXPIRATION,
+  AUTH_MAX_EXPIRATION_AGE,
+  AUTH_USERNAME,
+} from 'constants/asyncStorageKeys';
 import { logoutUser } from 'state/actions/authActions';
 import { COLORS } from 'constants/styles';
 import * as userMenuConstants from 'constants/userMenu';
@@ -150,11 +156,30 @@ class CurrentUserScreen extends Component {
     });
   }
 
+  resetAuthUserInAsyncStorage = async () => {
+    try {
+      AsyncStorage.setItem(STEEM_ACCESS_TOKEN, '');
+      AsyncStorage.setItem(AUTH_EXPIRATION, '');
+      AsyncStorage.setItem(AUTH_USERNAME, '');
+      AsyncStorage.setItem(AUTH_MAX_EXPIRATION_AGE, '');
+    } catch (e) {
+      console.log('FAILED TO RESET ASYNC STORAGE FOR AUTH USER');
+    }
+  };
+
   handleChangeUserMenu(option) {
     if (option.id === userMenuConstants.LOGOUT.id) {
-      sc2.revokeToken().then(() => {
-        this.props.logoutUser();
-      });
+      sc2
+        .revokeToken()
+        .then(() => {
+          this.resetAuthUserInAsyncStorage();
+          this.props.logoutUser();
+        })
+        .catch(() => {
+          // TODO errors out here, still need to fix why sc2 is breaking
+          this.resetAuthUserInAsyncStorage();
+          this.props.logoutUser();
+        });
     } else {
       this.setState({
         currentMenuOption: option,
@@ -277,7 +302,12 @@ class CurrentUserScreen extends Component {
           currentMenuOption={currentMenuOption}
           toggleCurrentUserMenu={this.toggleCurrentUserMenu}
         />
-        <UserHeader username={username} hasCover={false} userReputation={userReputation} />
+        <UserHeader
+          username={username}
+          hasCover={false}
+          userReputation={userReputation}
+          displayFollowButton={false}
+        />
         {this.renderUserStats()}
         {this.renderUserContent()}
         {this.renderLoader()}

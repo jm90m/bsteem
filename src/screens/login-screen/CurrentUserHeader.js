@@ -19,7 +19,6 @@ const Container = styled.View`
 const CurrentMenuDisplay = styled.View`
   flex-direction: row;
   align-items: center;
-  align-self: center;
 `;
 
 const CurrentMenuText = styled.Text`
@@ -29,10 +28,12 @@ const CurrentMenuText = styled.Text`
 
 const TouchableContainer = styled.TouchableOpacity`
   flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
 `;
 
 const MenuIconContainer = styled.View`
-  align-self: flex-end;
   padding: 5px;
 `;
 
@@ -58,7 +59,7 @@ class CurrentUserHeader extends Component {
           <MenuIconContainer>
             <MaterialCommunityIcons
               size={ICON_SIZES.menuIcon}
-              name={MATERIAL_COMMUNITY_ICONS.menuVertical}
+              name={MATERIAL_COMMUNITY_ICONS.chevronDown}
             />
           </MenuIconContainer>
         </TouchableContainer>

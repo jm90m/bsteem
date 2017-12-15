@@ -29,6 +29,10 @@ const StyledListView = styled.ListView`
   background-color: ${COLORS.WHITE.WHITE_SMOKE};
 `;
 
+const Loading = styled.ActivityIndicator`
+  padding: 10px;
+`;
+
 const mapStateToProps = state => ({
   tags: state.home.tags,
   searchResults: getSearchResults(state),
@@ -132,12 +136,14 @@ class SearchScreen extends Component {
   }
 
   renderSearchDefaultView() {
-    const { searchResults, tags } = this.props;
+    const { searchResults, tags, searchLoading } = this.props;
     const { currentSearchValue } = this.state;
     const hasNoSearchValue = _.isEmpty(currentSearchValue);
     const hasNoSearchResults = !_.isEmpty(currentSearchValue) && _.isEmpty(searchResults);
 
-    if (hasNoSearchValue) {
+    if (searchLoading) {
+      return <Loading color={COLORS.BLUE.MARINER} size="large" />;
+    } else if (hasNoSearchValue) {
       return <SearchDefaultView handleNavigateToFeed={this.handleNavigateToFeed} tags={tags} />;
     } else if (hasNoSearchResults) {
       return <NoResultsFoundText>No results found for your search</NoResultsFoundText>;
