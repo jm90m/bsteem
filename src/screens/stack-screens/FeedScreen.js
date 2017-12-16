@@ -47,7 +47,6 @@ const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
 class FeedScreen extends Component {
   static navigationOptions = {
     headerMode: 'none',
-    tabBarVisible: false,
   };
 
   constructor(props) {

@@ -19,8 +19,15 @@ export default function(state = INITIAL_STATE, action) {
         searchError: false,
       };
     case SEARCH_ASK_STEEM.SUCCESS: {
+      const askSteemResults = _.get(action.payload, 'askSteemResults', []);
+      const steemAccountLookupResults = _.get(action.payload, 'steemAccountLookupResults', []);
+      const formattedSteemLookupResults = _.map(steemAccountLookupResults, name => ({
+        type: 'user',
+        name,
+      }));
+      const searchResults = _.compact(_.concat(formattedSteemLookupResults, askSteemResults));
       return {
-        searchResults: _.compact(action.payload),
+        searchResults,
         loading: false,
       };
     }
@@ -29,6 +36,7 @@ export default function(state = INITIAL_STATE, action) {
         ...state,
         loading: false,
         searchError: true,
+        searchResults: [],
       };
 
     case SEARCH_FETCH_POST_DETAILS.ACTION:
@@ -39,7 +47,6 @@ export default function(state = INITIAL_STATE, action) {
     case SEARCH_FETCH_POST_DETAILS.SUCCESS: {
       const { author, permlink } = action.payload;
       const postKey = `${author}/${permlink}`;
-
       return {
         ...state,
         searchFetchPostLoading: false,

@@ -9,7 +9,7 @@ import * as navigationConstants from 'constants/navigation';
 import styled from 'styled-components/native';
 import { fetchTags } from 'state/actions/homeActions';
 import { searchAskSteem } from 'state/actions/searchActions';
-import { COLORS } from 'constants/styles';
+import { COLORS, MATERIAL_ICONS } from 'constants/styles';
 import { getSearchResults, getSearchLoading } from 'state/rootReducer';
 import SearchPostPreview from 'components/search/SearchPostPreview';
 import SearchUserPreview from 'components/search/SearchUserPreview';
@@ -18,6 +18,7 @@ import SearchDefaultView from 'components/search/SearchDefaultView';
 const Container = styled.View`
   flex: 1;
   background-color: ${COLORS.WHITE.WHITE};
+  padding-top: 10px;
 `;
 
 const NoResultsFoundText = styled.Text`
@@ -62,7 +63,9 @@ class SearchScreen extends Component {
   };
 
   static navigationOptions = {
-    tabBarIcon: ({ tintColor }) => <MaterialIcons name="public" size={20} color={tintColor} />,
+    tabBarIcon: ({ tintColor }) => (
+      <MaterialIcons name={MATERIAL_ICONS.search} size={20} color={tintColor} />
+    ),
   };
 
   constructor(props) {
@@ -155,7 +158,7 @@ class SearchScreen extends Component {
   render() {
     const { searchLoading, searchResults } = this.props;
     const { currentSearchValue } = this.state;
-    const hasSearchResults = !_.isEmpty(searchResults);
+    const hasSearchResults = !_.isEmpty(searchResults) && !_.isEmpty(currentSearchValue);
     return (
       <Container>
         <SearchBar

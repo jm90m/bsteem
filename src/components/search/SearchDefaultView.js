@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { ScrollView } from 'react-native';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import styled from 'styled-components/native';
@@ -44,10 +45,12 @@ class SearchDefaultView extends Component {
   }
   render() {
     return (
-      <Container>
-        <TrendingTagsTitle>{'Trending Tags'}</TrendingTagsTitle>
-        {this.renderTags()}
-      </Container>
+      <ScrollView>
+        <Container>
+          <TrendingTagsTitle>{'Trending Tags'}</TrendingTagsTitle>
+          {this.renderTags()}
+        </Container>
+      </ScrollView>
     );
   }
 }

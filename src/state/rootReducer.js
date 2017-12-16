@@ -13,6 +13,12 @@ export default combineReducers({
   search: searchReducer,
 });
 
+// Home Selectors
+export const getLoadingFetchDiscussions = state => fromHome.getLoadingFetchDiscussions(state.home);
+export const getLoadingFetchMoreDiscussions = state =>
+  fromHome.getLoadingFetchMoreDiscussions(state.home);
+export const getHomeFeedPosts = state => fromHome.getHomeFeedPosts(state.home);
+
 // User Selectors
 export const getUsersDetails = state => fromUsers.getUsersDetails(state.users);
 export const getUsersComments = state => fromUsers.getUsersComments(state.users);

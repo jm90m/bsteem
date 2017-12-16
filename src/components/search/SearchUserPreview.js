@@ -14,6 +14,7 @@ const Username = styled.Text`
   margin: 0 5px;
   color: ${COLORS.BLUE.MARINER};
   font-size: 18px;
+  font-weight: bold;
 `;
 
 const TouchableOpacity = styled.TouchableOpacity`

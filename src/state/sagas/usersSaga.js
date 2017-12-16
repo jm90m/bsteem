@@ -43,8 +43,10 @@ const fetchUserComments = function*(action) {
       result,
       username,
     };
+    console.log('FETCH USER COMMENTS', username, query);
     yield put(userActions.fetchUserComments.success(payload));
   } catch (error) {
+    console.log('FETCH USER COMMENTS ERROR ---');
     console.log(error);
     yield put(userActions.fetchUserComments.fail(error));
   }
@@ -92,4 +94,3 @@ export const watchFetchUserFollowCount = function*() {
 export const watchFetchAllUserDetails = function*() {
   yield takeEvery(FETCH_ALL_USER_DETAILS.ACTION, fetchAllUserDetails);
 };
-

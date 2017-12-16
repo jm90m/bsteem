@@ -56,12 +56,39 @@ const SearchNavigator = StackNavigator(
     },
     [navigationConstants.FEED]: {
       screen: FeedScreen,
+      navigationOptions: {
+        tabBarIcon: ({ tintColor }) => (
+          <MaterialIcons
+            name={MATERIAL_ICONS.search}
+            size={ICON_SIZES.tabBarIcon}
+            color={tintColor}
+          />
+        ),
+      },
     },
     [navigationConstants.USER]: {
       screen: UserScreen,
+      navigationOptions: {
+        tabBarIcon: ({ tintColor }) => (
+          <MaterialIcons
+            name={MATERIAL_ICONS.search}
+            size={ICON_SIZES.tabBarIcon}
+            color={tintColor}
+          />
+        ),
+      },
     },
     [navigationConstants.SEARCH_POST]: {
       screen: SearchPostScreen,
+      navigationOptions: {
+        tabBarIcon: ({ tintColor }) => (
+          <MaterialIcons
+            name={MATERIAL_ICONS.search}
+            size={ICON_SIZES.tabBarIcon}
+            color={tintColor}
+          />
+        ),
+      },
     },
   },
   {
@@ -88,6 +115,15 @@ const LoginNavigator = StackNavigator(
     },
     [navigationConstants.FEED]: {
       screen: FeedScreen,
+      navigationOptions: {
+        tabBarIcon: ({ tintColor }) => (
+          <MaterialIcons
+            name={MATERIAL_ICONS.login}
+            size={ICON_SIZES.tabBarIcon}
+            color={tintColor}
+          />
+        ),
+      },
     },
     [navigationConstants.COMMENTS]: {
       screen: CommentsScreen,

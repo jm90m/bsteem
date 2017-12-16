@@ -28,7 +28,7 @@ export const MATERIAL_ICONS = {
   // tab bar nav
   home: 'home',
   login: 'account-circle',
-
+  search: 'public',
 
   follow: 'person-add',
   followed: 'person',

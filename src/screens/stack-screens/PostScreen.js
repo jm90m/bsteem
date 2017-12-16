@@ -5,12 +5,12 @@ import { connect } from 'react-redux';
 import styled from 'styled-components/native';
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import { getHtml } from 'util/postUtils';
-import PostHeader from 'components/post-preview/Header';
-import postBodyStyles from 'constants/postBodyStyles';
-import PostMenu from 'components/post-menu/PostMenu';
 import { MATERIAL_ICONS, MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
 import * as navigationConstants from 'constants/navigation';
+import { COLORS } from 'constants/styles';
 import { getIsAuthenticated } from 'state/rootReducer';
+import postBodyStyles from 'constants/postBodyStyles';
+import PostMenu from 'components/post-menu/PostMenu';
 
 const Container = styled.View`
   flex: 1;
@@ -19,8 +19,9 @@ const Container = styled.View`
 const Header = styled.View`
   flex-direction: row;
   justify-content: space-between;
+  align-items: center;
   flex-wrap: nowrap;
-  padding-top: 10px;
+  padding-top: 20px;
 `;
 
 const Touchable = styled.TouchableOpacity`
@@ -34,6 +35,11 @@ const BackTouchable = styled.TouchableOpacity`
 const Menu = styled.View`
   justify-content: center;
   padding: 10px;
+`;
+
+const Author = styled.Text`
+  color: ${COLORS.BLUE.MARINER};
+  font-weight: bold;
 `;
 
 const mapStateToProps = state => ({
@@ -103,7 +109,7 @@ class PostScreen extends Component {
   }
 
   render() {
-    const { body, parsedJsonMetadata, postData } = this.props.navigation.state.params;
+    const { body, parsedJsonMetadata, postData, author } = this.props.navigation.state.params;
     const htmlPostTitle = `<h1>${postData.title}</h1>`;
     const htmlBody = `<body>${htmlPostTitle}<div class="Body">${getHtml(body, parsedJsonMetadata)}</div></body>`;
     const htmlHead = `<head>${postBodyStyles}</head>`;
@@ -115,7 +121,9 @@ class PostScreen extends Component {
           <BackTouchable onPress={this.navigateBack}>
             <MaterialIcons size={24} name={MATERIAL_ICONS.back} />
           </BackTouchable>
-          <PostHeader postData={postData} navigation={this.props.navigation} />
+          <Author>
+            {author}
+          </Author>
           <Menu>
             <Touchable onPress={() => this.setModalVisible(!this.state.modalVisible)}>
               <MaterialCommunityIcons size={24} name={MATERIAL_COMMUNITY_ICONS.menuVertical} />

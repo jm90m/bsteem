@@ -58,11 +58,15 @@ class API {
   }
 
   static async getAskSteemSearch(search, page) {
-    return sendRequest(`https://api.asksteem.com/search?q=${search}&types=user,post&pg=${page}`);
+    return sendRequest(`https://api.asksteem.com/search?q=${search}&types=post&pg=${page}`);
   }
 
   static async getContent(author, permlink) {
     return steem.api.getContentAsync(author, permlink);
+  }
+
+  static async getLookupAccountNames(name, limit = 5) {
+    return steem.api.lookupAccountsAsync(name, limit);
   }
 }
 

@@ -1,13 +1,23 @@
 import React, { Component } from 'react';
-import { ListView, View, Modal, NetInfo } from 'react-native';
+import PropTypes from 'prop-types';
+import _ from 'lodash';
+import { ListView, View, Modal, NetInfo, RefreshControl, Dimensions } from 'react-native';
 import { connect } from 'react-redux';
 import styled from 'styled-components/native';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { fetchDiscussions, fetchMoreDiscussions } from '../state/actions/homeActions';
-import { MATERIAL_COMMUNITY_ICONS, COLORS } from '../constants/styles';
-import { TRENDING } from '../constants/feedFilters';
-import PostPreview from '../components/post-preview/PostPreview';
-import FeedSort from '../components/feed-sort/FeedSort';
+import {
+  getLoadingFetchDiscussions,
+  getLoadingFetchMoreDiscussions,
+  getHomeFeedPosts,
+} from 'state/rootReducer';
+import { fetchDiscussions, fetchMoreDiscussions } from 'state/actions/homeActions';
+import { MATERIAL_COMMUNITY_ICONS, COLORS } from 'constants/styles';
+import { TRENDING } from 'constants/feedFilters';
+import PostPreview from 'components/post-preview/PostPreview';
+import FeedSort from 'components/feed-sort/FeedSort';
+import LargeLoading from 'components/common/LargeLoading';
+
+const { width, height } = Dimensions.get('screen');
 
 const StyledListView = styled.ListView`
   background-color: ${COLORS.WHITE.WHITE_SMOKE};
@@ -17,9 +27,8 @@ const HomeHeader = styled.View`
   background-color: ${COLORS.WHITE.WHITE};
   border-bottom-color: ${COLORS.WHITE.GAINSBORO};
   border-bottom-width: 1px;
-  padding-top: 10px;
+  padding-top: 20px;
   width: 100%;
-  height: 45px;
   justify-content: center;
   align-items: center;
 `;
@@ -37,8 +46,25 @@ const FilterMenuIcon = styled.View`
   margin-top: 3px;
 `;
 
+const LoadingMoreContainer = styled.View`
+  align-items: center;
+  background-color: transparent;
+  bottom: 0;
+  flex: 1;
+  height: 100%;
+  justify-content: center;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 100%;
+  z-index: 1;
+`;
+
 const mapStateToProps = state => ({
-  posts: state.home.posts,
+  posts: getHomeFeedPosts(state),
+  loadingFetchDiscussions: getLoadingFetchDiscussions(state),
+  loadingFetchMoreDiscussions: getLoadingFetchMoreDiscussions(state),
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -50,6 +76,15 @@ const mapDispatchToProps = dispatch => ({
 const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
 
 class HomeScreen extends Component {
+  static propTypes = {
+    posts: PropTypes.arrayOf(PropTypes.shape()).isRequired,
+    loadingFetchDiscussions: PropTypes.bool.isRequired,
+    loadingFetchMoreDiscussions: PropTypes.bool.isRequired,
+    fetchDiscussions: PropTypes.func.isRequired,
+    fetchMoreDiscussions: PropTypes.func.isRequired,
+    navigation: PropTypes.shape().isRequired,
+  };
+
   static navigationOptions = {
     headerMode: 'none',
     tabBarIcon: ({ tintColor }) => <MaterialIcons name={'home'} size={20} color={tintColor} />,
@@ -63,26 +98,13 @@ class HomeScreen extends Component {
       menuVisible: false,
       currentFilter: TRENDING,
     };
-  }
 
-  setMenuVisibile = visible => this.setState({ menuVisible: visible });
-
-  handleSortPost = filter => {
-    this.setState(
-      {
-        currentFilter: filter,
-        menuVisible: false,
-      },
-      () => this.props.fetchDiscussions(filter),
-    );
-  };
-
-  handleHideMenu = () => this.setMenuVisibile(false);
-
-  componentWillReceiveProps(nextProps) {
-    this.setState({
-      dataSource: ds.cloneWithRows(nextProps.posts),
-    });
+    this.setMenuVisibile = this.setMenuVisibile.bind(this);
+    this.handleSortPost = this.handleSortPost.bind(this);
+    this.handleHideMenu = this.handleHideMenu.bind(this);
+    this.onEndReached = this.onEndReached.bind(this);
+    this.renderRow = this.renderRow.bind(this);
+    this.onRefreshCurrentFeed = this.onRefreshCurrentFeed.bind(this);
   }
 
   componentDidMount() {
@@ -97,16 +119,51 @@ class HomeScreen extends Component {
     this.props.fetchDiscussions(this.state.currentFilter);
   }
 
-  onEndReached = () => {
-    const { posts } = this.props;
-    const lastPost = posts[posts.length - 1];
-    this.props.fetchMoreDiscussions(lastPost.author, lastPost.permlink, this.state.currentFilter);
-  };
+  componentWillReceiveProps(nextProps) {
+    this.setState({
+      dataSource: ds.cloneWithRows(nextProps.posts),
+    });
+  }
 
-  renderRow = rowData => <PostPreview postData={rowData} navigation={this.props.navigation} />;
+  onEndReached() {
+    const { posts, loadingFetchDiscussions } = this.props;
+    const loadMoreDiscussions = !loadingFetchDiscussions && !_.isEmpty(posts);
+    if (loadMoreDiscussions) {
+      const lastPost = posts[posts.length - 1];
+      this.props.fetchMoreDiscussions(lastPost.author, lastPost.permlink, this.state.currentFilter);
+    }
+  }
+
+  onRefreshCurrentFeed() {
+    this.props.fetchDiscussions(this.state.currentFilter);
+  }
+
+  setMenuVisibile(visible) {
+    this.setState({ menuVisible: visible });
+  }
+
+  handleSortPost(filter) {
+    this.setState(
+      {
+        currentFilter: filter,
+        menuVisible: false,
+      },
+      () => this.props.fetchDiscussions(filter),
+    );
+  }
+
+  handleHideMenu() {
+    this.setMenuVisibile(false);
+  }
+
+  renderRow(rowData) {
+    return <PostPreview postData={rowData} navigation={this.props.navigation} />;
+  }
 
   render() {
+    const { loadingFetchDiscussions, loadingFetchMoreDiscussions } = this.props;
     const { menuVisible, currentFilter, dataSource } = this.state;
+    console.log('loadingFetchMoreDiscussions', loadingFetchMoreDiscussions);
     return (
       <View>
         <HomeHeader>
@@ -130,11 +187,20 @@ class HomeScreen extends Component {
         >
           <FeedSort hideMenu={this.handleHideMenu} handleSortPost={this.handleSortPost} />
         </Modal>
+        {loadingFetchMoreDiscussions &&
+          <LoadingMoreContainer><LargeLoading /></LoadingMoreContainer>}
         <StyledListView
           dataSource={dataSource}
           renderRow={this.renderRow}
           enableEmptySections
           onEndReached={this.onEndReached}
+          refreshControl={
+            <RefreshControl
+              refreshing={loadingFetchDiscussions}
+              onRefresh={this.onRefreshCurrentFeed}
+              colors={[COLORS.BLUE.MARINER]}
+            />
+          }
         />
       </View>
     );

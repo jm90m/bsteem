@@ -47,7 +47,7 @@ const Header = styled.View`
   border-bottom-color: ${COLORS.WHITE.GAINSBORO};
   border-bottom-width: 1px;
   width: 100%;
-  padding-top: 10px;
+  padding-top: 20px;
   min-height: 45px;
 `;
 
@@ -100,7 +100,6 @@ const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
 class UserScreen extends Component {
   static navigationOptions = {
     headerMode: 'none',
-    tabBarVisible: false,
   };
 
   static propTypes = {
@@ -207,16 +206,16 @@ class UserScreen extends Component {
     });
   }
 
+  navigateBack() {
+    this.props.navigation.goBack();
+  }
+
   renderUserPostRow(rowData) {
     return <PostPreview postData={rowData} navigation={this.props.navigation} />;
   }
 
   renderUserCommentsRow(rowData) {
     return <CommentsPreview commentData={rowData} navigation={this.props.navigation} />;
-  }
-
-  navigateBack() {
-    this.props.navigation.goBack();
   }
 
   renderUserContent() {
