@@ -87,7 +87,6 @@ class HomeScreen extends Component {
 
   static navigationOptions = {
     headerMode: 'none',
-    tabBarIcon: ({ tintColor }) => <MaterialIcons name={'home'} size={20} color={tintColor} />,
   };
 
   constructor(props) {
@@ -163,7 +162,6 @@ class HomeScreen extends Component {
   render() {
     const { loadingFetchDiscussions, loadingFetchMoreDiscussions } = this.props;
     const { menuVisible, currentFilter, dataSource } = this.state;
-    console.log('loadingFetchMoreDiscussions', loadingFetchMoreDiscussions);
     return (
       <View>
         <HomeHeader>

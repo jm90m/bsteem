@@ -68,6 +68,10 @@ class API {
   static async getLookupAccountNames(name, limit = 5) {
     return steem.api.lookupAccountsAsync(name, limit);
   }
+
+  static async getDiscussionsByFeed(query) {
+    return steem.apigetDiscussionsByFeedAsync(query);
+  }
 }
 
 export const getAPIByFilter = filterId => {

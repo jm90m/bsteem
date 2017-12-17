@@ -65,9 +65,7 @@ class PostPreview extends Component {
   handleOnPressVote() {
     const { navigation, authenticated } = this.props;
     if (authenticated) {
-      console.log('AUTH VOTE');
     } else {
-      console.log('NOT AUTHENTICATED');
       navigation.navigate(navigationConstants.LOGIN);
     }
   }

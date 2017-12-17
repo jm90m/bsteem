@@ -68,6 +68,10 @@ export const MATERIAL_COMMUNITY_ICONS = {
   clock: 'clock',
 };
 
+export const FONT_AWESOME_ICONS = {
+  news: 'newspaper-o',
+};
+
 export const ICON_SIZES = {
   menuIcon: 24,
   tabBarIcon: 20,

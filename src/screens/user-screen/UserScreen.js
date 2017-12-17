@@ -151,11 +151,6 @@ class UserScreen extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps, nextState) {
-    console.log('USER SCREEN WILL RECEIVE PROPS');
-    console.log(nextProps);
-  }
-
   setMenuVisible(menuVisible) {
     this.setState({ menuVisible });
   }

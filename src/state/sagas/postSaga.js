@@ -37,7 +37,6 @@ const fetchComments = function*(action) {
     const content = result.content;
     yield put(fetchCommentsSuccess(rootsCommentsList, commentsChildrenList, content, postId));
   } catch (error) {
-    console.log(error);
     yield put(fetchCommentsFail(error));
   }
 };

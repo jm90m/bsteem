@@ -21,7 +21,6 @@ const fetchUser = function*(action) {
 
 const fetchUserBlog = function*(action) {
   try {
-    console.log('FETCH USER BLOG');
     const { username, query } = action.payload;
     const result = yield call(API.getDiscussionsByBlog, query);
     const payload = {
@@ -30,7 +29,6 @@ const fetchUserBlog = function*(action) {
     };
     yield put(userActions.fetchUserBlog.success(payload));
   } catch (error) {
-    console.log('fetchUserBlog- ERROR', error);
     yield put(userActions.fetchUserBlog.fail(error));
   }
 };
@@ -43,11 +41,8 @@ const fetchUserComments = function*(action) {
       result,
       username,
     };
-    console.log('FETCH USER COMMENTS', username, query);
     yield put(userActions.fetchUserComments.success(payload));
   } catch (error) {
-    console.log('FETCH USER COMMENTS ERROR ---');
-    console.log(error);
     yield put(userActions.fetchUserComments.fail(error));
   }
 };

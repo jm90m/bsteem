@@ -23,7 +23,7 @@ const Container = styled.View`
 `;
 
 const LoadingContainer = styled.View`
-  flex; 1;
+  flex: 1;
   justify-content: center;
   align-items: center;
 `;
@@ -59,9 +59,11 @@ class LoginScreen extends Component {
     ),
   };
 
-  state = {
-    loading: true,
-  };
+  constructor(props) {
+    super(props);
+
+    this.setAccessToken = this.setAccessToken.bind(this);
+  }
 
   componentDidMount() {
     this.setAccessToken();
@@ -75,33 +77,23 @@ class LoginScreen extends Component {
     }
   }
 
-  setAccessToken = async () => {
-    try {
-      const accessToken = await AsyncStorage.getItem(STEEM_ACCESS_TOKEN);
-      const username = await AsyncStorage.getItem(AUTH_USERNAME);
-      const expiresIn = await AsyncStorage.getItem(AUTH_EXPIRATION);
-      const maxAge = await AsyncStorage.getItem(AUTH_MAX_EXPIRATION_AGE);
-      const isAuthenticated = !_.isEmpty(accessToken) && !_.isEmpty(username);
-      if (isAuthenticated) {
-        const payload = {
-          accessToken,
-          expiresIn,
-          username,
-          maxAge,
-        };
-        sc2.setAccessToken(accessToken);
-        this.props.authenticateUserSuccess(payload);
-      }
-    } catch (e) {
-      this.setState({
-        loading: false,
-      });
-    } finally {
-      this.setState({
-        loading: false,
-      });
+  async setAccessToken() {
+    const accessToken = await AsyncStorage.getItem(STEEM_ACCESS_TOKEN);
+    const username = await AsyncStorage.getItem(AUTH_USERNAME);
+    const expiresIn = await AsyncStorage.getItem(AUTH_EXPIRATION);
+    const maxAge = await AsyncStorage.getItem(AUTH_MAX_EXPIRATION_AGE);
+    const isAuthenticated = !_.isEmpty(accessToken) && !_.isEmpty(username);
+    if (isAuthenticated) {
+      const payload = {
+        accessToken,
+        expiresIn,
+        username,
+        maxAge,
+      };
+      sc2.setAccessToken(accessToken);
+      this.props.authenticateUserSuccess(payload);
     }
-  };
+  }
 
   renderLoginButton() {
     const { accessToken } = this.props;
@@ -119,13 +111,13 @@ class LoginScreen extends Component {
   }
 
   render() {
-    if (this.state.loading) {
-      return (
-        <LoadingContainer>
-          <Loading color={COLORS.BLUE.MARINER} size="large" />
-        </LoadingContainer>
-      );
-    }
+    // if (this.state.loading) {
+    //   return (
+    //     <LoadingContainer>
+    //       <Loading color={COLORS.BLUE.MARINER} size="large" />
+    //     </LoadingContainer>
+    //   );
+    // }
     return (
       <Container>
         {this.renderUser()}

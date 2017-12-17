@@ -6,6 +6,7 @@ export const TAGS = 'TAGS';
 export const SEARCH = 'SEARCH';
 export const LOGIN = 'LOGIN';
 export const POST = 'POST';
+export const CURRENT_USER = 'CURRENT_USER';
 
 // user navigations
 export const USER_BLOG = 'USER_BLOG';
@@ -15,5 +16,5 @@ export const USER_FOLLOWING = 'USER_FOLLOWING';
 export const USER_WALLET = 'USER_WALLET';
 export const USER_ACTIVITY = 'USER_ACTIVITY';
 
-// search navigatiosn
+// search navigations
 export const SEARCH_POST = 'SEARCH_POST';

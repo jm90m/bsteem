@@ -11,7 +11,6 @@ const INITIAL_STATE = {
 export default (state = INITIAL_STATE, action) => {
   switch (action.type) {
     case AUTHENTICATE_USER.SUCCESS:
-      console.log('AUTH', action.payload);
       return {
         ...state,
         accessToken: action.payload.accessToken,

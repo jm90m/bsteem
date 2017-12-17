@@ -46,7 +46,6 @@ export default (state = INITIAL_STATE, action) => {
         loadingUsersComments: true,
       };
     case FETCH_USER_COMMENTS.SUCCESS: {
-      console.log('FETCH USER BLOG SUCCESS', action.payload.username);
       const userComments = state.usersComments[action.payload.username] || [];
       const newUserComments = _.uniqBy(_.concat(userComments, action.payload.result), 'id');
       return {
@@ -59,7 +58,6 @@ export default (state = INITIAL_STATE, action) => {
       };
     }
     case FETCH_USER_COMMENTS.ERROR:
-      console.log('FETCH USER BLOG FAIL', action.error);
       return {
         ...state,
         loadingUsersComments: false,

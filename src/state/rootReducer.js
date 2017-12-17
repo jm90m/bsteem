@@ -4,6 +4,7 @@ import authReducer, * as fromAuth from './reducers/authReducer';
 import commentsReducer, * as fromComments from './reducers/commentsReducer';
 import usersReducer, * as fromUsers from './reducers/usersReducer';
 import searchReducer, * as fromSearch from './reducers/searchReducer';
+import currentUserReducer, * as fromCurrentUser from './reducers/currentUserReducer';
 
 export default combineReducers({
   home: homeReducer,
@@ -11,6 +12,7 @@ export default combineReducers({
   comments: commentsReducer,
   users: usersReducer,
   search: searchReducer,
+  currentUser: currentUserReducer,
 });
 
 // Home Selectors
@@ -42,3 +44,10 @@ export const getAuthUsername = state => fromAuth.getUsername(state.auth);
 export const getAuthAccessToken = state => fromAuth.getAccessToken(state.auth);
 export const getAuthExpiresIn = state => fromAuth.getExpiresIn(state.auth);
 export const getIsAuthenticated = state => fromAuth.getIsAuthenticated(state.auth);
+
+// Current User Selectors
+export const getCurrentUserFeed = state => fromCurrentUser.getCurrentUserFeed(state.currentUser);
+export const getLoadingFetchCurrentUserFeed = state =>
+  fromCurrentUser.getLoadingFetchCurrentUserFeed(state.currentUser);
+export const getLoadingFetchMoreCurrentUserFeed = state =>
+  fromCurrentUser.getLoadingFetchMoreCurrentUserFeed(state.currentUser);

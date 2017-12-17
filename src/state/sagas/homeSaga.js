@@ -1,7 +1,7 @@
+import { takeLatest, call, put } from 'redux-saga/effects';
+import API, { getAPIByFilter } from 'api/api';
 import { FETCH_TAGS, FETCH_DISCUSSIONS, FETCH_MORE_DISCUSSIONS } from '../actions/actionTypes';
-import * as feedFilters from 'constants/feedFilters';
 import {
-  fetchTrendingFail,
   fetchTagsSuccess,
   fetchTagsFail,
   fetchDiscussionsSuccess,
@@ -9,8 +9,6 @@ import {
   fetchMoreDiscussionsSuccess,
   fetchMoreDiscussionsFail,
 } from '../actions/homeActions';
-import { takeLatest, call, put } from 'redux-saga/effects';
-import API, { getAPIByFilter } from 'api/api';
 
 const fetchTags = function*(action) {
   try {

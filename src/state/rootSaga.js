@@ -3,6 +3,7 @@ import * as homeSaga from './sagas/homeSaga';
 import * as postSaga from './sagas/postSaga';
 import * as usersSaga from './sagas/usersSaga';
 import * as searchSaga from './sagas/searchSaga';
+import * as currentUserSaga from './sagas/currentUserSaga';
 
 const rootSaga = function*() {
   yield all([
@@ -23,6 +24,10 @@ const rootSaga = function*() {
     // Search Sagas
     spawn(searchSaga.watchSearchAskSteem),
     spawn(searchSaga.watchSearchFetchPostDetails),
+
+    // Current User Sagas
+    spawn(currentUserSaga.watchFetchCurrentUserFeed),
+    spawn(currentUserSaga.watchFetchMoreCurrentUserFeed),
   ]);
 };
 

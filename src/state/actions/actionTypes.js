@@ -21,3 +21,7 @@ export const SEARCH_FETCH_POST_DETAILS = createAsyncActionType('@search-fetch-po
 // Auth Actions
 export const AUTHENTICATE_USER = createAsyncActionType('@authenticate-user');
 export const LOGOUT_USER = '@logout-user';
+
+// Current User Actions
+export const FETCH_CURRENT_USER_FEED = createAsyncActionType('@fetch_current_user_feed');
+export const FETCH_MORE_CURRENT_USER_FEED = createAsyncActionType('@fetch_more_current_user_feed');
