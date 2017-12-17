@@ -7,7 +7,7 @@ const INITIAL_STATE = {
 };
 
 export default (state = INITIAL_STATE, action) => {
-  switch (action.payload) {
+  switch (action.type) {
     case FETCH_CURRENT_USER_FEED.PENDING:
       return {
         ...state,

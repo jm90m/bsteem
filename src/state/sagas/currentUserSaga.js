@@ -3,7 +3,7 @@ import { takeLatest, call, put, select } from 'redux-saga/effects';
 import API from 'api/api';
 import { getAuthUsername, getCurrentUserFeed } from '../rootReducer';
 import { FETCH_CURRENT_USER_FEED, FETCH_MORE_CURRENT_USER_FEED } from '../actions/actionTypes';
-import { currentUserFeedFetch, currentUserFeedFetchMore } from '../actions/currentUserActions';
+import * as currentUserActions from '../actions/currentUserActions';
 
 const fetchCurrentUserFeed = function*() {
   try {
@@ -12,12 +12,10 @@ const fetchCurrentUserFeed = function*() {
       tag: currentUsername,
       limit: 10,
     };
-    const result = yield call(API.getDiscussionsByBlog, query);
-    console.log('FETCH CURRENT USER FEED', result);
-    yield put(currentUserFeedFetch.success(result));
+    const result = yield call(API.getDiscussionsByFeed, query);
+    yield put(currentUserActions.currentUserFeedFetch.success(result));
   } catch (error) {
-    console.log('FETCH CURRENT USER FEED ERROR', error);
-    yield put(currentUserFeedFetch.error(error));
+    yield put(currentUserActions.currentUserFeedFetch.fail(error));
   }
 };
 
@@ -34,10 +32,10 @@ const fetchMoreCurrentUserFeed = function*() {
       start_author: author,
       start_permlink: permlink,
     };
-    const result = yield call(API.getDiscussionsByBlog, query);
-    yield put(currentUserFeedFetchMore.success(result));
+    const result = yield call(API.getDiscussionsByFeed, query);
+    yield put(currentUserActions.currentUserFeedFetchMore.success(result));
   } catch (error) {
-    yield put(currentUserFeedFetchMore.error(error));
+    yield put(currentUserActions.currentUserFeedFetchMore.fail(error));
   }
 };
 

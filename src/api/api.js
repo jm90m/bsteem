@@ -70,7 +70,7 @@ class API {
   }
 
   static async getDiscussionsByFeed(query) {
-    return steem.apigetDiscussionsByFeedAsync(query);
+    return steem.api.getDiscussionsByFeedAsync(query);
   }
 }
 
