@@ -91,7 +91,6 @@ class CurrentUserFeed extends Component {
       loadingFetchMoreCurrentUserFeed,
     } = this.props;
     const dataSource = ds.cloneWithRows(currentUserFeed);
-    console.log('RENDER CURRENT USER FEED');
     return (
       <Container>
         <StyledListView

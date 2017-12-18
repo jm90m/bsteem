@@ -45,19 +45,9 @@ class CurrentUserScreen extends Component {
   };
 
   render() {
-    const { navigation, username } = this.props;
+    const { navigation } = this.props;
     return (
       <Container>
-        <Header>
-          <Username>
-            {username}
-          </Username>
-          <Menu>
-            <Touchable onPress={() => {}}>
-              <MaterialCommunityIcons size={24} name={MATERIAL_COMMUNITY_ICONS.menuVertical} />
-            </Touchable>
-          </Menu>
-        </Header>
         <CurrentUserFeed navigation={navigation} />
       </Container>
     );
