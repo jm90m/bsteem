@@ -2,12 +2,14 @@ import React, { Component } from 'react';
 import { TouchableOpacity } from 'react-native';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
+import { connect } from 'react-redux';
 import styled from 'styled-components/native';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS } from '../../constants/styles';
 import { sortVotes } from '../../util/sortUtils';
 import { getUpvotes } from '../../util/voteUtils';
 import { calculatePayout } from '../../util/steemitUtils';
+import { getAuthUsername } from '../../state/rootReducer';
 
 const Container = styled.View`
   flex-direction: row;
@@ -31,19 +33,45 @@ const Payout = styled.Text`
   align-self: center;
 `;
 
+const mapStateToProps = state => ({
+  authUsername: getAuthUsername(state),
+});
+@connect(mapStateToProps)
 class Footer extends Component {
   static propTypes = {
     postData: PropTypes.shape(),
     onPressVote: PropTypes.func,
+    authUsername: PropTypes.string,
   };
 
   static defaultProps = {
     postData: {},
     onPressVote: () => {},
+    authUsername: '',
   };
 
+  renderVoteButton() {
+    const { postData, authUsername, onPressVote } = this.props;
+    const userVote = _.find(postData.active_votes, { voter: authUsername }) || {};
+    const isVoted = userVote.percent > 0;
+
+    if (isVoted) {
+      return (
+        <TouchableOpacity onPress={onPressVote}>
+          <MaterialIcons name="thumb-up" size={24} color={COLORS.BLUE.MARINER} />
+        </TouchableOpacity>
+      );
+    }
+
+    return (
+      <TouchableOpacity onPress={onPressVote}>
+        <MaterialIcons name="thumb-up" size={24} color={COLORS.BLUE.LINK_WATER} />
+      </TouchableOpacity>
+    );
+  }
+
   render() {
-    const { postData, onPressVote } = this.props;
+    const { postData } = this.props;
     const { active_votes, children } = postData;
     const upVotes = getUpvotes(active_votes).sort(sortVotes);
     const payout = calculatePayout(postData);
@@ -54,9 +82,7 @@ class Footer extends Component {
 
     return (
       <Container>
-        <TouchableOpacity onPress={onPressVote}>
-          <MaterialIcons name="thumb-up" size={24} color={COLORS.BLUE.LINK_WATER} />
-        </TouchableOpacity>
+        {this.renderVoteButton()}
         <FooterValue>{upVotes.length}</FooterValue>
         <MaterialCommunityIcons
           name="comment-processing"
