@@ -3,15 +3,19 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components/native';
 import { View } from 'react-native';
 import steem from 'steem';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import moment from 'moment';
-import { COLORS } from 'constants/styles';
+import { COLORS, MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
 import Tag from 'components/post/Tag';
 import ReputationScore from 'components/post/ReputationScore';
 import Avatar from 'components/common/Avatar';
 
 const Container = styled.View`
-  flex-direction: row;
   padding: 16px;
+`;
+
+const UserHeaderContainer = styled.View`
+  flex-direction: row;
 `;
 
 const Author = styled.View`
@@ -28,6 +32,14 @@ const HeaderContents = styled.View`
 const PostCreated = styled.Text`
   color: ${COLORS.BLUE.BOTICELLI};
   font-size: 14px;
+`;
+
+const RebloggedText = styled.Text`
+  color: ${COLORS.BLUE.LINK_WATER};
+`;
+
+const Reblogged = styled.View`
+  flex-direction: row;
 `;
 
 const Touchable = styled.TouchableOpacity``;
@@ -52,27 +64,48 @@ class Header extends Component {
     navigation.navigate('FEED', { tag: category });
   };
 
+  renderReblogged() {
+    const { postData } = this.props;
+    if (postData.first_reblogged_by) {
+      return (
+        <Reblogged>
+          <MaterialCommunityIcons
+            name={MATERIAL_COMMUNITY_ICONS.reblog}
+            size={20}
+            color={COLORS.BLUE.LINK_WATER}
+          />
+          <RebloggedText>{`${postData.first_reblogged_by} reblogged`}</RebloggedText>
+        </Reblogged>
+      );
+    } else if (postData.first_reblogged_on) {
+      return <RebloggedText>Reblogged</RebloggedText>;
+    }
+    return null;
+  }
   render() {
     const { postData } = this.props;
 
     const { category, author, author_reputation, created } = postData;
     return (
       <Container>
-        <Avatar username={author} size={40} />
-        <HeaderContents>
-          <Author>
-            <View>
-              <Touchable onPress={this.handleUserNavigation}>
-                <AuthorText>{author}</AuthorText>
-              </Touchable>
-              <PostCreated>{moment(created).fromNow()}</PostCreated>
-            </View>
-            <ReputationScore reputation={steem.formatter.reputation(author_reputation)} />
-          </Author>
-        </HeaderContents>
-        <Touchable onPress={this.handleFeedNavigation}>
-          <Tag tag={category} />
-        </Touchable>
+        {this.renderReblogged()}
+        <UserHeaderContainer>
+          <Avatar username={author} size={40} />
+          <HeaderContents>
+            <Author>
+              <View>
+                <Touchable onPress={this.handleUserNavigation}>
+                  <AuthorText>{author}</AuthorText>
+                </Touchable>
+                <PostCreated>{moment(created).fromNow()}</PostCreated>
+              </View>
+              <ReputationScore reputation={steem.formatter.reputation(author_reputation)} />
+            </Author>
+          </HeaderContents>
+          <Touchable onPress={this.handleFeedNavigation}>
+            <Tag tag={category} />
+          </Touchable>
+        </UserHeaderContainer>
       </Container>
     );
   }

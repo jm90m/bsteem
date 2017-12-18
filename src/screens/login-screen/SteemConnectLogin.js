@@ -27,6 +27,11 @@ const Container = styled.View`
   justify-content: center;
 `;
 
+const RedirectUrl = styled.Text`
+  padding-top: 10px;
+  font-weight: bold;
+`;
+
 @connect(null, mapDispatchToProps)
 class SteemConnectLogin extends Component {
   static propTypes = {
@@ -82,6 +87,9 @@ class SteemConnectLogin extends Component {
           borderRadius={10}
           backgroundColor={COLORS.BLUE.MARINER}
         />
+        <RedirectUrl>
+          {`${Expo.Constants.linkingUri}/redirect`}
+        </RedirectUrl>
       </Container>
     );
   }
