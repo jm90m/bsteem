@@ -11,6 +11,7 @@ export const COLORS = {
   GREY: {
     GONDOLA: '#353535',
     CHARCOAL: '#454545',
+    NERO: '#2A2A2A',
   },
 
   WHITE: {
@@ -56,6 +57,8 @@ export const MATERIAL_ICONS = {
   // user profile
   location: 'location-on',
   reply: 'reply',
+
+  close: 'close',
 };
 
 export const MATERIAL_COMMUNITY_ICONS = {

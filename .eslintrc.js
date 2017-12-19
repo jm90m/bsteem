@@ -24,5 +24,6 @@ module.exports = {
     'react/jsx-closing-bracket-location': 'off',
     'indent': 'off',
     'arrow-parens': 'off',
+    'object-curly-newline': 'off',
   },
 };

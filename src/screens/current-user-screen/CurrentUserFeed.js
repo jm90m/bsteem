@@ -66,7 +66,6 @@ class CurrentUserFeed extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    debugger;
     if (_.isEmpty(this.props.currentUserFeed)) {
       this.props.currentUserFeedFetch();
     }

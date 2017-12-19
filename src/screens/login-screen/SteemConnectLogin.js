@@ -39,7 +39,7 @@ class SteemConnectLogin extends Component {
     this.handleSteemConnectLogin = this.handleSteemConnectLogin.bind(this);
   }
 
-  handleSteemConnectLogin = async () => {
+  async handleSteemConnectLogin() {
     let redirectUrl = AuthSession.getRedirectUrl();
     const url = sc2.getLoginURL({ authenticated: true });
     try {
@@ -70,7 +70,7 @@ class SteemConnectLogin extends Component {
     } catch (error) {
       console.warn('error authenticating user');
     }
-  };
+  }
 
   render() {
     return (

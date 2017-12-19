@@ -1,19 +1,16 @@
 import React, { Component } from 'react';
+
 import PropTypes from 'prop-types';
 import styled from 'styled-components/native';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS, ICON_SIZES, MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
 
 const Container = styled.View`
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
   background-color: ${COLORS.WHITE.WHITE};
   border-bottom-color: ${COLORS.WHITE.GAINSBORO};
   border-bottom-width: 1px;
   width: 100%;
-  padding-top: 10px;
-  min-height: 45px;
+  padding-top: 20px;
 `;
 
 const CurrentMenuDisplay = styled.View`
@@ -28,13 +25,17 @@ const CurrentMenuText = styled.Text`
 
 const TouchableContainer = styled.TouchableOpacity`
   flex-direction: row;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
   width: 100%;
 `;
 
 const MenuIconContainer = styled.View`
   padding: 5px;
+`;
+
+const EmptyView = styled.View`
+  width: 5px;
 `;
 
 class CurrentUserHeader extends Component {
@@ -48,6 +49,7 @@ class CurrentUserHeader extends Component {
     return (
       <Container>
         <TouchableContainer onPress={this.props.toggleCurrentUserMenu}>
+          <EmptyView />
           <CurrentMenuDisplay>
             <MaterialIcons
               size={ICON_SIZES.menuIcon}

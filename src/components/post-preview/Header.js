@@ -7,6 +7,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import moment from 'moment';
 import { COLORS, MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
 import Tag from 'components/post/Tag';
+import * as navigationConstants from 'constants/navigation';
 import ReputationScore from 'components/post/ReputationScore';
 import Avatar from 'components/common/Avatar';
 
@@ -34,15 +35,20 @@ const PostCreated = styled.Text`
   font-size: 14px;
 `;
 
+const RebloggedUsername = styled.Text`
+  color: ${COLORS.BLUE.MARINER};
+`;
 const RebloggedText = styled.Text`
-  color: ${COLORS.BLUE.LINK_WATER};
+  color: ${props => (props.color ? props.color : COLORS.BLUE.LINK_WATER)};
 `;
 
 const Reblogged = styled.View`
   flex-direction: row;
+  padding: 10px 0;
 `;
 
-const Touchable = styled.TouchableOpacity``;
+const Touchable = styled.TouchableOpacity`
+`;
 
 class Header extends Component {
   static propTypes = {
@@ -50,19 +56,25 @@ class Header extends Component {
     postData: PropTypes.shape().isRequired,
   };
 
-  handleUserNavigation = () => {
-    const { navigation, postData } = this.props;
-    const { author } = postData;
+  constructor(props) {
+    super(props);
 
-    navigation.navigate('USER', { username: author });
-  };
+    this.handleUserNavigation = this.handleUserNavigation.bind(this);
+    this.handleFeedNavigation = this.handleFeedNavigation.bind(this);
+  }
 
-  handleFeedNavigation = () => {
+  handleUserNavigation(username) {
+    const { navigation } = this.props;
+
+    navigation.navigate(navigationConstants.USER, { username });
+  }
+
+  handleFeedNavigation() {
     const { navigation, postData } = this.props;
     const { category } = postData;
 
-    navigation.navigate('FEED', { tag: category });
-  };
+    navigation.navigate(navigationConstants.FEED, { tag: category });
+  }
 
   renderReblogged() {
     const { postData } = this.props;
@@ -73,12 +85,26 @@ class Header extends Component {
             name={MATERIAL_COMMUNITY_ICONS.reblog}
             size={20}
             color={COLORS.BLUE.LINK_WATER}
+            style={{ marginRight: 5 }}
           />
-          <RebloggedText>{`${postData.first_reblogged_by} reblogged`}</RebloggedText>
+          <Touchable onPress={() => this.handleUserNavigation(postData.first_reblogged_by)}>
+            <RebloggedUsername>{postData.first_reblogged_by}</RebloggedUsername>
+          </Touchable>
+          <RebloggedText>{' reblogged'}</RebloggedText>
         </Reblogged>
       );
     } else if (postData.first_reblogged_on) {
-      return <RebloggedText>Reblogged</RebloggedText>;
+      return (
+        <Reblogged>
+          <MaterialCommunityIcons
+            name={MATERIAL_COMMUNITY_ICONS.reblog}
+            size={20}
+            color={COLORS.BLUE.LINK_WATER}
+            style={{ marginRight: 5 }}
+          />
+          <RebloggedText>Reblogged</RebloggedText>
+        </Reblogged>
+      );
     }
     return null;
   }
@@ -94,7 +120,7 @@ class Header extends Component {
           <HeaderContents>
             <Author>
               <View>
-                <Touchable onPress={this.handleUserNavigation}>
+                <Touchable onPress={() => this.handleUserNavigation(author)}>
                   <AuthorText>{author}</AuthorText>
                 </Touchable>
                 <PostCreated>{moment(created).fromNow()}</PostCreated>

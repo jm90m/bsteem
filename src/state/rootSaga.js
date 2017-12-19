@@ -28,6 +28,9 @@ const rootSaga = function*() {
     // Current User Sagas
     spawn(currentUserSaga.watchFetchCurrentUserFeed),
     spawn(currentUserSaga.watchFetchMoreCurrentUserFeed),
+    spawn(currentUserSaga.watchCurrentUserVotePost),
+    spawn(currentUserSaga.watchCurrentUserReblogPost),
+    spawn(currentUserSaga.watchCurrentUserOnboarding),
   ]);
 };
 

@@ -1,0 +1,2 @@
+export const DEFAULT_VOTE_WEIGHT = 10000;
+export const DEFAULT_UNVOTE_WEIGHT = 0;

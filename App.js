@@ -24,7 +24,7 @@ export default class App extends React.Component {
     sc2.init({
       app: 'busy-mobile',
       callbackURL: `${Constants.linkingUri}/redirect`,
-      scope: ['vote', 'comment'],
+      scope: [],
     });
   }
 
