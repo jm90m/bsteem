@@ -32,6 +32,8 @@ const rootSaga = function*() {
     spawn(currentUserSaga.watchCurrentUserReblogPost),
     spawn(currentUserSaga.watchCurrentUserOnboarding),
     spawn(currentUserSaga.watchCurrentUserFollowList),
+    spawn(currentUserSaga.watchCurrentUserFollowUser),
+    spawn(currentUserSaga.watchCurrentuserUnfollowUser),
   ]);
 };
 

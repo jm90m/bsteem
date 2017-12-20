@@ -2,7 +2,7 @@ import _ from 'lodash';
 import { takeLatest, all, call, put, select } from 'redux-saga/effects';
 import API from 'api/api';
 import sc2 from 'api/sc2';
-import { getAuthUsername, getCurrentUserFeed, getUsersDetails } from '../rootReducer';
+import { getAuthUsername, getCurrentUserFeed } from '../rootReducer';
 import {
   FETCH_CURRENT_USER_FEED,
   FETCH_MORE_CURRENT_USER_FEED,
@@ -10,6 +10,8 @@ import {
   CURRENT_USER_REBLOG_POST,
   CURRENT_USER_ONBOARDING,
   FETCH_CURRENT_USER_FOLLOW_LIST,
+  CURRENT_USER_FOLLOW_USER,
+  CURRENT_USER_UNFOLLOW_USER,
 } from '../actions/actionTypes';
 import * as currentUserActions from '../actions/currentUserActions';
 
@@ -100,6 +102,40 @@ const fetchCurrentUserFollowList = function*() {
   }
 };
 
+const followUser = function*(action) {
+  try {
+    const { username, followSuccessCallback } = action.payload;
+    const currentUsername = yield select(getAuthUsername);
+    const result = yield call(sc2.follow, currentUsername, username);
+    const payload = {
+      username,
+    };
+    followSuccessCallback();
+    console.log('FOLLOW SUCCESS', result, payload);
+    yield put(currentUserActions.currentUserFollowUser.success(payload));
+  } catch (error) {
+    console.log('FOLLOW FAIL', error);
+    yield put(currentUserActions.currentUserFollowUser.fail(error));
+  }
+};
+
+const unfollowUser = function*(action) {
+  try {
+    const { username, unfollowSuccessCallback } = action.payload;
+    const currentUsername = yield select(getAuthUsername);
+    const result = yield call(sc2.unfollow, currentUsername, username);
+    const payload = {
+      username,
+    };
+    unfollowSuccessCallback();
+    console.log('UNFOLLOW SUCCESS', result, payload);
+    yield put(currentUserActions.currentUserUnfollowUser.success(payload));
+  } catch (error) {
+    console.log('UNFOLLOW FAIL', error);
+    yield put(currentUserActions.currentUserUnfollowUser.fail(error));
+  }
+};
+
 const currentUserOnboarding = function*() {
   try {
     yield all([call(fetchCurrentUserFeed), call(fetchCurrentUserRebloggedList)]);
@@ -132,4 +168,12 @@ export const watchCurrentUserOnboarding = function*() {
 
 export const watchCurrentUserFollowList = function*() {
   yield takeLatest(FETCH_CURRENT_USER_FOLLOW_LIST.ACTION, fetchCurrentUserFollowList);
+};
+
+export const watchCurrentUserFollowUser = function*() {
+  yield takeLatest(CURRENT_USER_FOLLOW_USER.ACTION, followUser);
+};
+
+export const watchCurrentuserUnfollowUser = function*() {
+  yield takeLatest(CURRENT_USER_UNFOLLOW_USER.ACTION, unfollowUser);
 };

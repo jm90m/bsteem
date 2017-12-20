@@ -68,6 +68,10 @@ const FollowingButton = styled.TouchableOpacity`
   margin-right: 16px;
 `;
 
+const LoadingFollowing = styled.ActivityIndicator`
+  margin-left: auto;
+`;
+
 class UserCover extends Component {
   static propTypes = {
     username: PropTypes.string,
@@ -75,6 +79,9 @@ class UserCover extends Component {
     hasCover: PropTypes.bool,
     displayFollowButton: PropTypes.bool,
     hideFollowButton: PropTypes.bool,
+    loadingIsFollowing: PropTypes.bool,
+    handleFollow: PropTypes.func,
+    handleUnfollow: PropTypes.func,
   };
 
   static defaultProps = {
@@ -83,6 +90,9 @@ class UserCover extends Component {
     hasCover: false,
     displayFollowButton: true,
     hideFollowButton: false,
+    loadingIsFollowing: false,
+    handleFollow: () => {},
+    handleUnfollow: () => {},
   };
 
   constructor(props) {
@@ -108,19 +118,29 @@ class UserCover extends Component {
   }
 
   renderFollowButton() {
-    const { displayFollowButton, hideFollowButton } = this.props;
+    const {
+      displayFollowButton,
+      hideFollowButton,
+      handleFollow,
+      handleUnfollow,
+      loadingIsFollowing,
+    } = this.props;
 
     if (hideFollowButton) return null;
 
+    if (loadingIsFollowing) {
+      return <LoadingFollowing color={COLORS.BLUE.MARINER} size="small" />;
+    }
+
     if (displayFollowButton) {
       return (
-        <FollowButton>
+        <FollowButton onPress={handleFollow}>
           <MaterialIcons size={24} name={MATERIAL_ICONS.follow} color={COLORS.WHITE.WHITE} />
         </FollowButton>
       );
     }
     return (
-      <FollowingButton>
+      <FollowingButton onPress={handleUnfollow}>
         <MaterialIcons size={24} name={MATERIAL_ICONS.followed} color={COLORS.WHITE.WHITE} />
       </FollowingButton>
     );

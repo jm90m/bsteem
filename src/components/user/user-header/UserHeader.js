@@ -5,6 +5,7 @@ import { View } from 'react-native';
 import { connect } from 'react-redux';
 import steem from 'steem';
 import { getUsersDetails, getCurrentUserFollowList, getUsersFollowCount } from 'state/rootReducer';
+import { currentUserFollowUser, currentUserUnfollowUser } from 'state/actions/currentUserActions';
 import UserProfile from 'components/user/user-profile/UserProfile';
 import UserStats from './UserStats';
 import UserCover from './UserCover';
@@ -15,7 +16,14 @@ const mapStateToProps = state => ({
   usersFollowCount: getUsersFollowCount(state),
 });
 
-@connect(mapStateToProps)
+const mapDispatchToProps = dispatch => ({
+  currentUserFollowUser: (username, followSuccessCallback) =>
+    dispatch(currentUserFollowUser.action({ username, followSuccessCallback })),
+  currentUserUnfollowUser: (username, unfollowSuccessCallback) =>
+    dispatch(currentUserUnfollowUser.action({ username, unfollowSuccessCallback })),
+});
+
+@connect(mapStateToProps, mapDispatchToProps)
 class UserHeader extends Component {
   static propTypes = {
     currentUserFollowList: PropTypes.shape().isRequired,
@@ -23,20 +31,74 @@ class UserHeader extends Component {
     usersDetails: PropTypes.shape().isRequired,
     usersFollowCount: PropTypes.shape().isRequired,
     hideFollowButton: PropTypes.bool,
+    currentUserFollowUser: PropTypes.func.isRequired,
+    currentUserUnfollowUser: PropTypes.func.isRequired,
   };
 
   static defaultProps = {
     hideFollowButton: false,
   };
 
+  constructor(props) {
+    super(props);
+    const { username, currentUserFollowList } = this.props;
+    const isFollowing = _.get(currentUserFollowList, username, false);
+
+    this.state = {
+      isFollowing,
+      loadingIsFollowing: false,
+    };
+
+    this.handleFollow = this.handleFollow.bind(this);
+    this.handleUnfollow = this.handleUnfollow.bind(this);
+    this.loadingFollowing = this.loadingFollowing.bind(this);
+    this.successFollow = this.successFollow.bind(this);
+    this.successUnfollow = this.successUnfollow.bind(this);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const isFollowing = _.get(nextProps.currentUserFollowList, nextProps.username, false);
+    this.setState({
+      isFollowing,
+    });
+  }
+
+  loadingFollowing() {
+    this.setState({
+      loadingIsFollowing: true,
+    });
+  }
+
+  successFollow() {
+    this.setState({
+      isFollowing: true,
+      loadingIsFollowing: false,
+    });
+  }
+
+  successUnfollow() {
+    debugger;
+    this.setState({
+      isFollowing: false,
+      loadingIsFollowing: false,
+    });
+  }
+
+  handleFollow() {
+    this.loadingFollowing();
+    const { username } = this.props;
+    this.props.currentUserFollowUser(username, this.successFollow);
+  }
+
+  handleUnfollow() {
+    this.loadingFollowing();
+    const { username } = this.props;
+    this.props.currentUserUnfollowUser(username, this.successUnfollow);
+  }
+
   render() {
-    const {
-      usersDetails,
-      currentUserFollowList,
-      username,
-      usersFollowCount,
-      hideFollowButton,
-    } = this.props;
+    const { usersDetails, username, usersFollowCount, hideFollowButton } = this.props;
+    const { isFollowing, loadingIsFollowing } = this.state;
     const userDetails = usersDetails[username] || {};
     const userJsonMetaData = _.attempt(JSON.parse, userDetails.json_metadata);
     const userProfile = _.isError(userJsonMetaData) ? {} : userJsonMetaData.profile;
@@ -45,7 +107,6 @@ class UserHeader extends Component {
       ? steem.formatter.reputation(userDetails.reputation)
       : 0;
     const userFollowCount = usersFollowCount[username];
-    const displayFollowButton = !_.has(currentUserFollowList, username);
     const followerCount = _.get(userFollowCount, 'follower_count', 0);
     const followingCount = _.get(userFollowCount, 'following_count', 0);
     const postCount = _.get(userDetails, 'post_count', 0);
@@ -56,8 +117,11 @@ class UserHeader extends Component {
           username={username}
           hasCover={hasCover}
           userReputation={userReputation}
-          displayFollowButton={displayFollowButton}
+          displayFollowButton={isFollowing}
           hideFollowButton={hideFollowButton}
+          loadingIsFollowing={loadingIsFollowing}
+          handleFollow={this.handleFollow}
+          handleUnFollow={this.handleUnfollow}
         />
         <UserProfile userProfile={userProfile} />
         <UserStats

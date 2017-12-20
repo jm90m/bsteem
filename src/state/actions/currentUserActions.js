@@ -7,6 +7,8 @@ import {
   CURRENT_USER_REBLOG_POST,
   CURRENT_USER_ONBOARDING,
   FETCH_CURRENT_USER_FOLLOW_LIST,
+  CURRENT_USER_FOLLOW_USER,
+  CURRENT_USER_UNFOLLOW_USER,
 } from './actionTypes';
 
 export const currentUserFeedFetch = createAsyncSagaAction(FETCH_CURRENT_USER_FEED);
@@ -16,6 +18,7 @@ export const currentUserReblogListFetch = createAsyncSagaAction(FETCH_CURRENT_US
 
 export const currentUserVotePost = createAsyncSagaAction(CURRENT_USER_VOTE_POST);
 export const currentUserReblogPost = createAsyncSagaAction(CURRENT_USER_REBLOG_POST);
+export const currentUserFollowUser = createAsyncSagaAction(CURRENT_USER_FOLLOW_USER);
+export const currentUserUnfollowUser = createAsyncSagaAction(CURRENT_USER_UNFOLLOW_USER);
 
 export const currentUserOnboarding = createAsyncSagaAction(CURRENT_USER_ONBOARDING);
-

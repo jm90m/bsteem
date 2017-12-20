@@ -44,3 +44,9 @@ export const CURRENT_USER_ONBOARDING = createAsyncActionType(
 export const FETCH_CURRENT_USER_FOLLOW_LIST = createAsyncActionType(
   '@current-user/fetch-current-user-follow-list',
 );
+export const CURRENT_USER_FOLLOW_USER = createAsyncActionType(
+  '@current-user/current-user-follow-user',
+);
+export const CURRENT_USER_UNFOLLOW_USER = createAsyncActionType(
+  '@current-user/current-user-unfollow-user',
+);
