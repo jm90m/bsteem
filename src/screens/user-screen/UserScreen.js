@@ -28,10 +28,7 @@ import {
 } from 'state/rootReducer';
 import PostPreview from 'components/post-preview/PostPreview';
 import CommentsPreview from 'components/user/user-comments/CommentsPreview';
-import UserHeader from 'components/user/UserHeader';
 import UserMenu from 'components/user/UserMenu';
-import UserStats from 'components/user/UserStats';
-import UserProfile from 'components/user/user-profile/UserProfile';
 import UserBlog from './UserBlog';
 
 const Container = styled.View`

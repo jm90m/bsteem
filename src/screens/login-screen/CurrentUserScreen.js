@@ -36,8 +36,7 @@ import { COLORS } from 'constants/styles';
 import * as userMenuConstants from 'constants/userMenu';
 import PostPreview from 'components/post-preview/PostPreview';
 import CommentsPreview from 'components/user/user-comments/CommentsPreview';
-import UserHeader from 'components/user/UserHeader';
-import UserStats from 'components/user/UserStats';
+import UserHeader from 'components/user/user-header/UserHeader';
 import CurrentUserHeader from './CurrentUserHeader';
 import CurrentUserMenu from './CurrentUserMenu';
 
@@ -289,30 +288,9 @@ class CurrentUserScreen extends Component {
     }
   }
 
-  renderUserStats() {
-    const { usersDetails, usersFollowCount, username } = this.props;
-    const userFollowCount = _.get(usersFollowCount, username, {});
-    const userDetails = _.get(usersDetails, username, {});
-    const followerCount = _.get(userFollowCount, 'follower_count', 0);
-    const followingCount = _.get(userFollowCount, 'following_count', 0);
-    const postCount = _.get(userDetails, 'post_count', 0);
-
-    return (
-      <UserStats
-        postCount={postCount}
-        followerCount={followerCount}
-        followingCount={followingCount}
-      />
-    );
-  }
-
   render() {
     const { currentMenuOption, menuVisible } = this.state;
-    const { username, usersDetails } = this.props;
-    const userDetails = _.get(usersDetails, username, {});
-    const userReputation = _.has(userDetails, 'reputation')
-      ? steem.formatter.reputation(userDetails.reputation)
-      : 0;
+    const { username } = this.props;
 
     return (
       <Container>
@@ -320,13 +298,7 @@ class CurrentUserScreen extends Component {
           currentMenuOption={currentMenuOption}
           toggleCurrentUserMenu={this.toggleCurrentUserMenu}
         />
-        <UserHeader
-          username={username}
-          hasCover={false}
-          userReputation={userReputation}
-          displayFollowButton={false}
-        />
-        {this.renderUserStats()}
+        <UserHeader username={username} hideFollowButton />
         {this.renderUserContent()}
         {this.renderLoader()}
         <Modal

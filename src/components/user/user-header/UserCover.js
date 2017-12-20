@@ -68,12 +68,13 @@ const FollowingButton = styled.TouchableOpacity`
   margin-right: 16px;
 `;
 
-class UserHeader extends Component {
+class UserCover extends Component {
   static propTypes = {
     username: PropTypes.string,
     userReputation: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     hasCover: PropTypes.bool,
     displayFollowButton: PropTypes.bool,
+    hideFollowButton: PropTypes.bool,
   };
 
   static defaultProps = {
@@ -81,6 +82,7 @@ class UserHeader extends Component {
     userReputation: '0',
     hasCover: false,
     displayFollowButton: true,
+    hideFollowButton: false,
   };
 
   constructor(props) {
@@ -106,7 +108,10 @@ class UserHeader extends Component {
   }
 
   renderFollowButton() {
-    const { displayFollowButton } = this.props;
+    const { displayFollowButton, hideFollowButton } = this.props;
+
+    if (hideFollowButton) return null;
+
     if (displayFollowButton) {
       return (
         <FollowButton>
@@ -153,4 +158,4 @@ class UserHeader extends Component {
   }
 }
 
-export default UserHeader;
+export default UserCover;

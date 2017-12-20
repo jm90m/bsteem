@@ -50,18 +50,18 @@ class UserStats extends Component {
         </ValueLabelContainer>
         <ValueLabelContainer>
           <Value>
-            {abbreviateLargeNumber(followingCount)}
-          </Value>
-          <Label>
-            {'following'}
-          </Label>
-        </ValueLabelContainer>
-        <ValueLabelContainer>
-          <Value>
             {abbreviateLargeNumber(followerCount)}
           </Value>
           <Label>
             {'followers'}
+          </Label>
+        </ValueLabelContainer>
+        <ValueLabelContainer>
+          <Value>
+            {abbreviateLargeNumber(followingCount)}
+          </Value>
+          <Label>
+            {'following'}
           </Label>
         </ValueLabelContainer>
       </Container>
