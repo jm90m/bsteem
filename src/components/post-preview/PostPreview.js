@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Dimensions, Image, Modal } from 'react-native';
+import { Image, Modal } from 'react-native';
 import styled from 'styled-components/native';
 import { connect } from 'react-redux';
 import _ from 'lodash';
@@ -18,9 +18,8 @@ import ReblogModal from 'components/post/ReblogModal';
 import Footer from './Footer';
 import Header from './Header';
 import BodyShort from './BodyShort';
+import PreviewImage from './PreviewImage';
 import { currentUserReblogPost } from '../../state/actions/currentUserActions';
-
-const { width } = Dimensions.get('screen');
 
 const Container = styled.View`
   background-color: ${COLORS.WHITE.WHITE};
@@ -41,11 +40,6 @@ const Title = styled.Text`
   font-weight: 700;
   font-size: 20px;
   margin: 0 16px 8px;
-`;
-
-const PreviewImage = styled.Image`
-  min-height: 200px;
-  max-height: 400px;
 `;
 
 const Touchable = styled.TouchableOpacity``;
@@ -100,6 +94,7 @@ class PostPreview extends Component {
     navigation: PropTypes.shape().isRequired,
     postData: PropTypes.shape(),
     rebloggedList: PropTypes.arrayOf([PropTypes.string, PropTypes.number]),
+    currentUsername: PropTypes.string,
   };
 
   static defaultProps = {
@@ -107,6 +102,7 @@ class PostPreview extends Component {
     authenticated: false,
     authUsername: '',
     rebloggedList: [],
+    currentUsername: '',
   };
 
   constructor(props) {
@@ -238,7 +234,7 @@ class PostPreview extends Component {
   }
 
   render() {
-    const { postData, navigation, authUsername, rebloggedList } = this.props;
+    const { postData, navigation, authUsername, rebloggedList, currentUsername } = this.props;
     const { likedPost, loadingVote, displayReblogModal, loadingReblog } = this.state;
     const { title, category, author, json_metadata, body, permlink, id } = postData;
     const parsedJsonMetadata = JSON.parse(json_metadata);
@@ -248,7 +244,7 @@ class PostPreview extends Component {
 
     return (
       <Container>
-        <Header postData={postData} navigation={navigation} />
+        <Header postData={postData} navigation={navigation} currentUsername={currentUsername} />
         <Content>
           <Touchable
             onPress={() =>
@@ -264,12 +260,7 @@ class PostPreview extends Component {
               })}
           >
             <Title>{title}</Title>
-            {hasPreviewImage &&
-              <PreviewImage
-                style={{ height: null, width }}
-                source={{ uri: previewImage }}
-                resizeMode={Image.resizeMode.cover}
-              />}
+            {hasPreviewImage && <PreviewImage images={images} />}
             <BodyShort content={body} />
           </Touchable>
         </Content>

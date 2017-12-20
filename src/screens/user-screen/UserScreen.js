@@ -23,6 +23,8 @@ import {
   getLoadingUsersComments,
   getLoadingUsersDetails,
   getLoadingUsersFollowCount,
+  getCurrentUserFollowList,
+  getAuthUsername,
 } from 'state/rootReducer';
 import PostPreview from 'components/post-preview/PostPreview';
 import CommentsPreview from 'components/user/user-comments/CommentsPreview';
@@ -30,6 +32,7 @@ import UserHeader from 'components/user/UserHeader';
 import UserMenu from 'components/user/UserMenu';
 import UserStats from 'components/user/UserStats';
 import UserProfile from 'components/user/user-profile/UserProfile';
+import UserBlog from './UserBlog';
 
 const Container = styled.View`
   flex: 1;
@@ -86,6 +89,8 @@ const mapStateToProps = state => ({
   loadingUsersComments: getLoadingUsersComments(state),
   loadingUsersDetails: getLoadingUsersDetails(state),
   loadingUsersFollowCount: getLoadingUsersFollowCount(state),
+  currentUserFollowList: getCurrentUserFollowList(state),
+  authUsername: getAuthUsername(state),
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -97,6 +102,7 @@ const mapDispatchToProps = dispatch => ({
 
 const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
 
+@connect(mapStateToProps, mapDispatchToProps)
 class UserScreen extends Component {
   static navigationOptions = {
     headerMode: 'none',
@@ -206,7 +212,14 @@ class UserScreen extends Component {
   }
 
   renderUserPostRow(rowData) {
-    return <PostPreview postData={rowData} navigation={this.props.navigation} />;
+    const { username } = this.props.navigation.state.params;
+    return (
+      <PostPreview
+        postData={rowData}
+        navigation={this.props.navigation}
+        currentUsername={username}
+      />
+    );
   }
 
   renderUserCommentsRow(rowData) {
@@ -215,6 +228,13 @@ class UserScreen extends Component {
 
   renderUserContent() {
     const { currentMenuOption } = this.state;
+    const {
+      navigation,
+      usersDetails,
+      authUsername,
+      currentUserFollowList,
+      usersFollowCount,
+    } = this.props;
     const { username } = this.props.navigation.state.params;
     const { usersComments, usersBlog } = this.props;
     const userComments = usersComments[username] || [];
@@ -239,11 +259,15 @@ class UserScreen extends Component {
       case userMenuConstants.BLOG.id:
       default:
         return (
-          <StyledListView
-            dataSource={ds.cloneWithRows(userBlog)}
-            renderRow={this.renderUserPostRow}
-            enableEmptySections
-            onEndReached={this.fetchMoreUserPosts}
+          <UserBlog
+            username={username}
+            userBlog={userBlog}
+            navigation={navigation}
+            fetchMoreUserPosts={this.fetchMoreUserPosts}
+            usersDetails={usersDetails}
+            authUsername={authUsername}
+            usersFollowCount={usersFollowCount}
+            currentUserFollowList={currentUserFollowList}
           />
         );
     }
@@ -264,20 +288,7 @@ class UserScreen extends Component {
   }
 
   render() {
-    const { usersDetails, usersFollowCount } = this.props;
-    const { username } = this.props.navigation.state.params;
-    const userDetails = usersDetails[username] || {};
-    const userJsonMetaData = _.attempt(JSON.parse, userDetails.json_metadata);
-    const userProfile = _.isError(userJsonMetaData) ? {} : userJsonMetaData.profile;
-    const userFollowCount = usersFollowCount[username];
-    const hasCover = _.has(userProfile, 'cover_image');
     const { menuVisible, currentMenuOption } = this.state;
-    const userReputation = _.has(userDetails, 'reputation')
-      ? steem.formatter.reputation(userDetails.reputation)
-      : 0;
-    const followerCount = _.get(userFollowCount, 'follower_count', 0);
-    const followingCount = _.get(userFollowCount, 'following_count', 0);
-    const postCount = _.get(userDetails, 'post_count', 0);
 
     return (
       <Container>
@@ -313,20 +324,11 @@ class UserScreen extends Component {
             handleChangeUserMenu={this.handleChangeUserMenu}
           />
         </Modal>
-        <ScrollView>
-          <UserHeader username={username} hasCover={hasCover} userReputation={userReputation} />
-          <UserStats
-            postCount={postCount}
-            followerCount={followerCount}
-            followingCount={followingCount}
-          />
-          <UserProfile userProfile={userProfile} />
-          {this.renderUserContent()}
-          {this.renderLoader()}
-        </ScrollView>
+        {this.renderUserContent()}
+        {this.renderLoader()}
       </Container>
     );
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(UserScreen);
+export default UserScreen;

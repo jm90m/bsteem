@@ -2,7 +2,7 @@ import React from 'react';
 import { TabNavigator } from 'react-navigation';
 import * as navigation from 'constants/navigation';
 import { COLORS } from 'constants/styles';
-import UserBlogScreen from './UserBlogScreen';
+import UserBlogScreen from './UserBlog';
 import UserCommentsScreen from './UserCommentsScreen';
 import UserFollowingScreen from './UserFollowingScreen';
 import UserFollowerScreen from './UserFollowerScreen';

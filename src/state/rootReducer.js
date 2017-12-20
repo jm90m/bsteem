@@ -53,3 +53,5 @@ export const getLoadingFetchMoreCurrentUserFeed = state =>
   fromCurrentUser.getLoadingFetchMoreCurrentUserFeed(state.currentUser);
 export const getCurrentUserRebloggedList = state =>
   fromCurrentUser.getCurrentUserRebloggedList(state.currentUser);
+export const getCurrentUserFollowList = state =>
+  fromCurrentUser.getCurrentUserFollowList(state.currentUser);

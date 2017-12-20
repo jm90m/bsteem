@@ -1,8 +1,10 @@
+import _ from 'lodash';
 import {
   FETCH_CURRENT_USER_FEED,
   FETCH_MORE_CURRENT_USER_FEED,
   FETCH_CURRENT_USER_REBLOG_LIST,
   CURRENT_USER_REBLOG_POST,
+  FETCH_CURRENT_USER_FOLLOW_LIST,
 } from '../actions/actionTypes';
 
 const INITIAL_STATE = {
@@ -10,6 +12,7 @@ const INITIAL_STATE = {
   loadingFetchCurrentUserFeed: false,
   loadingFetchMoreCurrentUserFeed: false,
   rebloggedList: [],
+  followList: {},
 };
 
 export default (state = INITIAL_STATE, action) => {
@@ -58,6 +61,21 @@ export default (state = INITIAL_STATE, action) => {
         ...state,
         rebloggedList: state.rebloggedList.concat(action.payload.postId),
       };
+    case FETCH_CURRENT_USER_FOLLOW_LIST.SUCCESS: {
+      const formattedFollowList = _.reduce(
+        action.payload,
+        (obj, followDetails) => {
+          obj[followDetails.following] = true;
+          return obj;
+        },
+        {},
+      );
+      console.log(formattedFollowList);
+      return {
+        ...state,
+        followList: formattedFollowList,
+      };
+    }
     default:
       return state;
   }
@@ -67,3 +85,4 @@ export const getCurrentUserFeed = state => state.currentUserFeed;
 export const getLoadingFetchCurrentUserFeed = state => state.loadingFetchCurrentUserFeed;
 export const getLoadingFetchMoreCurrentUserFeed = state => state.loadingFetchMoreCurrentUserFeed;
 export const getCurrentUserRebloggedList = state => state.rebloggedList;
+export const getCurrentUserFollowList = state => state.followList;

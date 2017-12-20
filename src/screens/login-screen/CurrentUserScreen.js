@@ -22,6 +22,7 @@ import {
   getLoadingUsersComments,
   getLoadingUsersDetails,
   getLoadingUsersFollowCount,
+  getCurrentUserFollowList,
 } from 'state/rootReducer';
 import {
   STEEM_ACCESS_TOKEN,
@@ -30,6 +31,7 @@ import {
   AUTH_USERNAME,
 } from 'constants/asyncStorageKeys';
 import { logoutUser } from 'state/actions/authActions';
+import { currentUserFollowListFetch } from 'state/actions/currentUserActions';
 import { COLORS } from 'constants/styles';
 import * as userMenuConstants from 'constants/userMenu';
 import PostPreview from 'components/post-preview/PostPreview';
@@ -63,6 +65,7 @@ const mapStateToProps = state => ({
   loadingUsersComments: getLoadingUsersComments(state),
   loadingUsersDetails: getLoadingUsersDetails(state),
   loadingUsersFollowCount: getLoadingUsersFollowCount(state),
+  currentUserFollowList: getCurrentUserFollowList(state),
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -71,23 +74,26 @@ const mapDispatchToProps = dispatch => ({
   fetchUserComments: (username, query) => dispatch(fetchUserComments.action({ username, query })),
   fetchUserBlog: (username, query) => dispatch(fetchUserBlog.action({ username, query })),
   fetchUserFollowCount: username => dispatch(fetchUserFollowCount.action({ username })),
+  fetchCurrentUserFollowList: () => dispatch(currentUserFollowListFetch.action()),
 });
 
 @connect(mapStateToProps, mapDispatchToProps)
 class CurrentUserScreen extends Component {
   static propTypes = {
+    currentUserFollowList: PropTypes.shape().isRequired,
+    fetchCurrentUserFollowList: PropTypes.func.isRequired,
+    fetchUser: PropTypes.func.isRequired,
+    fetchUserBlog: PropTypes.func.isRequired,
+    fetchUserComments: PropTypes.func.isRequired,
+    fetchUserFollowCount: PropTypes.func.isRequired,
+    loadingUsersBlog: PropTypes.bool.isRequired,
+    loadingUsersComments: PropTypes.bool.isRequired,
     logoutUser: PropTypes.func.isRequired,
     navigation: PropTypes.shape().isRequired,
-    fetchUser: PropTypes.func.isRequired,
-    fetchUserComments: PropTypes.func.isRequired,
-    fetchUserBlog: PropTypes.func.isRequired,
-    fetchUserFollowCount: PropTypes.func.isRequired,
-    loadingUsersComments: PropTypes.bool.isRequired,
-    loadingUsersBlog: PropTypes.bool.isRequired,
     username: PropTypes.string.isRequired,
-    usersDetails: PropTypes.shape().isRequired,
-    usersComments: PropTypes.shape().isRequired,
     usersBlog: PropTypes.shape().isRequired,
+    usersComments: PropTypes.shape().isRequired,
+    usersDetails: PropTypes.shape().isRequired,
     usersFollowCount: PropTypes.shape().isRequired,
   };
 
@@ -110,7 +116,14 @@ class CurrentUserScreen extends Component {
   }
 
   componentDidMount() {
-    const { username, usersDetails, usersComments, usersBlog, usersFollowCount } = this.props;
+    const {
+      username,
+      usersDetails,
+      usersComments,
+      usersBlog,
+      usersFollowCount,
+      currentUserFollowList,
+    } = this.props;
     const userDetails = _.get(usersDetails, username, []);
     const userComments = _.get(usersComments, username, []);
     const userBlog = _.get(usersBlog, username, []);
@@ -132,6 +145,10 @@ class CurrentUserScreen extends Component {
 
     if (_.isEmpty(userFollowCount)) {
       this.props.fetchUserFollowCount(username);
+    }
+
+    if (_.isEmpty(currentUserFollowList)) {
+      this.props.fetchCurrentUserFollowList();
     }
   }
 
@@ -296,6 +313,7 @@ class CurrentUserScreen extends Component {
     const userReputation = _.has(userDetails, 'reputation')
       ? steem.formatter.reputation(userDetails.reputation)
       : 0;
+
     return (
       <Container>
         <CurrentUserHeader

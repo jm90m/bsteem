@@ -1,4 +1,5 @@
 import steem from 'steem';
+import _ from 'lodash';
 import * as feedFilters from 'constants/feedFilters';
 
 async function sendRequest(url, requestParams) {
@@ -71,6 +72,36 @@ class API {
 
   static async getDiscussionsByFeed(query) {
     return steem.api.getDiscussionsByFeedAsync(query);
+  }
+
+  static async getFollowers(following, startFollower, followType, limit) {
+    return steem.api.getFollowersAsync(following, startFollower, followType, limit);
+  }
+
+  static async getFollowing(follower, startFollowing, followType, limit) {
+    return steem.api.getFollowingAsync(follower, startFollowing, followType, limit);
+  }
+
+  static async getAllFollowing(username) {
+    return new Promise(async resolve => {
+      try {
+        const following = await API.getFollowCount(username);
+        const chunkSize = 100;
+        const limitArray = _.fill(
+          Array(Math.ceil(following.following_count / chunkSize)),
+          chunkSize,
+        );
+        const list = limitArray.reduce(async (currentListP, value) => {
+          const currentList = await currentListP;
+          const startForm = currentList[currentList.length - 1] || '';
+          const followers = await API.getFollowing(username, startForm, 'blog', value);
+          return currentList.slice(0, currentList.length - 1).concat(followers);
+        }, []);
+        resolve(list);
+      } catch (error) {
+        console.warn(error);
+      }
+    });
   }
 }
 

@@ -60,6 +60,14 @@ const FollowButton = styled.TouchableOpacity`
   margin-right: 16px;
 `;
 
+const FollowingButton = styled.TouchableOpacity`
+  background-color: ${COLORS.BLUE.MARINER};
+  border-radius: 4px;
+  margin-left: auto;
+  padding: 5px;
+  margin-right: 16px;
+`;
+
 class UserHeader extends Component {
   static propTypes = {
     username: PropTypes.string,
@@ -106,7 +114,11 @@ class UserHeader extends Component {
         </FollowButton>
       );
     }
-    return null;
+    return (
+      <FollowingButton>
+        <MaterialIcons size={24} name={MATERIAL_ICONS.followed} color={COLORS.WHITE.WHITE} />
+      </FollowingButton>
+    );
   }
 
   render() {

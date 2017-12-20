@@ -7,6 +7,7 @@ export const SEARCH = 'SEARCH';
 export const LOGIN = 'LOGIN';
 export const POST = 'POST';
 export const CURRENT_USER = 'CURRENT_USER';
+export const LOGOUT = 'LOGOUT';
 
 // user navigations
 export const USER_BLOG = 'USER_BLOG';

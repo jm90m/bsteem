@@ -8,6 +8,7 @@ import UserScreen from 'screens/user-screen/UserScreen';
 import PostScreen from 'screens/stack-screens/PostScreen';
 import FeedScreen from 'screens/stack-screens/FeedScreen';
 import CommentsScreen from 'screens/stack-screens/CommentsScreen';
+import LogoutScreen from 'screens/login-screen/LogoutScreen';
 
 const screenNavigationOptions = {
   tabBarIcon: ({ tintColor }) => (
@@ -34,6 +35,10 @@ const LoginNavigator = StackNavigator(
     },
     [navigationConstants.COMMENTS]: {
       screen: CommentsScreen,
+      navigationOptions: screenNavigationOptions,
+    },
+    [navigationConstants.LOGOUT]: {
+      screen: LogoutScreen,
       navigationOptions: screenNavigationOptions,
     },
   },

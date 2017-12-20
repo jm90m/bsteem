@@ -54,6 +54,11 @@ class Header extends Component {
   static propTypes = {
     navigation: PropTypes.shape().isRequired,
     postData: PropTypes.shape().isRequired,
+    currentUsername: PropTypes.string,
+  };
+
+  static defaultProps = {
+    currentUsername: '',
   };
 
   constructor(props) {
@@ -61,12 +66,19 @@ class Header extends Component {
 
     this.handleUserNavigation = this.handleUserNavigation.bind(this);
     this.handleFeedNavigation = this.handleFeedNavigation.bind(this);
+    this.handleReblogUserNavigation = this.handleReblogUserNavigation.bind(this);
   }
 
-  handleUserNavigation(username) {
-    const { navigation } = this.props;
+  handleUserNavigation() {
+    const { navigation, postData } = this.props;
+    const { author } = postData;
+    navigation.navigate(navigationConstants.USER, { username: author });
+  }
 
-    navigation.navigate(navigationConstants.USER, { username });
+  handleReblogUserNavigation() {
+    const { navigation, postData } = this.props;
+    const { first_reblogged_by } = postData;
+    navigation.navigate(navigationConstants.USER, { username: first_reblogged_by });
   }
 
   handleFeedNavigation() {
@@ -87,7 +99,7 @@ class Header extends Component {
             color={COLORS.BLUE.LINK_WATER}
             style={{ marginRight: 5 }}
           />
-          <Touchable onPress={() => this.handleUserNavigation(postData.first_reblogged_by)}>
+          <Touchable onPress={this.handleReblogUserNavigation}>
             <RebloggedUsername>{postData.first_reblogged_by}</RebloggedUsername>
           </Touchable>
           <RebloggedText>{' reblogged'}</RebloggedText>
@@ -108,6 +120,19 @@ class Header extends Component {
     }
     return null;
   }
+
+  renderAuthor() {
+    const { currentUsername, postData } = this.props;
+    const { author } = postData;
+    if (currentUsername === author) {
+      return <AuthorText>{author}</AuthorText>;
+    }
+    return (
+      <Touchable onPress={this.handleUserNavigation}>
+        <AuthorText>{author}</AuthorText>
+      </Touchable>
+    );
+  }
   render() {
     const { postData } = this.props;
 
@@ -120,9 +145,7 @@ class Header extends Component {
           <HeaderContents>
             <Author>
               <View>
-                <Touchable onPress={() => this.handleUserNavigation(author)}>
-                  <AuthorText>{author}</AuthorText>
-                </Touchable>
+                {this.renderAuthor()}
                 <PostCreated>{moment(created).fromNow()}</PostCreated>
               </View>
               <ReputationScore reputation={steem.formatter.reputation(author_reputation)} />

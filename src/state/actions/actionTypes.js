@@ -41,3 +41,6 @@ export const FETCH_CURRENT_USER_REBLOG_LIST = createAsyncActionType(
 export const CURRENT_USER_ONBOARDING = createAsyncActionType(
   '@current-user/current_user_onboarding',
 );
+export const FETCH_CURRENT_USER_FOLLOW_LIST = createAsyncActionType(
+  '@current-user/fetch-current-user-follow-list',
+);

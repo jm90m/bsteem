@@ -2,13 +2,14 @@ import _ from 'lodash';
 import { takeLatest, all, call, put, select } from 'redux-saga/effects';
 import API from 'api/api';
 import sc2 from 'api/sc2';
-import { getAuthUsername, getCurrentUserFeed } from '../rootReducer';
+import { getAuthUsername, getCurrentUserFeed, getUsersDetails } from '../rootReducer';
 import {
   FETCH_CURRENT_USER_FEED,
   FETCH_MORE_CURRENT_USER_FEED,
   CURRENT_USER_VOTE_POST,
   CURRENT_USER_REBLOG_POST,
   CURRENT_USER_ONBOARDING,
+  FETCH_CURRENT_USER_FOLLOW_LIST,
 } from '../actions/actionTypes';
 import * as currentUserActions from '../actions/currentUserActions';
 
@@ -88,6 +89,17 @@ const fetchCurrentUserRebloggedList = function*() {
   }
 };
 
+const fetchCurrentUserFollowList = function*() {
+  try {
+    const currentUsername = yield select(getAuthUsername);
+    const result = yield call(API.getAllFollowing, currentUsername);
+    yield put(currentUserActions.currentUserFollowListFetch.success(result));
+  } catch (error) {
+    console.log('FOLLOW LIST ERROR', error);
+    yield put(currentUserActions.currentUserFollowListFetch.fail(error));
+  }
+};
+
 const currentUserOnboarding = function*() {
   try {
     yield all([call(fetchCurrentUserFeed), call(fetchCurrentUserRebloggedList)]);
@@ -116,4 +128,8 @@ export const watchCurrentUserReblogPost = function*() {
 
 export const watchCurrentUserOnboarding = function*() {
   yield takeLatest(CURRENT_USER_ONBOARDING.ACTION, currentUserOnboarding);
+};
+
+export const watchCurrentUserFollowList = function*() {
+  yield takeLatest(FETCH_CURRENT_USER_FOLLOW_LIST.ACTION, fetchCurrentUserFollowList);
 };

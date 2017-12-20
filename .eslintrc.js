@@ -25,5 +25,6 @@ module.exports = {
     'indent': 'off',
     'arrow-parens': 'off',
     'object-curly-newline': 'off',
+    'function-paren-newline': 'off',
   },
 };
