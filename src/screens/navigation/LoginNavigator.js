@@ -51,6 +51,7 @@ const LoginNavigator = StackNavigator(
       screen: FollowingScreen,
       navigationOptions: screenNavigationOptions,
     },
+
   },
   {
     headerMode: 'none',
