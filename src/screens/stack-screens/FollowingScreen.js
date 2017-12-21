@@ -5,7 +5,7 @@ import { ListView } from 'react-native';
 import styled from 'styled-components/native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { COLORS, MATERIAL_ICONS } from 'constants/styles';
-import { Button } from 'react-native-elements';
+import FollowButton from 'components/common/FollowButton';
 import API from 'api/api';
 import * as navigationConstants from 'constants/navigation';
 import HeaderContainer from 'components/common/HeaderContainer';
@@ -108,28 +108,14 @@ class FollowingScreen extends Component {
   }
 
   renderRow(rowData) {
-    const { currentUserFollowList } = this.props;
     const { following } = rowData;
-    const isFollowingUser = _.get(currentUserFollowList, following, false);
     return (
       <UserContainer>
         <UserTouchable onPress={() => this.handleNavigateToUser(following)}>
           <Avatar username={following} />
           <UserText>{following}</UserText>
         </UserTouchable>
-        {isFollowingUser
-          ? <Button
-              title="Unfollow"
-              onPress={() => {}}
-              borderRadius={10}
-              backgroundColor={COLORS.RED.VALENCIA}
-            />
-          : <Button
-              title="Follow"
-              onPress={() => {}}
-              borderRadius={10}
-              backgroundColor={COLORS.BLUE.MARINER}
-            />}
+        <FollowButton username={following} />
       </UserContainer>
     );
   }

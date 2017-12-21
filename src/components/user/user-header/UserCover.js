@@ -5,8 +5,9 @@ import styled from 'styled-components/native';
 import { MaterialIcons } from '@expo/vector-icons';
 import Avatar from 'components/common/Avatar';
 import { getUserBackgroundCoverUrl } from 'util/busyImageUtils';
-import { COLORS, MATERIAL_ICONS } from 'constants/styles';
+import { COLORS } from 'constants/styles';
 import ReputationScore from 'components/post/ReputationScore';
+import FollowButton from 'components/common/FollowButton';
 
 const { width } = Dimensions.get('screen');
 
@@ -16,10 +17,11 @@ const Container = styled.View`
 `;
 
 const UserHeaderContents = styled.View`
-  padding-top: 10px;
   align-items: center;
-  padding-left: 16px;
   flex-direction: row;
+  flex-wrap: wrap;
+  padding: 5px;
+  height: 100%;
 `;
 
 const BackgroundImage = styled.Image`
@@ -52,23 +54,7 @@ const Handle = styled.Text`
   font-weight: 500; 
  `;
 
-const FollowButton = styled.TouchableOpacity`
-  background-color: ${COLORS.BLUE.MARINER};
-  border-radius: 4px;
-  margin-left: auto;
-  padding: 5px;
-  margin-right: 16px;
-`;
-
-const FollowingButton = styled.TouchableOpacity`
-  background-color: ${COLORS.BLUE.MARINER};
-  border-radius: 4px;
-  margin-left: auto;
-  padding: 5px;
-  margin-right: 16px;
-`;
-
-const LoadingFollowing = styled.ActivityIndicator`
+const FollowButtonContainer = styled.View`
   margin-left: auto;
 `;
 
@@ -77,22 +63,14 @@ class UserCover extends Component {
     username: PropTypes.string,
     userReputation: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     hasCover: PropTypes.bool,
-    displayFollowButton: PropTypes.bool,
     hideFollowButton: PropTypes.bool,
-    loadingIsFollowing: PropTypes.bool,
-    handleFollow: PropTypes.func,
-    handleUnfollow: PropTypes.func,
   };
 
   static defaultProps = {
     username: '',
     userReputation: '0',
     hasCover: false,
-    displayFollowButton: true,
     hideFollowButton: false,
-    loadingIsFollowing: false,
-    handleFollow: () => {},
-    handleUnfollow: () => {},
   };
 
   constructor(props) {
@@ -118,32 +96,11 @@ class UserCover extends Component {
   }
 
   renderFollowButton() {
-    const {
-      displayFollowButton,
-      hideFollowButton,
-      handleFollow,
-      handleUnfollow,
-      loadingIsFollowing,
-    } = this.props;
+    const { hideFollowButton, username } = this.props;
 
     if (hideFollowButton) return null;
 
-    if (loadingIsFollowing) {
-      return <LoadingFollowing color={COLORS.BLUE.MARINER} size="small" />;
-    }
-
-    if (displayFollowButton) {
-      return (
-        <FollowButton onPress={handleFollow}>
-          <MaterialIcons size={24} name={MATERIAL_ICONS.follow} color={COLORS.WHITE.WHITE} />
-        </FollowButton>
-      );
-    }
-    return (
-      <FollowingButton onPress={handleUnfollow}>
-        <MaterialIcons size={24} name={MATERIAL_ICONS.followed} color={COLORS.WHITE.WHITE} />
-      </FollowingButton>
-    );
+    return <FollowButtonContainer><FollowButton username={username} /></FollowButtonContainer>;
   }
 
   render() {

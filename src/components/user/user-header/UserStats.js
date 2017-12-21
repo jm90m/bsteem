@@ -33,6 +33,7 @@ class UserStats extends Component {
     followingCount: PropTypes.number,
     postCount: PropTypes.number,
     onPressFollowers: PropTypes.func,
+    onPressFollowing: PropTypes.func,
   };
 
   static defaultProps = {
@@ -40,10 +41,17 @@ class UserStats extends Component {
     followingCount: 0,
     postCount: 0,
     onPressFollowers: () => {},
+    onPressFollowing: () => {},
   };
 
   render() {
-    const { followerCount, followingCount, postCount, onPressFollowers } = this.props;
+    const {
+      followerCount,
+      followingCount,
+      postCount,
+      onPressFollowers,
+      onPressFollowing,
+    } = this.props;
     return (
       <Container>
         <ValueLabelContainer>
@@ -62,14 +70,14 @@ class UserStats extends Component {
             {'followers'}
           </Label>
         </TouchableOpacity>
-        <ValueLabelContainer>
+        <TouchableOpacity onPress={onPressFollowing}>
           <Value>
             {abbreviateLargeNumber(followingCount)}
           </Value>
           <Label>
             {'following'}
           </Label>
-        </ValueLabelContainer>
+        </TouchableOpacity>
       </Container>
     );
   }

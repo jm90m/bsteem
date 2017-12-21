@@ -1,18 +1,15 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import _ from 'lodash';
 import { ListView } from 'react-native';
 import styled from 'styled-components/native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { COLORS, MATERIAL_ICONS } from 'constants/styles';
-import { Button } from 'react-native-elements';
 import API from 'api/api';
 import * as navigationConstants from 'constants/navigation';
 import HeaderContainer from 'components/common/HeaderContainer';
-import { connect } from 'react-redux';
 import Avatar from 'components/common/Avatar';
 import LargeLoadingCenter from 'components/common/LargeLoadingCenter';
-import { getCurrentUserFollowList } from '../../state/rootReducer';
+import FollowButton from 'components/common/FollowButton';
 
 const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
 
@@ -59,17 +56,9 @@ const UserTouchable = styled.TouchableOpacity`
 
 const StyledListView = styled.ListView``;
 
-@connect(state => ({
-  currentUserFollowList: getCurrentUserFollowList(state),
-}))
 class FollowersScreen extends Component {
   static propTypes = {
     navigation: PropTypes.shape().isRequired,
-    currentUserFollowList: PropTypes.shape(),
-  };
-
-  static defaultProps = {
-    currentUserFollowList: {},
   };
 
   constructor(props) {
@@ -107,27 +96,14 @@ class FollowersScreen extends Component {
   }
 
   renderRow(rowData) {
-    const { currentUserFollowList } = this.props;
-    const isFollowingUser = _.get(currentUserFollowList, rowData.follower, false);
+    const { follower } = rowData;
     return (
       <UserContainer>
-        <UserTouchable onPress={this.handleNavigateToUser.bind(this, rowData.follower)}>
-          <Avatar username={rowData.follower} />
-          <UserText>{rowData.follower}</UserText>
+        <UserTouchable onPress={() => this.handleNavigateToUser(follower)}>
+          <Avatar username={follower} />
+          <UserText>{follower}</UserText>
         </UserTouchable>
-        {isFollowingUser
-          ? <Button
-              title="Unfollow"
-              onPress={() => {}}
-              borderRadius={10}
-              backgroundColor={COLORS.RED.VALENCIA}
-            />
-          : <Button
-              title="Follow"
-              onPress={() => {}}
-              borderRadius={10}
-              backgroundColor={COLORS.BLUE.MARINER}
-            />}
+        <FollowButton username={follower} />
       </UserContainer>
     );
   }
