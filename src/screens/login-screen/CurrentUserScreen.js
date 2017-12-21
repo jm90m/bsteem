@@ -34,6 +34,7 @@ import { logoutUser } from 'state/actions/authActions';
 import { currentUserFollowListFetch } from 'state/actions/currentUserActions';
 import { COLORS } from 'constants/styles';
 import * as userMenuConstants from 'constants/userMenu';
+import * as navigationConstants from 'constants/navigation';
 import PostPreview from 'components/post-preview/PostPreview';
 import CommentsPreview from 'components/user/user-comments/CommentsPreview';
 import UserHeader from 'components/user/user-header/UserHeader';
@@ -184,23 +185,43 @@ class CurrentUserScreen extends Component {
   };
 
   handleChangeUserMenu(option) {
-    if (option.id === userMenuConstants.LOGOUT.id) {
-      sc2
-        .revokeToken()
-        .then(() => {
-          this.resetAuthUserInAsyncStorage();
-          this.props.logoutUser();
-        })
-        .catch(() => {
-          // TODO errors out here, still need to fix why sc2 is breaking
-          this.resetAuthUserInAsyncStorage();
-          this.props.logoutUser();
+    const { username } = this.props;
+    switch (option.id) {
+      case userMenuConstants.FOLLOWERS.id:
+        this.setState(
+          {
+            menuVisible: false,
+          },
+          () => this.props.navigation.navigate(navigationConstants.USER_FOLLOWERS, { username }),
+        );
+        break;
+      case userMenuConstants.FOLLOWING.id:
+        this.setState(
+          {
+            menuVisible: false,
+          },
+          () => this.props.navigation.navigate(navigationConstants.USER_FOLLOWING, { username }),
+        );
+        break;
+      case userMenuConstants.LOGOUT.id:
+        sc2
+          .revokeToken()
+          .then(() => {
+            this.resetAuthUserInAsyncStorage();
+            this.props.logoutUser();
+          })
+          .catch(() => {
+            // TODO errors out here, still need to fix why sc2 is breaking
+            this.resetAuthUserInAsyncStorage();
+            this.props.logoutUser();
+          });
+        break;
+      default:
+        this.setState({
+          currentMenuOption: option,
+          menuVisible: false,
         });
-    } else {
-      this.setState({
-        currentMenuOption: option,
-        menuVisible: false,
-      });
+        break;
     }
   }
 
@@ -290,7 +311,7 @@ class CurrentUserScreen extends Component {
 
   render() {
     const { currentMenuOption, menuVisible } = this.state;
-    const { username } = this.props;
+    const { username, navigation } = this.props;
 
     return (
       <Container>
@@ -298,7 +319,7 @@ class CurrentUserScreen extends Component {
           currentMenuOption={currentMenuOption}
           toggleCurrentUserMenu={this.toggleCurrentUserMenu}
         />
-        <UserHeader username={username} hideFollowButton />
+        <UserHeader username={username} hideFollowButton navigation={navigation} />
         {this.renderUserContent()}
         {this.renderLoader()}
         <Modal

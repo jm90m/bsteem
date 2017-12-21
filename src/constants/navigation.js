@@ -8,6 +8,7 @@ export const LOGIN = 'LOGIN';
 export const POST = 'POST';
 export const CURRENT_USER = 'CURRENT_USER';
 export const LOGOUT = 'LOGOUT';
+export const POST_CREATION = 'POST_CREATION';
 
 // user navigations
 export const USER_BLOG = 'USER_BLOG';

@@ -34,7 +34,7 @@ class UserBlog extends Component {
   renderUserPostRow(rowData) {
     const { username, navigation } = this.props;
     if (_.has(rowData, 'renderUserHeader')) {
-      return <UserHeader username={username} />;
+      return <UserHeader username={username} navigation={navigation} />;
     }
     return <PostPreview postData={rowData} navigation={navigation} currentUsername={username} />;
   }

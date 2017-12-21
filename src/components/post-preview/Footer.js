@@ -42,7 +42,7 @@ class Footer extends Component {
     reblogPost: PropTypes.func,
     authUsername: PropTypes.string,
     loadingReblog: PropTypes.bool,
-    rebloggedList: PropTypes.arrayOf([PropTypes.number, PropTypes.string]),
+    rebloggedList: PropTypes.arrayOf(PropTypes.string),
   };
 
   static defaultProps = {
@@ -53,6 +53,7 @@ class Footer extends Component {
     reblogPost: () => {},
     authUsername: '',
     loadingReblog: false,
+    rebloggedList: [],
   };
 
   renderVoteButton() {
@@ -81,7 +82,7 @@ class Footer extends Component {
     const { postData, authUsername, reblogPost, loadingReblog, rebloggedList } = this.props;
     const ownPost = authUsername === postData.author;
     const showReblogLink = !ownPost && postData.parent_author === '';
-    const isReblogged = _.includes(rebloggedList, postData.id);
+    const isReblogged = _.includes(rebloggedList, `${postData.id}`);
 
     if (loadingReblog) {
       return <Loading color={COLORS.BLUE.MARINER} size="small" />;

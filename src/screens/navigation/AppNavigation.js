@@ -10,6 +10,7 @@ import HomeNavigator from './HomeNavigator';
 import SearchNavigator from './SearchNavigator';
 import LoginNavigator from './LoginNavigator';
 import CurrentUserNavigator from './CurrentUserNavigator';
+import PostCreationScreen from '../post-creation-screen/PostCreationScreen';
 
 const tabNavigatorOptions = {
   tabBarPosition: 'bottom',
@@ -49,6 +50,9 @@ const AuthUserNavigator = TabNavigator(
     },
     [navigationConstants.HOME]: {
       screen: HomeNavigator,
+    },
+    [navigationConstants.POST_CREATION]: {
+      screen: PostCreationScreen,
     },
     [navigationConstants.SEARCH]: {
       screen: SearchNavigator,

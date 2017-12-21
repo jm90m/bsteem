@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components/native';
-import steem from 'steem';
-import { ListView, Modal, Text, ScrollView } from 'react-native';
+import { ListView, Modal, Text } from 'react-native';
 import { connect } from 'react-redux';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import _ from 'lodash';
@@ -14,6 +13,7 @@ import {
 } from 'state/actions/usersActions';
 import { COLORS, MATERIAL_ICONS, MATERIAL_COMMUNITY_ICONS, ICON_SIZES } from 'constants/styles';
 import * as userMenuConstants from 'constants/userMenu';
+import * as navigationConstants from 'constants/navigation';
 import {
   getUsersDetails,
   getUsersComments,
@@ -26,7 +26,6 @@ import {
   getCurrentUserFollowList,
   getAuthUsername,
 } from 'state/rootReducer';
-import PostPreview from 'components/post-preview/PostPreview';
 import CommentsPreview from 'components/user/user-comments/CommentsPreview';
 import UserMenu from 'components/user/UserMenu';
 import UserBlog from './UserBlog';
@@ -121,7 +120,6 @@ class UserScreen extends Component {
     this.setMenuVisible = this.setMenuVisible.bind(this);
     this.handleHideMenu = this.handleHideMenu.bind(this);
     this.handleChangeUserMenu = this.handleChangeUserMenu.bind(this);
-    this.renderUserPostRow = this.renderUserPostRow.bind(this);
     this.renderUserCommentsRow = this.renderUserCommentsRow.bind(this);
     this.navigateBack = this.navigateBack.bind(this);
     this.fetchMoreUserComments = this.fetchMoreUserComments.bind(this);
@@ -198,25 +196,35 @@ class UserScreen extends Component {
   }
 
   handleChangeUserMenu(option) {
-    this.setState({
-      currentMenuOption: option,
-      menuVisible: false,
-    });
+    const { username } = this.props.navigation.state.params;
+    switch (option.id) {
+      case userMenuConstants.FOLLOWERS.id:
+        this.setState(
+          {
+            menuVisible: false,
+          },
+          () => this.props.navigation.navigate(navigationConstants.USER_FOLLOWERS, { username }),
+        );
+        break;
+      case userMenuConstants.FOLLOWING.id:
+        this.setState(
+          {
+            menuVisible: false,
+          },
+          () => this.props.navigation.navigate(navigationConstants.USER_FOLLOWING, { username }),
+        );
+        break;
+      default:
+        this.setState({
+          currentMenuOption: option,
+          menuVisible: false,
+        });
+        break;
+    }
   }
 
   navigateBack() {
     this.props.navigation.goBack();
-  }
-
-  renderUserPostRow(rowData) {
-    const { username } = this.props.navigation.state.params;
-    return (
-      <PostPreview
-        postData={rowData}
-        navigation={this.props.navigation}
-        currentUsername={username}
-      />
-    );
   }
 
   renderUserCommentsRow(rowData) {
@@ -272,7 +280,11 @@ class UserScreen extends Component {
 
   renderLoader() {
     const { currentMenuOption } = this.state;
+    const { username } = this.props.navigation.state.params;
     const { loadingUsersComments, loadingUsersBlog } = this.props;
+
+    console.log('LOADING USERS COMMENTS', loadingUsersComments, username);
+    console.log('LOADING USERS BLOG', loadingUsersBlog, username);
 
     switch (currentMenuOption.id) {
       case userMenuConstants.COMMENTS.id:

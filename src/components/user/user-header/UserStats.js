@@ -23,21 +23,27 @@ const Label = styled.Text`
   font-size: 12px;
 `;
 
+const TouchableOpacity = styled.TouchableOpacity`
+  align-items: center;
+`;
+
 class UserStats extends Component {
   static propTypes = {
     followerCount: PropTypes.number,
     followingCount: PropTypes.number,
     postCount: PropTypes.number,
+    onPressFollowers: PropTypes.func,
   };
 
   static defaultProps = {
     followerCount: 0,
     followingCount: 0,
     postCount: 0,
+    onPressFollowers: () => {},
   };
 
   render() {
-    const { followerCount, followingCount, postCount } = this.props;
+    const { followerCount, followingCount, postCount, onPressFollowers } = this.props;
     return (
       <Container>
         <ValueLabelContainer>
@@ -48,14 +54,14 @@ class UserStats extends Component {
             {'posts'}
           </Label>
         </ValueLabelContainer>
-        <ValueLabelContainer>
+        <TouchableOpacity onPress={onPressFollowers}>
           <Value>
             {abbreviateLargeNumber(followerCount)}
           </Value>
           <Label>
             {'followers'}
           </Label>
-        </ValueLabelContainer>
+        </TouchableOpacity>
         <ValueLabelContainer>
           <Value>
             {abbreviateLargeNumber(followingCount)}

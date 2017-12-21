@@ -36,7 +36,7 @@ const ModalFooter = ({ cancelText, cancelPress, successText, successPress }) => 
       borderColor={COLORS.WHITE.WHITE_SMOKE}
       onPress={cancelPress}
     >
-      <ButtonText>{cancelText}</ButtonText>
+      <ButtonText color={COLORS.BLUE.MARINER}>{cancelText}</ButtonText>
     </Button>
   </Container>
 );

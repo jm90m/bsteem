@@ -93,7 +93,7 @@ class PostPreview extends Component {
     currentUserVotePost: PropTypes.func.isRequired,
     navigation: PropTypes.shape().isRequired,
     postData: PropTypes.shape(),
-    rebloggedList: PropTypes.arrayOf([PropTypes.string, PropTypes.number]),
+    rebloggedList: PropTypes.arrayOf(PropTypes.string),
     currentUsername: PropTypes.string,
   };
 

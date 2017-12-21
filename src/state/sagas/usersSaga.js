@@ -23,12 +23,14 @@ const fetchUserBlog = function*(action) {
   try {
     const { username, query } = action.payload;
     const result = yield call(API.getDiscussionsByBlog, query);
+    console.log('FETCH USER BLOG', username, query);
     const payload = {
       result,
       username,
     };
     yield put(userActions.fetchUserBlog.success(payload));
   } catch (error) {
+    console.log('FETCH USER BLOG FAIL', error);
     yield put(userActions.fetchUserBlog.fail(error));
   }
 };
@@ -71,21 +73,21 @@ const fetchAllUserDetails = function*(action) {
 };
 
 export const watchFetchUser = function*() {
-  yield takeEvery(FETCH_USER.ACTION, fetchUser);
+  yield takeLatest(FETCH_USER.ACTION, fetchUser);
 };
 
 export const watchFetchUserComments = function*() {
-  yield takeEvery(FETCH_USER_COMMENTS.ACTION, fetchUserComments);
+  yield takeLatest(FETCH_USER_COMMENTS.ACTION, fetchUserComments);
 };
 
 export const watchFetchUserBlog = function*() {
-  yield takeEvery(FETCH_USER_BLOG.ACTION, fetchUserBlog);
+  yield takeLatest(FETCH_USER_BLOG.ACTION, fetchUserBlog);
 };
 
 export const watchFetchUserFollowCount = function*() {
-  yield takeEvery(FETCH_USER_FOLLOW_COUNT.ACTION, fetchUserFollowCount);
+  yield takeLatest(FETCH_USER_FOLLOW_COUNT.ACTION, fetchUserFollowCount);
 };
 
 export const watchFetchAllUserDetails = function*() {
-  yield takeEvery(FETCH_ALL_USER_DETAILS.ACTION, fetchAllUserDetails);
+  yield takeLatest(FETCH_ALL_USER_DETAILS.ACTION, fetchAllUserDetails);
 };

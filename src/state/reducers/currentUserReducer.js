@@ -59,7 +59,7 @@ export default (state = INITIAL_STATE, action) => {
     case CURRENT_USER_REBLOG_POST.SUCCESS:
       return {
         ...state,
-        rebloggedList: state.rebloggedList.concat(action.payload.postId),
+        rebloggedList: state.rebloggedList.concat(`${action.payload.postId}`),
       };
     case FETCH_CURRENT_USER_FOLLOW_LIST.SUCCESS: {
       const formattedFollowList = _.reduce(

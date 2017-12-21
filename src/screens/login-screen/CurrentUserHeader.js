@@ -61,7 +61,7 @@ class CurrentUserHeader extends Component {
           <MenuIconContainer>
             <MaterialCommunityIcons
               size={ICON_SIZES.menuIcon}
-              name={MATERIAL_COMMUNITY_ICONS.chevronDown}
+              name={MATERIAL_COMMUNITY_ICONS.menuVertical}
             />
           </MenuIconContainer>
         </TouchableContainer>

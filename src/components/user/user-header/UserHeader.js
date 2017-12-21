@@ -7,6 +7,7 @@ import steem from 'steem';
 import { getUsersDetails, getCurrentUserFollowList, getUsersFollowCount } from 'state/rootReducer';
 import { currentUserFollowUser, currentUserUnfollowUser } from 'state/actions/currentUserActions';
 import UserProfile from 'components/user/user-profile/UserProfile';
+import * as navigationConstants from 'constants/navigation';
 import UserStats from './UserStats';
 import UserCover from './UserCover';
 
@@ -33,6 +34,7 @@ class UserHeader extends Component {
     hideFollowButton: PropTypes.bool,
     currentUserFollowUser: PropTypes.func.isRequired,
     currentUserUnfollowUser: PropTypes.func.isRequired,
+    navigation: PropTypes.shape().isRequired,
   };
 
   static defaultProps = {
@@ -54,6 +56,8 @@ class UserHeader extends Component {
     this.loadingFollowing = this.loadingFollowing.bind(this);
     this.successFollow = this.successFollow.bind(this);
     this.successUnfollow = this.successUnfollow.bind(this);
+    this.handleOnPressFollowers = this.handleOnPressFollowers.bind(this);
+    this.handleOnPressFollowing = this.handleOnPressFollowing.bind(this);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -77,7 +81,6 @@ class UserHeader extends Component {
   }
 
   successUnfollow() {
-    debugger;
     this.setState({
       isFollowing: false,
       loadingIsFollowing: false,
@@ -94,6 +97,16 @@ class UserHeader extends Component {
     this.loadingFollowing();
     const { username } = this.props;
     this.props.currentUserUnfollowUser(username, this.successUnfollow);
+  }
+
+  handleOnPressFollowers() {
+    const { username } = this.props;
+    this.props.navigation.navigate(navigationConstants.USER_FOLLOWERS, { username });
+  }
+
+  handleOnPressFollowing() {
+    const { username } = this.props;
+    this.props.navigation.navigate(navigationConstants.USER_FOLLOWING, { username });
   }
 
   render() {
@@ -128,6 +141,8 @@ class UserHeader extends Component {
           postCount={postCount}
           followerCount={followerCount}
           followingCount={followingCount}
+          onPressFollowers={this.handleOnPressFollowers}
+          onPressFollowing={this.handleOnPressFollowing}
         />
       </View>
     );

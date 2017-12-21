@@ -93,8 +93,30 @@ class API {
         );
         const list = limitArray.reduce(async (currentListP, value) => {
           const currentList = await currentListP;
-          const startForm = currentList[currentList.length - 1] || '';
-          const followers = await API.getFollowing(username, startForm, 'blog', value);
+          const startFrom = currentList[currentList.length - 1] || '';
+          const followers = await API.getFollowing(username, startFrom.following, 'blog', value);
+          return currentList.slice(0, currentList.length - 1).concat(followers);
+        }, []);
+        resolve(list);
+      } catch (error) {
+        console.warn(error);
+      }
+    });
+  }
+
+  static async getAllFollowers(username) {
+    return new Promise(async resolve => {
+      try {
+        const following = await API.getFollowCount(username);
+        const chunkSize = 100;
+        const limitArray = _.fill(
+          Array(Math.ceil(following.follower_count / chunkSize)),
+          chunkSize,
+        );
+        const list = limitArray.reduce(async (currentListP, value) => {
+          const currentList = await currentListP;
+          const startFrom = currentList[currentList.length - 1] || '';
+          const followers = await API.getFollowers(username, startFrom.follower, 'blog', value);
           return currentList.slice(0, currentList.length - 1).concat(followers);
         }, []);
         resolve(list);

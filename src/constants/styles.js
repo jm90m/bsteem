@@ -8,6 +8,10 @@ export const COLORS = {
     HAVELOCK_BLUE: '#4A80BE',
   },
 
+  RED: {
+    VALENCIA: '#D9534F',
+  },
+
   GREY: {
     GONDOLA: '#353535',
     CHARCOAL: '#454545',
@@ -59,6 +63,7 @@ export const MATERIAL_ICONS = {
   reply: 'reply',
 
   close: 'close',
+  create: 'create',
 };
 
 export const MATERIAL_COMMUNITY_ICONS = {
@@ -69,6 +74,7 @@ export const MATERIAL_COMMUNITY_ICONS = {
   active: 'run-fast',
   linkVariant: 'link-variant',
   clock: 'clock',
+  magnify: 'magnify',
 };
 
 export const FONT_AWESOME_ICONS = {
