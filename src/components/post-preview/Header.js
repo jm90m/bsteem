@@ -13,6 +13,7 @@ import Avatar from 'components/common/Avatar';
 
 const Container = styled.View`
   padding: 16px;
+  padding-bottom: 0;
 `;
 
 const UserHeaderContainer = styled.View`
@@ -48,6 +49,16 @@ const Reblogged = styled.View`
 `;
 
 const Touchable = styled.TouchableOpacity`
+`;
+
+const TagContainer = styled.View`
+  padding: 5px 0;
+  justify-content: space-between;
+  flex-direction: row;
+`;
+
+const EmptyView = styled.View`
+  width: 3px;
 `;
 
 class Header extends Component {
@@ -153,10 +164,13 @@ class Header extends Component {
               <ReputationScore reputation={steem.formatter.reputation(author_reputation)} />
             </Author>
           </HeaderContents>
+        </UserHeaderContainer>
+        <TagContainer>
           <Touchable onPress={this.handleFeedNavigation}>
             <Tag tag={category} />
           </Touchable>
-        </UserHeaderContainer>
+          <EmptyView />
+        </TagContainer>
       </Container>
     );
   }

@@ -21,7 +21,7 @@ const Header = styled.View`
   border-bottom-color: ${COLORS.WHITE.GAINSBORO};
   border-bottom-width: 1px;
   width: 100%;
-  padding-top: 10px;
+  padding-top: 20px;
   min-height: 45px;
 `;
 

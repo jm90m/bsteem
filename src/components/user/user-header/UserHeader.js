@@ -4,36 +4,25 @@ import _ from 'lodash';
 import { View } from 'react-native';
 import { connect } from 'react-redux';
 import steem from 'steem';
-import { getUsersDetails, getCurrentUserFollowList, getUsersFollowCount } from 'state/rootReducer';
-import { currentUserFollowUser, currentUserUnfollowUser } from 'state/actions/currentUserActions';
+import { getUsersDetails, getUsersFollowCount } from 'state/rootReducer';
 import UserProfile from 'components/user/user-profile/UserProfile';
 import * as navigationConstants from 'constants/navigation';
 import UserStats from './UserStats';
 import UserCover from './UserCover';
+import UserFollowButton from './UserFollowButton';
 
 const mapStateToProps = state => ({
   usersDetails: getUsersDetails(state),
-  currentUserFollowList: getCurrentUserFollowList(state),
   usersFollowCount: getUsersFollowCount(state),
 });
 
-const mapDispatchToProps = dispatch => ({
-  currentUserFollowUser: (username, followSuccessCallback) =>
-    dispatch(currentUserFollowUser.action({ username, followSuccessCallback })),
-  currentUserUnfollowUser: (username, unfollowSuccessCallback) =>
-    dispatch(currentUserUnfollowUser.action({ username, unfollowSuccessCallback })),
-});
-
-@connect(mapStateToProps, mapDispatchToProps)
+@connect(mapStateToProps)
 class UserHeader extends Component {
   static propTypes = {
-    currentUserFollowList: PropTypes.shape().isRequired,
     username: PropTypes.string.isRequired,
     usersDetails: PropTypes.shape().isRequired,
     usersFollowCount: PropTypes.shape().isRequired,
     hideFollowButton: PropTypes.bool,
-    currentUserFollowUser: PropTypes.func.isRequired,
-    currentUserUnfollowUser: PropTypes.func.isRequired,
     navigation: PropTypes.shape().isRequired,
   };
 
@@ -43,60 +32,8 @@ class UserHeader extends Component {
 
   constructor(props) {
     super(props);
-    const { username, currentUserFollowList } = this.props;
-    const isFollowing = _.get(currentUserFollowList, username, false);
-
-    this.state = {
-      isFollowing,
-      loadingIsFollowing: false,
-    };
-
-    this.handleFollow = this.handleFollow.bind(this);
-    this.handleUnfollow = this.handleUnfollow.bind(this);
-    this.loadingFollowing = this.loadingFollowing.bind(this);
-    this.successFollow = this.successFollow.bind(this);
-    this.successUnfollow = this.successUnfollow.bind(this);
     this.handleOnPressFollowers = this.handleOnPressFollowers.bind(this);
     this.handleOnPressFollowing = this.handleOnPressFollowing.bind(this);
-  }
-
-  componentWillReceiveProps(nextProps) {
-    const isFollowing = _.get(nextProps.currentUserFollowList, nextProps.username, false);
-    this.setState({
-      isFollowing,
-    });
-  }
-
-  loadingFollowing() {
-    this.setState({
-      loadingIsFollowing: true,
-    });
-  }
-
-  successFollow() {
-    this.setState({
-      isFollowing: true,
-      loadingIsFollowing: false,
-    });
-  }
-
-  successUnfollow() {
-    this.setState({
-      isFollowing: false,
-      loadingIsFollowing: false,
-    });
-  }
-
-  handleFollow() {
-    this.loadingFollowing();
-    const { username } = this.props;
-    this.props.currentUserFollowUser(username, this.successFollow);
-  }
-
-  handleUnfollow() {
-    this.loadingFollowing();
-    const { username } = this.props;
-    this.props.currentUserUnfollowUser(username, this.successUnfollow);
   }
 
   handleOnPressFollowers() {
@@ -109,9 +46,16 @@ class UserHeader extends Component {
     this.props.navigation.navigate(navigationConstants.USER_FOLLOWING, { username });
   }
 
+  renderFollowButton() {
+    const { hideFollowButton, username } = this.props;
+
+    if (hideFollowButton) return <View />;
+
+    return <UserFollowButton username={username} />;
+  }
+
   render() {
-    const { usersDetails, username, usersFollowCount, hideFollowButton } = this.props;
-    const { isFollowing, loadingIsFollowing } = this.state;
+    const { usersDetails, username, usersFollowCount } = this.props;
     const userDetails = usersDetails[username] || {};
     const userJsonMetaData = _.attempt(JSON.parse, userDetails.json_metadata);
     const userProfile = _.isError(userJsonMetaData) ? {} : userJsonMetaData.profile;
@@ -126,16 +70,8 @@ class UserHeader extends Component {
 
     return (
       <View>
-        <UserCover
-          username={username}
-          hasCover={hasCover}
-          userReputation={userReputation}
-          displayFollowButton={isFollowing}
-          hideFollowButton={hideFollowButton}
-          loadingIsFollowing={loadingIsFollowing}
-          handleFollow={this.handleFollow}
-          handleUnFollow={this.handleUnfollow}
-        />
+        <UserCover username={username} hasCover={hasCover} userReputation={userReputation} />
+        {this.renderFollowButton()}
         <UserProfile userProfile={userProfile} />
         <UserStats
           postCount={postCount}

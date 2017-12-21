@@ -23,6 +23,10 @@ export const COLORS = {
     WHITE_SMOKE: '#EEEEEE',
     GAINSBORO: '#E9E7E7',
   },
+
+  VIOLET: {
+    PAUA: '#232A57',
+  },
 };
 
 export const FONT_SIZES = {

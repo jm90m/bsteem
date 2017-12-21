@@ -7,13 +7,13 @@ import Avatar from 'components/common/Avatar';
 import { getUserBackgroundCoverUrl } from 'util/busyImageUtils';
 import { COLORS } from 'constants/styles';
 import ReputationScore from 'components/post/ReputationScore';
-import FollowButton from 'components/common/FollowButton';
 
 const { width } = Dimensions.get('screen');
 
 const Container = styled.View`
   height: 75px;
   width: 100%;
+  background-color: ${props => (props.hasCover ? COLORS.VIOLET.PAUA : 'transparent')};
 `;
 
 const UserHeaderContents = styled.View`
@@ -54,23 +54,17 @@ const Handle = styled.Text`
   font-weight: 500; 
  `;
 
-const FollowButtonContainer = styled.View`
-  margin-left: auto;
-`;
-
 class UserCover extends Component {
   static propTypes = {
     username: PropTypes.string,
     userReputation: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     hasCover: PropTypes.bool,
-    hideFollowButton: PropTypes.bool,
   };
 
   static defaultProps = {
     username: '',
     userReputation: '0',
     hasCover: false,
-    hideFollowButton: false,
   };
 
   constructor(props) {
@@ -95,20 +89,12 @@ class UserCover extends Component {
     });
   }
 
-  renderFollowButton() {
-    const { hideFollowButton, username } = this.props;
-
-    if (hideFollowButton) return null;
-
-    return <FollowButtonContainer><FollowButton username={username} /></FollowButtonContainer>;
-  }
-
   render() {
     const { username, userReputation } = this.props;
     const { hasCover } = this.state;
 
     return (
-      <Container>
+      <Container hasCover={hasCover}>
         <BackgroundImage
           resizeMode="cover"
           source={{ uri: getUserBackgroundCoverUrl(username) }}
@@ -128,7 +114,6 @@ class UserCover extends Component {
               </Handle>
             </HandleContainer>
           </View>
-          {this.renderFollowButton()}
         </UserHeaderContents>
       </Container>
     );

@@ -30,9 +30,7 @@ const Container = styled.View`
 `;
 
 const Content = styled.View`
-  padding: 10px;
-  padding-left: 0;
-  padding-right: 0;
+  padding-bottom: 10px;
 `;
 
 const Title = styled.Text`
