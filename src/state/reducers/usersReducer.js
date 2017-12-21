@@ -54,9 +54,9 @@ export default (state = INITIAL_STATE, action) => {
           ...state.usersComments,
           [action.payload.username]: newUserComments,
         },
-        loadingUsersComments: false,
       };
     }
+    case FETCH_USER_COMMENTS.LOADING_END:
     case FETCH_USER_COMMENTS.ERROR:
       return {
         ...state,
@@ -76,9 +76,9 @@ export default (state = INITIAL_STATE, action) => {
           ...state.usersBlog,
           [action.payload.username]: newUserBlog,
         },
-        loadingUsersBlog: false,
       };
     }
+    case FETCH_USER_BLOG.LOADING_END:
     case FETCH_USER_BLOG.ERROR:
       return {
         ...state,

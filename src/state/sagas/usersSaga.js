@@ -32,6 +32,8 @@ const fetchUserBlog = function*(action) {
   } catch (error) {
     console.log('FETCH USER BLOG FAIL', error);
     yield put(userActions.fetchUserBlog.fail(error));
+  } finally {
+    yield put(userActions.fetchUserBlog.loadingEnd());
   }
 };
 
@@ -46,6 +48,8 @@ const fetchUserComments = function*(action) {
     yield put(userActions.fetchUserComments.success(payload));
   } catch (error) {
     yield put(userActions.fetchUserComments.fail(error));
+  } finally {
+    yield put(userActions.fetchUserComments.loadingEnd());
   }
 };
 
