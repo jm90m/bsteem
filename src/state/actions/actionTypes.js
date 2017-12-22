@@ -53,10 +53,15 @@ export const CURRENT_USER_UNFOLLOW_USER = createAsyncActionType(
 );
 
 // User Activity Actions
-
 export const FETCH_USER_ACCOUNT_HISTORY = createAsyncActionType(
   '@user-activity/fetch-user-account-history',
 );
 export const FETCH_MORE_USER_ACCOUNT_HISTORY = createAsyncActionType(
   '@user-activity/fetch-more-user-account-history',
+);
+
+// App Actions
+export const FETCH_STEEM_RATE = createAsyncActionType('@app/fetch-steem-rate');
+export const FETCH_STEEM_GLOBAL_PROPERTIES = createAsyncActionType(
+  '@app/fetch-steem-global-properties',
 );

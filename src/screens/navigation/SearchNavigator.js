@@ -7,6 +7,8 @@ import SearchScreen from 'screens/SearchScreen';
 import UserScreen from 'screens/user-screen/UserScreen';
 import FeedScreen from 'screens/stack-screens/FeedScreen';
 import SearchPostScreen from 'components/search/SearchPostScreen';
+import UserActivityScreen from 'screens/stack-screens/UserActivityScreen';
+import UserWalletScreen from 'screens/stack-screens/UserWalletScreen';
 
 const screenNavigationOptions = {
   tabBarIcon: ({ tintColor }) => (
@@ -29,6 +31,14 @@ const SearchNavigator = StackNavigator(
     },
     [navigationConstants.SEARCH_POST]: {
       screen: SearchPostScreen,
+      navigationOptions: screenNavigationOptions,
+    },
+    [navigationConstants.USER_ACTIVITY]: {
+      screen: UserActivityScreen,
+      navigationOptions: screenNavigationOptions,
+    },
+    [navigationConstants.USER_WALLET]: {
+      screen: UserWalletScreen,
       navigationOptions: screenNavigationOptions,
     },
   },

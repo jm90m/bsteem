@@ -1,30 +1,31 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components/native';
-import { ListView } from 'react-native';
+import { ListView, RefreshControl } from 'react-native';
 import _ from 'lodash';
 import { connect } from 'react-redux';
-import { getUsersTransactions } from 'state/rootReducer';
+import {
+  getUsersTransactions,
+  getUsersDetails,
+  getLoadingUsersDetails,
+  getLoadingFetchUserAccountHistory,
+} from 'state/rootReducer';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS, MATERIAL_ICONS, MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
 import {
   fetchMoreUserAccountHistory,
   fetchUserAccountHistory,
 } from 'state/actions/userActivityActions';
+import { fetchUser } from 'state/actions/usersActions';
 import HeaderContainer from 'components/common/HeaderContainer';
 import UserAction from 'components/activity/UserAction';
+import UserWalletSummary from 'components/wallet/UserWalletSummary';
 
 const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
 
 const Container = styled.View``;
 
 const StyledListView = styled.ListView``;
-
-const ActivityContainer = styled.View`
-  padding: 5px;
-  border-bottom-width: 1px ;
-  border-top-width: 1px;
-`;
 
 const BackTouchable = styled.TouchableOpacity`
   justify-content: center;
@@ -36,20 +37,22 @@ const TitleText = styled.Text`
   color: ${COLORS.BLUE.MARINER}
 `;
 
-const ActivityText = styled.Text``;
-
 const FilterTouchable = styled.TouchableOpacity`
   padding: 10px;
 `;
 
 const mapStateToProps = state => ({
   usersTransactions: getUsersTransactions(state),
+  usersDetails: getUsersDetails(state),
+  loadingUsersDetails: getLoadingUsersDetails(state),
+  loadingFetchUserAccountHistory: getLoadingFetchUserAccountHistory(state),
 });
 
 const mapDispatchToProps = dispatch => ({
   fetchUserAccountHistory: username => dispatch(fetchUserAccountHistory.action({ username })),
   fetchMoreUserAccountHistory: username =>
     dispatch(fetchMoreUserAccountHistory.action({ username })),
+  fetchUser: username => dispatch(fetchUser.action({ username })),
 });
 
 @connect(mapStateToProps, mapDispatchToProps)
@@ -57,8 +60,12 @@ class UserWalletScreen extends Component {
   static propTypes = {
     navigation: PropTypes.shape().isRequired,
     usersTransactions: PropTypes.shape().isRequired,
+    usersDetails: PropTypes.shape().isRequired,
+    loadingUsersDetails: PropTypes.bool.isRequired,
+    loadingFetchUserAccountHistory: PropTypes.bool.isRequired,
     fetchUserAccountHistory: PropTypes.func.isRequired,
     fetchMoreUserAccountHistory: PropTypes.func.isRequired,
+    fetchUser: PropTypes.func.isRequired,
   };
 
   constructor(props) {
@@ -66,16 +73,28 @@ class UserWalletScreen extends Component {
 
     this.renderUserWalletRow = this.renderUserWalletRow.bind(this);
     this.navigateBack = this.navigateBack.bind(this);
+    this.onRefreshUserWallet = this.onRefreshUserWallet.bind(this);
   }
 
   componentDidMount() {
-    const { usersTransactions } = this.props;
+    const { usersTransactions, usersDetails } = this.props;
     const { username } = this.props.navigation.state.params;
     const userAccountHistory = _.get(usersTransactions, username, []);
+    const userDetails = _.get(usersDetails, username, {});
 
     if (_.isEmpty(userAccountHistory)) {
       this.props.fetchUserAccountHistory(username);
     }
+
+    if (_.isEmpty(userDetails)) {
+      this.props.fetchUser(username);
+    }
+  }
+
+  onRefreshUserWallet() {
+    const { username } = this.props.navigation.state.params;
+    this.props.fetchUser(username);
+    this.props.fetchUserAccountHistory(username);
   }
 
   navigateBack() {
@@ -83,16 +102,25 @@ class UserWalletScreen extends Component {
   }
 
   renderUserWalletRow(rowData) {
+    const { loadingUsersDetails } = this.props;
     const { username } = this.props.navigation.state.params;
+    if (_.has(rowData, 'isUserWalletSummary')) {
+      const user = _.get(this.props.usersDetails, username, {});
+      return <UserWalletSummary user={user} loading={loadingUsersDetails} />;
+    }
     return (
       <UserAction currentUsername={username} action={rowData} navigation={this.props.navigation} />
     );
   }
 
   render() {
-    const { usersTransactions } = this.props;
+    const { usersTransactions, loadingFetchUserAccountHistory, loadingUsersDetails } = this.props;
     const { username } = this.props.navigation.state.params;
-    const userTransactionsDataSource = _.get(usersTransactions, username, []);
+    const userWalletSummary = [{ isUserWalletSummary: true }];
+    const userTransactionsDataSource = _.concat(
+      userWalletSummary,
+      _.get(usersTransactions, username, []),
+    );
 
     return (
       <Container>
@@ -114,6 +142,13 @@ class UserWalletScreen extends Component {
           renderRow={this.renderUserWalletRow}
           enableEmptySections
           onEndReached={this.props.fetchMoreUserAccountHistory}
+          refreshControl={
+            <RefreshControl
+              refreshing={loadingFetchUserAccountHistory || loadingUsersDetails}
+              onRefresh={this.onRefreshUserWallet}
+              colors={[COLORS.BLUE.MARINER]}
+            />
+          }
         />
       </Container>
     );

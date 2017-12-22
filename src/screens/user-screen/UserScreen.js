@@ -235,6 +235,22 @@ class UserScreen extends Component {
           () => this.props.navigation.navigate(navigationConstants.USER_FOLLOWING, { username }),
         );
         break;
+      case userMenuConstants.ACTIVITY.id:
+        this.setState(
+          {
+            menuVisible: false,
+          },
+          () => this.props.navigation.navigate(navigationConstants.USER_ACTIVITY, { username }),
+        );
+        break;
+      case userMenuConstants.WALLET.id:
+        this.setState(
+          {
+            menuVisible: false,
+          },
+          () => this.props.navigation.navigate(navigationConstants.USER_WALLET, { username }),
+        );
+        break;
       default:
         this.setState({
           currentMenuOption: option,

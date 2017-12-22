@@ -7,6 +7,7 @@ export const COLORS = {
     SOLITUDE: '#f5f6f9',
     HAVELOCK_BLUE: '#4A80BE',
     HEATHER: '#a1afba',
+    BALI_HAI: '#8798a4',
   },
 
   RED: {
@@ -102,10 +103,13 @@ export const MATERIAL_COMMUNITY_ICONS = {
 
 export const FEATHER_ICONS = {
   award: 'award',
-}
+};
 
 export const FONT_AWESOME_ICONS = {
   news: 'newspaper-o',
+  bolt: 'bolt',
+  dollar: 'dollar',
+  bank: 'bank',
 };
 
 export const ICON_SIZES = {

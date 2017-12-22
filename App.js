@@ -2,7 +2,7 @@ import React from 'react';
 import { View } from 'react-native';
 import sc2 from 'api/sc2';
 import { Provider } from 'react-redux';
-import { Constants, AppLoading} from 'expo';
+import { Constants, AppLoading, Asset } from 'expo';
 import configureStore from 'state/configureStore';
 
 import AppNavigation from 'screens/navigation/AppNavigation';
@@ -28,13 +28,13 @@ export default class App extends React.Component {
 
   async loadAssetsAsync() {
     try {
-      // await Promise.all([Asset.loadAsync([require('./src/images/sc2-logo-white.svg')])]);
+      await Promise.all([Asset.loadAsync([require('./src/images/steem.png')])]);
     } catch (e) {
-      // console.warn(
-      //   'There was an error caching assets network timeout, so we skipped caching. Reload the app to try again.',
-      // );
-      //
-      // console.log(e);
+      console.warn(
+        'There was an error caching assets network timeout, so we skipped caching. Reload the app to try again.',
+      );
+
+      console.log(e);
     } finally {
       this.setState({ assetsAreLoaded: true });
     }

@@ -1,3 +1,11 @@
+import steem from 'steem';
+/**
+ * https://github.com/steemit/steemit.com/blob/47fd0e0846bd8c7c941ee4f95d5f971d3dc3981d/app/utils/ParsersAndFormatters.js
+ */
+export function parsePayoutAmount(amount) {
+  return parseFloat(String(amount).replace(/\s[A-Z]*$/, ''));
+}
+
 /**
  * Calculates Payout Details Modified as needed
  * https://github.com/steemit/steemit.com/blob/47fd0e0846bd8c7c941ee4f95d5f971d3dc3981d/app/components/elements/Voting.jsx
@@ -51,9 +59,19 @@ export const calculatePayout = post => {
   return payoutDetails;
 };
 
-/**
- * https://github.com/steemit/steemit.com/blob/47fd0e0846bd8c7c941ee4f95d5f971d3dc3981d/app/utils/ParsersAndFormatters.js
- */
-export function parsePayoutAmount(amount) {
-  return parseFloat(String(amount).replace(/\s[A-Z]*$/, ''));
-}
+export const calculateEstAccountValue = (
+  user,
+  totalVestingShares,
+  totalVestingFundSteem,
+  steemRate,
+) => {
+  const steemPower = steem.formatter.vestToSteem(
+    user.vesting_shares,
+    totalVestingShares,
+    totalVestingFundSteem,
+  );
+  return (
+    parseFloat(steemRate) * (parseFloat(user.balance) + parseFloat(steemPower)) +
+    parseFloat(user.sbd_balance)
+  );
+};
