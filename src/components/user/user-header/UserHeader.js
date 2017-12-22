@@ -4,7 +4,12 @@ import _ from 'lodash';
 import { View } from 'react-native';
 import { connect } from 'react-redux';
 import steem from 'steem';
-import { getUsersDetails, getUsersFollowCount, getIsAuthenticated } from 'state/rootReducer';
+import {
+  getUsersDetails,
+  getUsersFollowCount,
+  getIsAuthenticated,
+  getAuthUsername,
+} from 'state/rootReducer';
 import UserProfile from 'components/user/user-profile/UserProfile';
 import * as navigationConstants from 'constants/navigation';
 import UserStats from './UserStats';
@@ -15,12 +20,14 @@ const mapStateToProps = state => ({
   usersDetails: getUsersDetails(state),
   usersFollowCount: getUsersFollowCount(state),
   authenticated: getIsAuthenticated(state),
+  authUsername: getAuthUsername(state),
 });
 
 @connect(mapStateToProps)
 class UserHeader extends Component {
   static propTypes = {
     username: PropTypes.string.isRequired,
+    authUsername: PropTypes.string,
     usersDetails: PropTypes.shape().isRequired,
     usersFollowCount: PropTypes.shape().isRequired,
     hideFollowButton: PropTypes.bool,
@@ -29,6 +36,7 @@ class UserHeader extends Component {
   };
 
   static defaultProps = {
+    authUsername: '',
     authenticated: false,
     hideFollowButton: false,
   };
@@ -50,9 +58,9 @@ class UserHeader extends Component {
   }
 
   renderFollowButton() {
-    const { hideFollowButton, username, authenticated } = this.props;
-
-    if (hideFollowButton || !authenticated) return <View />;
+    const { hideFollowButton, username, authenticated, authUsername } = this.props;
+    const isAuthUser = authUsername === username;
+    if (hideFollowButton || !authenticated || isAuthUser) return <View />;
 
     return <UserFollowButton username={username} />;
   }

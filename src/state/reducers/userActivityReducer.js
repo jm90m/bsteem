@@ -7,17 +7,23 @@ import {
 const initialState = {
   usersTransactions: {},
   usersAccountHistory: {},
-  usersAccountHistoryLoading: true,
-  loadingEstAccountValue: true,
-  loadingGlobalProperties: true,
-  loadingMoreUsersAccountHistory: false,
-  accountHistoryFilter: [],
-  currentDisplayedActions: [],
-  currentFilteredActions: [],
+  loadingFetchUserAccountHistory: false,
+  loadingFetchMoreUsersAccountHistory: false,
+
+  // loadingEstAccountValue: true,
+  // loadingGlobalProperties: true,
+  // accountHistoryFilter: [],
+  // currentDisplayedActions: [],
+  // currentFilteredActions: [],
 };
 
 export default function(state = initialState, action) {
   switch (action.type) {
+    case FETCH_USER_ACCOUNT_HISTORY.ACTION:
+      return {
+        ...state,
+        loadingFetchUserAccountHistory: true,
+      };
     case FETCH_USER_ACCOUNT_HISTORY.SUCCESS: {
       const { username, userWalletTransactions, userAccountHistory } = action.payload;
       return {
@@ -30,6 +36,12 @@ export default function(state = initialState, action) {
           ...state.usersAccountHistory,
           [username]: userAccountHistory,
         },
+      };
+    }
+    case FETCH_USER_ACCOUNT_HISTORY.LOADING_END: {
+      return {
+        ...state,
+        loadingFetchUserAccountHistory: false,
       };
     }
     case FETCH_MORE_USER_ACCOUNT_HISTORY.SUCCESS: {
@@ -62,3 +74,4 @@ export default function(state = initialState, action) {
 
 export const getUsersTransactions = state => state.usersTransactions;
 export const getUsersAccountHistory = state => state.usersAccountHistory;
+export const getLoadingFetchUserAccountHistory = state => state.loadingFetchUserAccountHistory;

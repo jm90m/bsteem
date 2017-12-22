@@ -51,18 +51,20 @@ class CommentsPreview extends Component {
   static propTypes = {
     commentData: PropTypes.shape(),
     navigation: PropTypes.shape().isRequired,
+    currentUsername: PropTypes.string,
   };
 
   static defaultProps = {
     commentData: {},
+    currentUsername: '',
   };
 
   render() {
-    const { commentData, navigation } = this.props;
+    const { commentData, navigation, currentUsername } = this.props;
 
     return (
       <Container>
-        <Header postData={commentData} navigation={navigation} />
+        <Header postData={commentData} navigation={navigation} currentUsername={currentUsername} />
         <TitleContainer>
           <CommentTag>
             <CommentTagText>{'RE'}</CommentTagText>

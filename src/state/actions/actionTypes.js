@@ -13,6 +13,7 @@ export const FETCH_USER_COMMENTS = createAsyncActionType('@user/fetch-user-comme
 export const FETCH_USER_BLOG = createAsyncActionType('@user/fetch-user-blog');
 export const FETCH_USER_FOLLOW_COUNT = createAsyncActionType('@user/fetch-user-follow-count');
 export const FETCH_ALL_USER_DETAILS = createAsyncActionType('@user/fetch-all-user-details');
+export const REFRESH_USER_BLOG = createAsyncActionType('@user/refresh-user-blog');
 
 // Tag/Search Screen Actions
 export const SEARCH_ASK_STEEM = createAsyncActionType('@search/search-ask-steem');

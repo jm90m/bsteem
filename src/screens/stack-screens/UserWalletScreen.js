@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components/native';
-import { ListView, RefreshControl } from 'react-native';
+import { ListView } from 'react-native';
 import _ from 'lodash';
 import { connect } from 'react-redux';
-import { getUsersAccountHistory, getLoadingFetchUserAccountHistory } from 'state/rootReducer';
+import { getUsersTransactions } from 'state/rootReducer';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS, MATERIAL_ICONS, MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
 import {
@@ -20,6 +20,12 @@ const Container = styled.View``;
 
 const StyledListView = styled.ListView``;
 
+const ActivityContainer = styled.View`
+  padding: 5px;
+  border-bottom-width: 1px ;
+  border-top-width: 1px;
+`;
+
 const BackTouchable = styled.TouchableOpacity`
   justify-content: center;
   padding: 10px;
@@ -30,13 +36,14 @@ const TitleText = styled.Text`
   color: ${COLORS.BLUE.MARINER}
 `;
 
+const ActivityText = styled.Text``;
+
 const FilterTouchable = styled.TouchableOpacity`
   padding: 10px;
 `;
 
 const mapStateToProps = state => ({
-  usersAccountHistory: getUsersAccountHistory(state),
-  loadingFetchUserAccountHistory: getLoadingFetchUserAccountHistory(state),
+  usersTransactions: getUsersTransactions(state),
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -46,10 +53,10 @@ const mapDispatchToProps = dispatch => ({
 });
 
 @connect(mapStateToProps, mapDispatchToProps)
-class UserActivityScreen extends Component {
+class UserWalletScreen extends Component {
   static propTypes = {
     navigation: PropTypes.shape().isRequired,
-    usersAccountHistory: PropTypes.shape().isRequired,
+    usersTransactions: PropTypes.shape().isRequired,
     fetchUserAccountHistory: PropTypes.func.isRequired,
     fetchMoreUserAccountHistory: PropTypes.func.isRequired,
   };
@@ -57,31 +64,25 @@ class UserActivityScreen extends Component {
   constructor(props) {
     super(props);
 
-    this.onRefreshUserAccountHistory = this.onRefreshUserAccountHistory.bind(this);
+    this.renderUserWalletRow = this.renderUserWalletRow.bind(this);
     this.navigateBack = this.navigateBack.bind(this);
-    this.renderUserActivityRow = this.renderUserActivityRow.bind(this);
   }
 
   componentDidMount() {
-    const { usersAccountHistory } = this.props;
+    const { usersTransactions } = this.props;
     const { username } = this.props.navigation.state.params;
-    const userAccountHistory = _.get(usersAccountHistory, username, []);
+    const userAccountHistory = _.get(usersTransactions, username, []);
 
     if (_.isEmpty(userAccountHistory)) {
       this.props.fetchUserAccountHistory(username);
     }
   }
 
-  onRefreshUserAccountHistory() {
-    const { username } = this.props.navigation.state.params;
-    this.props.fetchUserAccountHistory(username);
-  }
-
   navigateBack() {
     this.props.navigation.goBack();
   }
 
-  renderUserActivityRow(rowData) {
+  renderUserWalletRow(rowData) {
     const { username } = this.props.navigation.state.params;
     return (
       <UserAction currentUsername={username} action={rowData} navigation={this.props.navigation} />
@@ -89,9 +90,9 @@ class UserActivityScreen extends Component {
   }
 
   render() {
-    const { usersAccountHistory, loadingFetchUserAccountHistory } = this.props;
+    const { usersTransactions } = this.props;
     const { username } = this.props.navigation.state.params;
-    const userAccountHistoryDataSource = _.get(usersAccountHistory, username, []);
+    const userTransactionsDataSource = _.get(usersTransactions, username, []);
 
     return (
       <Container>
@@ -99,7 +100,7 @@ class UserActivityScreen extends Component {
           <BackTouchable onPress={this.navigateBack}>
             <MaterialIcons size={24} name={MATERIAL_ICONS.back} />
           </BackTouchable>
-          <TitleText>{`${username} activity`}</TitleText>
+          <TitleText>{`${username} wallet`}</TitleText>
           <FilterTouchable>
             <MaterialCommunityIcons
               size={24}
@@ -109,21 +110,14 @@ class UserActivityScreen extends Component {
           </FilterTouchable>
         </HeaderContainer>
         <StyledListView
-          dataSource={ds.cloneWithRows(userAccountHistoryDataSource)}
-          renderRow={this.renderUserActivityRow}
+          dataSource={ds.cloneWithRows(userTransactionsDataSource)}
+          renderRow={this.renderUserWalletRow}
           enableEmptySections
           onEndReached={this.props.fetchMoreUserAccountHistory}
-          refreshControl={
-            <RefreshControl
-              refreshing={loadingFetchUserAccountHistory}
-              onRefresh={this.onRefreshUserAccountHistory}
-              colors={[COLORS.BLUE.MARINER]}
-            />
-          }
         />
       </Container>
     );
   }
 }
 
-export default UserActivityScreen;
+export default UserWalletScreen;

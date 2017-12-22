@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components/native';
-import { ListView, Modal, Text } from 'react-native';
+import { Modal, Text } from 'react-native';
 import { connect } from 'react-redux';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import _ from 'lodash';
@@ -10,6 +10,7 @@ import {
   fetchUserComments,
   fetchUserBlog,
   fetchUserFollowCount,
+  refreshUserBlog,
 } from 'state/actions/usersActions';
 import { COLORS, MATERIAL_ICONS, MATERIAL_COMMUNITY_ICONS, ICON_SIZES } from 'constants/styles';
 import * as userMenuConstants from 'constants/userMenu';
@@ -23,12 +24,12 @@ import {
   getLoadingUsersComments,
   getLoadingUsersDetails,
   getLoadingUsersFollowCount,
-  getCurrentUserFollowList,
   getAuthUsername,
+  getRefreshUserBlogLoading,
 } from 'state/rootReducer';
-import CommentsPreview from 'components/user/user-comments/CommentsPreview';
 import UserMenu from 'components/user/UserMenu';
 import UserBlog from './UserBlog';
+import UserComments from './UserComments';
 
 const Container = styled.View`
   flex: 1;
@@ -62,10 +63,6 @@ const TouchableMenuContainer = styled.View`
   padding: 5px;
 `;
 
-const StyledListView = styled.ListView`
-  background-color: ${COLORS.WHITE.WHITE_SMOKE};
-`;
-
 const CurrentUserDisplay = styled.View`
   flex-direction: row;
   align-items: center;
@@ -85,7 +82,7 @@ const mapStateToProps = state => ({
   loadingUsersComments: getLoadingUsersComments(state),
   loadingUsersDetails: getLoadingUsersDetails(state),
   loadingUsersFollowCount: getLoadingUsersFollowCount(state),
-  currentUserFollowList: getCurrentUserFollowList(state),
+  refreshUserBlogLoading: getRefreshUserBlogLoading(state),
   authUsername: getAuthUsername(state),
 });
 
@@ -94,9 +91,8 @@ const mapDispatchToProps = dispatch => ({
   fetchUserComments: (username, query) => dispatch(fetchUserComments.action({ username, query })),
   fetchUserBlog: (username, query) => dispatch(fetchUserBlog.action({ username, query })),
   fetchUserFollowCount: username => dispatch(fetchUserFollowCount.action({ username })),
+  refreshUserBlog: username => dispatch(refreshUserBlog.action({ username })),
 });
-
-const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
 
 @connect(mapStateToProps, mapDispatchToProps)
 class UserScreen extends Component {
@@ -105,7 +101,27 @@ class UserScreen extends Component {
   };
 
   static propTypes = {
+    refreshUserBlogLoading: PropTypes.bool,
+    authUsername: PropTypes.string,
     navigation: PropTypes.shape().isRequired,
+    refreshUserBlog: PropTypes.func.isRequired,
+    usersDetails: PropTypes.shape().isRequired,
+    usersComments: PropTypes.shape().isRequired,
+    usersBlog: PropTypes.shape().isRequired,
+    usersFollowCount: PropTypes.shape().isRequired,
+    fetchUser: PropTypes.func.isRequired,
+    fetchUserBlog: PropTypes.func.isRequired,
+    fetchUserComments: PropTypes.func.isRequired,
+    fetchUserFollowCount: PropTypes.func.isRequired,
+    loadingUsersComments: PropTypes.bool,
+    loadingUsersBlog: PropTypes.bool,
+  };
+
+  static defaultProps = {
+    authUsername: '',
+    refreshUserBlogLoading: false,
+    loadingUsersComments: false,
+    loadingUsersBlog: false,
   };
 
   constructor(props) {
@@ -120,9 +136,9 @@ class UserScreen extends Component {
     this.setMenuVisible = this.setMenuVisible.bind(this);
     this.handleHideMenu = this.handleHideMenu.bind(this);
     this.handleChangeUserMenu = this.handleChangeUserMenu.bind(this);
-    this.renderUserCommentsRow = this.renderUserCommentsRow.bind(this);
     this.navigateBack = this.navigateBack.bind(this);
     this.fetchMoreUserComments = this.fetchMoreUserComments.bind(this);
+    this.handleUserBlogRefresh = this.handleUserBlogRefresh.bind(this);
   }
 
   componentDidMount() {
@@ -158,6 +174,11 @@ class UserScreen extends Component {
 
   handleHideMenu() {
     this.setMenuVisible(false);
+  }
+
+  handleUserBlogRefresh() {
+    const { username } = this.props.navigation.state.params;
+    this.props.refreshUserBlog(username);
   }
 
   fetchMoreUserPosts() {
@@ -227,17 +248,13 @@ class UserScreen extends Component {
     this.props.navigation.goBack();
   }
 
-  renderUserCommentsRow(rowData) {
-    return <CommentsPreview commentData={rowData} navigation={this.props.navigation} />;
-  }
-
   renderUserContent() {
     const { currentMenuOption } = this.state;
     const {
       navigation,
       usersDetails,
       authUsername,
-      currentUserFollowList,
+      refreshUserBlogLoading,
       usersFollowCount,
     } = this.props;
     const { username } = this.props.navigation.state.params;
@@ -248,11 +265,11 @@ class UserScreen extends Component {
     switch (currentMenuOption.id) {
       case userMenuConstants.COMMENTS.id:
         return (
-          <StyledListView
-            dataSource={ds.cloneWithRows(userComments)}
-            renderRow={this.renderUserCommentsRow}
-            enableEmptySections
-            onEndReached={this.fetchMoreUserComments}
+          <UserComments
+            userComments={userComments}
+            fetchMoreUserComments={this.fetchMoreUserComments}
+            navigation={navigation}
+            username={username}
           />
         );
       case userMenuConstants.FOLLOWERS.id:
@@ -272,7 +289,8 @@ class UserScreen extends Component {
             usersDetails={usersDetails}
             authUsername={authUsername}
             usersFollowCount={usersFollowCount}
-            currentUserFollowList={currentUserFollowList}
+            loadingUserBlog={refreshUserBlogLoading}
+            refreshUserBlog={this.handleUserBlogRefresh}
           />
         );
     }

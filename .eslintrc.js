@@ -27,5 +27,6 @@ module.exports = {
     'object-curly-newline': 'off',
     'function-paren-newline': 'off',
     'space-before-function-paren': 'off',
+    'react/jsx-indent': 'off'
   },
 };

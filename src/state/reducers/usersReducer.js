@@ -4,6 +4,7 @@ import {
   FETCH_USER_COMMENTS,
   FETCH_USER_BLOG,
   FETCH_USER_FOLLOW_COUNT,
+  REFRESH_USER_BLOG,
 } from '../actions/actionTypes';
 
 const INITIAL_STATE = {
@@ -68,13 +69,15 @@ export default (state = INITIAL_STATE, action) => {
         loadingUsersBlog: true,
       };
     case FETCH_USER_BLOG.SUCCESS: {
-      const userBlog = state.usersBlog[action.payload.username] || [];
-      const newUserBlog = _.uniqBy(_.concat(userBlog, action.payload.result), 'id');
+      const { username, result, refreshUser } = action.payload;
+      console.log('FETCH_USER_BLOG_SUCCESS', action.payload);
+      const userBlog = state.usersBlog[username] || [];
+      const newUserBlog = refreshUser ? result : _.uniqBy(_.concat(userBlog, result), 'id');
       return {
         ...state,
         usersBlog: {
           ...state.usersBlog,
-          [action.payload.username]: newUserBlog,
+          [username]: newUserBlog,
         },
       };
     }
@@ -103,6 +106,17 @@ export default (state = INITIAL_STATE, action) => {
         ...state,
         loadingUsersFollowCount: false,
       };
+    case REFRESH_USER_BLOG.ACTION:
+      return {
+        ...state,
+        refreshUserBlogLoading: true,
+      };
+    case REFRESH_USER_BLOG.ERROR:
+    case REFRESH_USER_BLOG.LOADING_END:
+      return {
+        ...state,
+        refreshUserBlogLoading: false,
+      };
     default:
       return state;
   }
@@ -116,3 +130,4 @@ export const getLoadingUsersBlog = state => state.loadingUsersBlog;
 export const getLoadingUsersComments = state => state.loadingUsersComments;
 export const getLoadingUsersDetails = state => state.loadingUsersDetails;
 export const getLoadingUsersFollowCount = state => state.loadingUsersFollowCount;
+export const getRefreshUserBlogLoading = state => state.refreshUserBlogLoading;

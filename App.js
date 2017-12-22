@@ -1,10 +1,8 @@
 import React from 'react';
 import { View } from 'react-native';
-import { TabNavigator, StackNavigator } from 'react-navigation';
 import sc2 from 'api/sc2';
 import { Provider } from 'react-redux';
-import { Constants, AppLoading, Asset } from 'expo';
-import { MaterialIcons } from '@expo/vector-icons';
+import { Constants, AppLoading} from 'expo';
 import configureStore from 'state/configureStore';
 
 import AppNavigation from 'screens/navigation/AppNavigation';

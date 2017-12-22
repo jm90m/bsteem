@@ -12,6 +12,7 @@ import LogoutScreen from 'screens/login-screen/LogoutScreen';
 import FollowersScreen from 'screens/stack-screens/FollowersScreen';
 import FollowingScreen from 'screens/stack-screens/FollowingScreen';
 import UserActivityScreen from 'screens/stack-screens/UserActivityScreen';
+import UserWalletScreen from 'screens/stack-screens/UserWalletScreen';
 
 const screenNavigationOptions = {
   tabBarIcon: ({ tintColor }) => (
@@ -54,6 +55,10 @@ const LoginNavigator = StackNavigator(
     },
     [navigationConstants.USER_ACTIVITY]: {
       screen: UserActivityScreen,
+      navigationOptions: screenNavigationOptions,
+    },
+    [navigationConstants.USER_WALLET]: {
+      screen: UserWalletScreen,
       navigationOptions: screenNavigationOptions,
     },
   },

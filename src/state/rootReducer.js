@@ -33,6 +33,7 @@ export const getLoadingUsersComments = state => fromUsers.getLoadingUsersComment
 export const getLoadingUsersDetails = state => fromUsers.getLoadingUsersDetails(state.users);
 export const getLoadingUsersFollowCount = state =>
   fromUsers.getLoadingUsersFollowCount(state.users);
+export const getRefreshUserBlogLoading = state => fromUsers.getRefreshUserBlogLoading(state.users);
 
 // Search Selectors
 export const getSearchLoading = state => fromSearch.getSearchLoading(state.search);
@@ -63,3 +64,5 @@ export const getUsersTransactions = state =>
   fromUserActivity.getUsersTransactions(state.userActivity);
 export const getUsersAccountHistory = state =>
   fromUserActivity.getUsersAccountHistory(state.userActivity);
+export const getLoadingFetchUserAccountHistory = state =>
+  fromUserActivity.getLoadingFetchUserAccountHistory(state.userActivity);

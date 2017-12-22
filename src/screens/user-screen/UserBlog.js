@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { ListView } from 'react-native';
+import { RefreshControl, ListView } from 'react-native';
 import _ from 'lodash';
 import styled from 'styled-components/native';
 import { COLORS } from 'constants/styles';
@@ -16,14 +16,20 @@ const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
 class UserBlog extends Component {
   static propTypes = {
     fetchMoreUserPosts: PropTypes.func.isRequired,
+    isCurrentUser: PropTypes.bool,
     navigation: PropTypes.shape().isRequired,
     userBlog: PropTypes.arrayOf(PropTypes.shape()),
     username: PropTypes.string,
+    loadingUserBlog: PropTypes.bool,
+    refreshUserBlog: PropTypes.func,
   };
 
   static defaultProps = {
+    isCurrentUser: false,
+    loadingUserBlog: false,
     username: '',
     userBlog: [],
+    refreshUserBlog: () => {},
   };
 
   constructor(props) {
@@ -32,15 +38,17 @@ class UserBlog extends Component {
   }
 
   renderUserPostRow(rowData) {
-    const { username, navigation } = this.props;
+    const { username, navigation, isCurrentUser } = this.props;
     if (_.has(rowData, 'renderUserHeader')) {
-      return <UserHeader username={username} navigation={navigation} />;
+      return (
+        <UserHeader username={username} navigation={navigation} hideFollowButton={isCurrentUser} />
+      );
     }
     return <PostPreview postData={rowData} navigation={navigation} currentUsername={username} />;
   }
 
   render() {
-    const { userBlog, fetchMoreUserPosts } = this.props;
+    const { userBlog, fetchMoreUserPosts, loadingUserBlog, refreshUserBlog } = this.props;
     const userHeaderData = [{ renderUserHeader: true }];
     const userBlogDataSource = _.concat(userHeaderData, userBlog);
     return (
@@ -49,6 +57,14 @@ class UserBlog extends Component {
         renderRow={this.renderUserPostRow}
         enableEmptySections
         onEndReached={fetchMoreUserPosts}
+        refreshControl={
+          <RefreshControl
+            refreshing={loadingUserBlog}
+            onRefresh={refreshUserBlog}
+            colors={[COLORS.BLUE.MARINER]}
+          />
+        }
+        // add on refresh
       />
     );
   }

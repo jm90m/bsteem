@@ -1,16 +1,16 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Modal, ListView, AsyncStorage } from 'react-native';
+import { Modal, AsyncStorage } from 'react-native';
 import _ from 'lodash';
 import sc2 from 'api/sc2';
-import steem from 'steem';
 import styled from 'styled-components/native';
 import {
   fetchUser,
   fetchUserComments,
   fetchUserBlog,
   fetchUserFollowCount,
+  refreshUserBlog,
 } from 'state/actions/usersActions';
 import {
   getAuthUsername,
@@ -23,6 +23,7 @@ import {
   getLoadingUsersDetails,
   getLoadingUsersFollowCount,
   getCurrentUserFollowList,
+  getRefreshUserBlogLoading,
 } from 'state/rootReducer';
 import {
   STEEM_ACCESS_TOKEN,
@@ -35,20 +36,13 @@ import { currentUserFollowListFetch } from 'state/actions/currentUserActions';
 import { COLORS } from 'constants/styles';
 import * as userMenuConstants from 'constants/userMenu';
 import * as navigationConstants from 'constants/navigation';
-import PostPreview from 'components/post-preview/PostPreview';
-import CommentsPreview from 'components/user/user-comments/CommentsPreview';
-import UserHeader from 'components/user/user-header/UserHeader';
+import UserBlog from 'screens/user-screen/UserBlog';
+import UserComments from 'screens/user-screen/UserComments';
 import CurrentUserHeader from './CurrentUserHeader';
 import CurrentUserMenu from './CurrentUserMenu';
 
-const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
-
 const Container = styled.View`
   flex: 1;
-`;
-
-const StyledListView = styled.ListView`
-  background-color: ${COLORS.WHITE.WHITE_SMOKE};
 `;
 
 const Loading = styled.ActivityIndicator`
@@ -66,6 +60,7 @@ const mapStateToProps = state => ({
   loadingUsersDetails: getLoadingUsersDetails(state),
   loadingUsersFollowCount: getLoadingUsersFollowCount(state),
   currentUserFollowList: getCurrentUserFollowList(state),
+  refreshUserBlogLoading: getRefreshUserBlogLoading(state),
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -75,10 +70,11 @@ const mapDispatchToProps = dispatch => ({
   fetchUserBlog: (username, query) => dispatch(fetchUserBlog.action({ username, query })),
   fetchUserFollowCount: username => dispatch(fetchUserFollowCount.action({ username })),
   fetchCurrentUserFollowList: () => dispatch(currentUserFollowListFetch.action()),
+  refreshUserBlog: username => dispatch(refreshUserBlog.action({ username })),
 });
 
 @connect(mapStateToProps, mapDispatchToProps)
-class CurrentUserScreen extends Component {
+class CurrentUserProfileScreen extends Component {
   static propTypes = {
     currentUserFollowList: PropTypes.shape().isRequired,
     fetchCurrentUserFollowList: PropTypes.func.isRequired,
@@ -89,12 +85,18 @@ class CurrentUserScreen extends Component {
     loadingUsersBlog: PropTypes.bool.isRequired,
     loadingUsersComments: PropTypes.bool.isRequired,
     logoutUser: PropTypes.func.isRequired,
+    refreshUserBlog: PropTypes.func.isRequired,
+    refreshUserBlogLoading: PropTypes.bool,
     navigation: PropTypes.shape().isRequired,
     username: PropTypes.string.isRequired,
     usersBlog: PropTypes.shape().isRequired,
     usersComments: PropTypes.shape().isRequired,
     usersDetails: PropTypes.shape().isRequired,
     usersFollowCount: PropTypes.shape().isRequired,
+  };
+
+  static defaultProps = {
+    refreshUserBlogLoading: false,
   };
 
   constructor(props) {
@@ -109,10 +111,9 @@ class CurrentUserScreen extends Component {
     this.hideCurrentUserMenu = this.hideCurrentUserMenu.bind(this);
     this.showCurrentUserMenu = this.showCurrentUserMenu.bind(this);
     this.handleChangeUserMenu = this.handleChangeUserMenu.bind(this);
-    this.renderUserPostRow = this.renderUserPostRow.bind(this);
-    this.renderUserCommentsRow = this.renderUserCommentsRow.bind(this);
     this.fetchMoreUserComments = this.fetchMoreUserComments.bind(this);
     this.fetchMoreUserPosts = this.fetchMoreUserPosts.bind(this);
+    this.handleRefreshUserBlog = this.handleRefreshUserBlog.bind(this);
   }
 
   componentDidMount() {
@@ -184,6 +185,11 @@ class CurrentUserScreen extends Component {
     }
   };
 
+  handleRefreshUserBlog() {
+    const { username } = this.props;
+    this.props.refreshUserBlog(username);
+  }
+
   handleChangeUserMenu(option) {
     const { username } = this.props;
     switch (option.id) {
@@ -209,6 +215,14 @@ class CurrentUserScreen extends Component {
             menuVisible: false,
           },
           () => this.props.navigation.navigate(navigationConstants.USER_ACTIVITY, { username }),
+        );
+        break;
+      case userMenuConstants.WALLET.id:
+        this.setState(
+          {
+            menuVisible: false,
+          },
+          () => this.props.navigation.navigate(navigationConstants.USER_WALLET, { username }),
         );
         break;
       case userMenuConstants.LOGOUT.id:
@@ -266,40 +280,37 @@ class CurrentUserScreen extends Component {
     }
   }
 
-  renderUserPostRow(rowData) {
-    return <PostPreview postData={rowData} navigation={this.props.navigation} />;
-  }
-
-  renderUserCommentsRow(rowData) {
-    return <CommentsPreview commentData={rowData} navigation={this.props.navigation} />;
-  }
-
   renderUserContent() {
     const { currentMenuOption } = this.state;
-    const { username, usersComments, usersBlog } = this.props;
+    const { username, usersComments, usersBlog, refreshUserBlogLoading } = this.props;
     const userComments = _.get(usersComments, username, []);
     const userBlog = _.get(usersBlog, username, []);
 
     switch (currentMenuOption.id) {
       case userMenuConstants.COMMENTS.id:
         return (
-          <StyledListView
-            dataSource={ds.cloneWithRows(userComments)}
-            enableEmptySections
-            renderRow={this.renderUserCommentsRow}
-            onEndReached={this.fetchMoreUserComments}
+          <UserComments
+            userComments={userComments}
+            navigation={this.props.navigation}
+            fetchMoreUserComments={this.fetchMoreUserComments}
+            isCurrentUser
+            username={username}
           />
         );
       case userMenuConstants.BLOG.id:
-      default:
         return (
-          <StyledListView
-            dataSource={ds.cloneWithRows(userBlog)}
-            renderRow={this.renderUserPostRow}
-            enableEmptySections
-            onEndReached={this.fetchMoreUserPosts}
+          <UserBlog
+            navigation={this.props.navigation}
+            userBlog={userBlog}
+            username={username}
+            fetchMoreUserPosts={this.fetchMoreUserPosts}
+            isCurrentUser
+            refreshUserBlog={this.handleRefreshUserBlog}
+            loadingUserBlog={refreshUserBlogLoading}
           />
         );
+      default:
+        return null;
     }
   }
 
@@ -319,15 +330,12 @@ class CurrentUserScreen extends Component {
 
   render() {
     const { currentMenuOption, menuVisible } = this.state;
-    const { username, navigation } = this.props;
-
     return (
       <Container>
         <CurrentUserHeader
           currentMenuOption={currentMenuOption}
           toggleCurrentUserMenu={this.toggleCurrentUserMenu}
         />
-        <UserHeader username={username} hideFollowButton navigation={navigation} />
         {this.renderUserContent()}
         {this.renderLoader()}
         <Modal
@@ -346,4 +354,4 @@ class CurrentUserScreen extends Component {
   }
 }
 
-export default CurrentUserScreen;
+export default CurrentUserProfileScreen;

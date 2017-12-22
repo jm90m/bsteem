@@ -8,7 +8,7 @@ import {
   AUTH_USERNAME,
   AUTH_MAX_EXPIRATION_AGE,
 } from 'constants/asyncStorageKeys';
-import { COLORS, MATERIAL_ICONS, ICON_SIZES } from 'constants/styles';
+import { MATERIAL_ICONS, ICON_SIZES } from 'constants/styles';
 import { MaterialIcons } from '@expo/vector-icons';
 import { connect } from 'react-redux';
 import styled from 'styled-components/native';
@@ -16,20 +16,10 @@ import sc2 from 'api/sc2';
 import { getAuthAccessToken } from 'state/rootReducer';
 import { authenticateUserSuccess } from 'state/actions/authActions';
 import SteemConnectLogin from './SteemConnectLogin';
-import CurrentUserScreen from './CurrentUserScreen';
+import CurrentUserProfileScreen from './CurrentUserProfileScreen';
 
 const Container = styled.View`
   flex: 1;
-`;
-
-const LoadingContainer = styled.View`
-  flex: 1;
-  justify-content: center;
-  align-items: center;
-`;
-
-const Loading = styled.ActivityIndicator`
-  padding: 10px;
 `;
 
 const mapStateToProps = state => ({
@@ -105,8 +95,8 @@ class LoginScreen extends Component {
 
   renderUser() {
     if (!_.isEmpty(this.props.accessToken)) {
-      console.log("RENDER LOGIN SCREEN CURRENT USER SCREEN");
-      return <CurrentUserScreen navigation={this.props.navigation} />;
+      console.log('RENDER LOGIN SCREEN CURRENT USER SCREEN');
+      return <CurrentUserProfileScreen navigation={this.props.navigation} />;
     }
     return null;
   }

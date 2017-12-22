@@ -6,6 +6,7 @@ import * as accountHistoryConstants from 'constants/accountHistory';
 import * as navigationConstants from 'constants/navigation';
 import { COLORS } from 'constants/styles';
 import CustomJSONMessage from './CustomJSONMessage';
+import VoteActionMessage from './VoteActionMessage';
 
 const Container = styled.View`
   padding-left: 10px;
@@ -55,6 +56,14 @@ class UserActionMessage extends Component {
       case accountHistoryConstants.CUSTOM_JSON:
         return (
           <CustomJSONMessage
+            actionDetails={actionDetails}
+            currentUsername={currentUsername}
+            navigation={navigation}
+          />
+        );
+      case accountHistoryConstants.VOTE:
+        return (
+          <VoteActionMessage
             actionDetails={actionDetails}
             currentUsername={currentUsername}
             navigation={navigation}
