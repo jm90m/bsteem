@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { ListView } from 'react-native';
+import { ListView, RefreshControl } from 'react-native';
 import styled from 'styled-components/native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { COLORS, MATERIAL_ICONS } from 'constants/styles';
@@ -62,14 +62,16 @@ class FollowersScreen extends Component {
   };
 
   constructor(props) {
-    super(props);
+    super(props)
 
     this.state = {
       isLoading: false,
+      isRefreshing: false,
       followers: [],
     };
     this.renderRow = this.renderRow.bind(this);
     this.navigateBack = this.navigateBack.bind(this);
+    this.refreshFollowers = this.refreshFollowers.bind(this);
   }
 
   componentWillMount() {
@@ -83,6 +85,24 @@ class FollowersScreen extends Component {
         }),
       )
       .catch(error => {
+        console.log('ERROR FOLLOWER SCREEN', error);
+      });
+  }
+
+  refreshFollowers() {
+    const { username } = this.props.navigation.state.params;
+    this.setState({ isRefreshing: true });
+    API.getAllFollowers(username)
+      .then(followers =>
+        this.setState({
+          isRefreshing: false,
+          followers: followers.sort(),
+        }),
+      )
+      .catch(error => {
+        this.setState({
+          isRefreshing: false,
+        });
         console.log('ERROR FOLLOWER SCREEN', error);
       });
   }
@@ -108,7 +128,7 @@ class FollowersScreen extends Component {
     );
   }
   render() {
-    const { followers, isLoading } = this.state;
+    const { followers, isLoading, isRefreshing } = this.state;
     const { username } = this.props.navigation.state.params;
     return (
       <Container>
@@ -125,6 +145,13 @@ class FollowersScreen extends Component {
               dataSource={ds.cloneWithRows(followers)}
               renderRow={this.renderRow}
               enableEmptySections
+              refreshControl={
+                <RefreshControl
+                  refreshing={isRefreshing}
+                  onRefresh={this.refreshFollowers}
+                  colors={[COLORS.BLUE.MARINER]}
+                />
+              }
             />}
       </Container>
     );

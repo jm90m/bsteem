@@ -2,12 +2,18 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import _ from 'lodash';
-import { getCurrentUserFollowList } from 'state/rootReducer';
-import { currentUserFollowUser, currentUserUnfollowUser } from 'state/actions/currentUserActions';
+import { getCurrentUserFollowList, getAuthUsername } from 'state/rootReducer';
+import {
+  currentUserFollowUser,
+  currentUserUnfollowUser,
+  currentUserFollowListFetch,
+} from 'state/actions/currentUserActions';
+import { fetchUserFollowCount } from 'state/actions/usersActions';
 import { Button } from 'react-native-elements';
 import { COLORS } from 'constants/styles';
 
 const mapStateToProps = state => ({
+  authUsername: getAuthUsername(state),
   currentUserFollowList: getCurrentUserFollowList(state),
 });
 
@@ -16,6 +22,8 @@ const mapDispatchToProps = dispatch => ({
     dispatch(currentUserFollowUser.action({ username, followSuccessCallback })),
   currentUserUnfollowUser: (username, unfollowSuccessCallback) =>
     dispatch(currentUserUnfollowUser.action({ username, unfollowSuccessCallback })),
+  fetchCurrentUserFollowList: () => dispatch(currentUserFollowListFetch.action()),
+  fetchUserFollowCount: username => dispatch(fetchUserFollowCount.action({ username })),
 });
 
 @connect(mapStateToProps, mapDispatchToProps)
@@ -23,8 +31,11 @@ class FollowButton extends Component {
   static propTypes = {
     currentUserFollowList: PropTypes.shape().isRequired,
     username: PropTypes.string.isRequired,
+    authUsername: PropTypes.string.isRequired,
     currentUserFollowUser: PropTypes.func.isRequired,
     currentUserUnfollowUser: PropTypes.func.isRequired,
+    fetchCurrentUserFollowList: PropTypes.func.isRequired,
+    fetchUserFollowCount: PropTypes.func.isRequired,
   };
 
   constructor(props) {
@@ -58,17 +69,25 @@ class FollowButton extends Component {
   }
 
   successFollow() {
+    const { username, authUsername } = this.props;
     this.setState({
       isFollowing: true,
       loadingIsFollowing: false,
     });
+    this.props.fetchCurrentUserFollowList();
+    this.props.fetchUserFollowCount(username);
+    this.props.fetchUserFollowCount(authUsername);
   }
 
   successUnfollow() {
+    const { username, authUsername } = this.props;
     this.setState({
       isFollowing: false,
       loadingIsFollowing: false,
     });
+    this.props.fetchCurrentUserFollowList();
+    this.props.fetchUserFollowCount(username);
+    this.props.fetchUserFollowCount(authUsername);
   }
 
   handleFollow() {

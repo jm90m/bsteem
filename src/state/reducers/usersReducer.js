@@ -113,6 +113,7 @@ export default (state = INITIAL_STATE, action) => {
       };
     case REFRESH_USER_BLOG.ERROR:
     case REFRESH_USER_BLOG.LOADING_END:
+      console.log('REFRESH USER BLOG LOADING END');
       return {
         ...state,
         refreshUserBlogLoading: false,
