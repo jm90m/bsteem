@@ -50,3 +50,12 @@ export const CURRENT_USER_FOLLOW_USER = createAsyncActionType(
 export const CURRENT_USER_UNFOLLOW_USER = createAsyncActionType(
   '@current-user/current-user-unfollow-user',
 );
+
+// User Activity Actions
+
+export const FETCH_USER_ACCOUNT_HISTORY = createAsyncActionType(
+  '@user-activity/fetch-user-account-history',
+);
+export const FETCH_MORE_USER_ACCOUNT_HISTORY = createAsyncActionType(
+  '@user-activity/fetch-more-user-account-history',
+);

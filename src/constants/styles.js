@@ -6,6 +6,7 @@ export const COLORS = {
     MEDIUM_AQUAMARINE: '#54D2A0',
     SOLITUDE: '#f5f6f9',
     HAVELOCK_BLUE: '#4A80BE',
+    HEATHER: '#a1afba',
   },
 
   RED: {
@@ -68,6 +69,18 @@ export const MATERIAL_ICONS = {
 
   close: 'close',
   create: 'create',
+
+  // activity
+  person: 'person',
+  businessCenter: 'business-center',
+  voteFill: 'thumb-up',
+  voteOutline: 'thumb-up-outline',
+  unvoteFill: 'thumb-down',
+  personAdd: 'person-add',
+  personOutline: 'person-outline',
+  star: 'star',
+  flashOn: 'flash-on',
+  modeComment: 'mode-comment',
 };
 
 export const MATERIAL_COMMUNITY_ICONS = {
@@ -79,7 +92,17 @@ export const MATERIAL_COMMUNITY_ICONS = {
   linkVariant: 'link-variant',
   clock: 'clock',
   magnify: 'magnify',
+  filter: 'filter',
+
+  // activity
+  voteFill: 'thumb-up',
+  voteOutline: 'thumb-up-outline',
+  unvoteFill: 'thumb-down',
 };
+
+export const FEATHER_ICONS = {
+  award: 'award',
+}
 
 export const FONT_AWESOME_ICONS = {
   news: 'newspaper-o',

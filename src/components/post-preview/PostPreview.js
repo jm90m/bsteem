@@ -37,7 +37,7 @@ const Title = styled.Text`
   padding-bottom: 10px;
   font-weight: 700;
   font-size: 20px;
-  margin: 0 16px 8px;
+  margin: 5px;
 `;
 
 const Touchable = styled.TouchableOpacity``;
@@ -207,9 +207,14 @@ class PostPreview extends Component {
   }
 
   showReblogModal() {
-    this.setState({
-      displayReblogModal: true,
-    });
+    const { authenticated, navigation } = this.props;
+    if (authenticated) {
+      this.setState({
+        displayReblogModal: true,
+      });
+    } else {
+      navigation.navigate(navigationConstants.LOGIN);
+    }
   }
 
   hideReblogModal() {

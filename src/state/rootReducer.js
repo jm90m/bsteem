@@ -5,6 +5,7 @@ import commentsReducer, * as fromComments from './reducers/commentsReducer';
 import usersReducer, * as fromUsers from './reducers/usersReducer';
 import searchReducer, * as fromSearch from './reducers/searchReducer';
 import currentUserReducer, * as fromCurrentUser from './reducers/currentUserReducer';
+import userActivityReducer, * as fromUserActivity from './reducers/userActivityReducer';
 
 export default combineReducers({
   home: homeReducer,
@@ -13,6 +14,7 @@ export default combineReducers({
   users: usersReducer,
   search: searchReducer,
   currentUser: currentUserReducer,
+  userActivity: userActivityReducer,
 });
 
 // Home Selectors
@@ -55,3 +57,9 @@ export const getCurrentUserRebloggedList = state =>
   fromCurrentUser.getCurrentUserRebloggedList(state.currentUser);
 export const getCurrentUserFollowList = state =>
   fromCurrentUser.getCurrentUserFollowList(state.currentUser);
+
+// User Activity Selectors
+export const getUsersTransactions = state =>
+  fromUserActivity.getUsersTransactions(state.userActivity);
+export const getUsersAccountHistory = state =>
+  fromUserActivity.getUsersAccountHistory(state.userActivity);

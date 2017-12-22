@@ -4,7 +4,7 @@ import _ from 'lodash';
 import { View } from 'react-native';
 import { connect } from 'react-redux';
 import steem from 'steem';
-import { getUsersDetails, getUsersFollowCount } from 'state/rootReducer';
+import { getUsersDetails, getUsersFollowCount, getIsAuthenticated } from 'state/rootReducer';
 import UserProfile from 'components/user/user-profile/UserProfile';
 import * as navigationConstants from 'constants/navigation';
 import UserStats from './UserStats';
@@ -14,6 +14,7 @@ import UserFollowButton from './UserFollowButton';
 const mapStateToProps = state => ({
   usersDetails: getUsersDetails(state),
   usersFollowCount: getUsersFollowCount(state),
+  authenticated: getIsAuthenticated(state),
 });
 
 @connect(mapStateToProps)
@@ -23,10 +24,12 @@ class UserHeader extends Component {
     usersDetails: PropTypes.shape().isRequired,
     usersFollowCount: PropTypes.shape().isRequired,
     hideFollowButton: PropTypes.bool,
+    authenticated: PropTypes.bool,
     navigation: PropTypes.shape().isRequired,
   };
 
   static defaultProps = {
+    authenticated: false,
     hideFollowButton: false,
   };
 
@@ -47,9 +50,9 @@ class UserHeader extends Component {
   }
 
   renderFollowButton() {
-    const { hideFollowButton, username } = this.props;
+    const { hideFollowButton, username, authenticated } = this.props;
 
-    if (hideFollowButton) return <View />;
+    if (hideFollowButton || !authenticated) return <View />;
 
     return <UserFollowButton username={username} />;
   }

@@ -159,7 +159,7 @@ class Header extends Component {
             <Author>
               <View>
                 {this.renderAuthor()}
-                <PostCreated>{moment(created).fromNow()}</PostCreated>
+                <PostCreated>{`${moment(created).fromNow(true)} ago`}</PostCreated>
               </View>
               <ReputationScore reputation={steem.formatter.reputation(author_reputation)} />
             </Author>

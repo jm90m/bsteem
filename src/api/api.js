@@ -15,6 +15,8 @@ async function sendRequest(url, requestParams) {
 }
 
 class API {
+  static DEFAULT_ACCOUNT_LIMIT = 1000;
+
   static async getTrending(query) {
     return steem.api.getDiscussionsByTrendingAsync(query);
   }
@@ -124,6 +126,10 @@ class API {
         console.warn(error);
       }
     });
+  }
+
+  static async getAccountHistory(account, from = -1, limit = API.DEFAULT_ACCOUNT_LIMIT) {
+    return steem.api.getAccountHistoryAsync(account, from, limit);
   }
 }
 

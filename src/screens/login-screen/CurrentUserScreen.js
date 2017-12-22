@@ -203,6 +203,14 @@ class CurrentUserScreen extends Component {
           () => this.props.navigation.navigate(navigationConstants.USER_FOLLOWING, { username }),
         );
         break;
+      case userMenuConstants.ACTIVITY.id:
+        this.setState(
+          {
+            menuVisible: false,
+          },
+          () => this.props.navigation.navigate(navigationConstants.USER_ACTIVITY, { username }),
+        );
+        break;
       case userMenuConstants.LOGOUT.id:
         sc2
           .revokeToken()

@@ -11,6 +11,7 @@ import CommentsScreen from 'screens/stack-screens/CommentsScreen';
 import LogoutScreen from 'screens/login-screen/LogoutScreen';
 import FollowersScreen from 'screens/stack-screens/FollowersScreen';
 import FollowingScreen from 'screens/stack-screens/FollowingScreen';
+import UserActivityScreen from 'screens/stack-screens/UserActivityScreen';
 
 const screenNavigationOptions = {
   tabBarIcon: ({ tintColor }) => (
@@ -51,7 +52,10 @@ const LoginNavigator = StackNavigator(
       screen: FollowingScreen,
       navigationOptions: screenNavigationOptions,
     },
-
+    [navigationConstants.USER_ACTIVITY]: {
+      screen: UserActivityScreen,
+      navigationOptions: screenNavigationOptions,
+    },
   },
   {
     headerMode: 'none',
