@@ -15,6 +15,7 @@ const TimeStamp = styled.Text`
 
 const Label = styled.Text`
   font-weight: bold;
+  padding-left: 10px;
 `;
 const Value = styled.Text`
   font-weight: bold;

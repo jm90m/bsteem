@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components/native';
 import * as accountHistoryConstants from 'constants/accountHistory';
 import PowerUpTransaction from './PowerUpTransaction';
 import TransferTransaction from './TransferTransaction';
 import ReceiveTransaction from './ReceiveTransaction';
 import ClaimReward from './ClaimReward';
+import SavingsTransaction from './SavingsTransaction';
 
 const getFormattedTransactionAmount = (amount, currency) => {
   if (!amount) {
@@ -71,14 +71,15 @@ const WalletTransaction = ({
     case accountHistoryConstants.TRANSFER_TO_SAVINGS:
     case accountHistoryConstants.TRANSFER_FROM_SAVINGS:
     case accountHistoryConstants.CANCEL_TRANSFER_FROM_SAVINGS:
-    // return (
-    //   <SavingsTransaction
-    //     transactionDetails={transactionDetails}
-    //     transactionType={transactionType}
-    //     amount={getFormattedTransactionAmount(transactionDetails.amount)}
-    //     timestamp={transaction.timestamp}
-    //   />
-    // );
+      return (
+        <SavingsTransaction
+          transactionDetails={transactionDetails}
+          transactionType={transactionType}
+          amount={getFormattedTransactionAmount(transactionDetails.amount)}
+          timestamp={transaction.timestamp}
+          navigation={navigation}
+        />
+      );
     default:
       return null;
   }
