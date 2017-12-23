@@ -5,7 +5,7 @@ import styled from 'styled-components/native';
 import { COLORS, FONT_AWESOME_ICONS, MATERIAL_ICONS } from 'constants/styles';
 import steem from 'steem';
 import SmallLoading from 'components/common/SmallLoading';
-import { calculateEstAccountValue } from 'util/steemitUtils';
+import { calculateEstAccountValue, calculateTotalDelegatedSP } from 'util/steemitUtils';
 
 const SteemLogo = require('images/steem.png');
 
@@ -37,6 +37,8 @@ const Label = styled.Text`
 
 const Value = styled.Text`
   margin-left: auto;
+  color: ${COLORS.BLUE.MARINER};
+  font-weight: bold;
 `;
 
 const IconContainer = styled.View`
@@ -47,6 +49,25 @@ const SteemImage = styled.Image`
   width: 22px;
   height: 22px;
 `;
+
+const TotalDelegatedSPText = styled.Text`
+  color: ${COLORS.BLUE.MARINER};
+  font-weight: bold;
+`;
+
+const getFormattedTotalDelegatedSP = (user, totalVestingShares, getTotalVestingFundSteem) => {
+  const totalDelegatedSPValue = calculateTotalDelegatedSP(
+    user,
+    totalVestingShares,
+    getTotalVestingFundSteem,
+  );
+  const totalDelegatedSPTextPrefix = totalDelegatedSPValue > 0 ? '(+' : '(';
+  const totalDelegatedSP = `${totalDelegatedSPTextPrefix}${parseFloat(totalDelegatedSPValue).toFixed(3)} SP)`;
+  if (totalDelegatedSPValue !== 0) {
+    return <TotalDelegatedSPText>{totalDelegatedSP}</TotalDelegatedSPText>;
+  }
+  return null;
+};
 
 const UserWalletSummary = ({
   user,
@@ -79,7 +100,8 @@ const UserWalletSummary = ({
           : <Value>
               {`${parseFloat(steem.formatter
                   .vestToSteem(user.vesting_shares, totalVestingShares, totalVestingFundSteem)
-                  .toFixed(3))} SP`}
+                  .toFixed(3))} SP `}
+              {getFormattedTotalDelegatedSP(user, totalVestingShares, totalVestingFundSteem)}
             </Value>}
       </UserWalletSummaryItem>
       <UserWalletSummaryItem>

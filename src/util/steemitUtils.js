@@ -75,3 +75,21 @@ export const calculateEstAccountValue = (
     parseFloat(user.sbd_balance)
   );
 };
+
+export const calculateTotalDelegatedSP = (user, totalVestingShares, totalVestingFundSteem) => {
+  const receivedSP = parseFloat(
+    steem.formatter.vestToSteem(
+      user.received_vesting_shares,
+      totalVestingShares,
+      totalVestingFundSteem,
+    ),
+  );
+  const delegatedSP = parseFloat(
+    steem.formatter.vestToSteem(
+      user.delegated_vesting_shares,
+      totalVestingShares,
+      totalVestingFundSteem,
+    ),
+  );
+  return receivedSP - delegatedSP;
+};

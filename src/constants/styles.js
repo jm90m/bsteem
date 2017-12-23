@@ -10,6 +10,10 @@ export const COLORS = {
     BALI_HAI: '#8798a4',
   },
 
+  BLACK: {
+    BLACK: '#030303',
+  },
+
   RED: {
     VALENCIA: '#D9534F',
   },
@@ -99,6 +103,9 @@ export const MATERIAL_COMMUNITY_ICONS = {
   voteFill: 'thumb-up',
   voteOutline: 'thumb-up-outline',
   unvoteFill: 'thumb-down',
+
+  //wallet
+  claimReward: 'check-circle',
 };
 
 export const FEATHER_ICONS = {
@@ -115,4 +122,9 @@ export const FONT_AWESOME_ICONS = {
 export const ICON_SIZES = {
   menuIcon: 24,
   tabBarIcon: 20,
+  actionIcon: 22,
+};
+
+export const ICON_COLORS = {
+  actionIcon: COLORS.BLUE.HEATHER,
 };

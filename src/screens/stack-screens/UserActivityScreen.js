@@ -52,6 +52,7 @@ class UserActivityScreen extends Component {
     usersAccountHistory: PropTypes.shape().isRequired,
     fetchUserAccountHistory: PropTypes.func.isRequired,
     fetchMoreUserAccountHistory: PropTypes.func.isRequired,
+    loadingFetchUserAccountHistory: PropTypes.bool.isRequired,
   };
 
   constructor(props) {

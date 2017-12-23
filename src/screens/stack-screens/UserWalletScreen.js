@@ -14,15 +14,15 @@ import {
   getTotalVestingFundSteem,
   getTotalVestingShares,
 } from 'state/rootReducer';
-import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS, MATERIAL_ICONS, MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
+import { MaterialIcons } from '@expo/vector-icons';
+import { COLORS, MATERIAL_ICONS } from 'constants/styles';
 import {
   fetchMoreUserAccountHistory,
   fetchUserAccountHistory,
 } from 'state/actions/userActivityActions';
 import { fetchUser } from 'state/actions/usersActions';
 import HeaderContainer from 'components/common/HeaderContainer';
-import UserAction from 'components/activity/UserAction';
+import WalletTransaction from 'components/wallet/WalletTransaction';
 import UserWalletSummary from 'components/wallet/UserWalletSummary';
 
 const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
@@ -41,7 +41,7 @@ const TitleText = styled.Text`
   color: ${COLORS.BLUE.MARINER}
 `;
 
-const FilterTouchable = styled.TouchableOpacity`
+const EmptyView = styled.View`
   padding: 10px;
 `;
 
@@ -136,7 +136,13 @@ class UserWalletScreen extends Component {
       );
     }
     return (
-      <UserAction currentUsername={username} action={rowData} navigation={this.props.navigation} />
+      <WalletTransaction
+        navigation={this.props.navigation}
+        transaction={rowData}
+        currentUsername={username}
+        totalVestingShares={totalVestingShares}
+        totalVestingFundSteem={totalVestingFundSteem}
+      />
     );
   }
 
@@ -156,13 +162,7 @@ class UserWalletScreen extends Component {
             <MaterialIcons size={24} name={MATERIAL_ICONS.back} />
           </BackTouchable>
           <TitleText>{`${username} wallet`}</TitleText>
-          <FilterTouchable>
-            <MaterialCommunityIcons
-              size={24}
-              name={MATERIAL_COMMUNITY_ICONS.filter}
-              color={COLORS.BLUE.MARINER}
-            />
-          </FilterTouchable>
+          <EmptyView />
         </HeaderContainer>
         <StyledListView
           dataSource={ds.cloneWithRows(userTransactionsDataSource)}
