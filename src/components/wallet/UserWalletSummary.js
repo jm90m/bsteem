@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
 import styled from 'styled-components/native';
 import { COLORS, FONT_AWESOME_ICONS, MATERIAL_ICONS } from 'constants/styles';
@@ -76,7 +77,9 @@ const UserWalletSummary = ({
         {loading || loadingGlobalProperties
           ? <SmallLoading style={loaderStyles} />
           : <Value>
-              {`${parseFloat(steem.formatter.vestToSteem(user.vesting_shares, totalVestingShares, totalVestingFundSteem))} SP`}
+              {`${parseFloat(steem.formatter
+                  .vestToSteem(user.vesting_shares, totalVestingShares, totalVestingFundSteem)
+                  .toFixed(3))} SP`}
             </Value>}
       </UserWalletSummaryItem>
       <UserWalletSummaryItem>
@@ -87,7 +90,7 @@ const UserWalletSummary = ({
         {loading
           ? <SmallLoading style={loaderStyles} />
           : <Value>
-              {`${parseFloat(user.sbd_balance)} SBD`}
+              {`${parseFloat(user.sbd_balance).toFixed(3)} SBD`}
             </Value>}
       </UserWalletSummaryItem>
       <UserWalletSummaryItem>
@@ -98,7 +101,7 @@ const UserWalletSummary = ({
         {loading
           ? <SmallLoading style={loaderStyles} />
           : <Value>
-              {`${parseFloat(user.savings_balance)} STEEM, ${parseFloat(user.savings_sbd_balance)} SBD`}
+              {`${parseFloat(user.savings_balance).toFixed(3)} STEEM, ${parseFloat(user.savings_sbd_balance).toFixed(3)} SBD`}
             </Value>}
       </UserWalletSummaryItem>
       <LastUserWalletSummaryItem>
@@ -109,11 +112,29 @@ const UserWalletSummary = ({
         {loading || loadingGlobalProperties
           ? <SmallLoading style={loaderStyles} />
           : <Value>
-              {`$${calculateEstAccountValue(user, totalVestingShares, totalVestingFundSteem, steemRate)}`}
+              {`$${parseFloat(calculateEstAccountValue(user, totalVestingShares, totalVestingFundSteem, steemRate)).toFixed(2)}`}
             </Value>}
       </LastUserWalletSummaryItem>
     </Container>
   );
+};
+
+UserWalletSummary.propTypes = {
+  user: PropTypes.shape(),
+  loading: PropTypes.bool,
+  totalVestingShares: PropTypes.string,
+  totalVestingFundSteem: PropTypes.string,
+  loadingGlobalProperties: PropTypes.bool,
+  steemRate: PropTypes.string,
+};
+
+UserWalletSummary.defaultProps = {
+  user: {},
+  loading: false,
+  totalVestingShares: '',
+  totalVestingFundSteem: '',
+  loadingGlobalProperties: false,
+  steemRate: '',
 };
 
 export default UserWalletSummary;

@@ -1,8 +1,10 @@
 import { FETCH_STEEM_RATE, FETCH_STEEM_GLOBAL_PROPERTIES } from '../actions/actionTypes';
 
 const INITIAL_STATE = {
-  steemRate: 0,
+  steemRate: '0',
   loadingSteemGlobalProperties: false,
+  totalVestingFundSteem: '',
+  totalVestingShares: '',
 };
 
 export default (state = INITIAL_STATE, action) => {
@@ -20,6 +22,8 @@ export default (state = INITIAL_STATE, action) => {
     case FETCH_STEEM_GLOBAL_PROPERTIES.SUCCESS:
       return {
         ...state,
+        totalVestingFundSteem: action.payload.total_vesting_fund_steem,
+        totalVestingShares: action.payload.total_vesting_shares,
         loadingSteemGlobalProperties: false,
       };
     case FETCH_STEEM_GLOBAL_PROPERTIES.ERROR:
@@ -33,7 +37,7 @@ export default (state = INITIAL_STATE, action) => {
   }
 };
 
-export const getAccessToken = state => state.accessToken;
-export const getExpiresIn = state => state.expiresIn;
-export const getUsername = state => state.username;
-export const getIsAuthenticated = state => state.authenticated;
+export const getSteemRate = state => state.steemRate;
+export const getLoadingSteemGlobalProperties = state => state.loadingSteemGlobalProperties;
+export const getTotalVestingFundSteem = state => state.totalVestingFundSteem;
+export const getTotalVestingShares = state => state.totalVestingShares;

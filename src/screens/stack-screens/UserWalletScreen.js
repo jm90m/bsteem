@@ -9,6 +9,10 @@ import {
   getUsersDetails,
   getLoadingUsersDetails,
   getLoadingFetchUserAccountHistory,
+  getSteemRate,
+  getLoadingSteemGlobalProperties,
+  getTotalVestingFundSteem,
+  getTotalVestingShares,
 } from 'state/rootReducer';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS, MATERIAL_ICONS, MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
@@ -46,6 +50,10 @@ const mapStateToProps = state => ({
   usersDetails: getUsersDetails(state),
   loadingUsersDetails: getLoadingUsersDetails(state),
   loadingFetchUserAccountHistory: getLoadingFetchUserAccountHistory(state),
+  steemRate: getSteemRate(state),
+  loadingSteemGlobalProperties: getLoadingSteemGlobalProperties(state),
+  totalVestingFundSteem: getTotalVestingFundSteem(state),
+  totalVestingShares: getTotalVestingShares(state),
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -66,6 +74,10 @@ class UserWalletScreen extends Component {
     fetchUserAccountHistory: PropTypes.func.isRequired,
     fetchMoreUserAccountHistory: PropTypes.func.isRequired,
     fetchUser: PropTypes.func.isRequired,
+    steemRate: PropTypes.string.isRequired,
+    loadingSteemGlobalProperties: PropTypes.bool.isRequired,
+    totalVestingFundSteem: PropTypes.string.isRequired,
+    totalVestingShares: PropTypes.string.isRequired,
   };
 
   constructor(props) {
@@ -102,11 +114,26 @@ class UserWalletScreen extends Component {
   }
 
   renderUserWalletRow(rowData) {
-    const { loadingUsersDetails } = this.props;
+    const {
+      loadingUsersDetails,
+      steemRate,
+      loadingSteemGlobalProperties,
+      totalVestingFundSteem,
+      totalVestingShares,
+    } = this.props;
     const { username } = this.props.navigation.state.params;
     if (_.has(rowData, 'isUserWalletSummary')) {
       const user = _.get(this.props.usersDetails, username, {});
-      return <UserWalletSummary user={user} loading={loadingUsersDetails} />;
+      return (
+        <UserWalletSummary
+          user={user}
+          loading={loadingUsersDetails}
+          steemRate={steemRate}
+          loadingSteemGlobalProperties={loadingSteemGlobalProperties}
+          totalVestingFundSteem={totalVestingFundSteem}
+          totalVestingShares={totalVestingShares}
+        />
+      );
     }
     return (
       <UserAction currentUsername={username} action={rowData} navigation={this.props.navigation} />

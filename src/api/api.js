@@ -131,6 +131,14 @@ class API {
   static async getAccountHistory(account, from = -1, limit = API.DEFAULT_ACCOUNT_LIMIT) {
     return steem.api.getAccountHistoryAsync(account, from, limit);
   }
+
+  static async getDynamicGlobalProperties() {
+    return steem.api.getDynamicGlobalPropertiesAsync();
+  }
+
+  static async getSteemRate() {
+    return sendRequest('https://api.coinmarketcap.com/v1/ticker/steem/');
+  }
 }
 
 export const getAPIByFilter = filterId => {

@@ -6,6 +6,7 @@ import { connect } from 'react-redux';
 import { COLORS } from 'constants/styles';
 import { getAuthAccessToken } from 'state/rootReducer';
 import * as navigationConstants from 'constants/navigation';
+import * as appActions from 'state/actions/appActions';
 import HomeNavigator from './HomeNavigator';
 import SearchNavigator from './SearchNavigator';
 import LoginNavigator from './LoginNavigator';
@@ -68,15 +69,27 @@ const mapStateToProps = state => ({
   accessToken: getAuthAccessToken(state),
 });
 
-@connect(mapStateToProps)
+const mapDispatchToProps = dispatch => ({
+  fetchSteemRate: () => dispatch(appActions.fetchSteemRate.action()),
+  fetchSteemGlobalProperties: () => dispatch(appActions.fetchSteemGlobalProperties.action()),
+});
+
+@connect(mapStateToProps, mapDispatchToProps)
 class AppNavigation extends React.Component {
   static propTypes = {
+    fetchSteemRate: PropTypes.func.isRequired,
+    fetchSteemGlobalProperties: PropTypes.func.isRequired,
     accessToken: PropTypes.string,
   };
 
   static defaultProps = {
     accessToken: '',
   };
+
+  componentDidMount() {
+    this.props.fetchSteemRate();
+    this.props.fetchSteemGlobalProperties();
+  }
 
   render() {
     const { accessToken } = this.props;

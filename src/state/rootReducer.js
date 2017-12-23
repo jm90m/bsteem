@@ -6,8 +6,10 @@ import usersReducer, * as fromUsers from './reducers/usersReducer';
 import searchReducer, * as fromSearch from './reducers/searchReducer';
 import currentUserReducer, * as fromCurrentUser from './reducers/currentUserReducer';
 import userActivityReducer, * as fromUserActivity from './reducers/userActivityReducer';
+import appReducer, * as fromApp from './reducers/appReducer';
 
 export default combineReducers({
+  app: appReducer,
   home: homeReducer,
   auth: authReducer,
   comments: commentsReducer,
@@ -66,3 +68,10 @@ export const getUsersAccountHistory = state =>
   fromUserActivity.getUsersAccountHistory(state.userActivity);
 export const getLoadingFetchUserAccountHistory = state =>
   fromUserActivity.getLoadingFetchUserAccountHistory(state.userActivity);
+
+// App Selectors
+export const getSteemRate = state => fromApp.getSteemRate(state.app);
+export const getLoadingSteemGlobalProperties = state =>
+  fromApp.getLoadingSteemGlobalProperties(state.app);
+export const getTotalVestingFundSteem = state => fromApp.getTotalVestingFundSteem(state.app);
+export const getTotalVestingShares = state => fromApp.getTotalVestingShares(state.app);
