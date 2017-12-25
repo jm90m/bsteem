@@ -4,13 +4,18 @@ import styled from 'styled-components/native';
 import { ListView, RefreshControl } from 'react-native';
 import _ from 'lodash';
 import { connect } from 'react-redux';
-import { getUsersAccountHistory, getLoadingFetchUserAccountHistory } from 'state/rootReducer';
+import {
+  getUsersAccountHistory,
+  getLoadingFetchUserAccountHistory,
+  getLoadingFetchMoreUserAccountHistory,
+} from 'state/rootReducer';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS, MATERIAL_ICONS, MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
 import {
   fetchMoreUserAccountHistory,
   fetchUserAccountHistory,
 } from 'state/actions/userActivityActions';
+import LargeLoading from 'components/common/LargeLoading';
 import HeaderContainer from 'components/common/HeaderContainer';
 import UserAction from 'components/activity/UserAction';
 
@@ -37,6 +42,7 @@ const FilterTouchable = styled.TouchableOpacity`
 const mapStateToProps = state => ({
   usersAccountHistory: getUsersAccountHistory(state),
   loadingFetchUserAccountHistory: getLoadingFetchUserAccountHistory(state),
+  loadingFetchMoreUserAccountHistory: getLoadingFetchMoreUserAccountHistory(state),
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -53,6 +59,7 @@ class UserActivityScreen extends Component {
     fetchUserAccountHistory: PropTypes.func.isRequired,
     fetchMoreUserAccountHistory: PropTypes.func.isRequired,
     loadingFetchUserAccountHistory: PropTypes.bool.isRequired,
+    loadingFetchMoreUserAccountHistory: PropTypes.bool.isRequired,
   };
 
   constructor(props) {
@@ -61,6 +68,7 @@ class UserActivityScreen extends Component {
     this.onRefreshUserAccountHistory = this.onRefreshUserAccountHistory.bind(this);
     this.navigateBack = this.navigateBack.bind(this);
     this.renderUserActivityRow = this.renderUserActivityRow.bind(this);
+    this.handleFetchMoreUserAccountHistory = this.handleFetchMoreUserAccountHistory.bind(this);
   }
 
   componentDidMount() {
@@ -82,6 +90,11 @@ class UserActivityScreen extends Component {
     this.props.navigation.goBack();
   }
 
+  handleFetchMoreUserAccountHistory() {
+    const { username } = this.props.navigation.state.params;
+    this.props.fetchMoreUserAccountHistory(username);
+  }
+
   renderUserActivityRow(rowData) {
     const { username } = this.props.navigation.state.params;
     return (
@@ -90,7 +103,11 @@ class UserActivityScreen extends Component {
   }
 
   render() {
-    const { usersAccountHistory, loadingFetchUserAccountHistory } = this.props;
+    const {
+      usersAccountHistory,
+      loadingFetchUserAccountHistory,
+      loadingFetchMoreUserAccountHistory,
+    } = this.props;
     const { username } = this.props.navigation.state.params;
     const userAccountHistoryDataSource = _.get(usersAccountHistory, username, []);
 
@@ -113,7 +130,7 @@ class UserActivityScreen extends Component {
           dataSource={ds.cloneWithRows(userAccountHistoryDataSource)}
           renderRow={this.renderUserActivityRow}
           enableEmptySections
-          onEndReached={this.props.fetchMoreUserAccountHistory}
+          onEndReached={this.handleFetchMoreUserAccountHistory}
           refreshControl={
             <RefreshControl
               refreshing={loadingFetchUserAccountHistory}
@@ -122,6 +139,7 @@ class UserActivityScreen extends Component {
             />
           }
         />
+        {loadingFetchMoreUserAccountHistory && <LargeLoading />}
       </Container>
     );
   }

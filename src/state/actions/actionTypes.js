@@ -59,6 +59,9 @@ export const FETCH_USER_ACCOUNT_HISTORY = createAsyncActionType(
 export const FETCH_MORE_USER_ACCOUNT_HISTORY = createAsyncActionType(
   '@user-activity/fetch-more-user-account-history',
 );
+export const LOAD_MORE_USER_ACTIONS = createAsyncActionType(
+  '@user-activity/load-more-user-actions',
+);
 
 // App Actions
 export const FETCH_STEEM_RATE = createAsyncActionType('@app/fetch-steem-rate');

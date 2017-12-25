@@ -9,6 +9,7 @@ import {
   getUsersDetails,
   getLoadingUsersDetails,
   getLoadingFetchUserAccountHistory,
+  getLoadingFetchMoreUserAccountHistory,
   getSteemRate,
   getLoadingSteemGlobalProperties,
   getTotalVestingFundSteem,
@@ -24,6 +25,7 @@ import { fetchUser } from 'state/actions/usersActions';
 import HeaderContainer from 'components/common/HeaderContainer';
 import WalletTransaction from 'components/wallet/WalletTransaction';
 import UserWalletSummary from 'components/wallet/UserWalletSummary';
+import LargeLoading from 'components/common/LargeLoading';
 
 const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
 
@@ -50,6 +52,7 @@ const mapStateToProps = state => ({
   usersDetails: getUsersDetails(state),
   loadingUsersDetails: getLoadingUsersDetails(state),
   loadingFetchUserAccountHistory: getLoadingFetchUserAccountHistory(state),
+  loadingFetchMoreUserAccountHistory: getLoadingFetchMoreUserAccountHistory(state),
   steemRate: getSteemRate(state),
   loadingSteemGlobalProperties: getLoadingSteemGlobalProperties(state),
   totalVestingFundSteem: getTotalVestingFundSteem(state),
@@ -71,6 +74,7 @@ class UserWalletScreen extends Component {
     usersDetails: PropTypes.shape().isRequired,
     loadingUsersDetails: PropTypes.bool.isRequired,
     loadingFetchUserAccountHistory: PropTypes.bool.isRequired,
+    loadingFetchMoreUserAccountHistory: PropTypes.bool.isRequired,
     fetchUserAccountHistory: PropTypes.func.isRequired,
     fetchMoreUserAccountHistory: PropTypes.func.isRequired,
     fetchUser: PropTypes.func.isRequired,
@@ -86,6 +90,7 @@ class UserWalletScreen extends Component {
     this.renderUserWalletRow = this.renderUserWalletRow.bind(this);
     this.navigateBack = this.navigateBack.bind(this);
     this.onRefreshUserWallet = this.onRefreshUserWallet.bind(this);
+    this.handleFetchMoreUserAccountHistory = this.handleFetchMoreUserAccountHistory.bind(this);
   }
 
   componentDidMount() {
@@ -111,6 +116,11 @@ class UserWalletScreen extends Component {
 
   navigateBack() {
     this.props.navigation.goBack();
+  }
+
+  handleFetchMoreUserAccountHistory() {
+    const { username } = this.props.navigation.state.params;
+    this.props.fetchMoreUserAccountHistory(username);
   }
 
   renderUserWalletRow(rowData) {
@@ -147,7 +157,12 @@ class UserWalletScreen extends Component {
   }
 
   render() {
-    const { usersTransactions, loadingFetchUserAccountHistory, loadingUsersDetails } = this.props;
+    const {
+      usersTransactions,
+      loadingFetchUserAccountHistory,
+      loadingUsersDetails,
+      loadingFetchMoreUserAccountHistory,
+    } = this.props;
     const { username } = this.props.navigation.state.params;
     const userWalletSummary = [{ isUserWalletSummary: true }];
     const userTransactionsDataSource = _.concat(
@@ -168,7 +183,7 @@ class UserWalletScreen extends Component {
           dataSource={ds.cloneWithRows(userTransactionsDataSource)}
           renderRow={this.renderUserWalletRow}
           enableEmptySections
-          onEndReached={this.props.fetchMoreUserAccountHistory}
+          onEndReached={this.handleFetchMoreUserAccountHistory}
           refreshControl={
             <RefreshControl
               refreshing={loadingFetchUserAccountHistory || loadingUsersDetails}
@@ -177,6 +192,7 @@ class UserWalletScreen extends Component {
             />
           }
         />
+        {loadingFetchMoreUserAccountHistory && <LargeLoading />}
       </Container>
     );
   }

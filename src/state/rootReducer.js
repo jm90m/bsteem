@@ -68,7 +68,8 @@ export const getUsersAccountHistory = state =>
   fromUserActivity.getUsersAccountHistory(state.userActivity);
 export const getLoadingFetchUserAccountHistory = state =>
   fromUserActivity.getLoadingFetchUserAccountHistory(state.userActivity);
-
+export const getLoadingFetchMoreUserAccountHistory = state =>
+  fromUserActivity.getLoadingFetchMoreUserAccountHistory(state.userActivity);
 // App Selectors
 export const getSteemRate = state => fromApp.getSteemRate(state.app);
 export const getLoadingSteemGlobalProperties = state =>

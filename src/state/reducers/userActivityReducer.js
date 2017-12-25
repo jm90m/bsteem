@@ -8,7 +8,7 @@ const initialState = {
   usersTransactions: {},
   usersAccountHistory: {},
   loadingFetchUserAccountHistory: false,
-  loadingFetchMoreUsersAccountHistory: false,
+  loadingFetchMoreUserAccountHistory: false,
 
   // loadingEstAccountValue: true,
   // loadingGlobalProperties: true,
@@ -44,6 +44,11 @@ export default function(state = initialState, action) {
         loadingFetchUserAccountHistory: false,
       };
     }
+    case FETCH_MORE_USER_ACCOUNT_HISTORY.ACTION:
+      return {
+        ...state,
+        loadingFetchMoreUserAccountHistory: true,
+      };
     case FETCH_MORE_USER_ACCOUNT_HISTORY.SUCCESS: {
       const { username, userWalletTransactions, userAccountHistory } = action.payload;
       const userCurrentWalletTransactions = _.get(state.usersTransactions, username, []);
@@ -64,9 +69,14 @@ export default function(state = initialState, action) {
             'actionCount',
           ),
         },
-        loadingMoreUsersAccountHistory: false,
       };
     }
+    case FETCH_MORE_USER_ACCOUNT_HISTORY.ERROR:
+    case FETCH_MORE_USER_ACCOUNT_HISTORY.LOADING_END:
+      return {
+        ...state,
+        loadingFetchMoreUserAccountHistory: false,
+      };
     default:
       return state;
   }
@@ -75,3 +85,5 @@ export default function(state = initialState, action) {
 export const getUsersTransactions = state => state.usersTransactions;
 export const getUsersAccountHistory = state => state.usersAccountHistory;
 export const getLoadingFetchUserAccountHistory = state => state.loadingFetchUserAccountHistory;
+export const getLoadingFetchMoreUserAccountHistory = state =>
+  state.loadingFetchMoreUserAccountHistory;

@@ -1,11 +1,13 @@
 import _ from 'lodash';
-import { takeLatest, call, put } from 'redux-saga/effects';
+import { takeLatest, call, put, select } from 'redux-saga/effects';
 import API from 'api/api';
 import {
   FETCH_USER_ACCOUNT_HISTORY,
   FETCH_MORE_USER_ACCOUNT_HISTORY,
+  LOAD_MORE_USER_ACTION,
 } from 'state/actions/actionTypes';
 import { isWalletTransaction } from 'util/apiUtils';
+import { getUsersAccountHistory } from 'state/rootReducer';
 import * as userActivityActions from 'state/actions/userActivityActions';
 
 const getParsedUserActions = userActions => {
@@ -56,8 +58,40 @@ const fetchUserAccountHistory = function*(action) {
 
 const fetchMoreUserAccountHistory = function*(action) {
   try {
+    const { username } = action.payload;
+    const usersAccountHistory = yield select(getUsersAccountHistory);
+    const currentUserAccountHistory = _.get(usersAccountHistory, username, []);
+    const lastUserAction = _.last(usersAccountHistory);
+    const lastUserActionCount = lastUserAction.actionCount;
+    const lastUserActionIndex = _.findIndex(
+      currentUserAccountHistory,
+      userAction => userAction.actionCount === lastUserActionCount,
+    );
+    const moreActions = currentUserAccountHistory.slice(
+      lastUserActionIndex + 1,
+      lastUserActionIndex + 1 + API.DEFAULT_ACCOUNT_LIMIT,
+    );
+    const lastMoreAction = _.last(moreActions);
+    const lastMoreActionCount = _.isEmpty(lastMoreAction) ? 0 : lastMoreAction.actionCount;
+
+    if (lastMoreActionCount !== 0) {
+      const lastActionCount = lastUserActionCount;
+      const limit = lastActionCount < API.DEFAULT_ACCOUNT_LIMIT
+        ? lastActionCount
+        : API.DEFAULT_ACCOUNT_LIMIT;
+      const result = yield call(API.getAccountHistory, lastActionCount, limit);
+      const parsedUserActions = getParsedUserActions(result);
+      const payload = {
+        username,
+        userWalletTransactions: parsedUserActions.userWalletTransactions,
+        userAccountHistory: parsedUserActions.userAccountHistory,
+      };
+      yield put(userActivityActions.fetchMoreUserAccountHistory.success(payload));
+    }
   } catch (error) {
+    yield put(userActivityActions.fetchMoreUserAccountHistory.fail(error));
   } finally {
+    yield put(userActivityActions.fetchUserAccountHistory.loadingEnd());
   }
 };
 
