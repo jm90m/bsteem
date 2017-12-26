@@ -1,16 +1,52 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Modal, WebView } from 'react-native';
+import { Modal, ScrollView, Dimensions, Image, View, WebView } from 'react-native';
 import { connect } from 'react-redux';
 import styled from 'styled-components/native';
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import { getHtml } from 'util/postUtils';
-import { MATERIAL_ICONS, MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
+import { COLORS, MATERIAL_ICONS, MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
 import * as navigationConstants from 'constants/navigation';
-import { COLORS } from 'constants/styles';
 import { getIsAuthenticated } from 'state/rootReducer';
 import postBodyStyles from 'constants/postBodyStyles';
 import PostMenu from 'components/post-menu/PostMenu';
+import HTMLView from 'components/html-view/HTMLView';
+
+const { width } = Dimensions.get('screen');
+
+const StyledImage = styled.Image`
+`;
+
+function renderNode(node, index, siblings, parent, defaultRenderer) {
+  if (node.name === 'iframe') {
+    return (
+      <WebView
+        key={`iframe-${node.attribs.src}`}
+        source={{ uri: node.attribs.src }}
+        style={{ height: 400, width }}
+        height={400}
+        width={width}
+      />
+    );
+  }
+
+  console.log('NODE', node.name);
+
+  // if (node.name === 'img') {
+  //   return (
+  //     <View>
+  //       <Image
+  //         key={node.attribs.src}
+  //         source={{ uri: node.attribs.src }}
+  //         style={{ height: null, width }}
+  //         resizeMode="contain"
+  //       />
+  //     </View>
+  //   );
+  // // }
+  //
+  // console.log('NODE', node.name);
+}
 
 const Container = styled.View`
   flex: 1;
@@ -70,6 +106,7 @@ class PostScreen extends Component {
     this.navigateToComments = this.navigateToComments.bind(this);
     this.navigateToLoginTab = this.navigateToLoginTab.bind(this);
     this.handleLikePost = this.handleLikePost.bind(this);
+    this.handlePostLinkPress = this.handlePostLinkPress.bind(this);
   }
 
   setModalVisible(visible) {
@@ -108,12 +145,13 @@ class PostScreen extends Component {
     });
   }
 
+  handlePostLinkPress(url) {
+    console.log('clicked link: ', url);
+  }
+
   render() {
     const { body, parsedJsonMetadata, postData, author } = this.props.navigation.state.params;
-    const htmlPostTitle = `<h1>${postData.title}</h1>`;
-    const htmlBody = `<body>${htmlPostTitle}<div class="Body">${getHtml(body, parsedJsonMetadata)}</div></body>`;
-    const htmlHead = `<head>${postBodyStyles}</head>`;
-    const html = `<html>${htmlHead}${htmlBody}</html>`;
+    const parsedHtmlBody = getHtml(body, parsedJsonMetadata);
 
     return (
       <Container>
@@ -138,7 +176,13 @@ class PostScreen extends Component {
         >
           <PostMenu hideMenu={this.handleHideModal} handleLikePost={this.handleLikePost} />
         </Modal>
-        <WebView source={{ html }} javaScriptEnabled />
+        <ScrollView>
+          <HTMLView
+            value={parsedHtmlBody}
+            renderNode={renderNode}
+            onLinkPress={this.handlePostLinkPress}
+          />
+        </ScrollView>
       </Container>
     );
   }

@@ -70,7 +70,6 @@ export default (state = INITIAL_STATE, action) => {
         },
         {},
       );
-      console.log(formattedFollowList);
       return {
         ...state,
         followList: formattedFollowList,

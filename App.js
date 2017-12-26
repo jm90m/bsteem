@@ -33,8 +33,6 @@ export default class App extends React.Component {
       console.warn(
         'There was an error caching assets network timeout, so we skipped caching. Reload the app to try again.',
       );
-
-      console.log(e);
     } finally {
       this.setState({ assetsAreLoaded: true });
     }

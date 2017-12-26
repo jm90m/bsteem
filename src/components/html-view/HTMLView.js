@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
+import { Linking, Platform, StyleSheet, View, ViewPropTypes } from 'react-native';
 import PropTypes from 'prop-types';
 import htmlToElement from './htmlToElement';
-import { Linking, Platform, StyleSheet, View, ViewPropTypes } from 'react-native';
 
 const boldStyle = { fontWeight: '500' };
 const italicStyle = { fontStyle: 'italic' };
@@ -135,8 +135,10 @@ HtmlView.propTypes = {
 };
 
 HtmlView.defaultProps = {
-  addLineBreaks: true,
-  onLinkPress: url => Linking.openURL(url),
+  addLineBreaks: false,
+  onLinkPress: url => {
+    console.log(url);
+  },
   onLinkLongPress: null,
   onError: console.error.bind(console),
   RootComponent: View,

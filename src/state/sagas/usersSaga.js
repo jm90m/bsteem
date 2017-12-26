@@ -29,7 +29,6 @@ const fetchUserBlog = function*(action) {
       username,
       refreshUser,
     };
-    console.log('PAYLOAD', payload);
     yield put(userActions.fetchUserBlog.success(payload));
   } catch (error) {
     yield put(userActions.fetchUserBlog.fail(error));

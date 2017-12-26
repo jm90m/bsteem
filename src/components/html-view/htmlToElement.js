@@ -1,9 +1,9 @@
 import React from 'react';
-import {StyleSheet, Text} from 'react-native';
+import { StyleSheet, Text, Image, Dimensions, View } from 'react-native';
 import htmlparser from 'htmlparser2-without-node-native';
 import entities from 'entities';
 
-import AutoSizedImage from './AutoSizedImage';
+const { width } = Dimensions.get('screen');
 
 const defaultOpts = {
   lineBreak: '\n',
@@ -16,24 +16,32 @@ const defaultOpts = {
 };
 
 const Img = props => {
-  const width =
+  const imgWidth =
     parseInt(props.attribs['width'], 10) || parseInt(props.attribs['data-width'], 10) || 0;
-  const height =
-    parseInt(props.attribs['height'], 10) ||
-    parseInt(props.attribs['data-height'], 10) ||
-    0;
+  const imgHeight =
+    parseInt(props.attribs['height'], 10) || parseInt(props.attribs['data-height'], 10) || 0;
 
-  const imgStyle = {
-    width,
-    height,
-  };
-
-  const source = {
-    uri: props.attribs.src,
-    width,
-    height,
-  };
-  return <AutoSizedImage source={source} style={imgStyle} />;
+  // const imgStyle = {
+  //   width,
+  //   height,
+  // };
+  //
+  // const source = {
+  //   width,
+  //   height,
+  // };
+  console.log('IMG PROPS', props);
+  console.log('IMG WIDTH', imgWidth);
+  console.log('IMG HEIGHT', imgHeight);
+  return (
+    <View style={{ height: 150, width }}>
+      <Image
+        source={{ uri: props.attribs.src }}
+        style={{ height: 150, width }}
+        rezizeMode={Image.resizeMode.cover}
+      />
+    </View>
+  );
 };
 
 export default function htmlToElement(rawHtml, customOpts = {}, done) {
@@ -46,7 +54,7 @@ export default function htmlToElement(rawHtml, customOpts = {}, done) {
     if (!parent) return null;
     const style = StyleSheet.flatten(opts.styles[parent.name]) || {};
     const parentStyle = inheritedStyle(parent.parent) || {};
-    return {...parentStyle, ...style};
+    return { ...parentStyle, ...style };
   }
 
   function domToElement(dom, parent) {
@@ -57,17 +65,11 @@ export default function htmlToElement(rawHtml, customOpts = {}, done) {
 
     return dom.map((node, index, list) => {
       if (renderNode) {
-        const rendered = renderNode(
-          node,
-          index,
-          list,
-          parent,
-          domToElement
-        );
+        const rendered = renderNode(node, index, list, parent, domToElement);
         if (rendered || rendered === null) return rendered;
       }
 
-      const {TextComponent} = opts;
+      const { TextComponent } = opts;
 
       if (node.type === 'text') {
         const defaultStyle = opts.textComponentProps ? opts.textComponentProps.style : null;
@@ -92,34 +94,10 @@ export default function htmlToElement(rawHtml, customOpts = {}, done) {
         let linkPressHandler = null;
         let linkLongPressHandler = null;
         if (node.name === 'a' && node.attribs && node.attribs.href) {
-          linkPressHandler = () =>
-            opts.linkHandler(entities.decodeHTML(node.attribs.href));
+          linkPressHandler = () => opts.linkHandler(entities.decodeHTML(node.attribs.href));
           if (opts.linkLongPressHandler) {
             linkLongPressHandler = () =>
               opts.linkLongPressHandler(entities.decodeHTML(node.attribs.href));
-          }
-        }
-
-        let linebreakBefore = null;
-        let linebreakAfter = null;
-        if (opts.addLineBreaks) {
-          switch (node.name) {
-          case 'pre':
-            linebreakBefore = opts.lineBreak;
-            break;
-          case 'p':
-            if (index < list.length - 1) {
-              linebreakAfter = opts.paragraphBreak;
-            }
-            break;
-          case 'br':
-          case 'h1':
-          case 'h2':
-          case 'h3':
-          case 'h4':
-          case 'h5':
-            linebreakAfter = opts.lineBreak;
-            break;
           }
         }
 
@@ -129,20 +107,21 @@ export default function htmlToElement(rawHtml, customOpts = {}, done) {
           const customStyle = inheritedStyle(parent);
 
           if (parent.name === 'ol') {
-            listItemPrefix = (<TextComponent style={[defaultStyle, customStyle]}>
-              {`${orderedListCounter++}. `}
-            </TextComponent>);
+            listItemPrefix = (
+              <TextComponent style={[defaultStyle, customStyle]}>
+                {`${orderedListCounter++}. `}
+              </TextComponent>
+            );
           } else if (parent.name === 'ul') {
-            listItemPrefix = (<TextComponent style={[defaultStyle, customStyle]}>
-              {opts.bullet}
-            </TextComponent>);
-          }
-          if (opts.addLineBreaks && index < list.length - 1) {
-            linebreakAfter = opts.lineBreak;
+            listItemPrefix = (
+              <TextComponent style={[defaultStyle, customStyle]}>
+                {opts.bullet}
+              </TextComponent>
+            );
           }
         }
 
-        const {NodeComponent, styles} = opts;
+        const { NodeComponent, styles } = opts;
 
         return (
           <NodeComponent
@@ -152,10 +131,8 @@ export default function htmlToElement(rawHtml, customOpts = {}, done) {
             style={!node.parent ? styles[node.name] : null}
             onLongPress={linkLongPressHandler}
           >
-            {linebreakBefore}
             {listItemPrefix}
             {domToElement(node.children, node)}
-            {linebreakAfter}
           </NodeComponent>
         );
       }

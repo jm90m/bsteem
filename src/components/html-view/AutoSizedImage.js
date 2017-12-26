@@ -42,7 +42,8 @@ export default class AutoSizedImage extends PureComponent {
     } else {
       source = Object.assign(source, this.props.source, finalSize);
     }
-
-    return <Image style={style} source={source} />;
+    console.log('IMAGE STYLE', style);
+    console.log('IMAGE SOURCE', source);
+    return <Image style={style} source={source} resizeMode="cover" />;
   }
 }
