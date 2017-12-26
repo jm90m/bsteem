@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import { MaterialIcons } from '@expo/vector-icons';
+
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { getHasNetworkConnection } from 'state/rootReducer';
@@ -7,18 +9,24 @@ import styled from 'styled-components/native';
 const Container = styled.View`
   position: absolute;
   left: 0;
+  top: 50px;
   justify-content: center;
   align-items: center;
   background-color: red;
   height: 100px;
-  border-bottom-width: 1px;
+  border-width: 1px;
+  border-radius: 4px;
+  border-color: red;
   padding: 10px;
-  border-bottom-color: red;
   width: 100%;
 `;
 
-const Text = styled.Text`
+const WarningText = styled.Text`
   color: white;
+`;
+
+const Touchable = styled.TouchableOpacity`
+  align-self: flex-end;
 `;
 
 const mapStateToProps = state => ({
@@ -31,17 +39,42 @@ class NetConnectionBanner extends Component {
     networkConnection: PropTypes.bool.isRequired,
   };
 
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      closeBanner: false,
+    };
+
+    this.handleCloseBanner = this.handleCloseBanner.bind(this);
+  }
+
+  handleCloseBanner() {
+    this.setState({
+      closeBanner: true,
+    });
+  }
+
   render() {
     const { networkConnection } = this.props;
+    const { closeBanner } = this.state;
+
+    if (closeBanner) return null;
+
     if (!networkConnection) {
       return (
         <Container>
-          <Text>
+          <Touchable onPress={this.handleCloseBanner}>
+            <MaterialIcons name="close" size={20} />
+          </Touchable>
+          <WarningText>
             No internet connection found, please connect to internet and restart the app
-          </Text>
+          </WarningText>
         </Container>
       );
     }
+
+    return null;
   }
 }
 
