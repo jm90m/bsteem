@@ -1,10 +1,15 @@
-import { FETCH_STEEM_RATE, FETCH_STEEM_GLOBAL_PROPERTIES } from '../actions/actionTypes';
+import {
+  FETCH_STEEM_RATE,
+  FETCH_STEEM_GLOBAL_PROPERTIES,
+  FETCH_NETWORK_CONNECTION,
+} from '../actions/actionTypes';
 
 const INITIAL_STATE = {
   steemRate: '0',
   loadingSteemGlobalProperties: false,
   totalVestingFundSteem: '',
   totalVestingShares: '',
+  networkConnection: false,
 };
 
 export default (state = INITIAL_STATE, action) => {
@@ -32,6 +37,16 @@ export default (state = INITIAL_STATE, action) => {
         ...state,
         loadingSteemGlobalProperties: false,
       };
+
+    case FETCH_NETWORK_CONNECTION.SUCCESS: {
+      // {type: "unknown", effectiveType: "unknown"}
+      const { type } = action.payload;
+      const hasNetworkConnection = type !== 'unknown';
+      return {
+        ...state,
+        networkConnection: hasNetworkConnection,
+      };
+    }
     default:
       return state;
   }
@@ -41,3 +56,4 @@ export const getSteemRate = state => state.steemRate;
 export const getLoadingSteemGlobalProperties = state => state.loadingSteemGlobalProperties;
 export const getTotalVestingFundSteem = state => state.totalVestingFundSteem;
 export const getTotalVestingShares = state => state.totalVestingShares;
+export const getHasNetworkConnection = state => state.networkConnection;

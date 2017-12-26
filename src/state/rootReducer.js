@@ -76,3 +76,4 @@ export const getLoadingSteemGlobalProperties = state =>
   fromApp.getLoadingSteemGlobalProperties(state.app);
 export const getTotalVestingFundSteem = state => fromApp.getTotalVestingFundSteem(state.app);
 export const getTotalVestingShares = state => fromApp.getTotalVestingShares(state.app);
+export const getHasNetworkConnection = state => fromApp.getHasNetworkConnection(state.app);

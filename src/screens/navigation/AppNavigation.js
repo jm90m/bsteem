@@ -72,6 +72,7 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
   fetchSteemRate: () => dispatch(appActions.fetchSteemRate.action()),
   fetchSteemGlobalProperties: () => dispatch(appActions.fetchSteemGlobalProperties.action()),
+  fetchNetworkConnection: () => dispatch(appActions.fetchNetworkConnection.action()),
 });
 
 @connect(mapStateToProps, mapDispatchToProps)
@@ -79,6 +80,7 @@ class AppNavigation extends React.Component {
   static propTypes = {
     fetchSteemRate: PropTypes.func.isRequired,
     fetchSteemGlobalProperties: PropTypes.func.isRequired,
+    fetchNetworkConnection: PropTypes.func.isRequired,
     accessToken: PropTypes.string,
   };
 
@@ -89,6 +91,7 @@ class AppNavigation extends React.Component {
   componentDidMount() {
     this.props.fetchSteemRate();
     this.props.fetchSteemGlobalProperties();
+    this.props.fetchNetworkConnection();
   }
 
   render() {

@@ -45,6 +45,7 @@ const rootSaga = function*() {
     // App Saga
     spawn(appSaga.watchFetchSteemGlobalProperties),
     spawn(appSaga.watchFetchSteemRate),
+    spawn(appSaga.watchFetchNetworkConnection),
   ]);
 };
 

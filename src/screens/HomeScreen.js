@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
-import { ListView, View, Modal, NetInfo, RefreshControl, Dimensions } from 'react-native';
+import { ListView, View, Modal, RefreshControl, Dimensions } from 'react-native';
 import { connect } from 'react-redux';
 import styled from 'styled-components/native';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
@@ -9,6 +9,7 @@ import {
   getLoadingFetchDiscussions,
   getLoadingFetchMoreDiscussions,
   getHomeFeedPosts,
+  getHasNetworkConnection,
 } from 'state/rootReducer';
 import { fetchDiscussions, fetchMoreDiscussions } from 'state/actions/homeActions';
 import { MATERIAL_COMMUNITY_ICONS, COLORS } from 'constants/styles';
@@ -16,6 +17,7 @@ import { TRENDING } from 'constants/feedFilters';
 import PostPreview from 'components/post-preview/PostPreview';
 import FeedSort from 'components/feed-sort/FeedSort';
 import LargeLoading from 'components/common/LargeLoading';
+import NetConnectionBanner from 'components/common/NetConnectionBanner';
 
 const { width, height } = Dimensions.get('screen');
 
@@ -65,6 +67,7 @@ const mapStateToProps = state => ({
   posts: getHomeFeedPosts(state),
   loadingFetchDiscussions: getLoadingFetchDiscussions(state),
   loadingFetchMoreDiscussions: getLoadingFetchMoreDiscussions(state),
+  networkConnection: getHasNetworkConnection(state),
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -107,15 +110,19 @@ class HomeScreen extends Component {
   }
 
   componentDidMount() {
-    NetInfo.getConnectionInfo().then(connectionInfo => {
-      console.log(
-        'Initial, type: ' +
-          connectionInfo.type +
-          ', effectiveType: ' +
-          connectionInfo.effectiveType,
-      );
-    });
-    this.props.fetchDiscussions(this.state.currentFilter);
+    // NetInfo.getConnectionInfo().then(connectionInfo => {
+    //   console.log(
+    //     'Initial, type: ' +
+    //       connectionInfo.type +
+    //       ', effectiveType: ' +
+    //       connectionInfo.effectiveType,
+    //   );
+    //
+    //   if(netInfoConstants.UNKNOWN_NET_INFO) {
+    //     this.props.noNetworkConnectionFound();
+    //   }
+    // });
+    // this.props.fetchDiscussions(this.state.currentFilter);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -200,6 +207,7 @@ class HomeScreen extends Component {
             />
           }
         />
+        <NetConnectionBanner />
       </View>
     );
   }

@@ -68,3 +68,4 @@ export const FETCH_STEEM_RATE = createAsyncActionType('@app/fetch-steem-rate');
 export const FETCH_STEEM_GLOBAL_PROPERTIES = createAsyncActionType(
   '@app/fetch-steem-global-properties',
 );
+export const FETCH_NETWORK_CONNECTION = createAsyncActionType('@app/fetch-network-connection');
