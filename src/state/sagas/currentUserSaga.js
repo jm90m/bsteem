@@ -23,7 +23,11 @@ const fetchCurrentUserFeed = function*() {
       limit: 10,
     };
     const result = yield call(API.getDiscussionsByFeed, query);
-    yield put(currentUserActions.currentUserFeedFetch.success(result));
+    if (result.error) {
+      yield put(currentUserActions.currentUserFeedFetch.fail(result.error));
+    } else {
+      yield put(currentUserActions.currentUserFeedFetch.success(result.result));
+    }
   } catch (error) {
     yield put(currentUserActions.currentUserFeedFetch.fail(error));
   }
@@ -43,7 +47,11 @@ const fetchMoreCurrentUserFeed = function*() {
       start_permlink: permlink,
     };
     const result = yield call(API.getDiscussionsByFeed, query);
-    yield put(currentUserActions.currentUserFeedFetchMore.success(result));
+    if (result.error) {
+      yield put(currentUserActions.currentUserFeedFetchMore.fail(result.error));
+    } else {
+      yield put(currentUserActions.currentUserFeedFetchMore.success(result.result));
+    }
   } catch (error) {
     yield put(currentUserActions.currentUserFeedFetchMore.fail(error));
   }

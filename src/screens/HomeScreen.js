@@ -17,9 +17,6 @@ import { TRENDING } from 'constants/feedFilters';
 import PostPreview from 'components/post-preview/PostPreview';
 import FeedSort from 'components/feed-sort/FeedSort';
 import LargeLoading from 'components/common/LargeLoading';
-import NetConnectionBanner from 'components/common/NetConnectionBanner';
-
-const { width, height } = Dimensions.get('screen');
 
 const StyledListView = styled.ListView`
   background-color: ${COLORS.WHITE.WHITE_SMOKE};
@@ -110,19 +107,7 @@ class HomeScreen extends Component {
   }
 
   componentDidMount() {
-    // NetInfo.getConnectionInfo().then(connectionInfo => {
-    //   console.log(
-    //     'Initial, type: ' +
-    //       connectionInfo.type +
-    //       ', effectiveType: ' +
-    //       connectionInfo.effectiveType,
-    //   );
-    //
-    //   if(netInfoConstants.UNKNOWN_NET_INFO) {
-    //     this.props.noNetworkConnectionFound();
-    //   }
-    // });
-    // this.props.fetchDiscussions(this.state.currentFilter);
+    this.props.fetchDiscussions(this.state.currentFilter);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -192,8 +177,11 @@ class HomeScreen extends Component {
         >
           <FeedSort hideMenu={this.handleHideMenu} handleSortPost={this.handleSortPost} />
         </Modal>
-        {loadingFetchMoreDiscussions &&
-          <LoadingMoreContainer><LargeLoading /></LoadingMoreContainer>}
+        {loadingFetchMoreDiscussions && (
+          <LoadingMoreContainer>
+            <LargeLoading />
+          </LoadingMoreContainer>
+        )}
         <StyledListView
           dataSource={dataSource}
           renderRow={this.renderRow}
@@ -207,7 +195,6 @@ class HomeScreen extends Component {
             />
           }
         />
-        <NetConnectionBanner />
       </View>
     );
   }

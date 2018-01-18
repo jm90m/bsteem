@@ -15,7 +15,7 @@ const fetchAskSteemSearchResults = function*(action) {
       call(API.getAskSteemSearch, search, 4),
       call(API.getAskSteemSearch, search, 5),
     ]);
-    const steemAccountLookupResults = yield call(API.getLookupAccountNames, search);
+    const steemAccountLookupResults = yield call(API.getAccountReputation, search);
 
     let mergedResults = [];
     _.each(askSteemResults, element => {
@@ -24,11 +24,12 @@ const fetchAskSteemSearchResults = function*(action) {
     const sortedAskSteemResults = _.reverse(_.sortBy(mergedResults, ['type', 'created']));
     const payload = {
       askSteemResults: sortedAskSteemResults,
-      steemAccountLookupResults,
+      steemAccountLookupResults: steemAccountLookupResults.result,
     };
 
     yield put(searchAskSteem.success(payload));
   } catch (error) {
+    console.log(error);
     yield put(searchAskSteem.fail(error));
   }
 };

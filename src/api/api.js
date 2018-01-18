@@ -1,4 +1,3 @@
-import steem from 'steem';
 import _ from 'lodash';
 import * as feedFilters from 'constants/feedFilters';
 
@@ -14,50 +13,92 @@ async function sendRequest(url, requestParams) {
   return result;
 }
 
+async function sendPostRequest(url, requestParams) {
+  const response = await fetch(url, {
+    body: JSON.stringify(requestParams),
+    method: 'post',
+    mode: 'cors',
+  });
+  let result;
+  try {
+    result = await response.json();
+  } catch (e) {
+    result = { error: e };
+  }
+
+  return result;
+}
+
 class API {
   static DEFAULT_ACCOUNT_LIMIT = 1000;
 
+  static BASE_URL = 'https://api.steemit.com';
+
+  static createRequestQuery(method, query) {
+    return {
+      method: method,
+      params: query,
+      jsonrpc: '2.0',
+    };
+  }
+
   static async getTrending(query) {
-    return steem.api.getDiscussionsByTrendingAsync(query);
+    const requestQuery = API.createRequestQuery('get_discussions_by_trending', [query]);
+    return sendPostRequest(API.BASE_URL, requestQuery);
   }
 
   static async getActive(query) {
-    return steem.api.getDiscussionsByActiveAsync(query);
+    const requestQuery = API.createRequestQuery('get_discussions_by_active', [query]);
+    return sendPostRequest(API.BASE_URL, requestQuery);
   }
+
   static async getPromoted(query) {
-    return steem.api.getDiscussionsByPromotedAsync(query);
+    const requestQuery = API.createRequestQuery('get_discussions_by_promoted', [query]);
+    return sendPostRequest(API.BASE_URL, requestQuery);
   }
 
   static async getHot(query) {
-    return steem.api.getDiscussionsByHotAsync(query);
+    const requestQuery = API.createRequestQuery('get_discussions_by_hot', [query]);
+    return sendPostRequest(API.BASE_URL, requestQuery);
   }
 
   static async getCreated(query) {
-    return steem.api.getDiscussionsByCreatedAsync(query);
+    const requestQuery = API.createRequestQuery('get_discussions_by_created', [query]);
+    return sendPostRequest(API.BASE_URL, requestQuery);
   }
 
   static async getTags() {
-    return steem.api.getTrendingTagsAsync(undefined, 50);
+    const requestQuery = API.createRequestQuery('get_trending_tags', [null, 50]);
+    return sendPostRequest(API.BASE_URL, requestQuery);
   }
 
   static async getComments(postUrl) {
-    return steem.api.getStateAsync(postUrl);
+    const requestQuery = API.createRequestQuery('get_state', [postUrl]);
+    return sendPostRequest(API.BASE_URL, requestQuery);
   }
 
   static async getAccount(username) {
-    return steem.api.getAccountsAsync([username]);
+    const requestQuery = API.createRequestQuery('get_accounts', [[username]]);
+    return sendPostRequest(API.BASE_URL, requestQuery);
   }
 
   static async getDiscussionsByBlog(query) {
-    return steem.api.getDiscussionsByBlogAsync(query);
+    const requestQuery = API.createRequestQuery('get_discussions_by_blog', [query]);
+    return sendPostRequest(API.BASE_URL, requestQuery);
   }
 
   static async getDiscussionsByComments(query) {
-    return steem.api.getDiscussionsByCommentsAsync(query);
+    const requestQuery = API.createRequestQuery('get_discussions_by_comments', [query]);
+    return sendPostRequest(API.BASE_URL, requestQuery);
   }
 
   static async getFollowCount(username) {
-    return steem.api.getFollowCountAsync(username);
+    const requestQuery = API.createRequestQuery('call', [
+      'follow_api',
+      'get_follow_count',
+      [username],
+    ]);
+    return sendPostRequest(API.BASE_URL, requestQuery);
   }
 
   static async getAskSteemSearch(search, page) {
@@ -65,23 +106,36 @@ class API {
   }
 
   static async getContent(author, permlink) {
-    return steem.api.getContentAsync(author, permlink);
+    const requestQuery = API.createRequestQuery('get_discussions_by_comments', [author, permlink]);
+    return sendPostRequest(API.BASE_URL, requestQuery);
   }
 
-  static async getLookupAccountNames(name, limit = 5) {
-    return steem.api.lookupAccountsAsync(name, limit);
+  static async getAccountReputation(name, limit = 20) {
+    const requestQuery = API.createRequestQuery('get_account_reputations', [name, limit]);
+    return sendPostRequest(API.BASE_URL, requestQuery);
   }
 
   static async getDiscussionsByFeed(query) {
-    return steem.api.getDiscussionsByFeedAsync(query);
+    const requestQuery = API.createRequestQuery('get_discussions_by_feed', [query]);
+    return sendPostRequest(API.BASE_URL, requestQuery);
   }
 
   static async getFollowers(following, startFollower, followType, limit) {
-    return steem.api.getFollowersAsync(following, startFollower, followType, limit);
+    const requestQuery = API.createRequestQuery('call', [
+      'follow_api',
+      'get_followers',
+      [following, startFollower, followType, limit],
+    ]);
+    return sendPostRequest(API.BASE_URL, requestQuery);
   }
 
   static async getFollowing(follower, startFollowing, followType, limit) {
-    return steem.api.getFollowingAsync(follower, startFollowing, followType, limit);
+    const requestQuery = API.createRequestQuery('call', [
+      'follow_api',
+      'get_following',
+      [follower, startFollowing, followType, limit],
+    ]);
+    return sendPostRequest(API.BASE_URL, requestQuery);
   }
 
   static async getAllFollowing(username) {
@@ -129,11 +183,13 @@ class API {
   }
 
   static async getAccountHistory(account, from = -1, limit = API.DEFAULT_ACCOUNT_LIMIT) {
-    return steem.api.getAccountHistoryAsync(account, from, limit);
+    const requestQuery = API.createRequestQuery('get_account_history', [account, from, limit]);
+    return sendPostRequest(API.BASE_URL, requestQuery);
   }
 
   static async getDynamicGlobalProperties() {
-    return steem.api.getDynamicGlobalPropertiesAsync();
+    const requestQuery = API.createRequestQuery('get_dynamic_global_properties', []);
+    return sendPostRequest(API.BASE_URL, requestQuery);
   }
 
   static async getSteemRate() {

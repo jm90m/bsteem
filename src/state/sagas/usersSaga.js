@@ -14,7 +14,11 @@ const fetchUser = function*(action) {
   try {
     const { username } = action.payload;
     const result = yield call(API.getAccount, username);
-    yield put(userActions.fetchUser.success(result));
+    if (result.error) {
+      yield put(userActions.fetchUser.fail(result.error));
+    } else {
+      yield put(userActions.fetchUser.success(result.result));
+    }
   } catch (error) {
     yield put(userActions.fetchUser.fail(error));
   }
@@ -24,12 +28,16 @@ const fetchUserBlog = function*(action) {
   try {
     const { username, query, refreshUser } = action.payload;
     const result = yield call(API.getDiscussionsByBlog, query);
-    const payload = {
-      result,
-      username,
-      refreshUser,
-    };
-    yield put(userActions.fetchUserBlog.success(payload));
+    if (result.error) {
+      yield put(userActions.fetchUserBlog.fail(result.error));
+    } else {
+      const payload = {
+        result: result.result,
+        username,
+        refreshUser,
+      };
+      yield put(userActions.fetchUserBlog.success(payload));
+    }
   } catch (error) {
     yield put(userActions.fetchUserBlog.fail(error));
   } finally {
@@ -76,11 +84,15 @@ const fetchUserFollowCount = function*(action) {
   try {
     const { username } = action.payload;
     const result = yield call(API.getFollowCount, username);
-    const payload = {
-      result,
-      username,
-    };
-    yield put(userActions.fetchUserFollowCount.success(payload));
+    if (result.error) {
+      yield put(userActions.fetchUserFollowCount.fail(result.error));
+    } else {
+      const payload = {
+        result: result.result,
+        username,
+      };
+      yield put(userActions.fetchUserFollowCount.success(payload));
+    }
   } catch (error) {
     yield put(userActions.fetchUserFollowCount.fail(error));
   }

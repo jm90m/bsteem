@@ -10,10 +10,15 @@ import {
   fetchMoreDiscussionsFail,
 } from '../actions/homeActions';
 
-const fetchTags = function*(action) {
+const fetchTags = function*() {
   try {
     const result = yield call(API.getTags);
-    yield put(fetchTagsSuccess(result));
+
+    if (result.error) {
+      yield put(fetchTagsFail(result.error));
+    } else {
+      yield put(fetchTagsSuccess(result.result));
+    }
   } catch (error) {
     yield put(fetchTagsFail(error));
   }
@@ -25,7 +30,11 @@ const fetchDiscussions = function*(action) {
     const query = { limit: 10 };
     const api = getAPIByFilter(filter.id);
     const result = yield call(api, query);
-    yield put(fetchDiscussionsSuccess(result));
+    if (result.error) {
+      yield put(fetchDiscussionsFail(result.error));
+    } else {
+      yield put(fetchDiscussionsSuccess(result.result));
+    }
   } catch (error) {
     yield put(fetchDiscussionsFail(error));
   }
@@ -41,7 +50,12 @@ const fetchMoreDiscussions = function*(action) {
     };
     const api = getAPIByFilter(filter.id);
     const result = yield call(api, query);
-    yield put(fetchMoreDiscussionsSuccess(result));
+
+    if (result.error) {
+      yield put(fetchMoreDiscussionsFail(result.error));
+    } else {
+      yield put(fetchMoreDiscussionsSuccess(result.result));
+    }
   } catch (error) {
     yield put(fetchMoreDiscussionsFail(error));
   }

@@ -81,6 +81,7 @@ class SearchScreen extends Component {
     this.renderSearchResultRow = this.renderSearchResultRow.bind(this);
     this.searchResultEndReached = this.searchResultEndReached.bind(this);
   }
+
   componentDidMount() {
     this.props.fetchTags();
   }
@@ -172,13 +173,14 @@ class SearchScreen extends Component {
           autoCorrect={false}
           autoCapitalize="none"
         />
-        {hasSearchResults &&
+        {hasSearchResults && (
           <StyledListView
             dataSource={ds.cloneWithRows(searchResults)}
             enableEmptySections
             renderRow={this.renderSearchResultRow}
             onEndReached={this.onEndReached}
-          />}
+          />
+        )}
         {this.renderSearchDefaultView()}
       </Container>
     );
