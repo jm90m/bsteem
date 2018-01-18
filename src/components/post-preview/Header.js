@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components/native';
 import { View } from 'react-native';
-import steem from 'steem';
+import { getReputation } from 'util/steemitFormatters';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import moment from 'moment';
 import { COLORS, MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
@@ -48,8 +48,7 @@ const Reblogged = styled.View`
   padding: 10px 0;
 `;
 
-const Touchable = styled.TouchableOpacity`
-`;
+const Touchable = styled.TouchableOpacity``;
 
 const TagContainer = styled.View`
   padding: 5px 0;
@@ -161,7 +160,7 @@ class Header extends Component {
                 {this.renderAuthor()}
                 <PostCreated>{`${moment(created).fromNow(true)} ago`}</PostCreated>
               </View>
-              <ReputationScore reputation={steem.formatter.reputation(author_reputation)} />
+              <ReputationScore reputation={getReputation(author_reputation)} />
             </Author>
           </HeaderContents>
         </UserHeaderContainer>

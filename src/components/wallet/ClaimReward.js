@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import steem from 'steem';
+import { vestToSteem } from 'util/steemitFormatters';
 import styled from 'styled-components/native';
 import moment from 'moment';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -40,7 +40,7 @@ const getFormattedPayout = (
   const parsedRewardSteem = parseFloat(rewardSteem).toFixed(3);
   const parsedRewardSbd = parseFloat(rewardSbd).toFixed(3);
   const parsedRewardVests = parseFloat(
-    steem.formatter.vestToSteem(rewardVests, totalVestingShares, totalVestingFundSteem),
+    vestToSteem(rewardVests, totalVestingShares, totalVestingFundSteem),
   ).toFixed(3);
 
   if (parsedRewardSteem > 0) {

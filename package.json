@@ -26,7 +26,6 @@
     "remarkable": "^1.7.1",
     "sanitize-html": "^1.16.1",
     "showdown": "^1.7.6",
-    "steem": "^0.6.4",
     "stream": "0.0.2",
     "styled-components": "^2.2.1",
     "url": "^0.11.0",

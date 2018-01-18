@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import _ from 'lodash';
 import { View } from 'react-native';
 import { connect } from 'react-redux';
-import steem from 'steem';
+import { getReputation } from 'util/steemitFormatters';
 import {
   getUsersDetails,
   getUsersFollowCount,
@@ -72,7 +72,7 @@ class UserHeader extends Component {
     const userProfile = _.isError(userJsonMetaData) ? {} : userJsonMetaData.profile;
     const hasCover = _.has(userProfile, 'cover_image');
     const userReputation = _.has(userDetails, 'reputation')
-      ? steem.formatter.reputation(userDetails.reputation)
+      ? getReputation(userDetails.reputation)
       : 0;
     const userFollowCount = usersFollowCount[username];
     const followerCount = _.get(userFollowCount, 'follower_count', 0);

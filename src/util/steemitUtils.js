@@ -1,4 +1,4 @@
-import steem from 'steem';
+import * as steemitFormatters from 'util/steemitFormatters';
 /**
  * https://github.com/steemit/steemit.com/blob/47fd0e0846bd8c7c941ee4f95d5f971d3dc3981d/app/utils/ParsersAndFormatters.js
  */
@@ -65,7 +65,7 @@ export const calculateEstAccountValue = (
   totalVestingFundSteem,
   steemRate,
 ) => {
-  const steemPower = steem.formatter.vestToSteem(
+  const steemPower = steemitFormatters.vestToSteem(
     user.vesting_shares,
     totalVestingShares,
     totalVestingFundSteem,
@@ -78,14 +78,14 @@ export const calculateEstAccountValue = (
 
 export const calculateTotalDelegatedSP = (user, totalVestingShares, totalVestingFundSteem) => {
   const receivedSP = parseFloat(
-    steem.formatter.vestToSteem(
+    steemitFormatters.vestToSteem(
       user.received_vesting_shares,
       totalVestingShares,
       totalVestingFundSteem,
     ),
   );
   const delegatedSP = parseFloat(
-    steem.formatter.vestToSteem(
+    steemitFormatters.vestToSteem(
       user.delegated_vesting_shares,
       totalVestingShares,
       totalVestingFundSteem,
