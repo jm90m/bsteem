@@ -32,10 +32,14 @@ const fetchComments = function*(action) {
     const { category, author, permlink, postId } = action.payload;
     const postUrl = `/${category}/@${author}/${permlink}`;
     const result = yield call(API.getComments, postUrl);
-    const rootsCommentsList = getRootCommentsList(result);
-    const commentsChildrenList = getCommentsChildrenLists(result);
-    const content = result.content;
-    yield put(fetchCommentsSuccess(rootsCommentsList, commentsChildrenList, content, postId));
+    if (result.error) {
+      yield put(fetchCommentsFail(result.error));
+    } else {
+      const rootsCommentsList = getRootCommentsList(result.result);
+      const commentsChildrenList = getCommentsChildrenLists(result.result);
+      const { content } = result.result;
+      yield put(fetchCommentsSuccess(rootsCommentsList, commentsChildrenList, content, postId));
+    }
   } catch (error) {
     yield put(fetchCommentsFail(error));
   }

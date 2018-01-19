@@ -34,13 +34,11 @@ const Img = props => {
   console.log('IMG WIDTH', imgWidth);
   console.log('IMG HEIGHT', imgHeight);
   return (
-    <View style={{ height: 150, width }}>
-      <Image
-        source={{ uri: props.attribs.src }}
-        style={{ height: 150, width }}
-        rezizeMode={Image.resizeMode.cover}
-      />
-    </View>
+    <Image
+      source={{ uri: props.attribs.src }}
+      style={{ height: 150, width: width - 20 }}
+      resizeMode={Image.resizeMode.contain}
+    />
   );
 };
 
@@ -74,16 +72,20 @@ export default function htmlToElement(rawHtml, customOpts = {}, done) {
       if (node.type === 'text') {
         const defaultStyle = opts.textComponentProps ? opts.textComponentProps.style : null;
         const customStyle = inheritedStyle(parent);
-
-        return (
-          <TextComponent
-            {...opts.textComponentProps}
-            key={index}
-            style={[defaultStyle, customStyle]}
-          >
-            {entities.decodeHTML(node.data)}
-          </TextComponent>
-        );
+        console.log('htmlToElement', node.data);
+        if (node.data) {
+          return (
+            <TextComponent
+              {...opts.textComponentProps}
+              key={index}
+              style={[defaultStyle, customStyle]}
+            >
+              {entities.decodeHTML(node.data)}
+            </TextComponent>
+          );
+        } else {
+          return <View style={{ width: 0, height: 0 }} />;
+        }
       }
 
       if (node.type === 'tag') {
@@ -114,9 +116,7 @@ export default function htmlToElement(rawHtml, customOpts = {}, done) {
             );
           } else if (parent.name === 'ul') {
             listItemPrefix = (
-              <TextComponent style={[defaultStyle, customStyle]}>
-                {opts.bullet}
-              </TextComponent>
+              <TextComponent style={[defaultStyle, customStyle]}>{opts.bullet}</TextComponent>
             );
           }
         }

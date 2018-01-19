@@ -12,7 +12,7 @@ import ReputationScore from 'components/post/ReputationScore';
 import Avatar from 'components/common/Avatar';
 
 const Container = styled.View`
-  padding: 16px;
+  padding: 16px 5px;
   padding-bottom: 0;
 `;
 

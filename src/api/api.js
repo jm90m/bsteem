@@ -144,14 +144,14 @@ class API {
         const following = await API.getFollowCount(username);
         const chunkSize = 100;
         const limitArray = _.fill(
-          Array(Math.ceil(following.following_count / chunkSize)),
+          Array(Math.ceil(following.result.following_count / chunkSize)),
           chunkSize,
         );
         const list = limitArray.reduce(async (currentListP, value) => {
           const currentList = await currentListP;
           const startFrom = currentList[currentList.length - 1] || '';
           const followers = await API.getFollowing(username, startFrom.following, 'blog', value);
-          return currentList.slice(0, currentList.length - 1).concat(followers);
+          return currentList.slice(0, currentList.length - 1).concat(followers.result);
         }, []);
         resolve(list);
       } catch (error) {
@@ -166,14 +166,14 @@ class API {
         const following = await API.getFollowCount(username);
         const chunkSize = 100;
         const limitArray = _.fill(
-          Array(Math.ceil(following.follower_count / chunkSize)),
+          Array(Math.ceil(following.result.follower_count / chunkSize)),
           chunkSize,
         );
         const list = limitArray.reduce(async (currentListP, value) => {
           const currentList = await currentListP;
           const startFrom = currentList[currentList.length - 1] || '';
           const followers = await API.getFollowers(username, startFrom.follower, 'blog', value);
-          return currentList.slice(0, currentList.length - 1).concat(followers);
+          return currentList.slice(0, currentList.length - 1).concat(followers.result);
         }, []);
         resolve(list);
       } catch (error) {

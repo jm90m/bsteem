@@ -9,7 +9,11 @@ import { FETCH_NETWORK_CONNECTION } from '../actions/actionTypes';
 const fetchGlobalSteemProperties = function*() {
   try {
     const result = yield call(API.getDynamicGlobalProperties);
-    yield put(appActions.fetchSteemGlobalProperties.success(result));
+    if (result.error) {
+      yield put(appActions.fetchSteemGlobalProperties.fail(result.error));
+    } else {
+      yield put(appActions.fetchSteemGlobalProperties.success(result));
+    }
   } catch (error) {
     yield put(appActions.fetchSteemGlobalProperties.fail(error));
   } finally {

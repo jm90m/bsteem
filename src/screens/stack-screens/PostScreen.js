@@ -14,8 +14,7 @@ import HTMLView from 'components/html-view/HTMLView';
 
 const { width } = Dimensions.get('screen');
 
-const StyledImage = styled.Image`
-`;
+const StyledImage = styled.Image``;
 
 function renderNode(node, index, siblings, parent, defaultRenderer) {
   if (node.name === 'iframe') {
@@ -60,8 +59,7 @@ const Header = styled.View`
   padding-top: 20px;
 `;
 
-const Touchable = styled.TouchableOpacity`
-`;
+const Touchable = styled.TouchableOpacity``;
 
 const BackTouchable = styled.TouchableOpacity`
   justify-content: center;
@@ -159,9 +157,7 @@ class PostScreen extends Component {
           <BackTouchable onPress={this.navigateBack}>
             <MaterialIcons size={24} name={MATERIAL_ICONS.back} />
           </BackTouchable>
-          <Author>
-            {author}
-          </Author>
+          <Author>{author}</Author>
           <Menu>
             <Touchable onPress={() => this.setModalVisible(!this.state.modalVisible)}>
               <MaterialCommunityIcons size={24} name={MATERIAL_COMMUNITY_ICONS.menuVertical} />
@@ -176,11 +172,12 @@ class PostScreen extends Component {
         >
           <PostMenu hideMenu={this.handleHideModal} handleLikePost={this.handleLikePost} />
         </Modal>
-        <ScrollView>
+        <ScrollView style={{ padding: 10, backgroundColor: COLORS.WHITE.WHITE }}>
           <HTMLView
             value={parsedHtmlBody}
             renderNode={renderNode}
             onLinkPress={this.handlePostLinkPress}
+            addLineBreaks={false}
           />
         </ScrollView>
       </Container>

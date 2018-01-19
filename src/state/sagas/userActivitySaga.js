@@ -39,15 +39,20 @@ const fetchUserAccountHistory = function*(action) {
   try {
     const { username } = action.payload;
     const result = yield call(API.getAccountHistory, username);
-    const parsedUserActions = getParsedUserActions(result);
 
-    const payload = {
-      username,
-      userWalletTransactions: parsedUserActions.userWalletTransactions,
-      userAccountHistory: parsedUserActions.userAccountHistory,
-    };
+    if (result.error) {
+      yield put(userActivityActions.fetchUserAccountHistory.fail(error));
+    } else {
+      const parsedUserActions = getParsedUserActions(result.result);
 
-    yield put(userActivityActions.fetchUserAccountHistory.success(payload));
+      const payload = {
+        username,
+        userWalletTransactions: parsedUserActions.userWalletTransactions,
+        userAccountHistory: parsedUserActions.userAccountHistory,
+      };
+
+      yield put(userActivityActions.fetchUserAccountHistory.success(payload));
+    }
   } catch (error) {
     console.log('fetch-user-account-history-error', action.payload.username, error);
     yield put(userActivityActions.fetchUserAccountHistory.fail(error));
@@ -76,11 +81,10 @@ const fetchMoreUserAccountHistory = function*(action) {
 
     if (lastMoreActionCount !== 0) {
       const lastActionCount = lastUserActionCount;
-      const limit = lastActionCount < API.DEFAULT_ACCOUNT_LIMIT
-        ? lastActionCount
-        : API.DEFAULT_ACCOUNT_LIMIT;
+      const limit =
+        lastActionCount < API.DEFAULT_ACCOUNT_LIMIT ? lastActionCount : API.DEFAULT_ACCOUNT_LIMIT;
       const result = yield call(API.getAccountHistory, lastActionCount, limit);
-      const parsedUserActions = getParsedUserActions(result);
+      const parsedUserActions = getParsedUserActions(result.result);
       const payload = {
         username,
         userWalletTransactions: parsedUserActions.userWalletTransactions,
