@@ -1,20 +1,19 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Modal, ScrollView, Dimensions, Image, View, WebView } from 'react-native';
+import { Modal, ScrollView, Dimensions, WebView } from 'react-native';
 import { connect } from 'react-redux';
 import styled from 'styled-components/native';
+import PhotoBrowser from 'react-native-photo-browser';
+import _ from 'lodash';
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import { getHtml } from 'util/postUtils';
 import { COLORS, MATERIAL_ICONS, MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
 import * as navigationConstants from 'constants/navigation';
 import { getIsAuthenticated } from 'state/rootReducer';
-import postBodyStyles from 'constants/postBodyStyles';
 import PostMenu from 'components/post-menu/PostMenu';
 import HTMLView from 'components/html-view/HTMLView';
 
 const { width } = Dimensions.get('screen');
-
-const StyledImage = styled.Image``;
 
 function renderNode(node, index, siblings, parent, defaultRenderer) {
   if (node.name === 'iframe') {
@@ -22,9 +21,9 @@ function renderNode(node, index, siblings, parent, defaultRenderer) {
       <WebView
         key={`iframe-${node.attribs.src}`}
         source={{ uri: node.attribs.src }}
-        style={{ height: 400, width }}
+        style={{ height: 400, width: width - 20 }}
         height={400}
-        width={width}
+        width={width - 20}
       />
     );
   }
@@ -96,6 +95,8 @@ class PostScreen extends Component {
 
     this.state = {
       modalVisible: false,
+      displayPhotoBrowser: false,
+      initialPhotoIndex: 0,
     };
 
     this.setModalVisible = this.setModalVisible.bind(this);
@@ -103,8 +104,10 @@ class PostScreen extends Component {
     this.navigateBack = this.navigateBack.bind(this);
     this.navigateToComments = this.navigateToComments.bind(this);
     this.navigateToLoginTab = this.navigateToLoginTab.bind(this);
+    this.navigateToUser = this.navigateToUser.bind(this);
     this.handleLikePost = this.handleLikePost.bind(this);
     this.handlePostLinkPress = this.handlePostLinkPress.bind(this);
+    this.handleImagePress = this.handleImagePress.bind(this);
   }
 
   setModalVisible(visible) {
@@ -123,6 +126,10 @@ class PostScreen extends Component {
       this.navigateToLoginTab();
     }
     this.handleHideModal();
+  }
+
+  navigateToUser(username) {
+    this.props.navigation.navigate(navigationConstants.USER, { username });
   }
 
   navigateToLoginTab() {
@@ -145,11 +152,31 @@ class PostScreen extends Component {
 
   handlePostLinkPress(url) {
     console.log('clicked link: ', url);
+    const urlArray = _.split(url, '');
+    const isUserURL = urlArray[0] === '/' && urlArray[1] === '@';
+    if (isUserURL) {
+      const user = _.slice(urlArray, 2, urlArray.length);
+      this.navigateToUser(user.join(''));
+    }
+  }
+
+  handleImagePress(url, alt) {
+    const { parsedJsonMetadata } = this.props.navigation.state.params;
+    const images = _.get(parsedJsonMetadata, 'image', []);
+    const photoIndex = _.findIndex(images, imageURL => _.includes(imageURL, alt));
+    console.log('IMAGE PRESSED', `URL: ${url}]\nALT: ${alt}`, `PhotoIndex: ${photoIndex}`, images);
+    this.setState({
+      displayPhotoBrowser: true,
+      initialPhotoIndex: photoIndex >= 0 ? photoIndex : 0,
+    });
   }
 
   render() {
     const { body, parsedJsonMetadata, postData, author } = this.props.navigation.state.params;
+    const { displayPhotoBrowser, modalVisible, initialPhotoIndex } = this.state;
     const parsedHtmlBody = getHtml(body, parsedJsonMetadata);
+    const images = _.get(parsedJsonMetadata, 'image', []);
+    const formattedImages = _.map(images, image => ({ photo: image }));
 
     return (
       <Container>
@@ -167,10 +194,34 @@ class PostScreen extends Component {
         <Modal
           animationType="slide"
           transparent
-          visible={this.state.modalVisible}
+          visible={modalVisible}
           onRequestClose={this.handleHideModal}
         >
           <PostMenu hideMenu={this.handleHideModal} handleLikePost={this.handleLikePost} />
+        </Modal>
+        <Modal
+          animationType="slide"
+          visible={displayPhotoBrowser}
+          onRequestClose={() => {
+            this.setState({ displayPhotoBrowser: false });
+          }}
+        >
+          <PhotoBrowser
+            onBack={() => {
+              this.setState({ displayPhotoBrowser: false });
+            }}
+            mediaList={formattedImages}
+            initialIndex={initialPhotoIndex}
+            displayNavArrows
+            displaySelectionButtons
+            displayActionButton
+            startOnGrid={false}
+            enableGrid
+            useCircleProgress
+            onSelectionChanged={() => {}}
+            onActionButton={() => {}}
+            alwaysDisplayStatusBar
+          />
         </Modal>
         <ScrollView style={{ padding: 10, backgroundColor: COLORS.WHITE.WHITE }}>
           <HTMLView
@@ -178,6 +229,7 @@ class PostScreen extends Component {
             renderNode={renderNode}
             onLinkPress={this.handlePostLinkPress}
             addLineBreaks={false}
+            handleImagePress={this.handleImagePress}
           />
         </ScrollView>
       </Container>

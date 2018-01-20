@@ -7,18 +7,21 @@ import { getValidImageUrl } from 'util/imageUtils';
 
 const { width } = Dimensions.get('screen');
 
-const StyledImage = styled.Image`
-  min-height: 200px;
-  max-height: 400px;
-`;
+const StyledImage = styled.Image``;
 
 class PreviewImage extends Component {
   static propTypes = {
     images: PropTypes.arrayOf(PropTypes.string),
+    height: PropTypes.number,
+    width: PropTypes.number,
+    onError: PropTypes.func,
   };
 
   static defaultProps = {
     images: [],
+    height: 300,
+    width,
+    onError: undefined,
   };
 
   constructor(props) {
@@ -48,13 +51,15 @@ class PreviewImage extends Component {
 
   render() {
     const { imageUrl, noImage } = this.state;
+    const { height, width: imageWidth, onError } = this.props;
+    const onErrorHandler = onError || this.handlePreviewImageError;
     if (noImage) return null;
     return (
       <StyledImage
-        style={{ height: null, width }}
+        style={{ width: imageWidth, height }}
         source={{ uri: imageUrl }}
-        resizeMode={Image.resizeMode.cover}
-        onError={this.handlePreviewImageError}
+        resizeMode={Image.resizeMode.contain}
+        onError={onErrorHandler}
       />
     );
   }

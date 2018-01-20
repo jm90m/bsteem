@@ -69,6 +69,7 @@ class HtmlView extends PureComponent {
       stylesheet,
       renderNode,
       onError,
+      handleImagePress,
     } = this.props;
 
     if (!value) {
@@ -81,6 +82,7 @@ class HtmlView extends PureComponent {
       linkLongPressHandler: onLinkLongPress,
       styles: { ...baseStyles, ...stylesheet, ...style },
       customRenderer: renderNode,
+      handleImagePress,
     };
 
     htmlToElementOptKeys.forEach(key => {
@@ -132,6 +134,7 @@ HtmlView.propTypes = {
   TextComponent: PropTypes.func,
   textComponentProps: PropTypes.object,
   value: PropTypes.string,
+  handleImagePress: PropTypes.func,
 };
 
 HtmlView.defaultProps = {
@@ -142,6 +145,9 @@ HtmlView.defaultProps = {
   onLinkLongPress: null,
   onError: console.error.bind(console),
   RootComponent: View,
+  handleImagePress: url => {
+    console.log(url);
+  },
 };
 
 export default HtmlView;

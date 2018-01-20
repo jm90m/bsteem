@@ -4,6 +4,7 @@ import { Image, Modal } from 'react-native';
 import styled from 'styled-components/native';
 import { connect } from 'react-redux';
 import _ from 'lodash';
+import PhotoBrowser from 'react-native-photo-browser';
 import { COLORS } from 'constants/styles';
 import {
   getIsAuthenticated,
@@ -112,6 +113,7 @@ class PostPreview extends Component {
       loadingVote: false,
       displayReblogModal: false,
       loadingReblog: false,
+      displayPhotoBrowser: false,
     };
 
     this.handleOnPressVote = this.handleOnPressVote.bind(this);
@@ -238,13 +240,19 @@ class PostPreview extends Component {
 
   render() {
     const { postData, navigation, authUsername, rebloggedList, currentUsername } = this.props;
-    const { likedPost, loadingVote, displayReblogModal, loadingReblog } = this.state;
+    const {
+      likedPost,
+      loadingVote,
+      displayReblogModal,
+      loadingReblog,
+      displayPhotoBrowser,
+    } = this.state;
     const { title, category, author, json_metadata, body, permlink, id } = postData;
     const parsedJsonMetadata = JSON.parse(json_metadata);
     const images = parsedJsonMetadata.image || [];
     const previewImage = _.head(images);
     const hasPreviewImage = images.length > 0 && !_.isEmpty(previewImage);
-
+    const formattedImages = _.map(images, image => ({ photo: image }));
     return (
       <Container>
         <Header postData={postData} navigation={navigation} currentUsername={currentUsername} />
@@ -260,10 +268,28 @@ class PostPreview extends Component {
                 category,
                 postId: id,
                 postData,
-              })}
+              })
+            }
           >
             <Title>{title}</Title>
+          </Touchable>
+          <Touchable onPress={() => this.setState({ displayPhotoBrowser: true })}>
             {hasPreviewImage && <PreviewImage images={images} />}
+          </Touchable>
+          <Touchable
+            onPress={() =>
+              navigation.navigate(navigationConstants.POST, {
+                title,
+                body,
+                permlink,
+                author,
+                parsedJsonMetadata,
+                category,
+                postId: id,
+                postData,
+              })
+            }
+          >
             <BodyShort content={body} />
           </Touchable>
         </Content>
@@ -284,6 +310,31 @@ class PostPreview extends Component {
           onRequestClose={this.hideReblogModal}
         >
           <ReblogModal closeModal={this.hideReblogModal} confirmReblog={this.handleReblogConfirm} />
+        </Modal>
+        <Modal
+          animationType="slide"
+          visible={displayPhotoBrowser}
+          onRequestClose={() => {
+            this.setState({ displayPhotoBrowser: false });
+          }}
+        >
+          <PhotoBrowser
+            onBack={() => {
+              this.setState({ displayPhotoBrowser: false });
+            }}
+            mediaList={formattedImages}
+            initialIndex={0}
+            displayNavArrows
+            displaySelectionButtons
+            displayActionButton
+            startOnGrid={false}
+            enableGrid
+            useCircleProgress
+            onSelectionChanged={() => {}}
+            onActionButton={() => {}}
+            alwaysDisplayStatusBar
+            customTitle={(index, rowCount) => `${index} sur ${rowCount}`}
+          />
         </Modal>
       </Container>
     );

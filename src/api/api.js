@@ -111,7 +111,11 @@ class API {
   }
 
   static async getAccountReputation(name, limit = 20) {
-    const requestQuery = API.createRequestQuery('get_account_reputations', [name, limit]);
+    const requestQuery = API.createRequestQuery('call', [
+      'follow_api',
+      'get_account_reputations',
+      [name, limit],
+    ]);
     return sendPostRequest(API.BASE_URL, requestQuery);
   }
 

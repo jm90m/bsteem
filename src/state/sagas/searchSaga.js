@@ -22,9 +22,13 @@ const fetchAskSteemSearchResults = function*(action) {
       mergedResults = _.concat(mergedResults, element.results);
     });
     const sortedAskSteemResults = _.reverse(_.sortBy(mergedResults, ['type', 'created']));
+    const formattedSteemAccountReputationResults = _.map(
+      steemAccountLookupResults.result,
+      user => user.account,
+    );
     const payload = {
       askSteemResults: sortedAskSteemResults,
-      steemAccountLookupResults: steemAccountLookupResults.result,
+      steemAccountLookupResults: formattedSteemAccountReputationResults,
     };
 
     yield put(searchAskSteem.success(payload));

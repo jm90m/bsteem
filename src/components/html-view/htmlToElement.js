@@ -1,5 +1,14 @@
 import React from 'react';
-import { StyleSheet, Text, Image, Dimensions, View } from 'react-native';
+import _ from 'lodash';
+import {
+  StyleSheet,
+  Text,
+  Image,
+  Dimensions,
+  View,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+} from 'react-native';
 import htmlparser from 'htmlparser2-without-node-native';
 import entities from 'entities';
 
@@ -11,8 +20,9 @@ const defaultOpts = {
   bullet: '\u2022 ',
   TextComponent: Text,
   textComponentProps: null,
-  NodeComponent: Text,
+  NodeComponent: View,
   nodeComponentProps: null,
+  handleImagePress: () => {},
 };
 
 const Img = props => {
@@ -20,25 +30,25 @@ const Img = props => {
     parseInt(props.attribs['width'], 10) || parseInt(props.attribs['data-width'], 10) || 0;
   const imgHeight =
     parseInt(props.attribs['height'], 10) || parseInt(props.attribs['data-height'], 10) || 0;
+  let setImgHeight = 300;
 
-  // const imgStyle = {
-  //   width,
-  //   height,
-  // };
-  //
-  // const source = {
-  //   width,
-  //   height,
-  // };
-  console.log('IMG PROPS', props);
-  console.log('IMG WIDTH', imgWidth);
-  console.log('IMG HEIGHT', imgHeight);
+  if (imgHeight > 0 && imgHeight < width) {
+    setImgHeight = imgHeight;
+  } else if (imgHeight > 0 && imgHeight > width) {
+    setImgHeight = width;
+  }
+
   return (
-    <Image
-      source={{ uri: props.attribs.src }}
-      style={{ height: 150, width: width - 20 }}
-      resizeMode={Image.resizeMode.contain}
-    />
+    <TouchableOpacity onPress={() => props.handleImagePress(props.attribs.src, props.attribs.alt)}>
+      <Image
+        source={{ uri: props.attribs.src }}
+        style={{ width: width - 20, height: setImgHeight, alignSelf: 'center', flex: 1 }}
+        onError={() => {
+          console.log('IMG URL ERROR', props.attribs.src);
+        }}
+        resizeMode={Image.resizeMode.contain}
+      />
+    </TouchableOpacity>
   );
 };
 
@@ -73,7 +83,9 @@ export default function htmlToElement(rawHtml, customOpts = {}, done) {
         const defaultStyle = opts.textComponentProps ? opts.textComponentProps.style : null;
         const customStyle = inheritedStyle(parent);
         console.log('htmlToElement', node.data);
-        if (node.data) {
+        if (_.isEmpty(node.data)) {
+          return <Text style={{ width: 0, height: 0 }} />;
+        } else {
           return (
             <TextComponent
               {...opts.textComponentProps}
@@ -83,14 +95,14 @@ export default function htmlToElement(rawHtml, customOpts = {}, done) {
               {entities.decodeHTML(node.data)}
             </TextComponent>
           );
-        } else {
-          return <View style={{ width: 0, height: 0 }} />;
         }
       }
 
       if (node.type === 'tag') {
         if (node.name === 'img') {
-          return <Img key={index} attribs={node.attribs} />;
+          return (
+            <Img key={index} attribs={node.attribs} handleImagePress={opts.handleImagePress} />
+          );
         }
 
         let linkPressHandler = null;
@@ -124,16 +136,20 @@ export default function htmlToElement(rawHtml, customOpts = {}, done) {
         const { NodeComponent, styles } = opts;
 
         return (
-          <NodeComponent
-            {...opts.nodeComponentProps}
-            key={index}
+          <TouchableWithoutFeedback
             onPress={linkPressHandler}
-            style={!node.parent ? styles[node.name] : null}
             onLongPress={linkLongPressHandler}
+            key={index}
           >
-            {listItemPrefix}
-            {domToElement(node.children, node)}
-          </NodeComponent>
+            <NodeComponent
+              {...opts.nodeComponentProps}
+              onPress={linkPressHandler}
+              onLongPress={linkLongPressHandler}
+            >
+              {listItemPrefix}
+              {domToElement(node.children, node)}
+            </NodeComponent>
+          </TouchableWithoutFeedback>
         );
       }
     });
