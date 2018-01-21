@@ -145,6 +145,7 @@ export default function htmlToElement(rawHtml, customOpts = {}, done) {
               {...opts.nodeComponentProps}
               onPress={linkPressHandler}
               onLongPress={linkLongPressHandler}
+              style={{ flexDirection: 'row', flexWrap: 'wrap' }}
             >
               {listItemPrefix}
               {domToElement(node.children, node)}

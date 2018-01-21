@@ -12,6 +12,8 @@ import * as navigationConstants from 'constants/navigation';
 import { getIsAuthenticated } from 'state/rootReducer';
 import PostMenu from 'components/post-menu/PostMenu';
 import HTMLView from 'components/html-view/HTMLView';
+import FooterTags from 'components/post/FooterTags';
+import Footer from 'components/post/Footer';
 
 const { width } = Dimensions.get('screen');
 
@@ -177,6 +179,11 @@ class PostScreen extends Component {
     const parsedHtmlBody = getHtml(body, parsedJsonMetadata);
     const images = _.get(parsedJsonMetadata, 'image', []);
     const formattedImages = _.map(images, image => ({ photo: image }));
+    const tags = _.compact(_.get(parsedJsonMetadata, 'tags', []));
+
+    console.log('POST DATA ---> START');
+    console.log(parsedJsonMetadata, postData);
+    console.log('POST DATA ---> END');
 
     return (
       <Container>
@@ -231,6 +238,8 @@ class PostScreen extends Component {
             addLineBreaks={false}
             handleImagePress={this.handleImagePress}
           />
+          <FooterTags tags={tags} />
+          <Footer postData={postData} />
         </ScrollView>
       </Container>
     );

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Image, Modal } from 'react-native';
+import { Modal } from 'react-native';
 import styled from 'styled-components/native';
 import { connect } from 'react-redux';
 import _ from 'lodash';
@@ -11,7 +11,7 @@ import {
   getAuthUsername,
   getCurrentUserRebloggedList,
 } from 'state/rootReducer';
-import { currentUserVotePost } from 'state/actions/currentUserActions';
+import { currentUserVotePost, currentUserReblogPost } from 'state/actions/currentUserActions';
 import { isPostVoted } from 'util/voteUtils';
 import * as navigationConstants from 'constants/navigation';
 import * as postConstants from 'constants/postConstants';
@@ -20,7 +20,6 @@ import Footer from './Footer';
 import Header from './Header';
 import BodyShort from './BodyShort';
 import PreviewImage from './PreviewImage';
-import { currentUserReblogPost } from '../../state/actions/currentUserActions';
 
 const Container = styled.View`
   background-color: ${COLORS.WHITE.WHITE};
@@ -333,7 +332,6 @@ class PostPreview extends Component {
             onSelectionChanged={() => {}}
             onActionButton={() => {}}
             alwaysDisplayStatusBar
-            customTitle={(index, rowCount) => `${index} sur ${rowCount}`}
           />
         </Modal>
       </Container>

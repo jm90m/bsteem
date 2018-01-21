@@ -12,7 +12,7 @@ const fetchGlobalSteemProperties = function*() {
     if (result.error) {
       yield put(appActions.fetchSteemGlobalProperties.fail(result.error));
     } else {
-      yield put(appActions.fetchSteemGlobalProperties.success(result));
+      yield put(appActions.fetchSteemGlobalProperties.success(result.result));
     }
   } catch (error) {
     yield put(appActions.fetchSteemGlobalProperties.fail(error));
