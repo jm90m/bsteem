@@ -67,7 +67,7 @@ class FeedScreen extends Component {
     api(query).then(result => {
       this.setState({
         loading: false,
-        dataSource: ds.cloneWithRows(result),
+        dataSource: ds.cloneWithRows(result.result),
         posts: result,
       });
     });
@@ -157,13 +157,14 @@ class FeedScreen extends Component {
         >
           <FeedSort hideMenu={this.handleHideMenu} handleSortPost={this.handleSortPost} />
         </Modal>
-        {displayListView &&
+        {displayListView && (
           <StyledListView
             dataSource={this.state.dataSource}
             renderRow={this.renderRow}
             enableEmptySections
             onEndReached={this.fetchMorePosts}
-          />}
+          />
+        )}
         {this.renderLoadingOrEmptyText()}
       </Container>
     );
