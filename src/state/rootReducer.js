@@ -70,6 +70,7 @@ export const getLoadingFetchUserAccountHistory = state =>
   fromUserActivity.getLoadingFetchUserAccountHistory(state.userActivity);
 export const getLoadingFetchMoreUserAccountHistory = state =>
   fromUserActivity.getLoadingFetchMoreUserAccountHistory(state.userActivity);
+
 // App Selectors
 export const getSteemRate = state => fromApp.getSteemRate(state.app);
 export const getLoadingSteemGlobalProperties = state =>
@@ -77,3 +78,6 @@ export const getLoadingSteemGlobalProperties = state =>
 export const getTotalVestingFundSteem = state => fromApp.getTotalVestingFundSteem(state.app);
 export const getTotalVestingShares = state => fromApp.getTotalVestingShares(state.app);
 export const getHasNetworkConnection = state => fromApp.getHasNetworkConnection(state.app);
+
+// Comments Selectors
+export const getCommentsByPostId = state => fromComments.getCommentsByPostId(state.comments);

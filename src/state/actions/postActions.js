@@ -10,11 +10,9 @@ export const fetchComments = (category, author, permlink, postId) => ({
   },
 });
 
-export const fetchCommentsSuccess = (rootsCommentsList, commentsChildrenList, content, postId) => ({
+export const fetchCommentsSuccess = (content, postId) => ({
   type: FETCH_COMMENTS.SUCCESS,
   payload: {
-    rootsCommentsList,
-    commentsChildrenList,
     content,
     postId,
   },

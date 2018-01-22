@@ -9,6 +9,7 @@ const Container = styled.View``;
 const Header = styled.View`
   flex-direction: row;
   height: 30px;
+  margin-top: 10px;
 `;
 
 const Touchable = styled.TouchableOpacity``;

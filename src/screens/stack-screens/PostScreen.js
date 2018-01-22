@@ -10,6 +10,7 @@ import { getHtml } from 'util/postUtils';
 import { COLORS, MATERIAL_ICONS, MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
 import * as navigationConstants from 'constants/navigation';
 import { getIsAuthenticated } from 'state/rootReducer';
+import { fetchComments } from 'state/actions/postActions';
 import PostMenu from 'components/post-menu/PostMenu';
 import HTMLView from 'components/html-view/HTMLView';
 import FooterTags from 'components/post/FooterTags';
@@ -81,7 +82,12 @@ const mapStateToProps = state => ({
   authenticated: getIsAuthenticated(state),
 });
 
-@connect(mapStateToProps)
+const mapDispatchToProps = dispatch => ({
+  fetchComments: (category, author, permlink, postId) =>
+    dispatch(fetchComments(category, author, permlink, postId)),
+});
+
+@connect(mapStateToProps, mapDispatchToProps)
 class PostScreen extends Component {
   static navigationOptions = {
     headerMode: 'none',
@@ -204,7 +210,11 @@ class PostScreen extends Component {
           visible={modalVisible}
           onRequestClose={this.handleHideModal}
         >
-          <PostMenu hideMenu={this.handleHideModal} handleLikePost={this.handleLikePost} />
+          <PostMenu
+            hideMenu={this.handleHideModal}
+            handleLikePost={this.handleLikePost}
+            handleNavigateToComments={this.navigateToComments}
+          />
         </Modal>
         <Modal
           animationType="slide"
@@ -239,7 +249,7 @@ class PostScreen extends Component {
             handleImagePress={this.handleImagePress}
           />
           <FooterTags tags={tags} />
-          <Footer postData={postData} />
+          <Footer postData={postData} navigation={this.props.navigation} />
         </ScrollView>
       </Container>
     );
