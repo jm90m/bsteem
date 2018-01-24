@@ -149,12 +149,13 @@ class PostScreen extends Component {
   }
 
   navigateToComments() {
-    const { author, category, permlink, postId } = this.props.navigation.state.params;
+    const { author, category, permlink, postId, postData } = this.props.navigation.state.params;
     this.props.navigation.navigate(navigationConstants.COMMENTS, {
       author,
       category,
       permlink,
       postId,
+      postData,
     });
   }
 

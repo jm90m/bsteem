@@ -124,6 +124,8 @@ class PostPreview extends Component {
     this.handleReblogConfirm = this.handleReblogConfirm.bind(this);
     this.loadingReblogStart = this.loadingReblogStart.bind(this);
     this.loadingReblogEnd = this.loadingReblogEnd.bind(this);
+    this.handleNavigateToPost = this.handleNavigateToPost.bind(this);
+    this.handleNavigateToComments = this.handleNavigateToComments.bind(this);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -237,6 +239,34 @@ class PostPreview extends Component {
     );
   }
 
+  handleNavigateToPost() {
+    const { postData } = this.props;
+    const { title, category, author, json_metadata, body, permlink, id } = postData;
+    const parsedJsonMetadata = JSON.parse(json_metadata);
+    this.props.navigation.navigate(navigationConstants.POST, {
+      title,
+      body,
+      permlink,
+      author,
+      parsedJsonMetadata,
+      category,
+      postId: id,
+      postData,
+    });
+  }
+
+  handleNavigateToComments() {
+    const { postData } = this.props;
+    const { category, author, permlink, id } = postData;
+    this.props.navigation.navigate(navigationConstants.COMMENTS, {
+      author,
+      category,
+      permlink,
+      postId: id,
+      postData,
+    });
+  }
+
   render() {
     const { postData, navigation, authUsername, rebloggedList, currentUsername } = this.props;
     const {
@@ -246,7 +276,7 @@ class PostPreview extends Component {
       loadingReblog,
       displayPhotoBrowser,
     } = this.state;
-    const { title, category, author, json_metadata, body, permlink, id } = postData;
+    const { title, json_metadata, body } = postData;
     const parsedJsonMetadata = JSON.parse(json_metadata);
     const images = parsedJsonMetadata.image || [];
     const previewImage = _.head(images);
@@ -256,39 +286,13 @@ class PostPreview extends Component {
       <Container>
         <Header postData={postData} navigation={navigation} currentUsername={currentUsername} />
         <Content>
-          <Touchable
-            onPress={() =>
-              navigation.navigate(navigationConstants.POST, {
-                title,
-                body,
-                permlink,
-                author,
-                parsedJsonMetadata,
-                category,
-                postId: id,
-                postData,
-              })
-            }
-          >
+          <Touchable onPress={this.handleNavigateToPost}>
             <Title>{title}</Title>
           </Touchable>
           <Touchable onPress={() => this.setState({ displayPhotoBrowser: true })}>
             {hasPreviewImage && <PreviewImage images={images} />}
           </Touchable>
-          <Touchable
-            onPress={() =>
-              navigation.navigate(navigationConstants.POST, {
-                title,
-                body,
-                permlink,
-                author,
-                parsedJsonMetadata,
-                category,
-                postId: id,
-                postData,
-              })
-            }
-          >
+          <Touchable onPress={this.handleNavigateToPost}>
             <BodyShort content={body} />
           </Touchable>
         </Content>
@@ -298,6 +302,7 @@ class PostPreview extends Component {
           loadingReblog={loadingReblog}
           loadingVote={loadingVote}
           onPressVote={this.handleOnPressVote}
+          handleNavigateToComments={this.handleNavigateToComments}
           postData={postData}
           reblogPost={this.showReblogModal}
           rebloggedList={rebloggedList}

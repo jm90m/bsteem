@@ -19,6 +19,18 @@ const mapCommentsBasedOnId = commentData =>
     {},
   );
 
+const getCommentsChildrenLists = content => {
+  const listsById = {};
+
+  _.keys(content).forEach(commentKey => {
+    listsById[content[commentKey].id] = content[commentKey].replies.map(
+      childKey => content[childKey].id,
+    );
+  });
+
+  return listsById;
+};
+
 export default (state = INITIAL_STATE, action) => {
   switch (action.type) {
     case FETCH_COMMENTS.PENDING:
@@ -28,12 +40,20 @@ export default (state = INITIAL_STATE, action) => {
       };
     case FETCH_COMMENTS.SUCCESS: {
       const { content, postId } = action.payload;
+      console.log('CONTENT FROM COMMENTS REQUEST', content);
       const comments = mapCommentsBasedOnId(content);
+      const childrenById = getCommentsChildrenLists(content);
       console.log('COMMENTS', comments);
+      console.log('CHILDREN_BY_ID', childrenById);
       return {
         ...state,
         commentsByPostId: {
-          [postId]: comments,
+          [postId]: {
+            comments,
+            childrenById,
+            isFetching: false,
+            pendingVotes: [],
+          },
         },
         isLoading: false,
       };

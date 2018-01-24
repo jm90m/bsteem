@@ -43,6 +43,7 @@ class Footer extends Component {
     authUsername: PropTypes.string,
     loadingReblog: PropTypes.bool,
     rebloggedList: PropTypes.arrayOf(PropTypes.string),
+    handleNavigateToComments: PropTypes.func,
   };
 
   static defaultProps = {
@@ -54,6 +55,7 @@ class Footer extends Component {
     authUsername: '',
     loadingReblog: false,
     rebloggedList: [],
+    handleNavigateToComments: () => {},
   };
 
   renderVoteButton() {
@@ -103,7 +105,7 @@ class Footer extends Component {
   }
 
   render() {
-    const { postData } = this.props;
+    const { postData, handleNavigateToComments } = this.props;
     const { active_votes, children } = postData;
     const upVotes = getUpvotes(active_votes).sort(sortVotes);
     const payout = calculatePayout(postData);
@@ -116,11 +118,13 @@ class Footer extends Component {
       <Container>
         {this.renderVoteButton()}
         <FooterValue>{upVotes.length}</FooterValue>
-        <MaterialCommunityIcons
-          name="comment-processing"
-          size={24}
-          color={COLORS.BLUE.LINK_WATER}
-        />
+        <TouchableOpacity onPress={handleNavigateToComments}>
+          <MaterialCommunityIcons
+            name="comment-processing"
+            size={24}
+            color={COLORS.BLUE.LINK_WATER}
+          />
+        </TouchableOpacity>
         <FooterValue>{children}</FooterValue>
         {this.renderReblogLink()}
         <Payout>${formattedDisplayedPayout}</Payout>

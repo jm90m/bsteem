@@ -3,14 +3,26 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components/native';
 import { SORT_COMMENTS } from 'constants/comments';
 import { getReputation } from 'util/steemitFormatters';
-import Avatar from 'common/Avatar';
+import { sortComments } from 'util/sortUtils';
+import _ from 'lodash';
+import Avatar from 'components/common/Avatar';
 import CommentFooter from './CommentFooter';
+import CommentContent from './CommentContent';
 
 const Container = styled.View``;
 
-const CommentContentContainer = styled.View``;
+const CommentContentContainer = styled.View`
+  margin-top: 10px;
+  flex-direction: row;
+`;
 
-const AvatarContainer = styled.View``;
+const AvatarContainer = styled.View`
+  margin-right: 5px;
+`;
+
+const CommentChildrenContainer = styled.View`
+  margin-left: 30px;
+`;
 
 class Comment extends Component {
   static propTypes = {
@@ -44,6 +56,38 @@ class Comment extends Component {
     onSendComment: () => {},
   };
 
+  renderCommentsChildren() {
+    const {
+      commentsChildren,
+      comment,
+      authUsername,
+      sort,
+      depth,
+      rootPostAuthor,
+      onLikeClick,
+      onDislikeClick,
+      onSendComment,
+    } = this.props;
+    console.log('COMMENTS CHILDREN', commentsChildren, comment.id);
+    if (!_.isEmpty(commentsChildren[comment.id])) {
+      return sortComments(commentsChildren[comment.id], sort).map(child => (
+        <Comment
+          key={child.id}
+          authUsername={authUsername}
+          depth={depth + 1}
+          comment={child}
+          parent={comment}
+          rootPostAuthor={rootPostAuthor}
+          commentsChildren={commentsChildren}
+          onLikeClick={onLikeClick}
+          onDislikeClick={onDislikeClick}
+          onSendComment={onSendComment}
+        />
+      ));
+    }
+    return null;
+  }
+
   render() {
     const { comment, authUsername } = this.props;
     const anchorId = `@${comment.author}/${comment.permlink}`;
@@ -59,11 +103,15 @@ class Comment extends Component {
           <AvatarContainer>
             <Avatar size={avatarSize} username={comment.author} />
           </AvatarContainer>
-          <CommentContents>
-            <Header> </Header>
-          </CommentContents>
+          <CommentContent
+            username={comment.author}
+            reputation={commentAuthorReputation}
+            created={comment.created}
+            body={comment.body}
+          />
         </CommentContentContainer>
         <CommentFooter />
+        <CommentChildrenContainer>{this.renderCommentsChildren()}</CommentChildrenContainer>
       </Container>
     );
   }

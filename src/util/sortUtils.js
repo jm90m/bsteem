@@ -1,14 +1,17 @@
-export const sortComments = (comments, sortType = 'BEST') => {
+import { SORT_COMMENTS } from 'constants/comments';
+
+export const sortComments = (comments, sortType = SORT_COMMENTS.BEST) => {
   const sortedComments = [...comments];
 
   const netNegative = a => a.net_rshares < 0;
   const totalPayout = a =>
-    parseFloat(a.pending_payout_value) + parseFloat(a.total_payout_value)
-    + parseFloat(a.curator_payout_value);
+    parseFloat(a.pending_payout_value) +
+    parseFloat(a.total_payout_value) +
+    parseFloat(a.curator_payout_value);
   const netRshares = a => a.net_rshares;
 
   switch (sortType) {
-    case 'BEST':
+    case SORT_COMMENTS.BEST:
       return sortedComments.sort((a, b) => {
         if (netNegative(a)) {
           return 1;
@@ -25,9 +28,9 @@ export const sortComments = (comments, sortType = 'BEST') => {
 
         return netRshares(b) - netRshares(a);
       });
-    case 'NEWEST':
+    case SORT_COMMENTS.NEWEST:
       return sortedComments.sort((a, b) => Date.parse(a.created) - Date.parse(b.created)).reverse();
-    case 'OLDEST':
+    case SORT_COMMENTS.OLDEST:
       return sortedComments.sort((a, b) => Date.parse(a.created) - Date.parse(b.created));
     default:
       return sortedComments;
