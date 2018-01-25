@@ -5,17 +5,31 @@ import { connect } from 'react-redux';
 import { MaterialIcons } from '@expo/vector-icons';
 import { fetchComments } from 'state/actions/postActions';
 import CommentsContainer from 'components/post/comments/CommentsContainer';
-import { ICON_SIZES, MATERIAL_ICONS } from 'constants/styles';
+import { ICON_SIZES, MATERIAL_ICONS, COLORS } from 'constants/styles';
 
 const Container = styled.View``;
 
-const Header = styled.View`
-  flex-direction: row;
-  height: 30px;
-  margin-top: 10px;
+const BackTouchable = styled.TouchableOpacity`
+  justify-content: center;
+  padding: 10px;
 `;
 
-const BackTouchable = styled.TouchableOpacity``;
+const Header = styled.View`
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom-color: ${COLORS.WHITE.GAINSBORO};
+  border-bottom-width: 1px;
+  width: 100%;
+  padding-top: 20px;
+  min-height: 45px;
+`;
+
+const Title = styled.Text``;
+
+const EmptyView = styled.View`
+  padding: 10px 20px;
+`;
 
 const mapDispatchToProps = dispatch => ({
   fetchComments: (category, author, permlink, postId) =>
@@ -61,6 +75,8 @@ class CommentScreen extends Component {
           <BackTouchable onPress={this.navigateBack}>
             <MaterialIcons size={ICON_SIZES.menuIcon} name={MATERIAL_ICONS.back} />
           </BackTouchable>
+          <Title>{'Comments'}</Title>
+          <EmptyView />
         </Header>
         <CommentsContainer postId={postId} postData={postData} />
       </Container>

@@ -1,18 +1,10 @@
 import React, { Component } from 'react';
 import { ListView } from 'react-native';
-import _ from 'lodash';
 import PropTypes from 'prop-types';
-import styled from 'styled-components/native';
-import Comment from './Comment';
 import { sortComments } from 'util/sortUtils';
+import Comment from './Comment';
 
 const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
-
-const Container = styled.View``;
-
-const Header = styled.View``;
-
-const Title = styled.Text``;
 
 class CommentsList extends Component {
   static propTypes = {
@@ -54,16 +46,11 @@ class CommentsList extends Component {
     const sortedComments = sortComments(comments, sort);
 
     return (
-      <Container>
-        <Header>
-          <Title>{'Comments'}</Title>
-        </Header>
-        <ListView
-          dataSource={ds.cloneWithRows(sortedComments)}
-          enableEmptySections
-          renderRow={this.renderComment}
-        />
-      </Container>
+      <ListView
+        dataSource={ds.cloneWithRows(sortedComments)}
+        enableEmptySections
+        renderRow={this.renderComment}
+      />
     );
   }
 }

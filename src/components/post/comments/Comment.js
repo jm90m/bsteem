@@ -4,12 +4,17 @@ import styled from 'styled-components/native';
 import { SORT_COMMENTS } from 'constants/comments';
 import { getReputation } from 'util/steemitFormatters';
 import { sortComments } from 'util/sortUtils';
+import { COLORS } from 'constants/styles';
 import _ from 'lodash';
 import Avatar from 'components/common/Avatar';
 import CommentFooter from './CommentFooter';
 import CommentContent from './CommentContent';
 
-const Container = styled.View``;
+const Container = styled.View`
+  background-color: ${COLORS.WHITE.WHITE};
+  margin-top: 2px;
+  margin-bottom: 2px;
+`;
 
 const CommentContentContainer = styled.View`
   margin-top: 10px;
@@ -17,7 +22,7 @@ const CommentContentContainer = styled.View`
 `;
 
 const AvatarContainer = styled.View`
-  margin-right: 5px;
+  padding: 5px 10px;
 `;
 
 const CommentChildrenContainer = styled.View`
@@ -108,6 +113,7 @@ class Comment extends Component {
             reputation={commentAuthorReputation}
             created={comment.created}
             body={comment.body}
+            commentDepth={comment.depth}
           />
         </CommentContentContainer>
         <CommentFooter />

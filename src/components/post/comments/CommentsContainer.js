@@ -22,13 +22,13 @@ class CommentsContainer extends Component {
     postData: PropTypes.shape().isRequired,
   };
 
-  getNestedComments(commentsObj, commentsIdArray, nestedComments) {
+  getNestedComments(postComments, commentsIdArray, nestedComments) {
     const newNestedComments = nestedComments;
     _.forEach(commentsIdArray, commentId => {
-      const nestedCommentArray = _.get(commentsObj, commentId, []);
+      const nestedCommentArray = _.get(postComments, `childrenById.${commentId}`, []);
       if (nestedCommentArray.length) {
-        newNestedComments[commentId] = _.map(nestedCommentArray, id => commentsObj.comments[id]);
-        this.getNestedComments(commentsObj, nestedCommentArray, newNestedComments);
+        newNestedComments[commentId] = _.map(nestedCommentArray, id => postComments.comments[id]);
+        this.getNestedComments(postComments, nestedCommentArray, newNestedComments);
       }
     });
     return newNestedComments;
@@ -53,7 +53,7 @@ class CommentsContainer extends Component {
     let commentsChildren = {};
 
     if (fetchedCommentsList && fetchedCommentsList.length) {
-      commentsChildren = this.getNestedComments(comments, postComments.childrenById, {});
+      commentsChildren = this.getNestedComments(postComments, rootNode, {});
     }
 
     return (
