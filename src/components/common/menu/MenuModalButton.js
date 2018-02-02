@@ -1,7 +1,7 @@
-import React from 'react';
 import { Dimensions } from 'react-native';
 import styled from 'styled-components/native';
-import { COLORS } from '../../../constants/styles';
+import { COLORS } from 'constants/styles';
+
 const { width } = Dimensions.get('screen');
 
 const MenuModalButton = styled.TouchableOpacity`
@@ -9,6 +9,8 @@ const MenuModalButton = styled.TouchableOpacity`
   width: ${width};
   margin: 2px 0;
   background-color: white;
+  border-top-width: 1px;
+  border-top-color: ${COLORS.WHITE.GAINSBORO};
   border-bottom-color: ${COLORS.WHITE.GAINSBORO};
   border-bottom-width: 1px;
 `;

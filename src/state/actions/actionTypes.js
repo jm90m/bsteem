@@ -69,3 +69,7 @@ export const FETCH_STEEM_GLOBAL_PROPERTIES = createAsyncActionType(
   '@app/fetch-steem-global-properties',
 );
 export const FETCH_NETWORK_CONNECTION = createAsyncActionType('@app/fetch-network-connection');
+
+// Editor Actions
+export const CREATE_POST = createAsyncActionType('@editor/create-post');
+export const UPLOAD_IMAGE = createAsyncActionType('@editor/upload-image');

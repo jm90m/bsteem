@@ -6,6 +6,7 @@ import * as searchSaga from './sagas/searchSaga';
 import * as currentUserSaga from './sagas/currentUserSaga';
 import * as userActivitySaga from './sagas/userActivitySaga';
 import * as appSaga from './sagas/appSaga';
+import * as editorSaga from './sagas/editorSaga';
 
 const rootSaga = function*() {
   yield all([
@@ -46,6 +47,10 @@ const rootSaga = function*() {
     spawn(appSaga.watchFetchSteemGlobalProperties),
     spawn(appSaga.watchFetchSteemRate),
     spawn(appSaga.watchFetchNetworkConnection),
+
+    // Editor Saga
+    spawn(editorSaga.watchCreatePost),
+    spawn(editorSaga.watchUploadImage),
   ]);
 };
 

@@ -3,6 +3,8 @@
   "private": true,
   "dependencies": {
     "babel-eslint": "^8.0.3",
+    "base58": "^1.0.1",
+    "bs58": "^4.0.1",
     "cross-fetch": "^1.1.0",
     "embedjs": "0.0.10",
     "entities": "^1.1.1",
@@ -26,10 +28,13 @@
     "redux-saga": "^0.15.6",
     "remarkable": "^1.7.1",
     "sanitize-html": "^1.16.1",
+    "secure-random": "^1.1.1",
     "showdown": "^1.7.6",
+    "speakingurl": "^14.0.1",
     "stream": "0.0.2",
     "styled-components": "^2.2.1",
     "url": "^0.11.0",
+    "uuid": "^3.2.1",
     "xmldom": "^0.1.27"
   },
   "devDependencies": {

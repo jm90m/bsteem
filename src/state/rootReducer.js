@@ -7,6 +7,7 @@ import searchReducer, * as fromSearch from './reducers/searchReducer';
 import currentUserReducer, * as fromCurrentUser from './reducers/currentUserReducer';
 import userActivityReducer, * as fromUserActivity from './reducers/userActivityReducer';
 import appReducer, * as fromApp from './reducers/appReducer';
+import editorReducer, * as fromEditor from './reducers/editorReducer';
 
 export default combineReducers({
   app: appReducer,
@@ -17,6 +18,7 @@ export default combineReducers({
   search: searchReducer,
   currentUser: currentUserReducer,
   userActivity: userActivityReducer,
+  editor: editorReducer,
 });
 
 // Home Selectors
