@@ -17,19 +17,10 @@ import { TRENDING } from 'constants/feedFilters';
 import PostPreview from 'components/post-preview/PostPreview';
 import FeedSort from 'components/feed-sort/FeedSort';
 import LargeLoading from 'components/common/LargeLoading';
+import Header from 'components/common/Header';
 
 const StyledListView = styled.ListView`
   background-color: ${COLORS.WHITE.WHITE_SMOKE};
-`;
-
-const HomeHeader = styled.View`
-  background-color: ${COLORS.WHITE.WHITE};
-  border-bottom-color: ${COLORS.WHITE.GAINSBORO};
-  border-bottom-width: 1px;
-  padding-top: 20px;
-  width: 100%;
-  justify-content: center;
-  align-items: center;
 `;
 
 const HomeText = styled.Text`
@@ -156,7 +147,7 @@ class HomeScreen extends Component {
     const { menuVisible, currentFilter, dataSource } = this.state;
     return (
       <View>
-        <HomeHeader>
+        <Header style={{ justifyContent: 'center' }}>
           <TouchableMenu onPress={() => this.setMenuVisibile(!menuVisible)}>
             <MaterialIcons name={currentFilter.icon} size={20} color={COLORS.BLUE.MARINER} />
             <HomeText>{currentFilter.label}</HomeText>
@@ -168,7 +159,7 @@ class HomeScreen extends Component {
               />
             </FilterMenuIcon>
           </TouchableMenu>
-        </HomeHeader>
+        </Header>
         <Modal
           animationType="slide"
           transparent

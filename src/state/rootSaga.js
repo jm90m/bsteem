@@ -47,6 +47,7 @@ const rootSaga = function*() {
     spawn(appSaga.watchFetchSteemGlobalProperties),
     spawn(appSaga.watchFetchSteemRate),
     spawn(appSaga.watchFetchNetworkConnection),
+    spawn(appSaga.watchSetTranslations),
 
     // Editor Saga
     spawn(editorSaga.watchCreatePost),

@@ -8,21 +8,10 @@ import { TRENDING } from 'constants/feedFilters';
 import Tag from 'components/post/Tag';
 import PostPreview from 'components/post-preview/PostPreview';
 import FeedSort from 'components/feed-sort/FeedSort';
+import Header from 'components/common/Header';
 
 const Container = styled.View`
   flex: 1;
-`;
-
-const Header = styled.View`
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  background-color: ${COLORS.WHITE.WHITE};
-  border-bottom-color: ${COLORS.WHITE.GAINSBORO};
-  border-bottom-width: 1px;
-  width: 100%;
-  padding-top: 20px;
-  min-height: 45px;
 `;
 
 const StyledListView = styled.ListView`

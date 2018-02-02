@@ -4,14 +4,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components/native';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS, ICON_SIZES, MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
-
-const Container = styled.View`
-  background-color: ${COLORS.WHITE.WHITE};
-  border-bottom-color: ${COLORS.WHITE.GAINSBORO};
-  border-bottom-width: 1px;
-  width: 100%;
-  padding-top: 20px;
-`;
+import Header from 'components/common/Header';
 
 const CurrentMenuDisplay = styled.View`
   flex-direction: row;
@@ -47,8 +40,8 @@ class CurrentUserHeader extends Component {
   render() {
     const { currentMenuOption } = this.props;
     return (
-      <Container>
-        <TouchableContainer onPress={this.props.toggleCurrentUserMenu}>
+      <TouchableContainer onPress={this.props.toggleCurrentUserMenu}>
+        <Header>
           <EmptyView />
           <CurrentMenuDisplay>
             <MaterialIcons
@@ -64,8 +57,8 @@ class CurrentUserHeader extends Component {
               name={MATERIAL_COMMUNITY_ICONS.menuVertical}
             />
           </MenuIconContainer>
-        </TouchableContainer>
-      </Container>
+        </Header>
+      </TouchableContainer>
     );
   }
 }

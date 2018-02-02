@@ -2,9 +2,15 @@ import { NetInfo } from 'react-native';
 import { takeLatest, call, put } from 'redux-saga/effects';
 import _ from 'lodash';
 import API from 'api/api';
+import { i18nInit } from 'i18n-settings/i18n';
 import * as appActions from 'state/actions/appActions';
-import { FETCH_STEEM_GLOBAL_PROPERTIES, FETCH_STEEM_RATE } from 'state/actions/actionTypes';
-import { FETCH_NETWORK_CONNECTION } from '../actions/actionTypes';
+
+import {
+  FETCH_STEEM_GLOBAL_PROPERTIES,
+  FETCH_STEEM_RATE,
+  FETCH_NETWORK_CONNECTION,
+  SET_TRANSLATIONS,
+} from 'state/actions/actionTypes';
 
 const fetchGlobalSteemProperties = function*() {
   try {
@@ -45,6 +51,16 @@ const fetchNetworkConnection = function*() {
   }
 };
 
+const setTranslations = function*(action) {
+  try {
+    const { locale } = action.payload;
+    yield call(i18nInit, locale);
+    console.log('success change locale to', locale);
+  } catch (error) {
+    console.log('failed to set translations');
+  }
+};
+
 export const watchFetchSteemGlobalProperties = function*() {
   yield takeLatest(FETCH_STEEM_GLOBAL_PROPERTIES.ACTION, fetchGlobalSteemProperties);
 };
@@ -55,4 +71,8 @@ export const watchFetchSteemRate = function*() {
 
 export const watchFetchNetworkConnection = function*() {
   yield takeLatest(FETCH_NETWORK_CONNECTION.ACTION, fetchNetworkConnection);
+};
+
+export const watchSetTranslations = function*() {
+  yield takeLatest(SET_TRANSLATIONS.ACTION, setTranslations);
 };

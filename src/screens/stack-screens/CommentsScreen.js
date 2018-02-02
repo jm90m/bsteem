@@ -2,10 +2,13 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components/native';
 import { connect } from 'react-redux';
+import _ from 'lodash';
 import { MaterialIcons } from '@expo/vector-icons';
 import { fetchComments } from 'state/actions/postActions';
 import CommentsContainer from 'components/post/comments/CommentsContainer';
 import { ICON_SIZES, MATERIAL_ICONS, COLORS } from 'constants/styles';
+import { getCommentsByPostId } from 'state/rootReducer';
+import Header from 'components/common/Header';
 
 const Container = styled.View``;
 
@@ -14,37 +17,31 @@ const BackTouchable = styled.TouchableOpacity`
   padding: 10px;
 `;
 
-const Header = styled.View`
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom-color: ${COLORS.WHITE.GAINSBORO};
-  border-bottom-width: 1px;
-  width: 100%;
-  padding-top: 20px;
-  min-height: 45px;
-`;
-
 const Title = styled.Text``;
 
 const EmptyView = styled.View`
   padding: 10px 20px;
 `;
 
+const mapStateToProps = state => ({
+  commentsByPostId: getCommentsByPostId(state),
+});
 const mapDispatchToProps = dispatch => ({
   fetchComments: (category, author, permlink, postId) =>
     dispatch(fetchComments(category, author, permlink, postId)),
 });
 
-@connect(null, mapDispatchToProps)
+@connect(mapStateToProps, mapDispatchToProps)
 class CommentScreen extends Component {
   static propTypes = {
     navigation: PropTypes.shape(),
     fetchComments: PropTypes.func.isRequired,
+    commentsByPostId: PropTypes.shape(),
   };
 
   static defaultProps = {
     navigation: {},
+    commentsByPostId: {},
   };
 
   static navigationOptions = {
@@ -59,8 +56,12 @@ class CommentScreen extends Component {
   }
 
   componentDidMount() {
+    const { commentsByPostId } = this.props;
     const { author, permlink, postId, category } = this.props.navigation.state.params;
-    this.props.fetchComments(category, author, permlink, postId);
+    const postComments = _.get(commentsByPostId, postId, null);
+    if (_.isEmpty(postComments) || _.isNull(postComments)) {
+      this.props.fetchComments(category, author, permlink, postId);
+    }
   }
 
   navigateBack() {

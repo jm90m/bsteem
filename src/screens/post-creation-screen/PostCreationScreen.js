@@ -13,6 +13,7 @@ import { COLORS, MATERIAL_ICONS, MATERIAL_COMMUNITY_ICONS, ICON_SIZES } from 'co
 import { getAuthUsername } from 'state/rootReducer';
 import { createPost, uploadImage } from 'state/actions/editorActions';
 import Tag from 'components/post/Tag';
+import Header from 'components/common/Header';
 
 const { width: deviceWidth } = Dimensions.get('screen');
 
@@ -21,18 +22,6 @@ const Container = styled.View`
 `;
 
 const StyledScrollView = styled.ScrollView``;
-
-const Header = styled.View`
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  background-color: ${COLORS.WHITE.WHITE};
-  border-bottom-color: ${COLORS.WHITE.GAINSBORO};
-  border-bottom-width: 1px;
-  width: 100%;
-  padding-top: 20px;
-  min-height: 45px;
-`;
 
 const TouchableMenu = styled.TouchableOpacity``;
 
@@ -57,7 +46,6 @@ const TagsContainer = styled.View`
   flex-direction: row;
   padding: 5px 20px;
   flex-wrap: wrap;
-  justify-content: space-between;
 `;
 
 const ImageContainer = styled.View`
@@ -68,6 +56,7 @@ const ImageContainer = styled.View`
 
 const TagOption = styled.View`
   flex-direction: row;
+  padding: 5px 0;
 `;
 
 const ButtonContainer = styled.View`
@@ -137,7 +126,11 @@ class PostCreationScreen extends Component {
   }
 
   onChangeTags(value) {
-    if (_.isEmpty(value)) return;
+    if (_.isEmpty(value)) {
+      this.setState({ tagsInput: value });
+      return;
+    }
+
     if (_.size(this.state.tags) >= 5) return;
 
     if (_.includes(value, ' ') || _.includes(value, ',')) {
@@ -354,10 +347,17 @@ class PostCreationScreen extends Component {
           <ButtonContainer>
             <Button
               raised
+              onPress={() => {}}
+              icon={{ name: 'add-a-photo' }}
+              title="Add Text"
+              backgroundColor={COLORS.GREY.NERO}
+              borderRadius={10}
+            />
+            <Button
               onPress={this.pickImage}
               icon={{ name: 'add-a-photo' }}
               title="Add Images"
-              backgroundColor={COLORS.BLUE.MARINER}
+              backgroundColor={COLORS.GREY.NERO}
               borderRadius={10}
             />
           </ButtonContainer>

@@ -15,6 +15,7 @@ import PostMenu from 'components/post-menu/PostMenu';
 import HTMLView from 'components/html-view/HTMLView';
 import FooterTags from 'components/post/FooterTags';
 import Footer from 'components/post/Footer';
+import Header from 'components/common/Header';
 
 const { width } = Dimensions.get('screen');
 
@@ -51,14 +52,6 @@ function renderNode(node, index, siblings, parent, defaultRenderer) {
 
 const Container = styled.View`
   flex: 1;
-`;
-
-const Header = styled.View`
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: nowrap;
-  padding-top: 20px;
 `;
 
 const Touchable = styled.TouchableOpacity``;

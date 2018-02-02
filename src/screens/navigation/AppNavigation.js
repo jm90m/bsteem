@@ -73,6 +73,7 @@ const mapDispatchToProps = dispatch => ({
   fetchSteemRate: () => dispatch(appActions.fetchSteemRate.action()),
   fetchSteemGlobalProperties: () => dispatch(appActions.fetchSteemGlobalProperties.action()),
   fetchNetworkConnection: () => dispatch(appActions.fetchNetworkConnection.action()),
+  setTranslations: locale => dispatch(appActions.setTranslations.action(locale)),
 });
 
 @connect(mapStateToProps, mapDispatchToProps)
@@ -81,6 +82,7 @@ class AppNavigation extends React.Component {
     fetchSteemRate: PropTypes.func.isRequired,
     fetchSteemGlobalProperties: PropTypes.func.isRequired,
     fetchNetworkConnection: PropTypes.func.isRequired,
+    setTranslations: PropTypes.func.isRequired,
     accessToken: PropTypes.string,
   };
 
@@ -92,6 +94,7 @@ class AppNavigation extends React.Component {
     this.props.fetchSteemRate();
     this.props.fetchSteemGlobalProperties();
     this.props.fetchNetworkConnection();
+    this.props.setTranslations('en_US');
   }
 
   render() {

@@ -28,6 +28,7 @@ import {
   getRefreshUserBlogLoading,
 } from 'state/rootReducer';
 import UserMenu from 'components/user/UserMenu';
+import Header from 'components/common/Header';
 import UserBlog from './UserBlog';
 import UserComments from './UserComments';
 
@@ -39,25 +40,12 @@ const Loading = styled.ActivityIndicator`
   margin-top: 10px;
 `;
 
-const Header = styled.View`
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  background-color: ${COLORS.WHITE.WHITE};
-  border-bottom-color: ${COLORS.WHITE.GAINSBORO};
-  border-bottom-width: 1px;
-  width: 100%;
-  padding-top: 20px;
-  min-height: 45px;
-`;
-
 const BackTouchable = styled.TouchableOpacity`
   justify-content: center;
   padding: 10px;
 `;
 
-const TouchableMenu = styled.TouchableOpacity`
-`;
+const TouchableMenu = styled.TouchableOpacity``;
 
 const TouchableMenuContainer = styled.View`
   padding: 5px;
@@ -314,11 +302,7 @@ class UserScreen extends Component {
 
   renderLoader() {
     const { currentMenuOption } = this.state;
-    const { username } = this.props.navigation.state.params;
     const { loadingUsersComments, loadingUsersBlog } = this.props;
-
-    console.log('LOADING USERS COMMENTS', loadingUsersComments, username);
-    console.log('LOADING USERS BLOG', loadingUsersBlog, username);
 
     switch (currentMenuOption.id) {
       case userMenuConstants.COMMENTS.id:
