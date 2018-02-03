@@ -25,8 +25,8 @@ const ButtonText = styled.Text`
 const ModalFooter = ({ cancelText, cancelPress, successText, successPress }) => (
   <Container>
     <Button
-      backgroundColor={COLORS.BLUE.MARINER}
-      borderColor={COLORS.BLUE.MARINER}
+      backgroundColor={COLORS.PRIMARY_COLOR}
+      borderColor={COLORS.PRIMARY_COLOR}
       onPress={successPress}
     >
       <ButtonText color={COLORS.WHITE.WHITE}>{successText}</ButtonText>
@@ -36,7 +36,7 @@ const ModalFooter = ({ cancelText, cancelPress, successText, successPress }) => 
       borderColor={COLORS.WHITE.WHITE_SMOKE}
       onPress={cancelPress}
     >
-      <ButtonText color={COLORS.BLUE.MARINER}>{cancelText}</ButtonText>
+      <ButtonText color={COLORS.PRIMARY_COLOR}>{cancelText}</ButtonText>
     </Button>
   </Container>
 );

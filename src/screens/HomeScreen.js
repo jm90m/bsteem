@@ -24,7 +24,7 @@ const StyledListView = styled.ListView`
 `;
 
 const HomeText = styled.Text`
-  color: ${COLORS.BLUE.MARINER};
+  color: ${COLORS.PRIMARY_COLOR};
   margin-left: 3px;
 `;
 const TouchableMenu = styled.TouchableOpacity`
@@ -149,13 +149,13 @@ class HomeScreen extends Component {
       <View>
         <Header style={{ justifyContent: 'center' }}>
           <TouchableMenu onPress={() => this.setMenuVisibile(!menuVisible)}>
-            <MaterialIcons name={currentFilter.icon} size={20} color={COLORS.BLUE.MARINER} />
+            <MaterialIcons name={currentFilter.icon} size={20} color={COLORS.PRIMARY_COLOR} />
             <HomeText>{currentFilter.label}</HomeText>
             <FilterMenuIcon>
               <MaterialCommunityIcons
                 name={MATERIAL_COMMUNITY_ICONS.chevronDown}
                 size={24}
-                color={COLORS.BLUE.MARINER}
+                color={COLORS.PRIMARY_COLOR}
               />
             </FilterMenuIcon>
           </TouchableMenu>
@@ -182,7 +182,7 @@ class HomeScreen extends Component {
             <RefreshControl
               refreshing={loadingFetchDiscussions}
               onRefresh={this.onRefreshCurrentFeed}
-              colors={[COLORS.BLUE.MARINER]}
+              colors={[COLORS.PRIMARY_COLOR]}
             />
           }
         />

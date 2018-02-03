@@ -222,13 +222,13 @@ class Footer extends Component {
     console.log('LOADING VOTE', loadingVote);
 
     if (loadingVote) {
-      return <Loading color={COLORS.BLUE.MARINER} size="small" />;
+      return <Loading color={COLORS.PRIMARY_COLOR} size="small" />;
     }
 
     if (likedPost) {
       return (
         <TouchableOpacity onPress={this.handleOnPressVote}>
-          <MaterialIcons name="thumb-up" size={24} color={COLORS.BLUE.MARINER} />
+          <MaterialIcons name="thumb-up" size={24} color={COLORS.PRIMARY_COLOR} />
         </TouchableOpacity>
       );
     }
@@ -248,11 +248,11 @@ class Footer extends Component {
     const isReblogged = _.includes(rebloggedList, `${postData.id}`);
 
     if (loadingReblog) {
-      return <Loading color={COLORS.BLUE.MARINER} size="small" />;
+      return <Loading color={COLORS.PRIMARY_COLOR} size="small" />;
     }
 
     if (isReblogged) {
-      return <MaterialCommunityIcons name="tumblr-reblog" size={24} color={COLORS.BLUE.MARINER} />;
+      return <MaterialCommunityIcons name="tumblr-reblog" size={24} color={COLORS.PRIMARY_COLOR} />;
     }
 
     if (showReblogLink) {
@@ -269,7 +269,8 @@ class Footer extends Component {
     const { postData } = this.props;
     const { displayReblogModal } = this.state;
     const { active_votes, children } = postData;
-    const upVotes = getUpvotes(active_votes).sort(sortVotes);
+    const activeVotes = Array.isArray(active_votes) ? active_votes : [];
+    const upVotes = getUpvotes(activeVotes).sort(sortVotes);
     const payout = calculatePayout(postData);
     const displayedPayout = payout.cashoutInTime ? payout.potentialPayout : payout.pastPayouts;
     const formattedDisplayedPayout = _.isUndefined(displayedPayout)

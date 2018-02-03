@@ -115,7 +115,7 @@ class FeedScreen extends Component {
   renderLoadingOrEmptyText = () => {
     const { dataSource, loading } = this.state;
     if (loading) {
-      return <Loading color={COLORS.BLUE.MARINER} size="large" />;
+      return <Loading color={COLORS.PRIMARY_COLOR} size="large" />;
     } else if (dataSource.getRowCount() === 0) {
       return <Text>Feed is currently empty</Text>;
     }
@@ -134,7 +134,7 @@ class FeedScreen extends Component {
           </BackTouchable>
           <Tag tag={tag} />
           <TouchableMenu onPress={() => this.setMenuVisible(!menuVisible)}>
-            <MaterialIcons size={24} name={currentFilter.icon} color={COLORS.BLUE.MARINER} />
+            <MaterialIcons size={24} name={currentFilter.icon} color={COLORS.PRIMARY_COLOR} />
             <MaterialCommunityIcons size={24} name={MATERIAL_COMMUNITY_ICONS.menuVertical} />
           </TouchableMenu>
         </Header>

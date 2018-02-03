@@ -17,7 +17,7 @@ const Header = styled.View`
 
 const Username = styled.Text`
   font-weight: 700;
-  color: ${COLORS.BLUE.MARINER};
+  color: ${COLORS.PRIMARY_COLOR};
 `;
 
 const CommentCreated = styled.Text`

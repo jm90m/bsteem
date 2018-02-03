@@ -58,7 +58,7 @@ const CurrentUserDisplay = styled.View`
 
 const CurrentUserDisplayText = styled.Text`
   margin-left: 5px;
-  color: ${COLORS.BLUE.MARINER};
+  color: ${COLORS.PRIMARY_COLOR};
 `;
 
 const mapStateToProps = state => ({
@@ -306,9 +306,9 @@ class UserScreen extends Component {
 
     switch (currentMenuOption.id) {
       case userMenuConstants.COMMENTS.id:
-        return loadingUsersComments && <Loading color={COLORS.BLUE.MARINER} size="large" />;
+        return loadingUsersComments && <Loading color={COLORS.PRIMARY_COLOR} size="large" />;
       case userMenuConstants.BLOG.id:
-        return loadingUsersBlog && <Loading color={COLORS.BLUE.MARINER} size="large" />;
+        return loadingUsersBlog && <Loading color={COLORS.PRIMARY_COLOR} size="large" />;
       default:
         return null;
     }
@@ -327,7 +327,7 @@ class UserScreen extends Component {
             <MaterialIcons
               size={ICON_SIZES.menuIcon}
               name={currentMenuOption.icon}
-              color={COLORS.BLUE.MARINER}
+              color={COLORS.PRIMARY_COLOR}
             />
             <CurrentUserDisplayText>{currentMenuOption.label}</CurrentUserDisplayText>
           </CurrentUserDisplay>

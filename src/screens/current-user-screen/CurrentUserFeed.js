@@ -101,7 +101,7 @@ class CurrentUserFeed extends Component {
             <RefreshControl
               refreshing={loadingFetchCurrentUserFeed}
               onRefresh={this.onRefreshCurrentFeed}
-              colors={[COLORS.BLUE.MARINER]}
+              colors={[COLORS.PRIMARY_COLOR]}
             />
           }
         />

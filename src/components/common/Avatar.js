@@ -2,11 +2,14 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components/native';
 import { getAvatarImageUrl } from 'util/busyImageUtils';
+import { COLORS } from 'constants/styles';
 
 const AvatarImage = styled.Image`
   height: ${props => props.size}px;
   width: ${props => props.size}px;
-  border-radius: 10px;
+  border-radius: ${props => props.size / 2}px;
+  border-width: 1px;
+  border-color: ${COLORS.BORDER_COLOR};
 `;
 
 const defaultImage =

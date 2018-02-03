@@ -20,7 +20,7 @@ class PostCreationPreview extends Component {
             text: 'Post Preview',
             style: { color: COLORS.WHITE.WHITE, fontWeight: 'bold' },
           }}
-          backgroundColor={COLORS.BLUE.MARINER}
+          backgroundColor={COLORS.PRIMARY_COLOR}
           outerContainerStyles={styles}
         />
       </Container>

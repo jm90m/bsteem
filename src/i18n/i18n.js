@@ -27,7 +27,8 @@ export const i18nInit = async () => {
   const momentLocale = supportedLocales[locale];
 
   if (locale !== defaultLocale && !!momentLocale) {
-    // const i18nLoaded = await import('i18n-settings/locales/' + locale);
+    // const url = `i18n-settings/locales/${locale}`
+    // const i18nLoaded = require(url);
     // _.merge(i18n, i18nLoaded.default);
     //
     // await import('moment/locale/' + momentLocale);

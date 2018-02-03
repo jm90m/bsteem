@@ -13,7 +13,7 @@ const Container = styled.View`
 `;
 
 const LinkText = styled.Text`
-  color: ${COLORS.BLUE.MARINER}
+  color: ${COLORS.PRIMARY_COLOR}
   font-weight: bold;
   margin-right: 5px;
 `;

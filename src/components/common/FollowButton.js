@@ -117,7 +117,7 @@ class FollowButton extends Component {
           title="Follow"
           onPress={this.handleFollow}
           borderRadius={10}
-          backgroundColor={COLORS.BLUE.MARINER}
+          backgroundColor={COLORS.PRIMARY_COLOR}
           loading={loadingIsFollowing}
         />;
   }

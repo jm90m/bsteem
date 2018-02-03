@@ -13,7 +13,7 @@ const CurrentMenuDisplay = styled.View`
 
 const CurrentMenuText = styled.Text`
   margin-left: 5px;
-  color: ${COLORS.BLUE.MARINER};
+  color: ${COLORS.PRIMARY_COLOR};
 `;
 
 const TouchableContainer = styled.TouchableOpacity`
@@ -47,7 +47,7 @@ class CurrentUserHeader extends Component {
             <MaterialIcons
               size={ICON_SIZES.menuIcon}
               name={currentMenuOption.icon}
-              color={COLORS.BLUE.MARINER}
+              color={COLORS.PRIMARY_COLOR}
             />
             <CurrentMenuText>{currentMenuOption.label}</CurrentMenuText>
           </CurrentMenuDisplay>

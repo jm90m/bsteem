@@ -28,7 +28,7 @@ const AuthorContents = styled.View`
 
 const AuthorText = styled.Text`
   font-weight: 700;
-  color: ${COLORS.BLUE.MARINER};
+  color: ${COLORS.PRIMARY_COLOR};
 `;
 
 const PostTitle = styled.Text`

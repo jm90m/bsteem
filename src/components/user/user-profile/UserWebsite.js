@@ -11,7 +11,7 @@ const Container = styled.View`
 
 const Website = styled.Text`
   margin-left: 5px;
-  color: ${COLORS.BLUE.MARINER};
+  color: ${COLORS.PRIMARY_COLOR};
 `;
 
 const UserWebsite = ({ website }) => (

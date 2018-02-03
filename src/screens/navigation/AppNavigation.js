@@ -18,13 +18,13 @@ const tabNavigatorOptions = {
   tabBarOptions: {
     showIcon: true,
     showLabel: false,
-    activeTintColor: COLORS.BLUE.MARINER,
+    activeTintColor: COLORS.PRIMARY_COLOR,
     inactiveTintColor: COLORS.BLUE.BOTICELLI,
     style: {
       backgroundColor: COLORS.WHITE.WHITE,
     },
     indicatorStyle: {
-      backgroundColor: COLORS.BLUE.MARINER,
+      backgroundColor: COLORS.PRIMARY_COLOR,
     },
   },
 };

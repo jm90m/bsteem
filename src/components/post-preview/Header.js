@@ -25,7 +25,7 @@ const Author = styled.View`
 `;
 const AuthorText = styled.Text`
   font-weight: 700;
-  color: ${COLORS.BLUE.MARINER};
+  color: ${COLORS.PRIMARY_COLOR};
 `;
 const HeaderContents = styled.View`
   margin: 0 12px;
@@ -37,7 +37,7 @@ const PostCreated = styled.Text`
 `;
 
 const RebloggedUsername = styled.Text`
-  color: ${COLORS.BLUE.MARINER};
+  color: ${COLORS.PRIMARY_COLOR};
 `;
 const RebloggedText = styled.Text`
   color: ${props => (props.color ? props.color : COLORS.BLUE.LINK_WATER)};

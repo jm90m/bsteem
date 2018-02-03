@@ -80,7 +80,7 @@ class SteemConnectLogin extends Component {
           title="Login with SteemConnect"
           fontWeight="bold"
           borderRadius={10}
-          backgroundColor={COLORS.BLUE.MARINER}
+          backgroundColor={COLORS.PRIMARY_COLOR}
         />
       </Container>
     );

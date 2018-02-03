@@ -32,7 +32,7 @@ const BackTouchable = styled.TouchableOpacity`
 
 const TitleText = styled.Text`
   font-weight: bold;
-  color: ${COLORS.BLUE.MARINER}
+  color: ${COLORS.PRIMARY_COLOR}
 `;
 
 const FilterTouchable = styled.TouchableOpacity`
@@ -122,7 +122,7 @@ class UserActivityScreen extends Component {
             <MaterialCommunityIcons
               size={24}
               name={MATERIAL_COMMUNITY_ICONS.filter}
-              color={COLORS.BLUE.MARINER}
+              color={COLORS.PRIMARY_COLOR}
             />
           </FilterTouchable>
         </HeaderContainer>
@@ -135,7 +135,7 @@ class UserActivityScreen extends Component {
             <RefreshControl
               refreshing={loadingFetchUserAccountHistory}
               onRefresh={this.onRefreshUserAccountHistory}
-              colors={[COLORS.BLUE.MARINER]}
+              colors={[COLORS.PRIMARY_COLOR]}
             />
           }
         />

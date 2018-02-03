@@ -23,7 +23,7 @@ const MenuModalContents = styled.View`
 
 const MenuText = styled.Text`
   margin-left: 5px;
-  color: ${COLORS.BLUE.MARINER};
+  color: ${COLORS.PRIMARY_COLOR};
   font-weight: bold;
 `;
 
@@ -41,7 +41,7 @@ class FeedSort extends Component {
             {_.map(FEED_FILTERS, filter => (
               <MenuModalButton onPress={() => this.props.handleSortPost(filter)} key={filter.label}>
                 <MenuModalContents>
-                  <MaterialIcons size={20} color={COLORS.BLUE.MARINER} name={filter.icon} />
+                  <MaterialIcons size={20} color={COLORS.PRIMARY_COLOR} name={filter.icon} />
                   <MenuText>
                     {filter.label}
                   </MenuText>

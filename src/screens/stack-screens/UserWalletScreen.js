@@ -40,7 +40,7 @@ const BackTouchable = styled.TouchableOpacity`
 
 const TitleText = styled.Text`
   font-weight: bold;
-  color: ${COLORS.BLUE.MARINER}
+  color: ${COLORS.PRIMARY_COLOR}
 `;
 
 const EmptyView = styled.View`
@@ -188,7 +188,7 @@ class UserWalletScreen extends Component {
             <RefreshControl
               refreshing={loadingFetchUserAccountHistory || loadingUsersDetails}
               onRefresh={this.onRefreshUserWallet}
-              colors={[COLORS.BLUE.MARINER]}
+              colors={[COLORS.PRIMARY_COLOR]}
             />
           }
         />

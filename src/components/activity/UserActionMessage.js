@@ -15,7 +15,7 @@ const Container = styled.View`
 const Touchable = styled.TouchableOpacity``;
 
 const Username = styled.Text`
-  color: ${COLORS.BLUE.MARINER}
+  color: ${COLORS.PRIMARY_COLOR}
 `;
 
 class UserActionMessage extends Component {

@@ -62,13 +62,13 @@ class Footer extends Component {
     const { likedPost, onPressVote, loadingVote } = this.props;
     console.log('LOADING VOTE', loadingVote);
     if (loadingVote) {
-      return <Loading color={COLORS.BLUE.MARINER} size="small" />;
+      return <Loading color={COLORS.PRIMARY_COLOR} size="small" />;
     }
 
     if (likedPost) {
       return (
         <TouchableOpacity onPress={onPressVote}>
-          <MaterialIcons name="thumb-up" size={24} color={COLORS.BLUE.MARINER} />
+          <MaterialIcons name="thumb-up" size={24} color={COLORS.PRIMARY_COLOR} />
         </TouchableOpacity>
       );
     }
@@ -87,11 +87,11 @@ class Footer extends Component {
     const isReblogged = _.includes(rebloggedList, `${postData.id}`);
 
     if (loadingReblog) {
-      return <Loading color={COLORS.BLUE.MARINER} size="small" />;
+      return <Loading color={COLORS.PRIMARY_COLOR} size="small" />;
     }
 
     if (isReblogged) {
-      return <MaterialCommunityIcons name="tumblr-reblog" size={24} color={COLORS.BLUE.MARINER} />;
+      return <MaterialCommunityIcons name="tumblr-reblog" size={24} color={COLORS.PRIMARY_COLOR} />;
     }
 
     if (showReblogLink) {

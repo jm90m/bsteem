@@ -12,7 +12,7 @@ const Container = styled.View`
 
 const Username = styled.Text`
   margin: 0 5px;
-  color: ${COLORS.BLUE.MARINER};
+  color: ${COLORS.PRIMARY_COLOR};
   font-size: 18px;
   font-weight: bold;
 `;

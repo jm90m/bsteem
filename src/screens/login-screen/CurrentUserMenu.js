@@ -17,7 +17,7 @@ const Container = styled.View`
 
 const MenuText = styled.Text`
   margin-left: 5px;
-  color: ${COLORS.BLUE.MARINER};
+  color: ${COLORS.PRIMARY_COLOR};
   font-weight: bold;
 `;
 
@@ -44,7 +44,7 @@ class CurrentUserMenu extends Component {
                 key={option.id}
               >
                 <MenuModalContents>
-                  <MaterialIcons size={20} name={option.icon} color={COLORS.BLUE.MARINER} />
+                  <MaterialIcons size={20} name={option.icon} color={COLORS.PRIMARY_COLOR} />
                   <MenuText>
                     {option.label}
                   </MenuText>

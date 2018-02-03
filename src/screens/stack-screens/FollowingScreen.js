@@ -44,7 +44,7 @@ const UserText = styled.Text`
 
 const TitleText = styled.Text`
   font-weight: bold;
-  color: ${COLORS.BLUE.MARINER}
+  color: ${COLORS.PRIMARY_COLOR}
 `;
 
 const EmptyView = styled.View`
@@ -160,7 +160,7 @@ class FollowingScreen extends Component {
                 <RefreshControl
                   refreshing={isRefreshing}
                   onRefresh={this.onRefreshCurrentFeed}
-                  colors={[COLORS.BLUE.MARINER]}
+                  colors={[COLORS.PRIMARY_COLOR]}
                 />
               }
             />}

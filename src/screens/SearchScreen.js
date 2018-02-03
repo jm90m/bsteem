@@ -146,7 +146,7 @@ class SearchScreen extends Component {
     const hasNoSearchResults = !_.isEmpty(currentSearchValue) && _.isEmpty(searchResults);
 
     if (searchLoading) {
-      return <Loading color={COLORS.BLUE.MARINER} size="large" />;
+      return <Loading color={COLORS.PRIMARY_COLOR} size="large" />;
     } else if (hasNoSearchValue) {
       return <SearchDefaultView handleNavigateToFeed={this.handleNavigateToFeed} tags={tags} />;
     } else if (hasNoSearchResults) {

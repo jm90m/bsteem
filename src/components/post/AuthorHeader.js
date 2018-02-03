@@ -14,7 +14,7 @@ const PostCreated = styled.Text`
 
 const AuthorText = styled.Text`
   font-weight: 700;
-  color: ${COLORS.BLUE.MARINER};
+  color: ${COLORS.PRIMARY_COLOR};
 `;
 
 const Container = styled.View`

@@ -320,9 +320,9 @@ class CurrentUserProfileScreen extends Component {
 
     switch (currentMenuOption.id) {
       case userMenuConstants.COMMENTS.id:
-        return loadingUsersComments && <Loading color={COLORS.BLUE.MARINER} size="large" />;
+        return loadingUsersComments && <Loading color={COLORS.PRIMARY_COLOR} size="large" />;
       case userMenuConstants.BLOG.id:
-        return loadingUsersBlog && <Loading color={COLORS.BLUE.MARINER} size="large" />;
+        return loadingUsersBlog && <Loading color={COLORS.PRIMARY_COLOR} size="large" />;
       default:
         return null;
     }

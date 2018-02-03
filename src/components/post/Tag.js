@@ -5,9 +5,10 @@ import { COLORS } from 'constants/styles';
 
 const Container = styled.View`
   align-items: center;
-  border-radius: 10px;
+  border-radius: 4px;
   border: 2px solid ${COLORS.BLUE.MEDIUM_AQUAMARINE};
   height: 25px;
+  background-color: ${COLORS.GREEN.BUBBLES};
   justify-content: center;
   padding: 0 10px;
 `;
@@ -19,7 +20,11 @@ const TagText = styled.Text`
   text-align: center;
 `;
 
-const Tag = ({ tag }) => <Container><TagText>{tag}</TagText></Container>;
+const Tag = ({ tag }) => (
+  <Container>
+    <TagText>{tag}</TagText>
+  </Container>
+);
 
 Tag.propTypes = {
   tag: PropTypes.string,

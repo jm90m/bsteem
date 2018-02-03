@@ -113,7 +113,7 @@ class SearchPostScreen extends Component {
     const postData = _.get(currentSearchedPosts, postKey, {});
 
     if (_.isEmpty(postData) || searchFetchPostLoading) {
-      return <Loading color={COLORS.BLUE.MARINER} size="large" />;
+      return <Loading color={COLORS.PRIMARY_COLOR} size="large" />;
     }
 
     const { body, json_metadata } = postData;

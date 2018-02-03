@@ -67,7 +67,7 @@ const Menu = styled.View`
 `;
 
 const Author = styled.Text`
-  color: ${COLORS.BLUE.MARINER};
+  color: ${COLORS.PRIMARY_COLOR};
   font-weight: bold;
 `;
 

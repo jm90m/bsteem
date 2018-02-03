@@ -6,7 +6,7 @@ import { COLORS } from 'constants/styles';
 const Loading = styled.ActivityIndicator``;
 
 const SmallLoading = ({ style }) => (
-  <Loading color={COLORS.BLUE.MARINER} size="small" style={style} />
+  <Loading color={COLORS.PRIMARY_COLOR} size="small" style={style} />
 );
 
 SmallLoading.propTypes = {

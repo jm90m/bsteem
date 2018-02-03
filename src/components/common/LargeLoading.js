@@ -4,6 +4,6 @@ import { COLORS } from 'constants/styles';
 
 const Loading = styled.ActivityIndicator``;
 
-const LargeLoading = () => <Loading color={COLORS.BLUE.MARINER} size="large" />;
+const LargeLoading = () => <Loading color={COLORS.PRIMARY_COLOR} size="large" />;
 
 export default LargeLoading;

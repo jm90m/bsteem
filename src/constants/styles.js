@@ -1,4 +1,4 @@
-export const COLORS = {
+const colorsMap = {
   BLUE: {
     MARINER: '#4757b2', // link color
     BOTICELLI: '#99AAB5',
@@ -8,6 +8,10 @@ export const COLORS = {
     HAVELOCK_BLUE: '#4A80BE',
     HEATHER: '#a1afba',
     BALI_HAI: '#8798a4',
+  },
+
+  GREEN: {
+    BUBBLES: '#EAF4EF',
   },
 
   BLACK: {
@@ -33,6 +37,16 @@ export const COLORS = {
   VIOLET: {
     PAUA: '#232A57',
   },
+};
+
+const appColors = {
+  PRIMARY_COLOR: colorsMap.BLUE.MARINER,
+  BORDER_COLOR: colorsMap.WHITE.GAINSBORO,
+};
+
+export const COLORS = {
+  ...colorsMap,
+  ...appColors,
 };
 
 export const FONT_SIZES = {

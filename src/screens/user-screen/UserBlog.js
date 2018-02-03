@@ -61,7 +61,7 @@ class UserBlog extends Component {
           <RefreshControl
             refreshing={loadingUserBlog}
             onRefresh={refreshUserBlog}
-            colors={[COLORS.BLUE.MARINER]}
+            colors={[COLORS.PRIMARY_COLOR]}
           />
         }
         // add on refresh

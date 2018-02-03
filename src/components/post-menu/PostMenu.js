@@ -15,7 +15,7 @@ const Container = styled.View`
 
 const MenuText = styled.Text`
   margin-left: 5px;
-  color: ${COLORS.BLUE.MARINER};
+  color: ${COLORS.PRIMARY_COLOR};
   font-weight: bold;
 `;
 
@@ -60,7 +60,7 @@ class PostMenu extends Component {
           <MenuWrapper>
             <MenuModalButton onPress={handleFollowUser}>
               <MenuModalContents>
-                <MaterialIcons size={20} name={MATERIAL_ICONS.follow} color={COLORS.BLUE.MARINER} />
+                <MaterialIcons size={20} name={MATERIAL_ICONS.follow} color={COLORS.PRIMARY_COLOR} />
                 <MenuText>
                   Follow
                 </MenuText>
@@ -70,7 +70,7 @@ class PostMenu extends Component {
               <MenuModalContents>
                 <MaterialCommunityIcons
                   size={20}
-                  color={COLORS.BLUE.MARINER}
+                  color={COLORS.PRIMARY_COLOR}
                   name={MATERIAL_COMMUNITY_ICONS.comment}
                 />
                 <MenuText>
@@ -80,7 +80,7 @@ class PostMenu extends Component {
             </MenuModalButton>
             <MenuModalButton onPress={handleLikePost}>
               <MenuModalContents>
-                <MaterialIcons size={20} color={COLORS.BLUE.MARINER} name={MATERIAL_ICONS.like} />
+                <MaterialIcons size={20} color={COLORS.PRIMARY_COLOR} name={MATERIAL_ICONS.like} />
                 <MenuText>
                   Like Post
                 </MenuText>
@@ -90,7 +90,7 @@ class PostMenu extends Component {
               <MenuModalContents>
                 <MaterialCommunityIcons
                   size={20}
-                  color={COLORS.BLUE.MARINER}
+                  color={COLORS.PRIMARY_COLOR}
                   name={MATERIAL_COMMUNITY_ICONS.reblog}
                 />
                 <MenuText>
@@ -100,7 +100,7 @@ class PostMenu extends Component {
             </MenuModalButton>
             <MenuModalButton onPress={handleReportPost}>
               <MenuModalContents>
-                <MaterialIcons size={20} color={COLORS.BLUE.MARINER} name={MATERIAL_ICONS.report} />
+                <MaterialIcons size={20} color={COLORS.PRIMARY_COLOR} name={MATERIAL_ICONS.report} />
                 <MenuText>
                   Report Post
                 </MenuText>

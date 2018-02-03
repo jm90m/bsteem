@@ -37,7 +37,7 @@ const Label = styled.Text`
 
 const Value = styled.Text`
   margin-left: auto;
-  color: ${COLORS.BLUE.MARINER};
+  color: ${COLORS.PRIMARY_COLOR};
   font-weight: bold;
 `;
 
@@ -51,7 +51,7 @@ const SteemImage = styled.Image`
 `;
 
 const TotalDelegatedSPText = styled.Text`
-  color: ${COLORS.BLUE.MARINER};
+  color: ${COLORS.PRIMARY_COLOR};
   font-weight: bold;
 `;
 

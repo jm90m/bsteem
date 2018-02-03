@@ -2,7 +2,7 @@ import { NetInfo } from 'react-native';
 import { takeLatest, call, put } from 'redux-saga/effects';
 import _ from 'lodash';
 import API from 'api/api';
-import { i18nInit } from 'i18n-settings/i18n';
+import { i18nInit } from 'i18n/i18n';
 import * as appActions from 'state/actions/appActions';
 
 import {

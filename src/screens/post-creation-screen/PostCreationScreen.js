@@ -1,21 +1,22 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Image, TouchableOpacity, Text, Dimensions } from 'react-native';
+import { Image, TouchableOpacity } from 'react-native';
 import _ from 'lodash';
 import uuidv4 from 'uuid/v4';
 import { connect } from 'react-redux';
 import styled from 'styled-components/native';
 import { ImagePicker } from 'expo';
 import * as navigationConstants from 'constants/navigation';
-import { FormLabel, FormInput, Button, FormValidationMessage } from 'react-native-elements';
+import i18n from 'i18n/i18n';
+import { FormLabel, FormInput, Icon } from 'react-native-elements';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS, MATERIAL_ICONS, MATERIAL_COMMUNITY_ICONS, ICON_SIZES } from 'constants/styles';
 import { getAuthUsername } from 'state/rootReducer';
 import { createPost, uploadImage } from 'state/actions/editorActions';
-import Tag from 'components/post/Tag';
 import Header from 'components/common/Header';
-
-const { width: deviceWidth } = Dimensions.get('screen');
+import TagsInput from 'components/editor/TagsInput';
+import SmallLoading from 'components/common/SmallLoading';
+import PrimaryButton from '/components/common/PrimaryButton';
 
 const Container = styled.View`
   flex: 1;
@@ -33,45 +34,40 @@ const EmptyView = styled.View`
   width: 5px;
 `;
 
-const StyledText = styled.Text`
-  padding: 0px 20px;
-`;
-
 const CreatePostText = styled.Text`
-  color: ${COLORS.BLUE.MARINER};
+  color: ${COLORS.PRIMARY_COLOR};
   font-weight: bold;
 `;
 
-const TagsContainer = styled.View`
+const ImageContainer = styled.View`
   flex-direction: row;
-  padding: 5px 20px;
+  margin-top: 10px;
+  padding: 0px 20px;
   flex-wrap: wrap;
 `;
 
-const ImageContainer = styled.View`
-  justify-content: center;
-  align-items: center;
-  margin-top: 10px;
-`;
-
-const TagOption = styled.View`
+const ImageOption = styled.View`
   flex-direction: row;
   padding: 5px 0;
+  margin-right: 10px;
 `;
 
-const ButtonContainer = styled.View`
-  margin: 10px 0;
+const ImagePickerTouchable = styled.TouchableOpacity`
+  width: 50px;
+  height: 50px;
+  justify-content: center;
+  background-color: ${COLORS.GREY.CHARCOAL};
+  border-radius: 25px;
+  align-items: center;
+  margin-right: 20px;
 `;
 
-const PostPreviewButton = () => (
-  <TouchableOpacity onPress={() => {}}>
-    <MaterialCommunityIcons
-      name={MATERIAL_COMMUNITY_ICONS.magnify}
-      size={ICON_SIZES.tabBarIcon}
-      color={COLORS.WHITE.WHITE}
-    />
-  </TouchableOpacity>
-);
+const ActionButtonsContainer = styled.View`
+  flex-direction: row;
+  flex-wrap: wrap;
+  margin-top; 10px;
+  justify-content: space-between;
+`;
 
 const mapStateToProps = state => ({
   authUsername: getAuthUsername(state),
@@ -102,7 +98,7 @@ class PostCreationScreen extends Component {
     tags: [],
     currentImages: [],
     menuVisibile: false,
-    tagError: false,
+    tagError: '',
   };
 
   constructor(props) {
@@ -131,7 +127,10 @@ class PostCreationScreen extends Component {
       return;
     }
 
-    if (_.size(this.state.tags) >= 5) return;
+    if (_.size(this.state.tags) >= 5) {
+      this.setState({ tagsInput: value, tagError: 'Can only add up to 5 tags.' });
+      return;
+    }
 
     if (_.includes(value, ' ') || _.includes(value, ',')) {
       const newTag = _.replace(_.replace(value, ' ', ''), ',', '');
@@ -164,6 +163,7 @@ class PostCreationScreen extends Component {
     console.log('IMAGE PICKER', result);
 
     if (!result.cancelled) {
+      this.setState({ imageLoading: true });
       this.props.uploadImage(
         result.uri,
         (url, name) => {
@@ -174,7 +174,6 @@ class PostCreationScreen extends Component {
           console.log('ERROR');
         },
       );
-      this.setState({ image: result.uri });
     }
   }
 
@@ -186,6 +185,7 @@ class PostCreationScreen extends Component {
     };
     this.setState({
       currentImages: _.concat(this.state.currentImages, newImage),
+      imageLoading: false,
     });
   };
 
@@ -249,6 +249,20 @@ class PostCreationScreen extends Component {
 
     this.setState({
       tags: newTags,
+      tagsInput: '',
+    });
+  }
+
+  removeImage(image) {
+    const { currentImages } = this.state;
+    const newImages = [...currentImages];
+    const index = newImages.indexOf(image);
+
+    if (index > -1) {
+      newImages.splice(index, 1);
+    }
+    this.setState({
+      currentImages: newImages,
     });
   }
 
@@ -273,22 +287,21 @@ class PostCreationScreen extends Component {
     this.props.createPost(postData, this.handleCreatePostSuccess);
   }
 
-  renderTagErrors() {
-    const { tagError } = this.state;
-    const emptyErrorMessage = 'Please enter tags';
-
-    if (tagError) {
-      return <FormValidationMessage>{emptyErrorMessage}</FormValidationMessage>;
-    }
-  }
-
   render() {
-    const { titleInput, tagsInput, tags, bodyInput } = this.state;
+    const {
+      titleInput,
+      tagsInput,
+      tags,
+      bodyInput,
+      tagError,
+      currentImages,
+      imageLoading,
+    } = this.state;
     return (
       <Container>
         <Header>
           <EmptyView />
-          <CreatePostText>Create Post</CreatePostText>
+          <CreatePostText>{i18n.titles.createPost}</CreatePostText>
           <TouchableMenu onPress={this.toggleMenu}>
             <TouchableMenuContainer>
               <MaterialCommunityIcons
@@ -299,75 +312,57 @@ class PostCreationScreen extends Component {
           </TouchableMenu>
         </Header>
         <StyledScrollView>
-          <FormLabel>Title</FormLabel>
+          <FormLabel>{i18n.editor.title}</FormLabel>
           <FormInput
             onChangeText={this.onChangeTitle}
-            placeholder="Enter title"
+            placeholder={i18n.editor.titlePlaceholder}
             value={titleInput}
           />
-          <FormLabel>Post Tags</FormLabel>
-          <StyledText>
-            Separate topics with commas or spaces. Only lowercase letters, numbers and hyphen
-            character is permitted.
-          </StyledText>
-          {this.renderTagErrors()}
-          <FormInput
-            onChangeText={this.onChangeTags}
-            placeholder="Please enter tags"
-            value={tagsInput}
-            autoCapitalize="none"
+          <TagsInput
+            tags={tags}
+            tagsInput={tagsInput}
+            onChangeTags={this.onChangeTags}
+            removeTag={this.removeTag}
+            tagError={tagError}
           />
-          <TagsContainer>
-            {_.map(tags, tag => (
-              <TagOption key={tag}>
-                <Tag tag={tag} />
-                <TouchableOpacity onPress={() => this.removeTag(tag)}>
-                  <MaterialIcons name="close" size={24} />
-                </TouchableOpacity>
-              </TagOption>
-            ))}
-          </TagsContainer>
-          <FormLabel>Post Body</FormLabel>
+          <FormLabel>{i18n.editor.body}</FormLabel>
           <FormInput
             onChangeText={this.onChangeBody}
-            placeholder="Write your story..."
+            placeholder={i18n.editor.bodyPlaceholder}
             multiline
             value={bodyInput}
           />
           <ImageContainer>
-            {_.map(this.state.currentImages, (image, index) => (
-              <Image
-                key={`${image.src}/${index}`}
-                source={{ uri: image.src }}
-                style={{ width: deviceWidth, height: deviceWidth }}
-                resizeMode={Image.resizeMode.contain}
-              />
+            {_.map(currentImages, (image, index) => (
+              <ImageOption key={`${image.src}/${index}`}>
+                <Image
+                  source={{ uri: image.src }}
+                  style={{ width: 100, height: 100, borderRadius: 4, marginRight: 3 }}
+                  resizeMode={Image.resizeMode.contain}
+                />
+                <TouchableOpacity onPress={() => this.removeImage(image.src)}>
+                  <MaterialIcons name={MATERIAL_ICONS.close} size={ICON_SIZES.actionIcon} />
+                </TouchableOpacity>
+              </ImageOption>
             ))}
+            {imageLoading && <SmallLoading />}
           </ImageContainer>
-          <ButtonContainer>
-            <Button
-              raised
-              onPress={() => {}}
-              icon={{ name: 'add-a-photo' }}
-              title="Add Text"
-              backgroundColor={COLORS.GREY.NERO}
-              borderRadius={10}
+          <ActionButtonsContainer>
+            <PrimaryButton
+              onPress={this.handleSubmit}
+              title="Create Post"
+              backgroundColor={COLORS.PRIMARY_COLOR}
+              rounded
             />
-            <Button
-              onPress={this.pickImage}
-              icon={{ name: 'add-a-photo' }}
-              title="Add Images"
-              backgroundColor={COLORS.GREY.NERO}
-              borderRadius={10}
-            />
-          </ButtonContainer>
-          <Button
-            raised
-            onPress={this.handleSubmit}
-            title="Create Post"
-            backgroundColor={COLORS.BLUE.MARINER}
-            borderRadius={10}
-          />
+            <ImagePickerTouchable onPress={this.pickImage}>
+              <Icon
+                name="add-a-photo"
+                backgroundColor={COLORS.GREY.NERO}
+                size={ICON_SIZES.actionIcon}
+                color={COLORS.WHITE.WHITE}
+              />
+            </ImagePickerTouchable>
+          </ActionButtonsContainer>
         </StyledScrollView>
       </Container>
     );
