@@ -5,7 +5,7 @@ const INITIAL_STATE = {
   commentsByPostId: {},
   comments: {},
   pendingVotes: [],
-  isLoading: false,
+  loading: false,
 };
 
 const mapCommentsBasedOnId = commentData =>
@@ -36,15 +36,12 @@ export default (state = INITIAL_STATE, action) => {
     case FETCH_COMMENTS.PENDING:
       return {
         ...state,
-        isLoading: true,
+        loading: true,
       };
     case FETCH_COMMENTS.SUCCESS: {
       const { content, postId } = action.payload;
-      console.log('CONTENT FROM COMMENTS REQUEST', content);
       const comments = mapCommentsBasedOnId(content);
       const childrenById = getCommentsChildrenLists(content);
-      console.log('COMMENTS', comments);
-      console.log('CHILDREN_BY_ID', childrenById);
       return {
         ...state,
         commentsByPostId: {
@@ -55,13 +52,14 @@ export default (state = INITIAL_STATE, action) => {
             pendingVotes: [],
           },
         },
-        isLoading: false,
+        loading: false,
       };
     }
     case FETCH_COMMENTS.ERROR:
+    case FETCH_COMMENTS.LOADING_END:
       return {
         ...state,
-        isLoading: false,
+        loading: false,
       };
     default:
       return state;
@@ -69,3 +67,4 @@ export default (state = INITIAL_STATE, action) => {
 };
 
 export const getCommentsByPostId = state => state.commentsByPostId;
+export const getLoadingComments = state => state.loading;

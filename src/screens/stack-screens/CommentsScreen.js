@@ -2,13 +2,15 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components/native';
 import { connect } from 'react-redux';
+import { View } from 'react-native';
 import _ from 'lodash';
 import { MaterialIcons } from '@expo/vector-icons';
 import { fetchComments } from 'state/actions/postActions';
 import CommentsContainer from 'components/post/comments/CommentsContainer';
 import { ICON_SIZES, MATERIAL_ICONS, COLORS } from 'constants/styles';
-import { getCommentsByPostId } from 'state/rootReducer';
+import { getCommentsByPostId, getLoadingComments } from 'state/rootReducer';
 import Header from 'components/common/Header';
+import LargeLoadingCenter from 'components/common/LargeLoadingCenter';
 
 const Container = styled.View``;
 
@@ -23,8 +25,13 @@ const EmptyView = styled.View`
   padding: 10px 20px;
 `;
 
+const LoadingContainer = styled.View`
+  margin-top: 50px;
+`;
+
 const mapStateToProps = state => ({
   commentsByPostId: getCommentsByPostId(state),
+  loadingComments: getLoadingComments(state),
 });
 const mapDispatchToProps = dispatch => ({
   fetchComments: (category, author, permlink, postId) =>
@@ -37,11 +44,13 @@ class CommentScreen extends Component {
     navigation: PropTypes.shape(),
     fetchComments: PropTypes.func.isRequired,
     commentsByPostId: PropTypes.shape(),
+    loadingComments: PropTypes.bool,
   };
 
   static defaultProps = {
     navigation: {},
     commentsByPostId: {},
+    loadingComments: false,
   };
 
   static navigationOptions = {
@@ -70,6 +79,7 @@ class CommentScreen extends Component {
 
   render() {
     const { postId, postData } = this.props.navigation.state.params;
+    const { loadingComments } = this.props;
     return (
       <Container>
         <Header>
@@ -80,6 +90,11 @@ class CommentScreen extends Component {
           <EmptyView />
         </Header>
         <CommentsContainer postId={postId} postData={postData} />
+        {loadingComments && (
+          <LoadingContainer>
+            <LargeLoadingCenter />
+          </LoadingContainer>
+        )}
       </Container>
     );
   }

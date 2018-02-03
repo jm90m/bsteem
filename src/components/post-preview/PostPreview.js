@@ -332,7 +332,7 @@ class PostPreview extends Component {
             displaySelectionButtons
             displayActionButton
             startOnGrid={false}
-            enableGrid
+            enableGrid={false}
             useCircleProgress
             onSelectionChanged={() => {}}
             onActionButton={() => {}}

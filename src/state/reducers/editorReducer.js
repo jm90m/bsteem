@@ -12,12 +12,8 @@ export default function(state = INITIAL_STATE, action) {
         loading: true,
       };
     case CREATE_POST.SUCCESS:
-      console.log(action.payload);
-      return {
-        ...state,
-        loading: false,
-      };
     case CREATE_POST.ERROR:
+    case CREATE_POST.LOADING_END:
       return {
         ...state,
         loading: false,
@@ -26,3 +22,5 @@ export default function(state = INITIAL_STATE, action) {
       return state;
   }
 }
+
+export const getCreatePostLoading = state => state.loading;

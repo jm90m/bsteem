@@ -9,8 +9,8 @@ import {
   currentUserFollowListFetch,
 } from 'state/actions/currentUserActions';
 import { fetchUserFollowCount } from 'state/actions/usersActions';
-import { Button } from 'react-native-elements';
-import { COLORS } from 'constants/styles';
+import PrimaryButton from './PrimaryButton';
+import DangerButton from './DangerButton';
 
 const mapStateToProps = state => ({
   authUsername: getAuthUsername(state),
@@ -18,10 +18,12 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  currentUserFollowUser: (username, followSuccessCallback) =>
-    dispatch(currentUserFollowUser.action({ username, followSuccessCallback })),
-  currentUserUnfollowUser: (username, unfollowSuccessCallback) =>
-    dispatch(currentUserUnfollowUser.action({ username, unfollowSuccessCallback })),
+  currentUserFollowUser: (username, followSuccessCallback, followFailCallback) =>
+    dispatch(currentUserFollowUser.action({ username, followSuccessCallback, followFailCallback })),
+  currentUserUnfollowUser: (username, unfollowSuccessCallback, unfollowFailCallback) =>
+    dispatch(
+      currentUserUnfollowUser.action({ username, unfollowSuccessCallback, unfollowFailCallback }),
+    ),
   fetchCurrentUserFollowList: () => dispatch(currentUserFollowListFetch.action()),
   fetchUserFollowCount: username => dispatch(fetchUserFollowCount.action({ username })),
 });
@@ -51,6 +53,8 @@ class FollowButton extends Component {
     this.loadingFollowing = this.loadingFollowing.bind(this);
     this.successFollow = this.successFollow.bind(this);
     this.successUnfollow = this.successUnfollow.bind(this);
+    this.failFollow = this.failFollow.bind(this);
+    this.failUnfollow = this.failUnfollow.bind(this);
     this.handleFollow = this.handleFollow.bind(this);
     this.handleUnfollow = this.handleUnfollow.bind(this);
   }
@@ -90,36 +94,38 @@ class FollowButton extends Component {
     this.props.fetchUserFollowCount(authUsername);
   }
 
+  failFollow() {
+    this.setState({
+      loadingIsFollowing: false,
+    });
+  }
+
+  failUnfollow() {
+    this.setState({
+      loadingIsFollowing: false,
+    });
+  }
+
   handleFollow() {
     this.loadingFollowing();
     const { username } = this.props;
-    this.props.currentUserFollowUser(username, this.successFollow);
+    this.props.currentUserFollowUser(username, this.successFollow, this.failFollow);
   }
 
   handleUnfollow() {
     this.loadingFollowing();
     const { username } = this.props;
-    this.props.currentUserUnfollowUser(username, this.successUnfollow);
+    this.props.currentUserUnfollowUser(username, this.successUnfollow, this.failUnfollow);
   }
 
   render() {
     const { loadingIsFollowing, isFollowing } = this.state;
 
-    return isFollowing
-      ? <Button
-          title="Unfollow"
-          onPress={this.handleUnfollow}
-          borderRadius={10}
-          backgroundColor={COLORS.RED.VALENCIA}
-          loading={loadingIsFollowing}
-        />
-      : <Button
-          title="Follow"
-          onPress={this.handleFollow}
-          borderRadius={10}
-          backgroundColor={COLORS.PRIMARY_COLOR}
-          loading={loadingIsFollowing}
-        />;
+    return isFollowing ? (
+      <DangerButton title="Unfollow" onPress={this.handleUnfollow} loading={loadingIsFollowing} />
+    ) : (
+      <PrimaryButton title="Follow" onPress={this.handleFollow} loading={loadingIsFollowing} />
+    );
   }
 }
 

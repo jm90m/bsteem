@@ -11,12 +11,13 @@ import i18n from 'i18n/i18n';
 import { FormLabel, FormInput, Icon } from 'react-native-elements';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS, MATERIAL_ICONS, MATERIAL_COMMUNITY_ICONS, ICON_SIZES } from 'constants/styles';
-import { getAuthUsername } from 'state/rootReducer';
+import { getAuthUsername, getCreatePostLoading } from 'state/rootReducer';
 import { createPost, uploadImage } from 'state/actions/editorActions';
+import defaultPostData from 'constants/defaultPostData';
 import Header from 'components/common/Header';
 import TagsInput from 'components/editor/TagsInput';
 import SmallLoading from 'components/common/SmallLoading';
-import PrimaryButton from '/components/common/PrimaryButton';
+import PrimaryButton from 'components/common/PrimaryButton';
 
 const Container = styled.View`
   flex: 1;
@@ -71,6 +72,7 @@ const ActionButtonsContainer = styled.View`
 
 const mapStateToProps = state => ({
   authUsername: getAuthUsername(state),
+  createPostLoading: getCreatePostLoading(state),
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -253,14 +255,10 @@ class PostCreationScreen extends Component {
     });
   }
 
-  removeImage(image) {
+  removeImage(imageSrc) {
     const { currentImages } = this.state;
-    const newImages = [...currentImages];
-    const index = newImages.indexOf(image);
+    const newImages = _.remove([...currentImages], { src: imageSrc });
 
-    if (index > -1) {
-      newImages.splice(index, 1);
-    }
     this.setState({
       currentImages: newImages,
     });
@@ -268,6 +266,10 @@ class PostCreationScreen extends Component {
 
   handleCreatePostSuccess(postData) {
     const { title, category, author, json_metadata, body, permlink, id } = postData;
+    const postDataWithDefaults = {
+      ...defaultPostData,
+      ...postData,
+    };
     const parsedJsonMetadata = _.attempt(JSON.parse, json_metadata);
     this.setState(PostCreationScreen.INITIAL_STATE);
     this.props.navigation.navigate(navigationConstants.POST, {
@@ -278,7 +280,7 @@ class PostCreationScreen extends Component {
       parsedJsonMetadata: _.isError(parsedJsonMetadata) ? {} : parsedJsonMetadata,
       category,
       postId: id,
-      postData,
+      postData: postDataWithDefaults,
     });
   }
 
@@ -288,6 +290,7 @@ class PostCreationScreen extends Component {
   }
 
   render() {
+    const { createPostLoading } = this.props;
     const {
       titleInput,
       tagsInput,
@@ -351,8 +354,9 @@ class PostCreationScreen extends Component {
             <PrimaryButton
               onPress={this.handleSubmit}
               title="Create Post"
-              backgroundColor={COLORS.PRIMARY_COLOR}
               rounded
+              disabled={createPostLoading}
+              loading={createPostLoading}
             />
             <ImagePickerTouchable onPress={this.pickImage}>
               <Icon

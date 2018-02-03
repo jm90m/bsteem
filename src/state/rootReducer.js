@@ -83,3 +83,7 @@ export const getHasNetworkConnection = state => fromApp.getHasNetworkConnection(
 
 // Comments Selectors
 export const getCommentsByPostId = state => fromComments.getCommentsByPostId(state.comments);
+export const getLoadingComments = state => fromComments.getLoadingComments(state.comments);
+
+// Editor Selectors
+export const getCreatePostLoading = state => fromEditor.getCreatePostLoading(state.editor);

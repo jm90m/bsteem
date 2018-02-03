@@ -17,6 +17,8 @@ const fetchComments = function*(action) {
     }
   } catch (error) {
     yield put(fetchCommentsFail(error));
+  } finally {
+    yield put({ type: FETCH_COMMENTS.LOADING_END });
   }
 };
 

@@ -8,30 +8,32 @@ const Container = styled.View`
   flex-direction: row;
   width: 100%;
   flex-wrap: wrap;
-  justify-content: space-between;
   padding: 10px 0;
 `;
 
-const TagContainer = styled.View`
-  padding: 5px 0;
+const TagTouchable = styled.TouchableOpacity`
+  margin-bottom: 10px;
+  margin-right: 10px;
 `;
 
-const FooterTags = ({ tags }) => (
+const FooterTags = ({ tags, handleFeedNavigation }) => (
   <Container>
     {_.map(tags, tag => (
-      <TagContainer key={tag}>
+      <TagTouchable key={tag} onPress={() => handleFeedNavigation(tag)}>
         <Tag tag={tag} />
-      </TagContainer>
+      </TagTouchable>
     ))}
   </Container>
 );
 
 FooterTags.propTypes = {
   tags: PropTypes.arrayOf(PropTypes.string),
+  handleFeedNavigation: PropTypes.func,
 };
 
 FooterTags.defaultProps = {
   tags: [],
+  handleFeedNavigation: () => {},
 };
 
 export default FooterTags;

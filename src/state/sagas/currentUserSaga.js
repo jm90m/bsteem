@@ -122,6 +122,8 @@ const followUser = function*(action) {
     console.log('FOLLOW SUCCESS', result, payload);
     yield put(currentUserActions.currentUserFollowUser.success(payload));
   } catch (error) {
+    const { followFailCallback } = action.payload;
+    followFailCallback();
     console.log('FOLLOW FAIL', error);
     yield put(currentUserActions.currentUserFollowUser.fail(error));
   }
@@ -140,6 +142,8 @@ const unfollowUser = function*(action) {
     yield put(currentUserActions.currentUserUnfollowUser.success(payload));
   } catch (error) {
     console.log('UNFOLLOW FAIL', error);
+    const { unfollowFailCallback } = action.payload;
+    unfollowFailCallback();
     yield put(currentUserActions.currentUserUnfollowUser.fail(error));
   }
 };

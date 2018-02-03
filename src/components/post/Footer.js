@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import _ from 'lodash';
 import styled from 'styled-components/native';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS } from 'constants/styles';
+import { COLORS, MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
 import { sortVotes } from 'util/sortUtils';
 import { getUpvotes, isPostVoted } from 'util/voteUtils';
 import { calculatePayout } from 'util/steemitUtils';
@@ -113,6 +113,7 @@ class Footer extends Component {
     };
 
     this.hideReblogModal = this.hideReblogModal.bind(this);
+    this.handleNavigateToComments = this.handleNavigateToComments.bind(this);
     this.handleReblogConfirm = this.handleReblogConfirm.bind(this);
     this.handleOnPressVote = this.handleOnPressVote.bind(this);
     this.loadingVote = this.loadingVote.bind(this);
@@ -180,6 +181,18 @@ class Footer extends Component {
       this.loadingReblogEnd,
       this.loadingReblogEnd,
     );
+  }
+
+  handleNavigateToComments() {
+    const { postData } = this.props;
+    const { category, author, permlink, id } = postData;
+    this.props.navigation.navigate(navigationConstants.COMMENTS, {
+      author,
+      category,
+      permlink,
+      postId: id,
+      postData,
+    });
   }
 
   handleOnPressVote() {
@@ -281,11 +294,13 @@ class Footer extends Component {
       <Container>
         {this.renderVoteButton()}
         <FooterValue>{upVotes.length}</FooterValue>
-        <MaterialCommunityIcons
-          name="comment-processing"
-          size={24}
-          color={COLORS.BLUE.LINK_WATER}
-        />
+        <TouchableOpacity onPress={this.handleNavigateToComments}>
+          <MaterialCommunityIcons
+            name={MATERIAL_COMMUNITY_ICONS.comment}
+            size={24}
+            color={COLORS.BLUE.LINK_WATER}
+          />
+        </TouchableOpacity>
         <FooterValue>{children}</FooterValue>
         {this.renderReblogLink()}
         <Payout>${formattedDisplayedPayout}</Payout>

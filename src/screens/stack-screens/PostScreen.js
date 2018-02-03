@@ -109,6 +109,7 @@ class PostScreen extends Component {
     this.handleLikePost = this.handleLikePost.bind(this);
     this.handlePostLinkPress = this.handlePostLinkPress.bind(this);
     this.handleImagePress = this.handleImagePress.bind(this);
+    this.handleFeedNavigation = this.handleFeedNavigation.bind(this);
   }
 
   setModalVisible(visible) {
@@ -150,6 +151,10 @@ class PostScreen extends Component {
       postId,
       postData,
     });
+  }
+
+  handleFeedNavigation(tag) {
+    this.props.navigation.navigate(navigationConstants.FEED, { tag });
   }
 
   handlePostLinkPress(url) {
@@ -226,8 +231,7 @@ class PostScreen extends Component {
             displayNavArrows
             displaySelectionButtons
             displayActionButton
-            startOnGrid={false}
-            enableGrid
+            enableGrid={false}
             useCircleProgress
             onSelectionChanged={() => {}}
             onActionButton={() => {}}
@@ -242,7 +246,7 @@ class PostScreen extends Component {
             addLineBreaks={false}
             handleImagePress={this.handleImagePress}
           />
-          <FooterTags tags={tags} />
+          <FooterTags tags={tags} handleFeedNavigation={this.handleFeedNavigation} />
           <Footer postData={postData} navigation={this.props.navigation} />
         </ScrollView>
       </Container>
