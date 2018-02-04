@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import _ from 'lodash';
 import { connect } from 'react-redux';
 import styled from 'styled-components/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -54,7 +55,7 @@ class SaveTagButton extends Component {
     const isSaved = _.includes(savedTags, tag);
 
     return isSaved ? (
-      <Touchable>
+      <Touchable onPress={this.handleUnsaveTag}>
         <MaterialCommunityIcons
           name={MATERIAL_COMMUNITY_ICONS.savedTag}
           size={ICON_SIZES.menuIcon}

@@ -42,6 +42,7 @@ const saveTag = function*(action) {
     const { tag } = action.payload;
     const authUsername = yield select(getAuthUsername);
     yield call(setFirebaseData, getSaveTagRef(authUsername, tag), true);
+    yield call(fetchSavedTags);
     yield put(firebaseActions.saveTag.success(tag));
   } catch (error) {
     console.log(error);
@@ -59,6 +60,7 @@ const unsaveTag = function*(action) {
     const authUsername = yield select(getAuthUsername);
     yield call(setFirebaseData, getSaveTagRef(authUsername, tag), null);
     yield put(firebaseActions.unsaveTag.success(tag));
+    yield call(fetchSavedTags);
   } catch (error) {
     console.log(error);
     const { tag } = action.payload;

@@ -15,7 +15,7 @@ export default (state = INITIAL_STATE, action) => {
         loadingSavedTags: true,
       };
     case FETCH_SAVED_TAGS.SUCCESS: {
-      const savedTags = _.map(action.payload, tag => tag);
+      const savedTags = _.map(action.payload, (val, tag) => tag);
       console.log(action.payload, savedTags);
       return {
         ...state,

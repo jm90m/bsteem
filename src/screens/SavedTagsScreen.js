@@ -9,8 +9,10 @@ import Tag from 'components/post/Tag';
 import { MaterialIcons } from '@expo/vector-icons';
 import i18n from 'i18n/i18n';
 import { fetchSavedTags } from 'state/actions/firebaseActions';
-import { COLORS, MATERIAL_ICONS } from '../constants/styles';
-import { getLoadingSavedTags, getPendingSavingTags, getSavedTags } from '../state/rootReducer';
+import { COLORS, MATERIAL_ICONS, ICON_SIZES } from '../constants/styles';
+import { getLoadingSavedTags, getSavedTags } from '../state/rootReducer';
+import SaveTagButton from '../components/common/SaveTagButton';
+import * as navigationConstants from 'constants/navigation';
 
 const BackTouchable = styled.TouchableOpacity`
   justify-content: center;
@@ -20,9 +22,24 @@ const BackTouchable = styled.TouchableOpacity`
 const Container = styled.View``;
 
 const Title = styled.Text`
-  align-self: center;
+  margin-left: 5px;
   color: ${COLORS.PRIMARY_COLOR};
 `;
+
+const TitleContainer = styled.View`
+  flex-direction: row;
+  align-items: center;
+`;
+
+const TagOption = styled.View`
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 10px;
+  margin: 5px 0;
+  background-color: ${COLORS.PRIMARY_BACKGROUND_COLOR};
+`;
+
+const TagTouchble = styled.TouchableOpacity``;
 
 @connect(
   state => ({
@@ -41,11 +58,29 @@ class SavedTagsScreen extends Component {
 
   constructor(props) {
     super(props);
+
+    this.state = {
+      currentSavedTags: props.savedTags,
+    };
+
     this.navigateBack = this.navigateBack.bind(this);
+    this.handleNavigateTag = this.handleNavigateTag.bind(this);
   }
 
   componentDidMount() {
     this.props.fetchSavedTags();
+  }
+
+  componentWillReceiveProps(nextProps) {
+    this.setState({
+      currentSavedTags: _.union(this.state.currentSavedTags, nextProps.savedTags),
+    });
+  }
+
+  handleNavigateTag(tag) {
+    this.props.navigation.navigate(navigationConstants.FEED, {
+      tag,
+    });
   }
 
   navigateBack() {
@@ -57,12 +92,26 @@ class SavedTagsScreen extends Component {
       <Container>
         <Header>
           <BackTouchable onPress={this.navigateBack}>
-            <MaterialIcons size={24} name={MATERIAL_ICONS.back} />
+            <MaterialIcons size={ICON_SIZES.menuIcon} name={MATERIAL_ICONS.back} />
           </BackTouchable>
-          <Title>{i18n.titles.savedTags}</Title>
+          <TitleContainer>
+            <MaterialIcons
+              size={ICON_SIZES.menuIcon}
+              name={MATERIAL_ICONS.star}
+              color={COLORS.PRIMARY_COLOR}
+            />
+            <Title>{i18n.titles.savedTags}</Title>
+          </TitleContainer>
           <HeaderEmptyView />
         </Header>
-        {_.map(this.props.savedTags, tag => <Tag tag={tag} />)}
+        {_.map(this.state.currentSavedTags, tag => (
+          <TagOption key={tag}>
+            <TagTouchble onPress={() => this.handleNavigateTag(tag)}>
+              <Tag tag={tag} />
+            </TagTouchble>
+            <SaveTagButton tag={tag} />
+          </TagOption>
+        ))}
       </Container>
     );
   }
