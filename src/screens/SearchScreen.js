@@ -5,12 +5,13 @@ import _ from 'lodash';
 import { MaterialIcons } from '@expo/vector-icons';
 import { SearchBar } from 'react-native-elements';
 import { connect } from 'react-redux';
+import firebase from 'firebase';
 import * as navigationConstants from 'constants/navigation';
 import styled from 'styled-components/native';
 import { fetchTags } from 'state/actions/homeActions';
 import { searchAskSteem } from 'state/actions/searchActions';
 import { COLORS, MATERIAL_ICONS } from 'constants/styles';
-import { getSearchResults, getSearchLoading } from 'state/rootReducer';
+import { getSearchResults, getSearchLoading, getIsAuthenticated } from 'state/rootReducer';
 import SearchPostPreview from 'components/search/SearchPostPreview';
 import SearchUserPreview from 'components/search/SearchUserPreview';
 import SearchDefaultView from 'components/search/SearchDefaultView';
@@ -35,6 +36,7 @@ const Loading = styled.ActivityIndicator`
 `;
 
 const mapStateToProps = state => ({
+  authenticated: getIsAuthenticated(state),
   tags: state.home.tags,
   searchResults: getSearchResults(state),
   searchLoading: getSearchLoading(state),
@@ -53,6 +55,7 @@ class SearchScreen extends Component {
     fetchTags: PropTypes.func.isRequired,
     searchAskSteem: PropTypes.func.isRequired,
     searchLoading: PropTypes.bool.isRequired,
+    authenticated: PropTypes.bool,
     searchResults: PropTypes.arrayOf(PropTypes.shape()),
     tags: PropTypes.arrayOf(PropTypes.shape()),
   };
@@ -160,6 +163,7 @@ class SearchScreen extends Component {
     const { searchLoading, searchResults } = this.props;
     const { currentSearchValue } = this.state;
     const hasSearchResults = !_.isEmpty(searchResults) && !_.isEmpty(currentSearchValue);
+
     return (
       <Container>
         <SearchBar

@@ -2,6 +2,7 @@ export default {
   titles: {
     post: 'Post',
     createPost: 'Create Post',
+    savedTags: 'Saved Tags',
   },
   editor: {
     title: 'Title',
@@ -11,6 +12,5 @@ export default {
     tags: 'Tags',
     tagsDescription:
       'Separate topics with commas or spaces. Only lowercase letters, numbers and hyphen character is permitted',
-
   },
 };

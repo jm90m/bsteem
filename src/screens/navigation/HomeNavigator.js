@@ -12,6 +12,7 @@ import FollowersScreen from 'screens/stack-screens/FollowersScreen';
 import FollowingScreen from 'screens/stack-screens/FollowingScreen';
 import UserActivityScreen from 'screens/stack-screens/UserActivityScreen';
 import UserWalletScreen from 'screens/stack-screens/UserWalletScreen';
+import SavedTagsScreen from '../SavedTagsScreen';
 
 const screenNavigationOptions = {
   tabBarIcon: ({ tintColor }) => (
@@ -55,6 +56,10 @@ const HomeNavigator = StackNavigator(
     },
     [navigationConstants.USER_WALLET]: {
       screen: UserWalletScreen,
+      navigationOptions: screenNavigationOptions,
+    },
+    [navigationConstants.SAVED_TAGS]: {
+      screen: SavedTagsScreen,
       navigationOptions: screenNavigationOptions,
     },
   },

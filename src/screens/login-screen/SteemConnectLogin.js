@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import _ from 'lodash';
 import { AsyncStorage } from 'react-native';
 import Expo, { AuthSession } from 'expo';
 import { connect } from 'react-redux';
@@ -25,6 +26,10 @@ const Container = styled.View`
   background-color: ${COLORS.WHITE.WHITE};
   align-items: center;
   justify-content: center;
+`;
+
+const DebugText = styled.Text`
+  padding: 20px;
 `;
 
 @connect(null, mapDispatchToProps)
@@ -82,6 +87,10 @@ class SteemConnectLogin extends Component {
           borderRadius={10}
           backgroundColor={COLORS.PRIMARY_COLOR}
         />
+        <DebugText>
+          {`LinkingURI: ${Expo.Constants.linkingUri}/redirect`}
+          {`RedirectURI: ${AuthSession.getRedirectUrl()}`}
+        </DebugText>
       </Container>
     );
   }

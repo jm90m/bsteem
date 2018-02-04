@@ -74,3 +74,8 @@ export const SET_TRANSLATIONS = createAsyncActionType('@app/set-translations');
 // Editor Actions
 export const CREATE_POST = createAsyncActionType('@editor/create-post');
 export const UPLOAD_IMAGE = createAsyncActionType('@editor/upload-image');
+
+// Firebase Actions
+export const FETCH_SAVED_TAGS = createAsyncActionType('@firebase/fetch-saved-tags');
+export const SAVE_TAG = createAsyncActionType('@firebase/save-tag');
+export const UNSAVE_TAG = createAsyncActionType('@firebase/unsave-tag');

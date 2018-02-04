@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components/native';
 import { connect } from 'react-redux';
-import { View } from 'react-native';
 import _ from 'lodash';
 import { MaterialIcons } from '@expo/vector-icons';
 import { fetchComments } from 'state/actions/postActions';
@@ -11,6 +10,7 @@ import { ICON_SIZES, MATERIAL_ICONS, COLORS } from 'constants/styles';
 import { getCommentsByPostId, getLoadingComments } from 'state/rootReducer';
 import Header from 'components/common/Header';
 import LargeLoadingCenter from 'components/common/LargeLoadingCenter';
+import HeaderEmptyView from 'components/common/HeaderEmptyView';
 
 const Container = styled.View``;
 
@@ -20,10 +20,6 @@ const BackTouchable = styled.TouchableOpacity`
 `;
 
 const Title = styled.Text``;
-
-const EmptyView = styled.View`
-  padding: 10px 20px;
-`;
 
 const LoadingContainer = styled.View`
   margin-top: 50px;
@@ -87,7 +83,7 @@ class CommentScreen extends Component {
             <MaterialIcons size={ICON_SIZES.menuIcon} name={MATERIAL_ICONS.back} />
           </BackTouchable>
           <Title>{'Comments'}</Title>
-          <EmptyView />
+          <HeaderEmptyView />
         </Header>
         <CommentsContainer postId={postId} postData={postData} />
         {loadingComments && (

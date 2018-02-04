@@ -7,6 +7,7 @@ import * as currentUserSaga from './sagas/currentUserSaga';
 import * as userActivitySaga from './sagas/userActivitySaga';
 import * as appSaga from './sagas/appSaga';
 import * as editorSaga from './sagas/editorSaga';
+import * as firebaseSaga from './sagas/firebaseSaga';
 
 const rootSaga = function*() {
   yield all([
@@ -43,15 +44,20 @@ const rootSaga = function*() {
     spawn(userActivitySaga.watchFetchUserAccountHistory),
     spawn(userActivitySaga.watchFetchMoreUserAccountHistory),
 
-    // App Saga
+    // App Sagas
     spawn(appSaga.watchFetchSteemGlobalProperties),
     spawn(appSaga.watchFetchSteemRate),
     spawn(appSaga.watchFetchNetworkConnection),
     spawn(appSaga.watchSetTranslations),
 
-    // Editor Saga
+    // Editor Sagas
     spawn(editorSaga.watchCreatePost),
     spawn(editorSaga.watchUploadImage),
+
+    // Firebase Sagas
+    spawn(firebaseSaga.watchFetchSavedTags),
+    spawn(firebaseSaga.watchSaveTag),
+    spawn(firebaseSaga.watchUnsaveTag),
   ]);
 };
 

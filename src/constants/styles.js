@@ -42,11 +42,16 @@ const colorsMap = {
 const appColors = {
   PRIMARY_COLOR: colorsMap.BLUE.MARINER,
   BORDER_COLOR: colorsMap.WHITE.GAINSBORO,
+  PRIMARY_BACKGROUND_COLOR: colorsMap.WHITE.WHITE,
 };
 
 export const COLORS = {
   ...colorsMap,
   ...appColors,
+};
+
+export const APP_STYLES = {
+  PRIMARY_BORDER_WIDTH: 1,
 };
 
 export const FONT_SIZES = {
@@ -118,8 +123,12 @@ export const MATERIAL_COMMUNITY_ICONS = {
   voteOutline: 'thumb-up-outline',
   unvoteFill: 'thumb-down',
 
-  //wallet
+  // wallet
   claimReward: 'check-circle',
+
+  // tags
+  saveTag: 'star-outline',
+  savedTag: 'star',
 };
 
 export const FEATHER_ICONS = {

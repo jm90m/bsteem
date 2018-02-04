@@ -7,7 +7,8 @@ import { COLORS, MATERIAL_ICONS } from 'constants/styles';
 import FollowButton from 'components/common/FollowButton';
 import API from 'api/api';
 import * as navigationConstants from 'constants/navigation';
-import HeaderContainer from 'components/common/HeaderContainer';
+import Header from 'components/common/Header';
+import HeaderEmptyView from 'components/common/HeaderEmptyView';
 import { connect } from 'react-redux';
 import Avatar from 'components/common/Avatar';
 import LargeLoadingCenter from 'components/common/LargeLoadingCenter';
@@ -44,11 +45,7 @@ const UserText = styled.Text`
 
 const TitleText = styled.Text`
   font-weight: bold;
-  color: ${COLORS.PRIMARY_COLOR}
-`;
-
-const EmptyView = styled.View`
-  padding: 10px;
+  color: ${COLORS.PRIMARY_COLOR};
 `;
 
 const UserTouchable = styled.TouchableOpacity`
@@ -143,27 +140,29 @@ class FollowingScreen extends Component {
     const { username } = this.props.navigation.state.params;
     return (
       <Container>
-        <HeaderContainer>
+        <Header>
           <BackTouchable onPress={this.navigateBack}>
             <MaterialIcons size={24} name={MATERIAL_ICONS.back} />
           </BackTouchable>
           <TitleText>{`${username} following`}</TitleText>
-          <EmptyView />
-        </HeaderContainer>
-        {isLoading
-          ? <LargeLoadingCenter />
-          : <StyledListView
-              dataSource={ds.cloneWithRows(followers)}
-              renderRow={this.renderRow}
-              enableEmptySections
-              refreshControl={
-                <RefreshControl
-                  refreshing={isRefreshing}
-                  onRefresh={this.onRefreshCurrentFeed}
-                  colors={[COLORS.PRIMARY_COLOR]}
-                />
-              }
-            />}
+          <HeaderEmptyView />
+        </Header>
+        {isLoading ? (
+          <LargeLoadingCenter />
+        ) : (
+          <StyledListView
+            dataSource={ds.cloneWithRows(followers)}
+            renderRow={this.renderRow}
+            enableEmptySections
+            refreshControl={
+              <RefreshControl
+                refreshing={isRefreshing}
+                onRefresh={this.onRefreshCurrentFeed}
+                colors={[COLORS.PRIMARY_COLOR]}
+              />
+            }
+          />
+        )}
       </Container>
     );
   }

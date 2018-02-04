@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import firebase from 'firebase';
 import { TabNavigator } from 'react-navigation';
 import _ from 'lodash';
 import { connect } from 'react-redux';
@@ -95,6 +96,15 @@ class AppNavigation extends React.Component {
     this.props.fetchSteemGlobalProperties();
     this.props.fetchNetworkConnection();
     this.props.setTranslations('en_US');
+    const config = {
+      apiKey: 'AIzaSyBEzVCm5Q6ygDXxZcFGV6mHDyT1RvuMzYc',
+      authDomain: 'bsteem-85a85.firebaseapp.com',
+      databaseURL: 'https://bsteem-85a85.firebaseio.com',
+      projectId: 'bsteem-85a85',
+      storageBucket: '',
+      messagingSenderId: '591405749824',
+    };
+    firebase.initializeApp(config);
   }
 
   render() {

@@ -22,7 +22,8 @@ import {
   fetchUserAccountHistory,
 } from 'state/actions/userActivityActions';
 import { fetchUser } from 'state/actions/usersActions';
-import HeaderContainer from 'components/common/HeaderContainer';
+import Header from 'components/common/Header';
+import HeaderEmptyView from 'components/common/HeaderEmptyView';
 import WalletTransaction from 'components/wallet/WalletTransaction';
 import UserWalletSummary from 'components/wallet/UserWalletSummary';
 import LargeLoading from 'components/common/LargeLoading';
@@ -40,11 +41,7 @@ const BackTouchable = styled.TouchableOpacity`
 
 const TitleText = styled.Text`
   font-weight: bold;
-  color: ${COLORS.PRIMARY_COLOR}
-`;
-
-const EmptyView = styled.View`
-  padding: 10px;
+  color: ${COLORS.PRIMARY_COLOR};
 `;
 
 const mapStateToProps = state => ({
@@ -172,13 +169,13 @@ class UserWalletScreen extends Component {
 
     return (
       <Container>
-        <HeaderContainer>
+        <Header>
           <BackTouchable onPress={this.navigateBack}>
             <MaterialIcons size={24} name={MATERIAL_ICONS.back} />
           </BackTouchable>
           <TitleText>{`${username} wallet`}</TitleText>
-          <EmptyView />
-        </HeaderContainer>
+          <HeaderEmptyView />
+        </Header>
         <StyledListView
           dataSource={ds.cloneWithRows(userTransactionsDataSource)}
           renderRow={this.renderUserWalletRow}

@@ -11,6 +11,7 @@
     "events": "^1.1.1",
     "expo": "^23.0.0",
     "filesize": "^3.5.11",
+    "firebase": "^4.9.1",
     "htmlparser2-without-node-native": "^3.9.2",
     "isomorphic-fetch": "^2.2.1",
     "lodash": "^4.17.4",

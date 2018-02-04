@@ -5,6 +5,7 @@ import styled from 'styled-components/native';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS, ICON_SIZES, MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
 import Header from 'components/common/Header';
+import HeaderEmptyView from 'components/common/HeaderEmptyView';
 
 const CurrentMenuDisplay = styled.View`
   flex-direction: row;
@@ -27,10 +28,6 @@ const MenuIconContainer = styled.View`
   padding: 5px;
 `;
 
-const EmptyView = styled.View`
-  width: 5px;
-`;
-
 class CurrentUserHeader extends Component {
   static propTypes = {
     currentMenuOption: PropTypes.shape().isRequired,
@@ -42,7 +39,7 @@ class CurrentUserHeader extends Component {
     return (
       <TouchableContainer onPress={this.props.toggleCurrentUserMenu}>
         <Header>
-          <EmptyView />
+          <HeaderEmptyView />
           <CurrentMenuDisplay>
             <MaterialIcons
               size={ICON_SIZES.menuIcon}

@@ -9,6 +9,8 @@ import FeedScreen from 'screens/stack-screens/FeedScreen';
 import SearchPostScreen from 'components/search/SearchPostScreen';
 import UserActivityScreen from 'screens/stack-screens/UserActivityScreen';
 import UserWalletScreen from 'screens/stack-screens/UserWalletScreen';
+import FollowingScreen from 'screens/stack-screens/FollowingScreen';
+import FollowersScreen from 'screens/stack-screens/FollowersScreen';
 
 const screenNavigationOptions = {
   tabBarIcon: ({ tintColor }) => (
@@ -39,6 +41,14 @@ const SearchNavigator = StackNavigator(
     },
     [navigationConstants.USER_WALLET]: {
       screen: UserWalletScreen,
+      navigationOptions: screenNavigationOptions,
+    },
+    [navigationConstants.USER_FOLLOWERS]: {
+      screen: FollowersScreen,
+      navigationOptions: screenNavigationOptions,
+    },
+    [navigationConstants.USER_FOLLOWING]: {
+      screen: FollowingScreen,
       navigationOptions: screenNavigationOptions,
     },
   },

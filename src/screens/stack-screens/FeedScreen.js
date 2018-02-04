@@ -9,6 +9,7 @@ import Tag from 'components/post/Tag';
 import PostPreview from 'components/post-preview/PostPreview';
 import FeedSort from 'components/feed-sort/FeedSort';
 import Header from 'components/common/Header';
+import SaveTagButton from 'components/common/SaveTagButton';
 
 const Container = styled.View`
   flex: 1;
@@ -29,6 +30,10 @@ const TouchableMenu = styled.TouchableOpacity`
 
 const Loading = styled.ActivityIndicator`
   padding: 10px;
+`;
+
+const TagContainer = styled.View`
+  flex-direction: row;
 `;
 
 const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
@@ -132,7 +137,10 @@ class FeedScreen extends Component {
           <BackTouchable onPress={this.navigateBack}>
             <MaterialIcons size={24} name={MATERIAL_ICONS.back} />
           </BackTouchable>
-          <Tag tag={tag} />
+          <TagContainer>
+            <Tag tag={tag} />
+            <SaveTagButton tag={tag} />
+          </TagContainer>
           <TouchableMenu onPress={() => this.setMenuVisible(!menuVisible)}>
             <MaterialIcons size={24} name={currentFilter.icon} color={COLORS.PRIMARY_COLOR} />
             <MaterialCommunityIcons size={24} name={MATERIAL_COMMUNITY_ICONS.menuVertical} />

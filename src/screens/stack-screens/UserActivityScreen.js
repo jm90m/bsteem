@@ -16,7 +16,7 @@ import {
   fetchUserAccountHistory,
 } from 'state/actions/userActivityActions';
 import LargeLoading from 'components/common/LargeLoading';
-import HeaderContainer from 'components/common/HeaderContainer';
+import Header from 'components/common/Header';
 import UserAction from 'components/activity/UserAction';
 
 const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
@@ -32,7 +32,7 @@ const BackTouchable = styled.TouchableOpacity`
 
 const TitleText = styled.Text`
   font-weight: bold;
-  color: ${COLORS.PRIMARY_COLOR}
+  color: ${COLORS.PRIMARY_COLOR};
 `;
 
 const FilterTouchable = styled.TouchableOpacity`
@@ -113,7 +113,7 @@ class UserActivityScreen extends Component {
 
     return (
       <Container>
-        <HeaderContainer>
+        <Header>
           <BackTouchable onPress={this.navigateBack}>
             <MaterialIcons size={24} name={MATERIAL_ICONS.back} />
           </BackTouchable>
@@ -125,7 +125,7 @@ class UserActivityScreen extends Component {
               color={COLORS.PRIMARY_COLOR}
             />
           </FilterTouchable>
-        </HeaderContainer>
+        </Header>
         <StyledListView
           dataSource={ds.cloneWithRows(userAccountHistoryDataSource)}
           renderRow={this.renderUserActivityRow}

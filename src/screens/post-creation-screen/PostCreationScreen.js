@@ -179,6 +179,9 @@ class PostCreationScreen extends Component {
     }
   }
 
+  // TODO
+  handleSuccessImageUpload(url, name) {}
+
   insertImage = (image, imageName = 'image') => {
     const newImage = {
       src: image,

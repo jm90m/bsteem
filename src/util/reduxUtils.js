@@ -15,11 +15,13 @@ export const createAsyncSagaAction = actionType => ({
     type: actionType.SUCCESS,
     payload,
   }),
-  fail: error => ({
+  fail: (error, payload) => ({
     type: actionType.ERROR,
     error,
+    payload,
   }),
-  loadingEnd: () => ({
+  loadingEnd: payload => ({
     type: actionType.LOADING_END,
+    payload,
   }),
 });
