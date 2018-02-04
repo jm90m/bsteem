@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
-import { ListView, View, Modal, RefreshControl, Dimensions } from 'react-native';
+import { ListView, View, Modal, RefreshControl, TouchableOpacity } from 'react-native';
 import { connect } from 'react-redux';
 import styled from 'styled-components/native';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
@@ -12,12 +12,14 @@ import {
   getHasNetworkConnection,
 } from 'state/rootReducer';
 import { fetchDiscussions, fetchMoreDiscussions } from 'state/actions/homeActions';
-import { MATERIAL_COMMUNITY_ICONS, COLORS } from 'constants/styles';
+import { MATERIAL_COMMUNITY_ICONS, COLORS, ICON_SIZES } from 'constants/styles';
 import { TRENDING } from 'constants/feedFilters';
 import PostPreview from 'components/post-preview/PostPreview';
 import FeedSort from 'components/feed-sort/FeedSort';
 import LargeLoading from 'components/common/LargeLoading';
+import * as navigationConstants from 'constants/navigation';
 import Header from 'components/common/Header';
+import HeaderEmptyView from 'components/common/HeaderEmptyView';
 
 const StyledListView = styled.ListView`
   background-color: ${COLORS.WHITE.WHITE_SMOKE};
@@ -95,6 +97,7 @@ class HomeScreen extends Component {
     this.onEndReached = this.onEndReached.bind(this);
     this.renderRow = this.renderRow.bind(this);
     this.onRefreshCurrentFeed = this.onRefreshCurrentFeed.bind(this);
+    this.handleNavigateToSavedTags = this.handleNavigateToSavedTags.bind(this);
   }
 
   componentDidMount() {
@@ -138,6 +141,10 @@ class HomeScreen extends Component {
     this.setMenuVisibile(false);
   }
 
+  handleNavigateToSavedTags() {
+    this.props.navigation.navigate(navigationConstants.SAVED_TAGS);
+  }
+
   renderRow(rowData) {
     return <PostPreview postData={rowData} navigation={this.props.navigation} />;
   }
@@ -147,18 +154,31 @@ class HomeScreen extends Component {
     const { menuVisible, currentFilter, dataSource } = this.state;
     return (
       <View>
-        <Header style={{ justifyContent: 'center' }}>
+        <Header>
+          <HeaderEmptyView />
           <TouchableMenu onPress={() => this.setMenuVisibile(!menuVisible)}>
-            <MaterialIcons name={currentFilter.icon} size={20} color={COLORS.PRIMARY_COLOR} />
+            <MaterialIcons
+              name={currentFilter.icon}
+              size={ICON_SIZES.menuIcon}
+              color={COLORS.PRIMARY_COLOR}
+            />
             <HomeText>{currentFilter.label}</HomeText>
             <FilterMenuIcon>
               <MaterialCommunityIcons
                 name={MATERIAL_COMMUNITY_ICONS.chevronDown}
-                size={24}
+                size={ICON_SIZES.menuIcon}
                 color={COLORS.PRIMARY_COLOR}
               />
             </FilterMenuIcon>
           </TouchableMenu>
+          <TouchableOpacity onPress={this.handleNavigateToSavedTags}>
+            <MaterialCommunityIcons
+              name="star"
+              size={ICON_SIZES.menuIcon}
+              style={{ padding: 5 }}
+              color={COLORS.PRIMARY_COLOR}
+            />
+          </TouchableOpacity>
         </Header>
         <Modal
           animationType="slide"

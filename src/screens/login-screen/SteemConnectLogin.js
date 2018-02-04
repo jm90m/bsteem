@@ -87,10 +87,8 @@ class SteemConnectLogin extends Component {
           borderRadius={10}
           backgroundColor={COLORS.PRIMARY_COLOR}
         />
-        <DebugText>
-          {`LinkingURI: ${Expo.Constants.linkingUri}/redirect`}
-          {`RedirectURI: ${AuthSession.getRedirectUrl()}`}
-        </DebugText>
+        <DebugText>{`LinkingURI: ${Expo.Constants.linkingUri}/redirect`}</DebugText>
+        <DebugText>{`RedirectURI: ${AuthSession.getRedirectUrl()}`}</DebugText>
       </Container>
     );
   }

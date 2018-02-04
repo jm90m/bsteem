@@ -106,7 +106,7 @@ class API {
   }
 
   static async getContent(author, permlink) {
-    const requestQuery = API.createRequestQuery('get_discussions_by_comments', [author, permlink]);
+    const requestQuery = API.createRequestQuery('get_content', [author, permlink]);
     return sendPostRequest(API.BASE_URL, requestQuery);
   }
 
@@ -199,6 +199,7 @@ class API {
   static async getSteemRate() {
     return sendRequest('https://api.coinmarketcap.com/v1/ticker/steem/');
   }
+
   static async createPermlink(author, slug) {
     const requestQuery = API.createRequestQuery('get_content', [author, slug]);
     return sendPostRequest(API.BASE_URL, requestQuery);

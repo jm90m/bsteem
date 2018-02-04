@@ -1,13 +1,13 @@
 import { takeLatest, takeEvery, call, put, select } from 'redux-saga/effects';
+import _ from 'lodash';
 import firebase from 'firebase';
+import Expo from 'expo';
 import { FETCH_SAVED_TAGS, SAVE_TAG, UNSAVE_TAG } from 'state/actions/actionTypes';
 import * as firebaseActions from '../actions/firebaseActions';
 import { getAuthUsername } from '../rootReducer';
 
 const baseUserSettingsRef = 'user-settings';
-
 const getUserSavedTagsRef = username => `${baseUserSettingsRef}/${username}/saved-tags`;
-
 const getSaveTagRef = (username, tag) => `${getUserSavedTagsRef(username)}/${tag}`;
 
 const getFirebaseValueOnce = (ref, key) =>
@@ -26,8 +26,15 @@ const setFirebaseData = (ref, values = {}) => {
 const fetchSavedTags = function*() {
   try {
     const authUsername = yield select(getAuthUsername);
-    const snapshot = yield call(getFirebaseValueOnce, getUserSavedTagsRef(authUsername), 'value');
-    const savedTags = snapshot.val() || [];
+    let userID;
+
+    if (_.isEmpty(authUsername)) {
+      userID = Expo.Constants.deviceId;
+    } else {
+      userID = authUsername;
+    }
+    const snapshot = yield call(getFirebaseValueOnce, getUserSavedTagsRef(userID), 'value');
+    const savedTags = snapshot.val() || {};
     yield put(firebaseActions.fetchSavedTags.success(savedTags));
   } catch (error) {
     console.log(error);
@@ -41,7 +48,13 @@ const saveTag = function*(action) {
   try {
     const { tag } = action.payload;
     const authUsername = yield select(getAuthUsername);
-    yield call(setFirebaseData, getSaveTagRef(authUsername, tag), true);
+    let userID;
+    if (_.isEmpty(authUsername)) {
+      userID = Expo.Constants.deviceId;
+    } else {
+      userID = authUsername;
+    }
+    yield call(setFirebaseData, getSaveTagRef(userID, tag), true);
     yield call(fetchSavedTags);
     yield put(firebaseActions.saveTag.success(tag));
   } catch (error) {
@@ -58,7 +71,13 @@ const unsaveTag = function*(action) {
   try {
     const { tag } = action.payload;
     const authUsername = yield select(getAuthUsername);
-    yield call(setFirebaseData, getSaveTagRef(authUsername, tag), null);
+    let userID;
+    if (_.isEmpty(authUsername)) {
+      userID = Expo.Constants.deviceId;
+    } else {
+      userID = authUsername;
+    }
+    yield call(setFirebaseData, getSaveTagRef(userID, tag), null);
     yield put(firebaseActions.unsaveTag.success(tag));
     yield call(fetchSavedTags);
   } catch (error) {

@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { Modal, ScrollView, Dimensions, WebView } from 'react-native';
 import { connect } from 'react-redux';
 import styled from 'styled-components/native';
-import PhotoBrowser from 'react-native-photo-browser';
 import _ from 'lodash';
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import { getHtml } from 'util/postUtils';
@@ -11,6 +10,7 @@ import { COLORS, MATERIAL_ICONS, MATERIAL_COMMUNITY_ICONS } from 'constants/styl
 import * as navigationConstants from 'constants/navigation';
 import { getIsAuthenticated } from 'state/rootReducer';
 import { fetchComments } from 'state/actions/postActions';
+import PostPhotoBrowser from 'components/post/PostPhotoBrowser';
 import PostMenu from 'components/post-menu/PostMenu';
 import HTMLView from 'components/html-view/HTMLView';
 import FooterTags from 'components/post/FooterTags';
@@ -75,12 +75,7 @@ const mapStateToProps = state => ({
   authenticated: getIsAuthenticated(state),
 });
 
-const mapDispatchToProps = dispatch => ({
-  fetchComments: (category, author, permlink, postId) =>
-    dispatch(fetchComments(category, author, permlink, postId)),
-});
-
-@connect(mapStateToProps, mapDispatchToProps)
+@connect(mapStateToProps)
 class PostScreen extends Component {
   static navigationOptions = {
     headerMode: 'none',
@@ -110,6 +105,7 @@ class PostScreen extends Component {
     this.handlePostLinkPress = this.handlePostLinkPress.bind(this);
     this.handleImagePress = this.handleImagePress.bind(this);
     this.handleFeedNavigation = this.handleFeedNavigation.bind(this);
+    this.handleHidePhotoBrowser = this.handleHidePhotoBrowser.bind(this);
   }
 
   setModalVisible(visible) {
@@ -167,6 +163,12 @@ class PostScreen extends Component {
     }
   }
 
+  handleHidePhotoBrowser() {
+    this.setState({
+      displayPhotoBrowser: false,
+    });
+  }
+
   handleImagePress(url, alt) {
     const { parsedJsonMetadata } = this.props.navigation.state.params;
     const images = _.get(parsedJsonMetadata, 'image', []);
@@ -203,6 +205,17 @@ class PostScreen extends Component {
             </Touchable>
           </Menu>
         </Header>
+        <ScrollView style={{ padding: 10, backgroundColor: COLORS.WHITE.WHITE }}>
+          <HTMLView
+            value={parsedHtmlBody}
+            renderNode={renderNode}
+            onLinkPress={this.handlePostLinkPress}
+            addLineBreaks={false}
+            handleImagePress={this.handleImagePress}
+          />
+          <FooterTags tags={tags} handleFeedNavigation={this.handleFeedNavigation} />
+          <Footer postData={postData} navigation={this.props.navigation} />
+        </ScrollView>
         <Modal
           animationType="slide"
           transparent
@@ -215,40 +228,12 @@ class PostScreen extends Component {
             handleNavigateToComments={this.navigateToComments}
           />
         </Modal>
-        <Modal
-          animationType="slide"
-          visible={displayPhotoBrowser}
-          onRequestClose={() => {
-            this.setState({ displayPhotoBrowser: false });
-          }}
-        >
-          <PhotoBrowser
-            onBack={() => {
-              this.setState({ displayPhotoBrowser: false });
-            }}
-            mediaList={formattedImages}
-            initialIndex={initialPhotoIndex}
-            displayNavArrows
-            displaySelectionButtons
-            displayActionButton
-            enableGrid={false}
-            useCircleProgress
-            onSelectionChanged={() => {}}
-            onActionButton={() => {}}
-            alwaysDisplayStatusBar
-          />
-        </Modal>
-        <ScrollView style={{ padding: 10, backgroundColor: COLORS.WHITE.WHITE }}>
-          <HTMLView
-            value={parsedHtmlBody}
-            renderNode={renderNode}
-            onLinkPress={this.handlePostLinkPress}
-            addLineBreaks={false}
-            handleImagePress={this.handleImagePress}
-          />
-          <FooterTags tags={tags} handleFeedNavigation={this.handleFeedNavigation} />
-          <Footer postData={postData} navigation={this.props.navigation} />
-        </ScrollView>
+        <PostPhotoBrowser
+          displayPhotoBrowser={displayPhotoBrowser}
+          mediaList={formattedImages}
+          initialPhotoIndex={initialPhotoIndex}
+          handleClose={this.handleHidePhotoBrowser}
+        />
       </Container>
     );
   }

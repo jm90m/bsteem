@@ -42,7 +42,11 @@ const fetchSearchPostDetails = function*(action) {
   try {
     const { author, permlink } = action.payload;
     const result = yield call(API.getContent, author, permlink);
-    yield put(searchFetchPostDetails.success(result));
+    if (result.error) {
+      yield put(searchFetchPostDetails.fail());
+    } else {
+      yield put(searchFetchPostDetails.success(result.result));
+    }
   } catch (error) {
     yield put(searchFetchPostDetails.fail(error));
   }

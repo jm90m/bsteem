@@ -6,7 +6,7 @@ import * as navigationConstants from 'constants/navigation';
 import SearchScreen from 'screens/SearchScreen';
 import UserScreen from 'screens/user-screen/UserScreen';
 import FeedScreen from 'screens/stack-screens/FeedScreen';
-import SearchPostScreen from 'components/search/SearchPostScreen';
+import FetchPostScreen from 'screens/stack-screens/FetchPostScreen';
 import UserActivityScreen from 'screens/stack-screens/UserActivityScreen';
 import UserWalletScreen from 'screens/stack-screens/UserWalletScreen';
 import FollowingScreen from 'screens/stack-screens/FollowingScreen';
@@ -31,8 +31,8 @@ const SearchNavigator = StackNavigator(
       screen: UserScreen,
       navigationOptions: screenNavigationOptions,
     },
-    [navigationConstants.SEARCH_POST]: {
-      screen: SearchPostScreen,
+    [navigationConstants.FETCH_POST]: {
+      screen: FetchPostScreen,
       navigationOptions: screenNavigationOptions,
     },
     [navigationConstants.USER_ACTIVITY]: {

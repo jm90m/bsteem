@@ -107,7 +107,7 @@ class SearchScreen extends Component {
   }
 
   handleNavigateToPostScreen(author, permlink) {
-    this.props.navigation.navigate(navigationConstants.SEARCH_POST, { author, permlink });
+    this.props.navigation.navigate(navigationConstants.FETCH_POST, { author, permlink });
   }
 
   searchResultEndReached() {}
