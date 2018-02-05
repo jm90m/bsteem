@@ -361,7 +361,7 @@ class PostPreview extends Component {
           visible={displayMenu}
           onRequestClose={this.handleHideMenu}
         >
-          <PostMenu hideMenu={this.handleHideMenu} />
+          <PostMenu hideMenu={this.handleHideMenu} postData={postData} />
         </Modal>
       </Container>
     );

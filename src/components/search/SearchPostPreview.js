@@ -112,15 +112,13 @@ class SearchPostPreview extends Component {
             <TouchableOpacity onPress={this.handleNavigateToUserScreen}>
               <AuthorText>{`@${author}`}</AuthorText>
             </TouchableOpacity>
-            <PostCreated>
-              {moment(created).fromNow()}
-            </PostCreated>
+            <PostCreated>{moment(created).fromNow()}</PostCreated>
           </AuthorContents>
         </AuthorContainer>
         <TouchableOpacity onPress={this.handleNavigateToPostScreen}>
           <PostTitle>{title}</PostTitle>
         </TouchableOpacity>
-        <TouchableOpacity onPRess={this.handleNavigateToPostScreen}>
+        <TouchableOpacity onPress={this.handleNavigateToPostScreen}>
           <BodyShort content={summary} />
         </TouchableOpacity>
         <TagsContainer>

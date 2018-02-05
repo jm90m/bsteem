@@ -78,6 +78,9 @@ export const UPLOAD_IMAGE = createAsyncActionType('@editor/upload-image');
 export const FETCH_SAVED_TAGS = createAsyncActionType('@firebase/fetch-saved-tags');
 export const SAVE_TAG = createAsyncActionType('@firebase/save-tag');
 export const UNSAVE_TAG = createAsyncActionType('@firebase/unsave-tag');
+export const FETCH_SAVED_POSTS = createAsyncActionType('@firebase/fetch-saved-posts');
+export const SAVE_POST = createAsyncActionType('@firebase/save-post');
+export const UNSAVE_POST = createAsyncActionType('@firebase/unsave-post');
 
 // Posts Actions
 export const FETCH_POST_DETAILS = createAsyncActionType('@posts/fetch-post-details');

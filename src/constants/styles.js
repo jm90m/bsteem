@@ -12,6 +12,7 @@ const colorsMap = {
 
   GREEN: {
     BUBBLES: '#EAF4EF',
+    DARK_GREEN: '#000222',
   },
 
   BLACK: {
@@ -36,13 +37,15 @@ const colorsMap = {
 
   VIOLET: {
     PAUA: '#232A57',
+    HAN_PURPLE: '#4630EB',
   },
 };
 
 const appColors = {
-  PRIMARY_COLOR: colorsMap.BLUE.MARINER,
+  PRIMARY_COLOR: colorsMap.VIOLET.HAN_PURPLE,
   BORDER_COLOR: colorsMap.WHITE.GAINSBORO,
   PRIMARY_BACKGROUND_COLOR: colorsMap.WHITE.WHITE,
+  SECONDARY_COLOR: colorsMap.GREEN.DARK_GREEN,
 };
 
 export const COLORS = {
@@ -111,6 +114,7 @@ export const MATERIAL_COMMUNITY_ICONS = {
   reblog: 'tumblr-reblog',
   comment: 'comment-processing',
   menuVertical: 'dots-vertical',
+  menuHorizontal: 'dots-horizontal',
   chevronDown: 'chevron-down',
   active: 'run-fast',
   linkVariant: 'link-variant',
@@ -129,6 +133,10 @@ export const MATERIAL_COMMUNITY_ICONS = {
   // tags
   saveTag: 'star-outline',
   savedTag: 'star',
+
+  // post
+  savePost: 'star-outline',
+  savedPost: 'star',
 };
 
 export const FEATHER_ICONS = {
@@ -146,6 +154,7 @@ export const ICON_SIZES = {
   menuIcon: 24,
   tabBarIcon: 20,
   actionIcon: 22,
+  menuModalOptionIcon: 20,
 };
 
 export const ICON_COLORS = {

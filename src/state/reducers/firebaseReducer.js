@@ -1,10 +1,13 @@
 import _ from 'lodash';
-import { FETCH_SAVED_TAGS, SAVE_TAG } from '../actions/actionTypes';
+import { FETCH_SAVED_TAGS, SAVE_TAG, SAVE_POST, FETCH_SAVED_POSTS } from '../actions/actionTypes';
 
 const INITIAL_STATE = {
   savedTags: [],
   pendingSavingTags: [],
-  loadingSaving: false,
+  pendingSavingPosts: [],
+  savedPosts: [],
+  loadingSavedTags: false,
+  loadingSavedPosts: false,
 };
 
 export default (state = INITIAL_STATE, action) => {
@@ -33,15 +36,41 @@ export default (state = INITIAL_STATE, action) => {
     case SAVE_TAG.ACTION:
       return {
         ...state,
-        loadingSaving: true,
         pendingSavingTags: [...state.pendingSavingTags, action.payload],
       };
+
     case SAVE_TAG.SUCCESS:
     case SAVE_TAG.LOADING_END:
     case SAVE_TAG.ERROR:
       return {
         ...state,
-        pendingSavingTags: _.remove(state.pendingSavingTags, tag => tag !== action.payload),
+        pendingSavingPosts: _.remove(state.pendingSavingPosts, postID => postID !== action.payload),
+      };
+    case FETCH_SAVED_POSTS.ACTION:
+      return {
+        ...state,
+        loadingSavedPosts: true,
+      };
+    case FETCH_SAVED_POSTS.SUCCESS: {
+      const savedPosts = _.map(action.payload, post => post);
+      console.log(action.payload, savedPosts);
+      return {
+        ...state,
+        savedPosts,
+        loadingSavedPosts: false,
+      };
+    }
+    case SAVE_POST.ACTION:
+      return {
+        ...state,
+        pendingSavingPosts: [...state.pendingSavingPosts, action.payload.id],
+      };
+    case SAVE_POST.SUCCESS:
+    case SAVE_POST.LOADING_END:
+    case SAVE_POST.ERROR:
+      return {
+        ...state,
+        pendingSavingPosts: _.remove(state.pendingSavingPosts, postID => postID !== action.payload),
       };
     default:
       return state;
@@ -51,3 +80,5 @@ export default (state = INITIAL_STATE, action) => {
 export const getLoadingSavedTags = state => state.loadingSavedTags;
 export const getPendingSavingTags = state => state.pendingSavingTags;
 export const getSavedTags = state => state.savedTags;
+export const getPendingSavingPosts = state => state.pendingSavingPosts;
+export const getSavedPosts = state => state.savedPosts;

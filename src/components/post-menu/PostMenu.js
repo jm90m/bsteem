@@ -6,6 +6,7 @@ import styled from 'styled-components/native';
 import { COLORS, MATERIAL_ICONS, MATERIAL_COMMUNITY_ICONS } from '../../constants/styles';
 import MenuModalButton from '../common/menu/MenuModalButton';
 import MenuWrapper from '../common/menu/MenuWrapper';
+import SavePostMenuButton from './SavePostMenuButton';
 
 const Container = styled.View`
   align-items: center;
@@ -33,6 +34,12 @@ class PostMenu extends Component {
     handleReblog: PropTypes.func,
     handleReportPost: PropTypes.func,
     hideMenu: PropTypes.func,
+    postData: PropTypes.shape({
+      author: PropTypes.string,
+      title: PropTypes.string,
+      permlink: PropTypes.string,
+      id: PropTypes.number,
+    }),
   };
 
   static defaultProps = {
@@ -52,12 +59,15 @@ class PostMenu extends Component {
       handleNavigateToComments,
       handleReblog,
       handleReportPost,
+      postData,
     } = this.props;
+    const { title, permlink, author, id } = postData;
 
     return (
       <TouchableWithoutFeedback onPress={hideMenu}>
         <Container>
           <MenuWrapper>
+            <SavePostMenuButton title={title} permlink={permlink} author={author} id={id} />
             <MenuModalButton onPress={handleFollowUser}>
               <MenuModalContents>
                 <MaterialIcons

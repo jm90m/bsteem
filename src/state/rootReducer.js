@@ -96,6 +96,8 @@ export const getCreatePostLoading = state => fromEditor.getCreatePostLoading(sta
 export const getLoadingSavedTags = state => fromFirebase.getLoadingSavedTags(state.firebase);
 export const getSavedTags = state => fromFirebase.getSavedTags(state.firebase);
 export const getPendingSavingTags = state => fromFirebase.getPendingSavingTags(state.firebase);
+export const getPendingSavingPosts = state => fromFirebase.getPendingSavingPosts(state.firebase);
+export const getSavedPosts = state => fromFirebase.getSavedPosts(state.firebase);
 
 // Posts Selectors
 export const getPostsDetails = state => fromPosts.getPostsDetails(state.posts);

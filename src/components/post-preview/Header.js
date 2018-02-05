@@ -4,7 +4,7 @@ import styled from 'styled-components/native';
 import { View } from 'react-native';
 import { getReputation } from 'util/steemitFormatters';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import moment from 'moment';
+import moment from 'moment-timezone';
 import { COLORS, MATERIAL_COMMUNITY_ICONS, ICON_SIZES } from 'constants/styles';
 import Tag from 'components/post/Tag';
 import * as navigationConstants from 'constants/navigation';
@@ -58,6 +58,13 @@ const TagContainer = styled.View`
 
 const EmptyView = styled.View`
   width: 3px;
+`;
+
+const MenuIconContainer = styled.View`
+  margin-left: auto;
+  padding-bottom: 10px;
+  padding-left: 10px;
+  padding-right: 10px;
 `;
 
 class Header extends Component {
@@ -165,10 +172,14 @@ class Header extends Component {
               <ReputationScore reputation={getReputation(author_reputation)} />
             </Author>
           </HeaderContents>
-          <Touchable onPress={displayMenu} style={{ alignSelf: 'flex-end' }}>
+          <Touchable
+            onPress={displayMenu}
+            style={{ marginLeft: 'auto', paddingLeft: 10, paddingRight: 10, paddingBottom: 10 }}
+          >
             <MaterialCommunityIcons
-              name={MATERIAL_COMMUNITY_ICONS.menuVertical}
-              size={ICON_SIZES.actionIcon}
+              name={MATERIAL_COMMUNITY_ICONS.menuHorizontal}
+              size={ICON_SIZES.menuIcon}
+              color={COLORS.BLUE.MARINER}
             />
           </Touchable>
         </UserHeaderContainer>
