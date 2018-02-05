@@ -36,7 +36,7 @@ class CurrentUserScreen extends Component {
   }
 
   handleNavigateToSavedTags() {
-    this.props.navigation.navigate(navigationConstants.SAVED_TAGS);
+    this.props.navigation.navigate(navigationConstants.SAVED_CONTENT);
   }
 
   render() {

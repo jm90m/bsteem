@@ -78,6 +78,7 @@ export default (state = INITIAL_STATE, action) => {
 };
 
 export const getLoadingSavedTags = state => state.loadingSavedTags;
+export const getLoadingSavedPosts = state => state.loadingSavedPosts;
 export const getPendingSavingTags = state => state.pendingSavingTags;
 export const getSavedTags = state => state.savedTags;
 export const getPendingSavingPosts = state => state.pendingSavingPosts;

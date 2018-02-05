@@ -3,6 +3,7 @@ export default {
     post: 'Post',
     createPost: 'Create Post',
     savedTags: 'Saved Tags',
+    saved: 'Saved',
   },
   editor: {
     title: 'Title',

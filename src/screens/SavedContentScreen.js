@@ -2,17 +2,18 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import styled from 'styled-components/native';
+import { ScrollView } from 'react-native';
 import Header from 'components/common/Header';
 import _ from 'lodash';
 import HeaderEmptyView from 'components/common/HeaderEmptyView';
 import Tag from 'components/post/Tag';
 import { MaterialIcons } from '@expo/vector-icons';
 import i18n from 'i18n/i18n';
-import { fetchSavedTags } from 'state/actions/firebaseActions';
-import { COLORS, MATERIAL_ICONS, ICON_SIZES } from '../constants/styles';
-import { getLoadingSavedTags, getSavedTags } from '../state/rootReducer';
-import SaveTagButton from '../components/common/SaveTagButton';
 import * as navigationConstants from 'constants/navigation';
+import { fetchSavedTags, fetchSavedPosts } from 'state/actions/firebaseActions';
+import { COLORS, MATERIAL_ICONS, ICON_SIZES } from '../constants/styles';
+import { getLoadingSavedTags, getSavedPosts, getSavedTags } from '../state/rootReducer';
+import SaveTagButton from '../components/common/SaveTagButton';
 
 const BackTouchable = styled.TouchableOpacity`
   justify-content: center;
@@ -45,15 +46,18 @@ const TagTouchble = styled.TouchableOpacity``;
   state => ({
     loading: getLoadingSavedTags(state),
     savedTags: getSavedTags(state),
+    savedPosts: getSavedPosts(state),
   }),
   dispatch => ({
     fetchSavedTags: () => dispatch(fetchSavedTags.action()),
+    fetchSavedPosts: () => dispatch(fetchSavedPosts.action()),
   }),
 )
-class SavedTagsScreen extends Component {
+class SavedContentScreen extends Component {
   static propTypes = {
     navigation: PropTypes.shape().isRequired,
     fetchSavedTags: PropTypes.func.isRequired,
+    fetchSavedPosts: PropTypes.func.isRequired,
   };
 
   constructor(props) {
@@ -104,17 +108,19 @@ class SavedTagsScreen extends Component {
           </TitleContainer>
           <HeaderEmptyView />
         </Header>
-        {_.map(this.state.currentSavedTags, tag => (
-          <TagOption key={tag}>
-            <TagTouchble onPress={() => this.handleNavigateTag(tag)}>
-              <Tag tag={tag} />
-            </TagTouchble>
-            <SaveTagButton tag={tag} />
-          </TagOption>
-        ))}
+        <ScrollView>
+          {_.map(this.state.currentSavedTags, tag => (
+            <TagOption key={tag}>
+              <TagTouchble onPress={() => this.handleNavigateTag(tag)}>
+                <Tag tag={tag} />
+              </TagTouchble>
+              <SaveTagButton tag={tag} />
+            </TagOption>
+          ))}
+        </ScrollView>
       </Container>
     );
   }
 }
 
-export default SavedTagsScreen;
+export default SavedContentScreen;

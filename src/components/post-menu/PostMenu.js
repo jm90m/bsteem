@@ -61,13 +61,19 @@ class PostMenu extends Component {
       handleReportPost,
       postData,
     } = this.props;
-    const { title, permlink, author, id } = postData;
+    const { title, permlink, author, id, created } = postData;
 
     return (
       <TouchableWithoutFeedback onPress={hideMenu}>
         <Container>
           <MenuWrapper>
-            <SavePostMenuButton title={title} permlink={permlink} author={author} id={id} />
+            <SavePostMenuButton
+              title={title}
+              permlink={permlink}
+              author={author}
+              id={id}
+              created={created}
+            />
             <MenuModalButton onPress={handleFollowUser}>
               <MenuModalContents>
                 <MaterialIcons

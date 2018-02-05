@@ -28,8 +28,8 @@ const MenuModalContents = styled.View`
     savedPosts: getSavedPosts(state),
   }),
   dispatch => ({
-    savePost: (author, permlink, title, id) =>
-      dispatch(savePost.action({ author, permlink, title, id })),
+    savePost: (author, permlink, title, id, created) =>
+      dispatch(savePost.action({ author, permlink, title, id, created })),
     unsavePost: id => dispatch(unsavePost.action({ id })),
   }),
 )
@@ -41,6 +41,7 @@ class SavePostMenuButton extends Component {
     permlink: PropTypes.string,
     author: PropTypes.string,
     id: PropTypes.number,
+    created: PropTypes.string,
     pendingSavingPosts: PropTypes.arrayOf(PropTypes.number),
     savedPosts: PropTypes.arrayOf(PropTypes.shape()),
   };
@@ -53,8 +54,8 @@ class SavePostMenuButton extends Component {
   }
 
   handleSavePost() {
-    const { title, author, permlink, id } = this.props;
-    this.props.savePost(author, permlink, title, id);
+    const { title, author, permlink, id, created } = this.props;
+    this.props.savePost(author, permlink, title, id, created);
   }
 
   handleUnsavePost() {

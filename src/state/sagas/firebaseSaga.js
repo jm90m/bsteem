@@ -121,7 +121,7 @@ const fetchSavedPosts = function*() {
 
 const savePost = function*(action) {
   try {
-    const { author, permlink, title, id } = action.payload;
+    const { author, permlink, title, id, created } = action.payload;
     const authUsername = yield select(getAuthUsername);
     let userID;
     if (_.isEmpty(authUsername)) {
@@ -129,7 +129,7 @@ const savePost = function*(action) {
     } else {
       userID = authUsername;
     }
-    const postData = { author, permlink, title, id };
+    const postData = { author, permlink, title, id, created };
     yield call(setFirebaseData, getSavePostRef(userID, id), postData);
     yield call(fetchSavedPosts);
     yield put(firebaseActions.savePost.success());
