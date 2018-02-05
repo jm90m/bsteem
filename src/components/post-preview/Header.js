@@ -5,7 +5,7 @@ import { View } from 'react-native';
 import { getReputation } from 'util/steemitFormatters';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import moment from 'moment';
-import { COLORS, MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
+import { COLORS, MATERIAL_COMMUNITY_ICONS, ICON_SIZES } from 'constants/styles';
 import Tag from 'components/post/Tag';
 import * as navigationConstants from 'constants/navigation';
 import ReputationScore from 'components/post/ReputationScore';
@@ -65,10 +65,12 @@ class Header extends Component {
     navigation: PropTypes.shape().isRequired,
     postData: PropTypes.shape().isRequired,
     currentUsername: PropTypes.string,
+    displayMenu: PropTypes.func,
   };
 
   static defaultProps = {
     currentUsername: '',
+    displayMenu: () => {},
   };
 
   constructor(props) {
@@ -146,7 +148,7 @@ class Header extends Component {
     );
   }
   render() {
-    const { postData } = this.props;
+    const { postData, displayMenu } = this.props;
 
     const { category, author, author_reputation, created } = postData;
     return (
@@ -163,6 +165,12 @@ class Header extends Component {
               <ReputationScore reputation={getReputation(author_reputation)} />
             </Author>
           </HeaderContents>
+          <Touchable onPress={displayMenu} style={{ alignSelf: 'flex-end' }}>
+            <MaterialCommunityIcons
+              name={MATERIAL_COMMUNITY_ICONS.menuVertical}
+              size={ICON_SIZES.actionIcon}
+            />
+          </Touchable>
         </UserHeaderContainer>
         <TagContainer>
           <Touchable onPress={this.handleFeedNavigation}>

@@ -4,7 +4,7 @@ import styled from 'styled-components/native';
 import { connect } from 'react-redux';
 import _ from 'lodash';
 import { MaterialIcons } from '@expo/vector-icons';
-import { fetchComments } from 'state/actions/postActions';
+import { fetchComments } from 'state/actions/postsActions';
 import CommentsContainer from 'components/post/comments/CommentsContainer';
 import { ICON_SIZES, MATERIAL_ICONS, COLORS } from 'constants/styles';
 import { getCommentsByPostId, getLoadingComments } from 'state/rootReducer';

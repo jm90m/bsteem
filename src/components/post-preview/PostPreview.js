@@ -4,7 +4,6 @@ import { Modal } from 'react-native';
 import styled from 'styled-components/native';
 import { connect } from 'react-redux';
 import _ from 'lodash';
-import PhotoBrowser from 'react-native-photo-browser';
 import { COLORS } from 'constants/styles';
 import {
   getIsAuthenticated,
@@ -15,11 +14,13 @@ import { currentUserVotePost, currentUserReblogPost } from 'state/actions/curren
 import { isPostVoted } from 'util/voteUtils';
 import * as navigationConstants from 'constants/navigation';
 import * as postConstants from 'constants/postConstants';
+import PostPhotoBrowser from 'components/post/PostPhotoBrowser';
 import ReblogModal from 'components/post/ReblogModal';
 import Footer from './Footer';
 import Header from './Header';
 import BodyShort from './BodyShort';
 import PreviewImage from './PreviewImage';
+import PostMenu from 'components/post-menu/PostMenu';
 
 const Container = styled.View`
   background-color: ${COLORS.WHITE.WHITE};
@@ -113,6 +114,7 @@ class PostPreview extends Component {
       displayReblogModal: false,
       loadingReblog: false,
       displayPhotoBrowser: false,
+      displayMenu: false,
     };
 
     this.handleOnPressVote = this.handleOnPressVote.bind(this);
@@ -121,11 +123,15 @@ class PostPreview extends Component {
     this.unlikedVoteSuccess = this.unlikedVoteSuccess.bind(this);
     this.showReblogModal = this.showReblogModal.bind(this);
     this.hideReblogModal = this.hideReblogModal.bind(this);
+    this.handleDisplayMenu = this.handleDisplayMenu.bind(this);
+    this.handleHideMenu = this.handleHideMenu.bind(this);
+    this.handleDisplayPhotoBrowser = this.handleDisplayPhotoBrowser.bind(this);
     this.handleReblogConfirm = this.handleReblogConfirm.bind(this);
     this.loadingReblogStart = this.loadingReblogStart.bind(this);
     this.loadingReblogEnd = this.loadingReblogEnd.bind(this);
     this.handleNavigateToPost = this.handleNavigateToPost.bind(this);
     this.handleNavigateToComments = this.handleNavigateToComments.bind(this);
+    this.handleHidePhotoBrowser = this.handleHidePhotoBrowser.bind(this);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -239,6 +245,28 @@ class PostPreview extends Component {
     );
   }
 
+  handleDisplayMenu() {
+    this.setState({
+      displayMenu: true,
+    });
+  }
+
+  handleHideMenu() {
+    this.setState({
+      displayMenu: false,
+    });
+  }
+
+  handleDisplayPhotoBrowser() {
+    this.setState({
+      displayPhotoBrowser: true,
+    });
+  }
+
+  handleHidePhotoBrowser() {
+    this.setState({ displayPhotoBrowser: false });
+  }
+
   handleNavigateToPost() {
     const { postData } = this.props;
     const { title, category, author, json_metadata, body, permlink, id } = postData;
@@ -275,6 +303,7 @@ class PostPreview extends Component {
       displayReblogModal,
       loadingReblog,
       displayPhotoBrowser,
+      displayMenu,
     } = this.state;
     const { title, json_metadata, body } = postData;
     const parsedJsonMetadata = JSON.parse(json_metadata);
@@ -284,12 +313,17 @@ class PostPreview extends Component {
     const formattedImages = _.map(images, image => ({ photo: image }));
     return (
       <Container>
-        <Header postData={postData} navigation={navigation} currentUsername={currentUsername} />
+        <Header
+          postData={postData}
+          navigation={navigation}
+          currentUsername={currentUsername}
+          displayMenu={this.handleDisplayMenu}
+        />
         <Content>
           <Touchable onPress={this.handleNavigateToPost}>
             <Title>{title}</Title>
           </Touchable>
-          <Touchable onPress={() => this.setState({ displayPhotoBrowser: true })}>
+          <Touchable onPress={this.handleDisplayPhotoBrowser}>
             {hasPreviewImage && <PreviewImage images={images} />}
           </Touchable>
           <Touchable onPress={this.handleNavigateToPost}>
@@ -315,29 +349,19 @@ class PostPreview extends Component {
         >
           <ReblogModal closeModal={this.hideReblogModal} confirmReblog={this.handleReblogConfirm} />
         </Modal>
+        <PostPhotoBrowser
+          displayPhotoBrowser={displayPhotoBrowser}
+          mediaList={formattedImages}
+          handleClose={this.handleHidePhotoBrowser}
+          initialPhotoIndex={0}
+        />
         <Modal
           animationType="slide"
-          visible={displayPhotoBrowser}
-          onRequestClose={() => {
-            this.setState({ displayPhotoBrowser: false });
-          }}
+          transparent
+          visible={displayMenu}
+          onRequestClose={this.handleHideMenu}
         >
-          <PhotoBrowser
-            onBack={() => {
-              this.setState({ displayPhotoBrowser: false });
-            }}
-            mediaList={formattedImages}
-            initialIndex={0}
-            displayNavArrows
-            displaySelectionButtons
-            displayActionButton
-            startOnGrid={false}
-            enableGrid={false}
-            useCircleProgress
-            onSelectionChanged={() => {}}
-            onActionButton={() => {}}
-            alwaysDisplayStatusBar
-          />
+          <PostMenu hideMenu={this.handleHideMenu} />
         </Modal>
       </Container>
     );

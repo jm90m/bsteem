@@ -1,6 +1,6 @@
 import { spawn, all } from 'redux-saga/effects';
 import * as homeSaga from './sagas/homeSaga';
-import * as postSaga from './sagas/postSaga';
+import * as postsSaga from './sagas/postsSaga';
 import * as usersSaga from './sagas/usersSaga';
 import * as searchSaga from './sagas/searchSaga';
 import * as currentUserSaga from './sagas/currentUserSaga';
@@ -16,8 +16,9 @@ const rootSaga = function*() {
     spawn(homeSaga.watchFetchMoreDiscussions),
     spawn(homeSaga.watchFetchTags),
 
-    // Post Sagas
-    spawn(postSaga.watchFetchComments),
+    // Posts Sagas
+    spawn(postsSaga.watchFetchComments),
+    spawn(postsSaga.watchFetchPostDetails),
 
     // User Sagas
     spawn(usersSaga.watchFetchUser),

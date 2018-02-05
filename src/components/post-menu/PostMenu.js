@@ -60,10 +60,12 @@ class PostMenu extends Component {
           <MenuWrapper>
             <MenuModalButton onPress={handleFollowUser}>
               <MenuModalContents>
-                <MaterialIcons size={20} name={MATERIAL_ICONS.follow} color={COLORS.PRIMARY_COLOR} />
-                <MenuText>
-                  Follow
-                </MenuText>
+                <MaterialIcons
+                  size={20}
+                  name={MATERIAL_ICONS.follow}
+                  color={COLORS.PRIMARY_COLOR}
+                />
+                <MenuText>Follow</MenuText>
               </MenuModalContents>
             </MenuModalButton>
             <MenuModalButton onPress={handleNavigateToComments}>
@@ -73,17 +75,13 @@ class PostMenu extends Component {
                   color={COLORS.PRIMARY_COLOR}
                   name={MATERIAL_COMMUNITY_ICONS.comment}
                 />
-                <MenuText>
-                  Comments
-                </MenuText>
+                <MenuText>Comments</MenuText>
               </MenuModalContents>
             </MenuModalButton>
             <MenuModalButton onPress={handleLikePost}>
               <MenuModalContents>
                 <MaterialIcons size={20} color={COLORS.PRIMARY_COLOR} name={MATERIAL_ICONS.like} />
-                <MenuText>
-                  Like Post
-                </MenuText>
+                <MenuText>Like Post</MenuText>
               </MenuModalContents>
             </MenuModalButton>
             <MenuModalButton onPress={handleReblog}>
@@ -93,17 +91,17 @@ class PostMenu extends Component {
                   color={COLORS.PRIMARY_COLOR}
                   name={MATERIAL_COMMUNITY_ICONS.reblog}
                 />
-                <MenuText>
-                  Reblog
-                </MenuText>
+                <MenuText>Reblog</MenuText>
               </MenuModalContents>
             </MenuModalButton>
             <MenuModalButton onPress={handleReportPost}>
               <MenuModalContents>
-                <MaterialIcons size={20} color={COLORS.PRIMARY_COLOR} name={MATERIAL_ICONS.report} />
-                <MenuText>
-                  Report Post
-                </MenuText>
+                <MaterialIcons
+                  size={20}
+                  color={COLORS.PRIMARY_COLOR}
+                  name={MATERIAL_ICONS.report}
+                />
+                <MenuText>Report Post</MenuText>
               </MenuModalContents>
             </MenuModalButton>
           </MenuWrapper>

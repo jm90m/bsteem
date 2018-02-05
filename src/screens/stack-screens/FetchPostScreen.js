@@ -8,12 +8,8 @@ import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import { getHtml } from 'util/postUtils';
 import { COLORS, ICON_SIZES, MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
 import * as navigationConstants from 'constants/navigation';
-import { searchFetchPostDetails } from 'state/actions/searchActions';
-import {
-  getIsAuthenticated,
-  getCurrentSearchedPosts,
-  getSearchFetchPostLoading,
-} from 'state/rootReducer';
+import { fetchPostDetails } from 'state/actions/postsActions';
+import { getIsAuthenticated, getPostsDetails, getPostLoading } from 'state/rootReducer';
 import PostPhotoBrowser from 'components/post/PostPhotoBrowser';
 import PostMenu from 'components/post-menu/PostMenu';
 import HTMLView from 'components/html-view/HTMLView';
@@ -59,13 +55,12 @@ function renderNode(node, index, siblings, parent, defaultRenderer) {
 }
 
 const mapStateToProps = state => ({
-  currentSearchedPosts: getCurrentSearchedPosts(state),
-  searchFetchPostLoading: getSearchFetchPostLoading(state),
+  postsDetails: getPostsDetails(state),
+  postLoading: getPostLoading(state),
 });
 
 const mapDispatchToProps = dispatch => ({
-  searchFetchPostDetails: (author, permlink) =>
-    dispatch(searchFetchPostDetails.action({ author, permlink })),
+  fetchPostDetails: (author, permlink) => dispatch(fetchPostDetails.action({ author, permlink })),
 });
 
 class SearchPostScreen extends Component {
@@ -75,15 +70,15 @@ class SearchPostScreen extends Component {
   };
 
   static propTypes = {
-    searchFetchPostLoading: PropTypes.bool,
+    postLoading: PropTypes.bool,
     navigation: PropTypes.shape().isRequired,
-    currentSearchedPosts: PropTypes.shape(),
-    searchFetchPostDetails: PropTypes.func.isRequired,
+    postsDetails: PropTypes.shape(),
+    fetchPostDetails: PropTypes.func.isRequired,
   };
 
   static defaultProps = {
-    currentSearchedPosts: {},
-    searchFetchPostLoading: false,
+    postsDetails: {},
+    postLoading: false,
   };
 
   constructor(props) {
@@ -103,17 +98,23 @@ class SearchPostScreen extends Component {
     this.handleFeedNavigation = this.handleFeedNavigation.bind(this);
     this.handleHidePhotoBrowser = this.handleHidePhotoBrowser.bind(this);
     this.navigateToUser = this.navigateToUser.bind(this);
+    this.getCurrentPostDetails = this.getCurrentPostDetails.bind(this);
   }
 
   componentDidMount() {
     const { author, permlink } = this.props.navigation.state.params;
-    const { currentSearchedPosts } = this.props;
-    const postKey = `${author}/${permlink}`;
-    const post = _.get(currentSearchedPosts, postKey, {});
+    const currentPostDetails = this.getCurrentPostDetails();
 
-    if (_.isEmpty(post)) {
-      this.props.searchFetchPostDetails(author, permlink);
+    if (_.isEmpty(currentPostDetails)) {
+      this.props.fetchPostDetails(author, permlink);
     }
+  }
+
+  getCurrentPostDetails() {
+    const { author, permlink } = this.props.navigation.state.params;
+    const { postsDetails } = this.props;
+    const postKey = `${author}/${permlink}`;
+    return _.get(postsDetails, postKey, {});
   }
 
   setMenuVisible(visible) {
@@ -147,11 +148,8 @@ class SearchPostScreen extends Component {
   }
 
   handleImagePress(url, alt) {
-    const { author, permlink } = this.props.navigation.state.params;
-    const { currentSearchedPosts } = this.props;
-    const postKey = `${author}/${permlink}`;
-    const postData = _.get(currentSearchedPosts, postKey, {});
-    const { json_metadata } = postData;
+    const currentPostDetails = this.getCurrentPostDetails();
+    const { json_metadata } = currentPostDetails;
     const jsonParse = _.attempt(JSON.parse, json_metadata);
     const parsedJsonMetadata = _.isError(jsonParse) ? {} : jsonParse;
     const images = _.get(parsedJsonMetadata, 'image', []);
@@ -170,18 +168,17 @@ class SearchPostScreen extends Component {
   }
 
   render() {
-    const { author, permlink } = this.props.navigation.state.params;
-    const { currentSearchedPosts, searchFetchPostLoading } = this.props;
+    const { author } = this.props.navigation.state.params;
+    const { postLoading } = this.props;
     const { displayPhotoBrowser, menuVisible, initialPhotoIndex } = this.state;
-    const postKey = `${author}/${permlink}`;
-    const postData = _.get(currentSearchedPosts, postKey, {});
+    const currentPostDetails = this.getCurrentPostDetails();
 
-    console.log(postData, searchFetchPostLoading);
-    if (_.isEmpty(postData) || searchFetchPostLoading) {
+    console.log(currentPostDetails);
+    if (_.isEmpty(currentPostDetails) || postLoading) {
       return <Loading color={COLORS.PRIMARY_COLOR} size="large" />;
     }
 
-    const { body, json_metadata } = postData;
+    const { body, json_metadata } = currentPostDetails;
     const jsonParse = _.attempt(JSON.parse, json_metadata);
     const parsedJsonMetadata = _.isError(jsonParse) ? {} : jsonParse;
     const parsedHtmlBody = getHtml(body, parsedJsonMetadata);
@@ -226,7 +223,7 @@ class SearchPostScreen extends Component {
             handleImagePress={this.handleImagePress}
           />
           <FooterTags tags={tags} handleFeedNavigation={this.handleFeedNavigation} />
-          <Footer postData={postData} navigation={this.props.navigation} />
+          <Footer postData={currentPostDetails} navigation={this.props.navigation} />
         </ScrollView>
       </Container>
     );

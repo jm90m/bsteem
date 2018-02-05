@@ -9,7 +9,7 @@ import { getHtml } from 'util/postUtils';
 import { COLORS, MATERIAL_ICONS, MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
 import * as navigationConstants from 'constants/navigation';
 import { getIsAuthenticated } from 'state/rootReducer';
-import { fetchComments } from 'state/actions/postActions';
+import { fetchComments } from 'state/actions/postsActions';
 import PostPhotoBrowser from 'components/post/PostPhotoBrowser';
 import PostMenu from 'components/post-menu/PostMenu';
 import HTMLView from 'components/html-view/HTMLView';

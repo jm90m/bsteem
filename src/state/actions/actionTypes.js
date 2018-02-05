@@ -3,7 +3,6 @@ import { createAsyncActionType } from 'util/reduxUtils';
 // Home Actions
 export const FETCH_DISCUSSIONS = createAsyncActionType('@home/fetch-discussions');
 export const FETCH_MORE_DISCUSSIONS = createAsyncActionType('@home/fetch-more-discussions');
-
 export const FETCH_TAGS = createAsyncActionType('@fetch-tags');
 export const FETCH_COMMENTS = createAsyncActionType('@fetch-comments');
 
@@ -79,3 +78,6 @@ export const UPLOAD_IMAGE = createAsyncActionType('@editor/upload-image');
 export const FETCH_SAVED_TAGS = createAsyncActionType('@firebase/fetch-saved-tags');
 export const SAVE_TAG = createAsyncActionType('@firebase/save-tag');
 export const UNSAVE_TAG = createAsyncActionType('@firebase/unsave-tag');
+
+// Posts Actions
+export const FETCH_POST_DETAILS = createAsyncActionType('@posts/fetch-post-details');

@@ -9,6 +9,7 @@ import userActivityReducer, * as fromUserActivity from './reducers/userActivityR
 import appReducer, * as fromApp from './reducers/appReducer';
 import editorReducer, * as fromEditor from './reducers/editorReducer';
 import firebaseReducer, * as fromFirebase from './reducers/firebaseReducer';
+import postsReducer, * as fromPosts from './reducers/postsReducer';
 
 export default combineReducers({
   app: appReducer,
@@ -21,6 +22,7 @@ export default combineReducers({
   userActivity: userActivityReducer,
   editor: editorReducer,
   firebase: firebaseReducer,
+  posts: postsReducer,
 });
 
 // Home Selectors
@@ -94,3 +96,7 @@ export const getCreatePostLoading = state => fromEditor.getCreatePostLoading(sta
 export const getLoadingSavedTags = state => fromFirebase.getLoadingSavedTags(state.firebase);
 export const getSavedTags = state => fromFirebase.getSavedTags(state.firebase);
 export const getPendingSavingTags = state => fromFirebase.getPendingSavingTags(state.firebase);
+
+// Posts Selectors
+export const getPostsDetails = state => fromPosts.getPostsDetails(state.posts);
+export const getPostLoading = state => fromPosts.getPostLoading(state.posts);
