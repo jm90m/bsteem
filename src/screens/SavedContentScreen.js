@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import styled from 'styled-components/native';
-import { ScrollView } from 'react-native';
+import { ScrollView, RefreshControl, View } from 'react-native';
 import Header from 'components/common/Header';
 import _ from 'lodash';
 import HeaderEmptyView from 'components/common/HeaderEmptyView';
@@ -12,7 +12,13 @@ import i18n from 'i18n/i18n';
 import * as navigationConstants from 'constants/navigation';
 import { fetchSavedTags, fetchSavedPosts } from 'state/actions/firebaseActions';
 import { COLORS, MATERIAL_ICONS, ICON_SIZES } from '../constants/styles';
-import { getLoadingSavedTags, getSavedPosts, getSavedTags } from '../state/rootReducer';
+import {
+  getLoadingSavedTags,
+  getSavedPosts,
+  getSavedTags,
+  getLoadingSavedPosts,
+} from '../state/rootReducer';
+import PostPreview from '../components/saved-content/PostPreview';
 import SaveTagButton from '../components/common/SaveTagButton';
 
 const BackTouchable = styled.TouchableOpacity`
@@ -44,7 +50,8 @@ const TagTouchble = styled.TouchableOpacity``;
 
 @connect(
   state => ({
-    loading: getLoadingSavedTags(state),
+    loadingSavedTags: getLoadingSavedTags(state),
+    loadingSavedPosts: getLoadingSavedPosts(state),
     savedTags: getSavedTags(state),
     savedPosts: getSavedPosts(state),
   }),
@@ -58,6 +65,10 @@ class SavedContentScreen extends Component {
     navigation: PropTypes.shape().isRequired,
     fetchSavedTags: PropTypes.func.isRequired,
     fetchSavedPosts: PropTypes.func.isRequired,
+    savedTags: PropTypes.arrayOf(PropTypes.string),
+    savedPosts: PropTypes.arrayOf(PropTypes.shape()),
+    loadingSavedTags: PropTypes.bool.isRequired,
+    loadingSavedPosts: PropTypes.bool.isRequired,
   };
 
   constructor(props) {
@@ -65,20 +76,31 @@ class SavedContentScreen extends Component {
 
     this.state = {
       currentSavedTags: props.savedTags,
+      currentSavedPosts: props.savedPosts,
     };
 
     this.navigateBack = this.navigateBack.bind(this);
     this.handleNavigateTag = this.handleNavigateTag.bind(this);
+    this.handleNavigatePost = this.handleNavigatePost.bind(this);
+    this.handleNavigateUser = this.handleNavigateUser.bind(this);
+    this.onRefreshContent = this.onRefreshContent.bind(this);
   }
 
   componentDidMount() {
     this.props.fetchSavedTags();
+    this.props.fetchSavedPosts();
   }
 
   componentWillReceiveProps(nextProps) {
     this.setState({
       currentSavedTags: _.union(this.state.currentSavedTags, nextProps.savedTags),
+      currentSavedPosts: _.unionBy(this.state.currentSavedPosts, nextProps.savedPosts, 'id'),
     });
+  }
+
+  onRefreshContent() {
+    this.props.fetchSavedTags();
+    this.props.fetchSavedPosts();
   }
 
   handleNavigateTag(tag) {
@@ -87,11 +109,24 @@ class SavedContentScreen extends Component {
     });
   }
 
+  handleNavigatePost(author, permlink) {
+    this.props.navigation.navigate(navigationConstants.FETCH_POST, {
+      author,
+      permlink,
+    });
+  }
+
+  handleNavigateUser(username) {
+    this.props.navigation.navigate(navigationConstants.USER, { username });
+  }
+
   navigateBack() {
     this.props.navigation.goBack();
   }
 
   render() {
+    const { loadingSavedTags, loadingSavedPosts } = this.props;
+    const loading = loadingSavedTags || loadingSavedPosts;
     return (
       <Container>
         <Header>
@@ -104,11 +139,19 @@ class SavedContentScreen extends Component {
               name={MATERIAL_ICONS.star}
               color={COLORS.PRIMARY_COLOR}
             />
-            <Title>{i18n.titles.savedTags}</Title>
+            <Title>{i18n.titles.saved}</Title>
           </TitleContainer>
           <HeaderEmptyView />
         </Header>
-        <ScrollView>
+        <ScrollView
+          refreshControl={
+            <RefreshControl
+              refreshing={loading}
+              onRefresh={this.onRefreshContent}
+              colors={[COLORS.PRIMARY_COLOR]}
+            />
+          }
+        >
           {_.map(this.state.currentSavedTags, tag => (
             <TagOption key={tag}>
               <TagTouchble onPress={() => this.handleNavigateTag(tag)}>
@@ -117,6 +160,17 @@ class SavedContentScreen extends Component {
               <SaveTagButton tag={tag} />
             </TagOption>
           ))}
+          {_.map(this.state.currentSavedPosts, post => (
+            <PostPreview
+              key={post.id}
+              handleNavigatePost={() => this.handleNavigatePost(post.author, post.permlink)}
+              handleNavigateUser={() => this.handleNavigateUser(post.author)}
+              author={post.author}
+              created={post.created}
+              title={post.title}
+            />
+          ))}
+          <View style={{ height: 100 }} />
         </ScrollView>
       </Container>
     );

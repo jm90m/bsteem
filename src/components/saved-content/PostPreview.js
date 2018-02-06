@@ -42,6 +42,22 @@ const PostCreated = styled.Text`
 `;
 
 class PostPreview extends Component {
+  static propTypes = {
+    author: PropTypes.string,
+    title: PropTypes.string,
+    created: PropTypes.string,
+    handleNavigatePost: PropTypes.func,
+    handleNavigateUser: PropTypes.func,
+  };
+
+  static defaultProps = {
+    author: '',
+    title: '',
+    created: '',
+    handleNavigatePost: () => {},
+    handleNavigateUser: () => {},
+  };
+
   render() {
     const { author, title, created, handleNavigatePost, handleNavigateUser } = this.props;
 
