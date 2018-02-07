@@ -3,7 +3,12 @@ import PropTypes from 'prop-types';
 import { TouchableWithoutFeedback } from 'react-native';
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import styled from 'styled-components/native';
-import { COLORS, MATERIAL_ICONS, MATERIAL_COMMUNITY_ICONS } from '../../constants/styles';
+import {
+  COLORS,
+  MATERIAL_ICONS,
+  MATERIAL_COMMUNITY_ICONS,
+  ICON_SIZES,
+} from '../../constants/styles';
 import MenuModalButton from '../common/menu/MenuModalButton';
 import MenuWrapper from '../common/menu/MenuWrapper';
 import SavePostMenuButton from './SavePostMenuButton';
@@ -77,7 +82,7 @@ class PostMenu extends Component {
             <MenuModalButton onPress={handleFollowUser}>
               <MenuModalContents>
                 <MaterialIcons
-                  size={20}
+                  size={ICON_SIZES.menuModalOptionIcon}
                   name={MATERIAL_ICONS.follow}
                   color={COLORS.PRIMARY_COLOR}
                 />
@@ -87,7 +92,7 @@ class PostMenu extends Component {
             <MenuModalButton onPress={handleNavigateToComments}>
               <MenuModalContents>
                 <MaterialCommunityIcons
-                  size={20}
+                  size={ICON_SIZES.menuModalOptionIcon}
                   color={COLORS.PRIMARY_COLOR}
                   name={MATERIAL_COMMUNITY_ICONS.comment}
                 />
@@ -103,7 +108,7 @@ class PostMenu extends Component {
             <MenuModalButton onPress={handleReblog}>
               <MenuModalContents>
                 <MaterialCommunityIcons
-                  size={20}
+                  size={ICON_SIZES.menuModalOptionIcon}
                   color={COLORS.PRIMARY_COLOR}
                   name={MATERIAL_COMMUNITY_ICONS.reblog}
                 />
@@ -113,7 +118,7 @@ class PostMenu extends Component {
             <MenuModalButton onPress={handleReportPost}>
               <MenuModalContents>
                 <MaterialIcons
-                  size={20}
+                  size={ICON_SIZES.menuModalOptionIcon}
                   color={COLORS.PRIMARY_COLOR}
                   name={MATERIAL_ICONS.report}
                 />
