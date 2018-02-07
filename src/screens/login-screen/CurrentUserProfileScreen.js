@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Modal, AsyncStorage } from 'react-native';
+import { Modal, AsyncStorage, Linking } from 'react-native';
 import _ from 'lodash';
 import sc2 from 'api/sc2';
 import styled from 'styled-components/native';
@@ -40,6 +40,7 @@ import UserBlog from 'screens/user-screen/UserBlog';
 import UserComments from 'screens/user-screen/UserComments';
 import CurrentUserHeader from './CurrentUserHeader';
 import CurrentUserMenu from './CurrentUserMenu';
+import LogoutScreen from './LogoutScreen';
 
 const Container = styled.View`
   flex: 1;
@@ -105,6 +106,7 @@ class CurrentUserProfileScreen extends Component {
     this.state = {
       currentMenuOption: userMenuConstants.BLOG,
       menuVisible: false,
+      logoutVisible: false,
     };
 
     this.toggleCurrentUserMenu = this.toggleCurrentUserMenu.bind(this);
@@ -114,6 +116,8 @@ class CurrentUserProfileScreen extends Component {
     this.fetchMoreUserComments = this.fetchMoreUserComments.bind(this);
     this.fetchMoreUserPosts = this.fetchMoreUserPosts.bind(this);
     this.handleRefreshUserBlog = this.handleRefreshUserBlog.bind(this);
+    this.showLogoutScreen = this.showLogoutScreen.bind(this);
+    this.hideLogoutScreen = this.hideLogoutScreen.bind(this);
   }
 
   componentDidMount() {
@@ -174,20 +178,22 @@ class CurrentUserProfileScreen extends Component {
     });
   }
 
-  resetAuthUserInAsyncStorage = async () => {
-    try {
-      AsyncStorage.setItem(STEEM_ACCESS_TOKEN, '');
-      AsyncStorage.setItem(AUTH_EXPIRATION, '');
-      AsyncStorage.setItem(AUTH_USERNAME, '');
-      AsyncStorage.setItem(AUTH_MAX_EXPIRATION_AGE, '');
-    } catch (e) {
-      console.log('FAILED TO RESET ASYNC STORAGE FOR AUTH USER');
-    }
-  };
-
   handleRefreshUserBlog() {
     const { username } = this.props;
     this.props.refreshUserBlog(username);
+  }
+
+  showLogoutScreen() {
+    this.setState({
+      logoutVisible: true,
+      menuVisible: false,
+    });
+  }
+
+  hideLogoutScreen() {
+    this.setState({
+      logoutVisible: false,
+    });
   }
 
   handleChangeUserMenu(option) {
@@ -226,17 +232,7 @@ class CurrentUserProfileScreen extends Component {
         );
         break;
       case userMenuConstants.LOGOUT.id:
-        sc2
-          .revokeToken()
-          .then(() => {
-            this.resetAuthUserInAsyncStorage();
-            this.props.logoutUser();
-          })
-          .catch(() => {
-            // TODO errors out here, still need to fix why sc2 is breaking
-            this.resetAuthUserInAsyncStorage();
-            this.props.logoutUser();
-          });
+        this.showLogoutScreen();
         break;
       default:
         this.setState({
@@ -329,7 +325,7 @@ class CurrentUserProfileScreen extends Component {
   }
 
   render() {
-    const { currentMenuOption, menuVisible } = this.state;
+    const { currentMenuOption, menuVisible, logoutVisible } = this.state;
     return (
       <Container>
         <CurrentUserHeader
@@ -338,6 +334,11 @@ class CurrentUserProfileScreen extends Component {
         />
         {this.renderUserContent()}
         {this.renderLoader()}
+        <LogoutScreen
+          visible={logoutVisible}
+          handleHide={this.hideLogoutScreen}
+          logoutUser={this.props.logoutUser}
+        />
         <Modal
           animationType="slide"
           transparent

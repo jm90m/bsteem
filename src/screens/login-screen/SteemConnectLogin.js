@@ -32,6 +32,12 @@ const DebugText = styled.Text`
   padding: 20px;
 `;
 
+const Description = styled.Text`
+  padding: 20px;
+  text-align: center;
+  font-weight: bold;
+`;
+
 @connect(null, mapDispatchToProps)
 class SteemConnectLogin extends Component {
   static propTypes = {
@@ -80,6 +86,9 @@ class SteemConnectLogin extends Component {
   render() {
     return (
       <Container>
+        <Description>
+          Sign in with SteemConnect so that you can vote, like, comment, and create posts.
+        </Description>
         <Button
           onPress={this.handleSteemConnectLogin}
           title="Login with SteemConnect"

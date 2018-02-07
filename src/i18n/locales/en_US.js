@@ -13,5 +13,9 @@ export default {
     tags: 'Tags',
     tagsDescription:
       'Separate topics with commas or spaces. Only lowercase letters, numbers and hyphen character is permitted',
+    errors: {
+      emptyTags: 'Must include atleast 1 tag.',
+      emptyTitle: 'Title cannot be empty',
+    },
   },
 };

@@ -103,13 +103,6 @@ class LoginScreen extends Component {
   }
 
   render() {
-    // if (this.state.loading) {
-    //   return (
-    //     <LoadingContainer>
-    //       <Loading color={COLORS.PRIMARY_COLOR} size="large" />
-    //     </LoadingContainer>
-    //   );
-    // }
     return (
       <Container>
         {this.renderUser()}

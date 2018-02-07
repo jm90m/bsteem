@@ -9,9 +9,11 @@ import {
   MATERIAL_COMMUNITY_ICONS,
   ICON_SIZES,
 } from '../../constants/styles';
+import { connect } from 'react-redux';
 import MenuModalButton from '../common/menu/MenuModalButton';
 import MenuWrapper from '../common/menu/MenuWrapper';
 import SavePostMenuButton from './SavePostMenuButton';
+import { getAuthUsername } from '../../state/rootReducer';
 
 const Container = styled.View`
   align-items: center;
@@ -31,6 +33,9 @@ const MenuModalContents = styled.View`
   align-items: center;
 `;
 
+@connect(state => ({
+  authUsername: getAuthUsername(state),
+}))
 class PostMenu extends Component {
   static propTypes = {
     handleFollowUser: PropTypes.func,
@@ -45,6 +50,7 @@ class PostMenu extends Component {
       permlink: PropTypes.string,
       id: PropTypes.number,
     }),
+    authUsername: PropTypes.string.isRequired,
   };
 
   static defaultProps = {
@@ -65,8 +71,10 @@ class PostMenu extends Component {
       handleReblog,
       handleReportPost,
       postData,
+      authUsername,
     } = this.props;
     const { title, permlink, author, id, created } = postData;
+    const displayMenuButton = authUsername !== author;
 
     return (
       <TouchableWithoutFeedback onPress={hideMenu}>
@@ -79,16 +87,18 @@ class PostMenu extends Component {
               id={id}
               created={created}
             />
-            <MenuModalButton onPress={handleFollowUser}>
-              <MenuModalContents>
-                <MaterialIcons
-                  size={ICON_SIZES.menuModalOptionIcon}
-                  name={MATERIAL_ICONS.follow}
-                  color={COLORS.PRIMARY_COLOR}
-                />
-                <MenuText>Follow</MenuText>
-              </MenuModalContents>
-            </MenuModalButton>
+            {displayMenuButton && (
+              <MenuModalButton onPress={handleFollowUser}>
+                <MenuModalContents>
+                  <MaterialIcons
+                    size={ICON_SIZES.menuModalOptionIcon}
+                    name={MATERIAL_ICONS.follow}
+                    color={COLORS.PRIMARY_COLOR}
+                  />
+                  <MenuText>Follow</MenuText>
+                </MenuModalContents>
+              </MenuModalButton>
+            )}
             <MenuModalButton onPress={handleNavigateToComments}>
               <MenuModalContents>
                 <MaterialCommunityIcons
@@ -101,30 +111,38 @@ class PostMenu extends Component {
             </MenuModalButton>
             <MenuModalButton onPress={handleLikePost}>
               <MenuModalContents>
-                <MaterialIcons size={20} color={COLORS.PRIMARY_COLOR} name={MATERIAL_ICONS.like} />
-                <MenuText>Like Post</MenuText>
-              </MenuModalContents>
-            </MenuModalButton>
-            <MenuModalButton onPress={handleReblog}>
-              <MenuModalContents>
-                <MaterialCommunityIcons
-                  size={ICON_SIZES.menuModalOptionIcon}
-                  color={COLORS.PRIMARY_COLOR}
-                  name={MATERIAL_COMMUNITY_ICONS.reblog}
-                />
-                <MenuText>Reblog</MenuText>
-              </MenuModalContents>
-            </MenuModalButton>
-            <MenuModalButton onPress={handleReportPost}>
-              <MenuModalContents>
                 <MaterialIcons
                   size={ICON_SIZES.menuModalOptionIcon}
                   color={COLORS.PRIMARY_COLOR}
-                  name={MATERIAL_ICONS.report}
+                  name={MATERIAL_ICONS.like}
                 />
-                <MenuText>Report Post</MenuText>
+                <MenuText>Like Post</MenuText>
               </MenuModalContents>
             </MenuModalButton>
+            {displayMenuButton && (
+              <MenuModalButton onPress={handleReblog}>
+                <MenuModalContents>
+                  <MaterialCommunityIcons
+                    size={ICON_SIZES.menuModalOptionIcon}
+                    color={COLORS.PRIMARY_COLOR}
+                    name={MATERIAL_COMMUNITY_ICONS.reblog}
+                  />
+                  <MenuText>Reblog</MenuText>
+                </MenuModalContents>
+              </MenuModalButton>
+            )}
+            {displayMenuButton && (
+              <MenuModalButton onPress={handleReportPost}>
+                <MenuModalContents>
+                  <MaterialIcons
+                    size={ICON_SIZES.menuModalOptionIcon}
+                    color={COLORS.PRIMARY_COLOR}
+                    name={MATERIAL_ICONS.report}
+                  />
+                  <MenuText>Report Post</MenuText>
+                </MenuModalContents>
+              </MenuModalButton>
+            )}
           </MenuWrapper>
         </Container>
       </TouchableWithoutFeedback>

@@ -8,7 +8,7 @@ import styled from 'styled-components/native';
 import { ImagePicker } from 'expo';
 import * as navigationConstants from 'constants/navigation';
 import i18n from 'i18n/i18n';
-import { FormLabel, FormInput, Icon } from 'react-native-elements';
+import { FormLabel, FormInput, Icon, FormValidationMessage } from 'react-native-elements';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS, MATERIAL_ICONS, MATERIAL_COMMUNITY_ICONS, ICON_SIZES } from 'constants/styles';
 import { getAuthUsername, getCreatePostLoading } from 'state/rootReducer';
@@ -18,22 +18,13 @@ import Header from 'components/common/Header';
 import TagsInput from 'components/editor/TagsInput';
 import SmallLoading from 'components/common/SmallLoading';
 import PrimaryButton from 'components/common/PrimaryButton';
+import HeaderEmptyView from 'components/common/HeaderEmptyView';
 
 const Container = styled.View`
   flex: 1;
 `;
 
 const StyledScrollView = styled.ScrollView``;
-
-const TouchableMenu = styled.TouchableOpacity``;
-
-const TouchableMenuContainer = styled.View`
-  padding: 5px;
-`;
-
-const EmptyView = styled.View`
-  width: 5px;
-`;
 
 const CreatePostText = styled.Text`
   color: ${COLORS.PRIMARY_COLOR};
@@ -99,8 +90,9 @@ class PostCreationScreen extends Component {
     bodyInput: '',
     tags: [],
     currentImages: [],
-    menuVisibile: false,
     tagError: '',
+    titleError: '',
+    bodyError: '',
   };
 
   constructor(props) {
@@ -110,17 +102,25 @@ class PostCreationScreen extends Component {
     this.onChangeTitle = this.onChangeTitle.bind(this);
     this.onChangeTags = this.onChangeTags.bind(this);
     this.onChangeBody = this.onChangeBody.bind(this);
-    this.toggleMenu = this.toggleMenu.bind(this);
     this.pickImage = this.pickImage.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.removeTag = this.removeTag.bind(this);
     this.handleCreatePostSuccess = this.handleCreatePostSuccess.bind(this);
+    this.handleSuccessImageUpload = this.handleSuccessImageUpload.bind(this);
+    this.insertImage = this.insertImage.bind(this);
   }
 
   onChangeTitle(value) {
-    this.setState({
-      titleInput: value,
-    });
+    if (!_.isEmpty(value)) {
+      this.setState({
+        titleInput: value,
+        titleError: '',
+      });
+    } else {
+      this.setState({
+        titleInput: value,
+      });
+    }
   }
 
   onChangeTags(value) {
@@ -143,6 +143,7 @@ class PostCreationScreen extends Component {
       const tags = _.compact([...this.state.tags, newTag]);
       this.setState({
         tagsInput: '',
+        tagError: '',
         tags,
       });
     } else {
@@ -166,23 +167,17 @@ class PostCreationScreen extends Component {
 
     if (!result.cancelled) {
       this.setState({ imageLoading: true });
-      this.props.uploadImage(
-        result.uri,
-        (url, name) => {
-          console.log('IMAGE SUCCESS', url, name);
-          this.insertImage(url, name);
-        },
-        () => {
-          console.log('ERROR');
-        },
-      );
+      this.props.uploadImage(result.uri, this.handleSuccessImageUpload, () => {
+        console.log('ERROR');
+      });
     }
   }
 
-  // TODO
-  handleSuccessImageUpload(url, name) {}
+  handleSuccessImageUpload(url, name) {
+    this.insertImage(url, name);
+  }
 
-  insertImage = (image, imageName = 'image') => {
+  insertImage(image, imageName = 'image') {
     const newImage = {
       src: image,
       name: imageName,
@@ -192,12 +187,14 @@ class PostCreationScreen extends Component {
       currentImages: _.concat(this.state.currentImages, newImage),
       imageLoading: false,
     });
-  };
+  }
 
   getPostData() {
-    const tags = _.compact([...this.state.tags, 'bsteem', 'busy']);
+    const bsteemTag = 'bsteem';
+    // dont forget to put bsteem tag here
+    const tags = _.compact([...this.state.tags]);
     const images = _.map(this.state.currentImages, image => image.src);
-    let postBody = this.state.bodyInput;
+    let postBody = _.isEmpty(this.state.bodyInput) ? ' ' : this.state.bodyInput;
     let postImages = _.reduce(
       this.state.currentImages,
       (str, image) => {
@@ -235,12 +232,6 @@ class PostCreationScreen extends Component {
     data.jsonMetadata = metaData;
 
     return data;
-  }
-
-  toggleMenu() {
-    this.setState({
-      menuVisible: !this.state.menuVisibile,
-    });
   }
 
   removeTag(tag) {
@@ -288,8 +279,21 @@ class PostCreationScreen extends Component {
   }
 
   handleSubmit() {
-    const postData = this.getPostData();
-    this.props.createPost(postData, this.handleCreatePostSuccess);
+    // validate form
+    const { tags, titleInput } = this.state;
+    const errorState = {};
+
+    if (_.isEmpty(tags)) errorState.tagError = i18n.editor.errors.emptyTags;
+    if (_.isEmpty(titleInput)) errorState.titleError = i18n.editor.errors.emptyTitle;
+
+    if (_.isEmpty(errorState)) {
+      this.setState(errorState, () => {
+        const postData = this.getPostData();
+        this.props.createPost(postData, this.handleCreatePostSuccess);
+      });
+    } else {
+      this.setState(errorState);
+    }
   }
 
   render() {
@@ -302,20 +306,16 @@ class PostCreationScreen extends Component {
       tagError,
       currentImages,
       imageLoading,
+      titleError,
     } = this.state;
+    const displayTitleError = !_.isEmpty(titleError);
+
     return (
       <Container>
         <Header>
-          <EmptyView />
+          <HeaderEmptyView />
           <CreatePostText>{i18n.titles.createPost}</CreatePostText>
-          <TouchableMenu onPress={this.toggleMenu}>
-            <TouchableMenuContainer>
-              <MaterialCommunityIcons
-                size={ICON_SIZES.menuIcon}
-                name={MATERIAL_COMMUNITY_ICONS.menuVertical}
-              />
-            </TouchableMenuContainer>
-          </TouchableMenu>
+          <HeaderEmptyView />
         </Header>
         <StyledScrollView>
           <FormLabel>{i18n.editor.title}</FormLabel>
@@ -324,6 +324,7 @@ class PostCreationScreen extends Component {
             placeholder={i18n.editor.titlePlaceholder}
             value={titleInput}
           />
+          {displayTitleError && <FormValidationMessage>{titleError}</FormValidationMessage>}
           <TagsInput
             tags={tags}
             tagsInput={tagsInput}
@@ -361,7 +362,7 @@ class PostCreationScreen extends Component {
               disabled={createPostLoading}
               loading={createPostLoading}
             />
-            <ImagePickerTouchable onPress={this.pickImage}>
+            <ImagePickerTouchable onPress={this.pickImage} disabled={createPostLoading}>
               <Icon
                 name="add-a-photo"
                 backgroundColor={COLORS.GREY.NERO}

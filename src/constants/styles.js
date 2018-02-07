@@ -12,7 +12,7 @@ const colorsMap = {
 
   GREEN: {
     BUBBLES: '#EAF4EF',
-    DARK_GREEN: '#000222',
+    DARK_GREEN: '#000024',
   },
 
   BLACK: {
