@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { ListView, Modal, Text } from 'react-native';
+import _ from 'lodash';
 import styled from 'styled-components/native';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { getAPIByFilter } from 'api/api';
@@ -58,11 +59,11 @@ class FeedScreen extends Component {
     const { tag } = this.props.navigation.state.params;
     const query = { tag, limit: 10 };
     const api = getAPIByFilter(this.state.currentFilter.id);
-    api(query).then(result => {
+    api(query).then(response => {
       this.setState({
         loading: false,
-        dataSource: ds.cloneWithRows(result.result),
-        posts: result,
+        dataSource: ds.cloneWithRows(response.result),
+        posts: response.result,
       });
     });
   };
@@ -86,11 +87,13 @@ class FeedScreen extends Component {
     const query = {
       tag,
       limit: 11,
-      start_permlink: lastPost.permlink,
-      start_author: lastPost.author,
+      start_permlink: _.get(lastPost, 'permlink', ''),
+      start_author: _.get(lastPost, 'author', ''),
     };
 
-    api(query).then(result => {
+    api(query).then(response => {
+      if (response.error) return;
+      const { result } = response;
       const posts = this.state.posts.concat(result.slice(1, result.length - 1));
       this.setState({
         dataSource: ds.cloneWithRows(posts),

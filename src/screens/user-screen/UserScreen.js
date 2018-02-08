@@ -181,8 +181,8 @@ class UserScreen extends Component {
       const lastPost = _.last(userBlog);
       const query = {
         tag: username,
-        start_author: lastPost.author,
-        start_permlink: lastPost.permlink,
+        start_author: _.get(lastPost, 'author', ''),
+        start_permlink: _.get(lastPost, 'permlink', ''),
         limit: 10,
       };
       this.props.fetchUserBlog(username, query);
