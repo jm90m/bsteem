@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Image, TouchableOpacity } from 'react-native';
+import { Image, TouchableOpacity, View, Dimensions } from 'react-native';
 import _ from 'lodash';
 import uuidv4 from 'uuid/v4';
 import { connect } from 'react-redux';
@@ -10,7 +10,7 @@ import * as navigationConstants from 'constants/navigation';
 import i18n from 'i18n/i18n';
 import { FormLabel, FormInput, Icon, FormValidationMessage } from 'react-native-elements';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS, MATERIAL_ICONS, MATERIAL_COMMUNITY_ICONS, ICON_SIZES } from 'constants/styles';
+import { COLORS, MATERIAL_ICONS, ICON_SIZES } from 'constants/styles';
 import { getAuthUsername, getCreatePostLoading } from 'state/rootReducer';
 import { createPost, uploadImage } from 'state/actions/editorActions';
 import defaultPostData from 'constants/defaultPostData';
@@ -19,6 +19,9 @@ import TagsInput from 'components/editor/TagsInput';
 import SmallLoading from 'components/common/SmallLoading';
 import PrimaryButton from 'components/common/PrimaryButton';
 import HeaderEmptyView from 'components/common/HeaderEmptyView';
+import { MATERIAL_COMMUNITY_ICONS } from '../../constants/styles';
+
+const { width: deviceWidth } = Dimensions.get('screen');
 
 const Container = styled.View`
   flex: 1;
@@ -38,13 +41,7 @@ const ImageContainer = styled.View`
   flex-wrap: wrap;
 `;
 
-const ImageOption = styled.View`
-  flex-direction: row;
-  padding: 5px 0;
-  margin-right: 10px;
-`;
-
-const ImagePickerTouchable = styled.TouchableOpacity`
+const ActionButtonTouchable = styled.TouchableOpacity`
   width: 50px;
   height: 50px;
   justify-content: center;
@@ -57,8 +54,13 @@ const ImagePickerTouchable = styled.TouchableOpacity`
 const ActionButtonsContainer = styled.View`
   flex-direction: row;
   flex-wrap: wrap;
-  margin-top; 10px;
+  margin-top: 20px;
   justify-content: space-between;
+  padding-bottom: 100px;
+`;
+
+const ActionButtons = styled.View`
+  flex-direction: row;
 `;
 
 const mapStateToProps = state => ({
@@ -93,11 +95,15 @@ class PostCreationScreen extends Component {
     tagError: '',
     titleError: '',
     bodyError: '',
+    additionalPostContents: [],
+    additionalInputCounter: 0,
   };
 
   constructor(props) {
     super(props);
     this.state = PostCreationScreen.INITIAL_STATE;
+
+    this.additionalContents = {};
 
     this.onChangeTitle = this.onChangeTitle.bind(this);
     this.onChangeTags = this.onChangeTags.bind(this);
@@ -108,6 +114,9 @@ class PostCreationScreen extends Component {
     this.handleCreatePostSuccess = this.handleCreatePostSuccess.bind(this);
     this.handleSuccessImageUpload = this.handleSuccessImageUpload.bind(this);
     this.insertImage = this.insertImage.bind(this);
+    this.addTextInput = this.addTextInput.bind(this);
+    this.renderAdditionalContents = this.renderAdditionalContents.bind(this);
+    this.removeAdditionalContent = this.removeAdditionalContent.bind(this);
   }
 
   onChangeTitle(value) {
@@ -178,15 +187,36 @@ class PostCreationScreen extends Component {
   }
 
   insertImage(image, imageName = 'image') {
+    const id = uuidv4();
     const newImage = {
       src: image,
       name: imageName,
-      id: uuidv4(),
+      type: 'image',
+      ref: `image-${id}`,
+      id,
     };
     this.setState({
       currentImages: _.concat(this.state.currentImages, newImage),
       imageLoading: false,
+      additionalPostContents: _.concat(this.state.additionalPostContents, newImage),
     });
+  }
+
+  getPostBody() {
+    const { bodyInput, additionalPostContents } = this.state;
+    let body = _.isEmpty(bodyInput) ? '' : `${bodyInput}\n`;
+
+    _.each(additionalPostContents, content => {
+      if (content.type === 'text') {
+        const inputField = this.additionalContents[content.ref];
+        if (inputField) {
+          body += _.get(inputField, 'input._lastNativeText', '');
+        }
+      } else if (content.type === 'image') {
+        body += `![${content.name}](${content.src})\n`;
+      }
+    });
+    return body;
   }
 
   getPostData() {
@@ -194,19 +224,12 @@ class PostCreationScreen extends Component {
     // dont forget to put bsteem tag here
     const tags = _.compact([...this.state.tags]);
     const images = _.map(this.state.currentImages, image => image.src);
-    let postBody = _.isEmpty(this.state.bodyInput) ? ' ' : this.state.bodyInput;
-    let postImages = _.reduce(
-      this.state.currentImages,
-      (str, image) => {
-        const imageText = `![${image.name}](${image.src})\n`;
-        return `${str}${imageText}`;
-      },
-      ' ',
-    );
-    postBody += postImages;
+    const postBody = this.getPostBody();
+    const body = _.isEmpty(postBody) ? ' ' : postBody;
+
     const postTitle = this.state.titleInput;
     const data = {
-      body: postBody,
+      body,
       title: postTitle,
       reward: '50',
       author: this.props.authUsername,
@@ -249,15 +272,6 @@ class PostCreationScreen extends Component {
     });
   }
 
-  removeImage(imageSrc) {
-    const { currentImages } = this.state;
-    const newImages = _.remove([...currentImages], { src: imageSrc });
-
-    this.setState({
-      currentImages: newImages,
-    });
-  }
-
   handleCreatePostSuccess(postData) {
     const { title, category, author, json_metadata, body, permlink, id } = postData;
     const postDataWithDefaults = {
@@ -265,7 +279,11 @@ class PostCreationScreen extends Component {
       ...postData,
     };
     const parsedJsonMetadata = _.attempt(JSON.parse, json_metadata);
+
+    // reset form state
     this.setState(PostCreationScreen.INITIAL_STATE);
+    this.additionalContents = {};
+
     this.props.navigation.navigate(navigationConstants.POST, {
       title,
       body,
@@ -296,6 +314,91 @@ class PostCreationScreen extends Component {
     }
   }
 
+  removeAdditionalContent(index, type, imgID) {
+    const additionalPostContents = [...this.state.additionalPostContents];
+    additionalPostContents.splice(index, 1);
+
+    if (type === 'image') {
+      const currentImages = [...this.state.currentImages];
+      _.remove(currentImages, { id: imgID });
+      this.setState({
+        currentImages,
+        additionalPostContents,
+      });
+    } else if (type === 'text') {
+      this.setState({
+        additionalPostContents,
+      });
+    }
+  }
+
+  addTextInput() {
+    const key = `text-${this.state.additionalInputCounter}`;
+    const additionalInput = {
+      key,
+      type: 'text',
+      ref: key,
+    };
+    this.setState({
+      additionalPostContents: _.concat(this.state.additionalPostContents, additionalInput),
+      additionalInputCounter: this.state.additionalInputCounter + 1,
+    });
+  }
+
+  renderAdditionalContents() {
+    const closeButtonStyles = {
+      position: 'absolute',
+      top: '50%',
+      right: 20,
+      backgroundColor: 'transparent',
+    };
+    return _.map(this.state.additionalPostContents, (content, index) => {
+      const { type, key, ref } = content;
+      if (type === 'text') {
+        return (
+          <View key={key}>
+            <FormInput
+              ref={input => (this.additionalContents[ref] = input)}
+              placeholder={i18n.editor.bodyPlaceholder}
+              multiline
+            />
+            <TouchableOpacity
+              onPress={() => this.removeAdditionalContent(index, type)}
+              style={closeButtonStyles}
+            >
+              <MaterialCommunityIcons
+                name={MATERIAL_COMMUNITY_ICONS.closeCircle}
+                size={ICON_SIZES.actionIcon}
+                color={COLORS.PRIMARY_COLOR}
+              />
+            </TouchableOpacity>
+          </View>
+        );
+      } else if (type === 'image') {
+        return (
+          <View key={`${content.src}/${index}`}>
+            <Image
+              ref={img => (this.additionalContents[ref] = img)}
+              source={{ uri: content.src }}
+              style={{ width: deviceWidth, height: deviceWidth }}
+              resizeMode={Image.resizeMode.contain}
+            />
+            <TouchableOpacity
+              onPress={() => this.removeAdditionalContent(index, type, content.id)}
+              style={closeButtonStyles}
+            >
+              <MaterialCommunityIcons
+                name={MATERIAL_COMMUNITY_ICONS.closeCircle}
+                size={ICON_SIZES.actionIcon}
+                color={COLORS.PRIMARY_COLOR}
+              />
+            </TouchableOpacity>
+          </View>
+        );
+      }
+    });
+  }
+
   render() {
     const { createPostLoading } = this.props;
     const {
@@ -304,7 +407,6 @@ class PostCreationScreen extends Component {
       tags,
       bodyInput,
       tagError,
-      currentImages,
       imageLoading,
       titleError,
     } = this.state;
@@ -323,6 +425,7 @@ class PostCreationScreen extends Component {
             onChangeText={this.onChangeTitle}
             placeholder={i18n.editor.titlePlaceholder}
             value={titleInput}
+            maxLength={255}
           />
           {displayTitleError && <FormValidationMessage>{titleError}</FormValidationMessage>}
           <TagsInput
@@ -339,37 +442,33 @@ class PostCreationScreen extends Component {
             multiline
             value={bodyInput}
           />
-          <ImageContainer>
-            {_.map(currentImages, (image, index) => (
-              <ImageOption key={`${image.src}/${index}`}>
-                <Image
-                  source={{ uri: image.src }}
-                  style={{ width: 100, height: 100, borderRadius: 4, marginRight: 3 }}
-                  resizeMode={Image.resizeMode.contain}
-                />
-                <TouchableOpacity onPress={() => this.removeImage(image.src)}>
-                  <MaterialIcons name={MATERIAL_ICONS.close} size={ICON_SIZES.actionIcon} />
-                </TouchableOpacity>
-              </ImageOption>
-            ))}
-            {imageLoading && <SmallLoading />}
-          </ImageContainer>
+          {this.renderAdditionalContents()}
+          {imageLoading && <SmallLoading style={{ marginTop: 20, alignSelf: 'center' }} />}
           <ActionButtonsContainer>
             <PrimaryButton
               onPress={this.handleSubmit}
               title="Create Post"
-              rounded
               disabled={createPostLoading}
               loading={createPostLoading}
             />
-            <ImagePickerTouchable onPress={this.pickImage} disabled={createPostLoading}>
-              <Icon
-                name="add-a-photo"
-                backgroundColor={COLORS.GREY.NERO}
-                size={ICON_SIZES.actionIcon}
-                color={COLORS.WHITE.WHITE}
-              />
-            </ImagePickerTouchable>
+            <ActionButtons>
+              <ActionButtonTouchable onPress={this.addTextInput} disabled={createPostLoading}>
+                <Icon
+                  name="note-add"
+                  backgroundColor={COLORS.GREY.NERO}
+                  size={ICON_SIZES.actionIcon}
+                  color={COLORS.WHITE.WHITE}
+                />
+              </ActionButtonTouchable>
+              <ActionButtonTouchable onPress={this.pickImage} disabled={createPostLoading}>
+                <Icon
+                  name="add-a-photo"
+                  backgroundColor={COLORS.GREY.NERO}
+                  size={ICON_SIZES.actionIcon}
+                  color={COLORS.WHITE.WHITE}
+                />
+              </ActionButtonTouchable>
+            </ActionButtons>
           </ActionButtonsContainer>
         </StyledScrollView>
       </Container>
