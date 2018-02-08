@@ -64,6 +64,7 @@ class TagsInput extends Component {
           placeholder="Please enter tags"
           value={tagsInput}
           autoCapitalize="none"
+          maxLength={20}
         />
         {this.renderTagError()}
         <TagsContainer>
