@@ -121,6 +121,8 @@ class FollowButton extends Component {
   render() {
     const { loadingIsFollowing, isFollowing } = this.state;
 
+    console.log('RENDER FOLLOW', isFollowing);
+
     return isFollowing ? (
       <DangerButton title="Unfollow" onPress={this.handleUnfollow} loading={loadingIsFollowing} />
     ) : (

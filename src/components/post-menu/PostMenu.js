@@ -3,17 +3,19 @@ import PropTypes from 'prop-types';
 import { TouchableWithoutFeedback } from 'react-native';
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import styled from 'styled-components/native';
+import { connect } from 'react-redux';
+import i18n from 'i18n/i18n';
 import {
   COLORS,
   MATERIAL_ICONS,
   MATERIAL_COMMUNITY_ICONS,
   ICON_SIZES,
 } from '../../constants/styles';
-import { connect } from 'react-redux';
 import MenuModalButton from '../common/menu/MenuModalButton';
 import MenuWrapper from '../common/menu/MenuWrapper';
 import SavePostMenuButton from './SavePostMenuButton';
-import { getAuthUsername } from '../../state/rootReducer';
+import { getAuthUsername, getCurrentUserFollowList } from '../../state/rootReducer';
+import FollowMenuButton from './FollowMenuButton';
 
 const Container = styled.View`
   align-items: center;
@@ -35,6 +37,7 @@ const MenuModalContents = styled.View`
 
 @connect(state => ({
   authUsername: getAuthUsername(state),
+  followingList: getCurrentUserFollowList(state),
 }))
 class PostMenu extends Component {
   static propTypes = {
@@ -62,6 +65,10 @@ class PostMenu extends Component {
     handleReportPost: () => {},
   };
 
+  renderFollowOption() {
+    const { followingList } = this.props;
+  }
+
   render() {
     const {
       hideMenu,
@@ -87,18 +94,7 @@ class PostMenu extends Component {
               id={id}
               created={created}
             />
-            {displayMenuButton && (
-              <MenuModalButton onPress={handleFollowUser}>
-                <MenuModalContents>
-                  <MaterialIcons
-                    size={ICON_SIZES.menuModalOptionIcon}
-                    name={MATERIAL_ICONS.follow}
-                    color={COLORS.PRIMARY_COLOR}
-                  />
-                  <MenuText>Follow</MenuText>
-                </MenuModalContents>
-              </MenuModalButton>
-            )}
+            {displayMenuButton && <FollowMenuButton username={author} />}
             <MenuModalButton onPress={handleNavigateToComments}>
               <MenuModalContents>
                 <MaterialCommunityIcons
@@ -106,7 +102,7 @@ class PostMenu extends Component {
                   color={COLORS.PRIMARY_COLOR}
                   name={MATERIAL_COMMUNITY_ICONS.comment}
                 />
-                <MenuText>Comments</MenuText>
+                <MenuText>{i18n.postMenu.comments}</MenuText>
               </MenuModalContents>
             </MenuModalButton>
             <MenuModalButton onPress={handleLikePost}>
@@ -116,7 +112,7 @@ class PostMenu extends Component {
                   color={COLORS.PRIMARY_COLOR}
                   name={MATERIAL_ICONS.like}
                 />
-                <MenuText>Like Post</MenuText>
+                <MenuText>{i18n.postMenu.likePost}</MenuText>
               </MenuModalContents>
             </MenuModalButton>
             {displayMenuButton && (
@@ -127,7 +123,7 @@ class PostMenu extends Component {
                     color={COLORS.PRIMARY_COLOR}
                     name={MATERIAL_COMMUNITY_ICONS.reblog}
                   />
-                  <MenuText>Reblog</MenuText>
+                  <MenuText>{i18n.postMenu.reblog}</MenuText>
                 </MenuModalContents>
               </MenuModalButton>
             )}
@@ -139,7 +135,7 @@ class PostMenu extends Component {
                     color={COLORS.PRIMARY_COLOR}
                     name={MATERIAL_ICONS.report}
                   />
-                  <MenuText>Report Post</MenuText>
+                  <MenuText>{i18n.postMenu.reportPost}</MenuText>
                 </MenuModalContents>
               </MenuModalButton>
             )}

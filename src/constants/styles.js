@@ -157,6 +157,7 @@ export const ICON_SIZES = {
   tabBarIcon: 20,
   actionIcon: 22,
   menuModalOptionIcon: 20,
+  editorCloseIcon: 30,
 };
 
 export const ICON_COLORS = {

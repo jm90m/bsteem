@@ -4,6 +4,7 @@ export default {
     createPost: 'Create Post',
     savedTags: 'Saved Tags',
     saved: 'Saved',
+    comments: 'Comments',
   },
   editor: {
     title: 'Title',
@@ -17,5 +18,14 @@ export default {
       emptyTags: 'Must include atleast 1 tag.',
       emptyTitle: 'Title cannot be empty',
     },
+  },
+  postMenu: {
+    follow: 'Follow',
+    unfollow: 'Unfollow',
+    comments: 'Comments',
+    likePost: 'Like Post',
+    unlikePost: 'Unlike Post',
+    reblog: 'Reblog',
+    reportPost: 'ReportPost',
   },
 };

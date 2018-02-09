@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { takeLatest, all, call, put, select } from 'redux-saga/effects';
+import { takeLatest, all, call, put, select, takeEvery } from 'redux-saga/effects';
 import API from 'api/api';
 import sc2 from 'api/sc2';
 import { getAuthUsername, getCurrentUserFeed } from '../rootReducer';
@@ -167,11 +167,11 @@ export const watchFetchMoreCurrentUserFeed = function*() {
 };
 
 export const watchCurrentUserVotePost = function*() {
-  yield takeLatest(CURRENT_USER_VOTE_POST.ACTION, votePost);
+  yield takeEvery(CURRENT_USER_VOTE_POST.ACTION, votePost);
 };
 
 export const watchCurrentUserReblogPost = function*() {
-  yield takeLatest(CURRENT_USER_REBLOG_POST.ACTION, reblogPost);
+  yield takeEvery(CURRENT_USER_REBLOG_POST.ACTION, reblogPost);
 };
 
 export const watchCurrentUserOnboarding = function*() {
@@ -179,13 +179,13 @@ export const watchCurrentUserOnboarding = function*() {
 };
 
 export const watchCurrentUserFollowList = function*() {
-  yield takeLatest(FETCH_CURRENT_USER_FOLLOW_LIST.ACTION, fetchCurrentUserFollowList);
+  yield takeEvery(FETCH_CURRENT_USER_FOLLOW_LIST.ACTION, fetchCurrentUserFollowList);
 };
 
 export const watchCurrentUserFollowUser = function*() {
-  yield takeLatest(CURRENT_USER_FOLLOW_USER.ACTION, followUser);
+  yield takeEvery(CURRENT_USER_FOLLOW_USER.ACTION, followUser);
 };
 
 export const watchCurrentuserUnfollowUser = function*() {
-  yield takeLatest(CURRENT_USER_UNFOLLOW_USER.ACTION, unfollowUser);
+  yield takeEvery(CURRENT_USER_UNFOLLOW_USER.ACTION, unfollowUser);
 };

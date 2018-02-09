@@ -5,6 +5,7 @@ import { View } from 'react-native';
 import { getReputation } from 'util/steemitFormatters';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import moment from 'moment-timezone';
+import APPS from 'constants/apps';
 import { COLORS, MATERIAL_COMMUNITY_ICONS, ICON_SIZES } from 'constants/styles';
 import Tag from 'components/post/Tag';
 import * as navigationConstants from 'constants/navigation';
@@ -56,16 +57,7 @@ const TagContainer = styled.View`
   flex-direction: row;
 `;
 
-const EmptyView = styled.View`
-  width: 3px;
-`;
-
-const MenuIconContainer = styled.View`
-  margin-left: auto;
-  padding-bottom: 10px;
-  padding-left: 10px;
-  padding-right: 10px;
-`;
+const PostedFrom = styled.Text``;
 
 class Header extends Component {
   static propTypes = {
@@ -154,6 +146,18 @@ class Header extends Component {
       </Touchable>
     );
   }
+
+  renderPostedFrom() {
+    try {
+      const { postData } = this.props;
+      const app = JSON.parse(postData.json_metadata).app.split('/');
+      const from = APPS[app[0]];
+      // version = app[1];
+      return <PostedFrom>{from}</PostedFrom>;
+    } catch (e) {
+      return <View />;
+    }
+  }
   render() {
     const { postData, displayMenu } = this.props;
 
@@ -179,7 +183,7 @@ class Header extends Component {
             <MaterialCommunityIcons
               name={MATERIAL_COMMUNITY_ICONS.menuHorizontal}
               size={ICON_SIZES.menuIcon}
-              color={COLORS.BLUE.MARINER}
+              color={COLORS.PRIMARY_COLOR}
             />
           </Touchable>
         </UserHeaderContainer>
@@ -187,7 +191,7 @@ class Header extends Component {
           <Touchable onPress={this.handleFeedNavigation}>
             <Tag tag={category} />
           </Touchable>
-          <EmptyView />
+          {this.renderPostedFrom()}
         </TagContainer>
       </Container>
     );

@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import _ from 'lodash';
 import { MaterialIcons } from '@expo/vector-icons';
 import { fetchComments } from 'state/actions/postsActions';
+import i18n from 'i18n/i18n';
 import CommentsContainer from 'components/post/comments/CommentsContainer';
 import { ICON_SIZES, MATERIAL_ICONS, COLORS } from 'constants/styles';
 import { getCommentsByPostId, getLoadingComments } from 'state/rootReducer';
@@ -23,6 +24,11 @@ const Title = styled.Text``;
 
 const LoadingContainer = styled.View`
   margin-top: 50px;
+`;
+
+const TitleContainer = styled.View`
+  flex-direction: row;
+  align-items: center;
 `;
 
 const mapStateToProps = state => ({
@@ -82,7 +88,14 @@ class CommentScreen extends Component {
           <BackTouchable onPress={this.navigateBack}>
             <MaterialIcons size={ICON_SIZES.menuIcon} name={MATERIAL_ICONS.back} />
           </BackTouchable>
-          <Title>{'Comments'}</Title>
+          <TitleContainer>
+            <MaterialIcons
+              size={ICON_SIZES.menuIcon}
+              name={MATERIAL_ICONS.comments}
+              color={COLORS.PRIMARY_COLOR}
+            />
+            <Title>{i18n.titles.comments}</Title>
+          </TitleContainer>
           <HeaderEmptyView />
         </Header>
         <CommentsContainer postId={postId} postData={postData} />

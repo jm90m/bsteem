@@ -185,7 +185,10 @@ class PostScreen extends Component {
     const { displayPhotoBrowser, modalVisible, initialPhotoIndex } = this.state;
     const parsedHtmlBody = getHtml(body, parsedJsonMetadata);
     const images = _.get(parsedJsonMetadata, 'image', []);
-    const formattedImages = _.map(images, image => ({ photo: image }));
+    const formattedImages = _.map(images, image => ({
+      photo: image,
+      caption: image.caption || '',
+    }));
     const tags = _.compact(_.get(parsedJsonMetadata, 'tags', []));
 
     console.log('POST DATA ---> START');
@@ -226,6 +229,7 @@ class PostScreen extends Component {
             hideMenu={this.handleHideModal}
             handleLikePost={this.handleLikePost}
             handleNavigateToComments={this.navigateToComments}
+            postData={postData}
           />
         </Modal>
         <PostPhotoBrowser

@@ -34,11 +34,10 @@ const CreatePostText = styled.Text`
   font-weight: bold;
 `;
 
-const ImageContainer = styled.View`
-  flex-direction: row;
-  margin-top: 10px;
-  padding: 0px 20px;
-  flex-wrap: wrap;
+const TouchableMenu = styled.TouchableOpacity``;
+
+const TouchableMenuContainer = styled.View`
+  padding: 5px;
 `;
 
 const ActionButtonTouchable = styled.TouchableOpacity`
@@ -348,8 +347,8 @@ class PostCreationScreen extends Component {
   renderAdditionalContents() {
     const closeButtonStyles = {
       position: 'absolute',
-      top: '50%',
-      right: 20,
+      top: 5,
+      right: 0,
       backgroundColor: 'transparent',
     };
     return _.map(this.state.additionalPostContents, (content, index) => {
@@ -368,7 +367,7 @@ class PostCreationScreen extends Component {
             >
               <MaterialCommunityIcons
                 name={MATERIAL_COMMUNITY_ICONS.closeCircle}
-                size={ICON_SIZES.actionIcon}
+                size={ICON_SIZES.editorCloseIcon}
                 color={COLORS.PRIMARY_COLOR}
               />
             </TouchableOpacity>
@@ -389,7 +388,7 @@ class PostCreationScreen extends Component {
             >
               <MaterialCommunityIcons
                 name={MATERIAL_COMMUNITY_ICONS.closeCircle}
-                size={ICON_SIZES.actionIcon}
+                size={ICON_SIZES.editorCloseIcon}
                 color={COLORS.PRIMARY_COLOR}
               />
             </TouchableOpacity>
@@ -417,7 +416,14 @@ class PostCreationScreen extends Component {
         <Header>
           <HeaderEmptyView />
           <CreatePostText>{i18n.titles.createPost}</CreatePostText>
-          <HeaderEmptyView />
+          <TouchableMenu onPress={() => {}}>
+            <TouchableMenuContainer>
+              <MaterialCommunityIcons
+                size={ICON_SIZES.menuIcon}
+                name={MATERIAL_COMMUNITY_ICONS.menuVertical}
+              />
+            </TouchableMenuContainer>
+          </TouchableMenu>
         </Header>
         <StyledScrollView>
           <FormLabel>{i18n.editor.title}</FormLabel>
