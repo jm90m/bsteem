@@ -29,9 +29,8 @@ class EmbedContent extends Component {
   };
 
   static defaultProps = {
-    embedContent: {},
     height: 400,
-    width: deviceWidth - 20,
+    width: deviceWidth,
   };
 
   constructor(props) {
@@ -66,27 +65,21 @@ class EmbedContent extends Component {
 
   renderIframe() {
     const { height, width, embedContent } = this.props;
-
     return (
       <WebView
         source={{ html: embedContent.embed }}
-        style={{ height, width }}
-        width={width}
-        height={height}
+        style={{
+          width,
+          height,
+        }}
+        scalesPageToFit={false}
       />
     );
   }
   render() {
     const { embedContent, inPost } = this.props;
-    const shouldRenderThumb = inPost ? false : !this.state.showIframe;
 
-    if (
-      (embedContent.provider_name === 'YouTube' || embedContent.provider_name === 'DTube') &&
-      shouldRenderThumb
-    ) {
-      return this.renderThumbFirst(embedContent.thumbnail);
-    } else if (embedContent.embed) {
-      console.log('RENDER_IFRAME');
+    if (embedContent.embed) {
       return this.renderIframe();
     }
     return <View />;
@@ -94,20 +87,3 @@ class EmbedContent extends Component {
 }
 
 export default EmbedContent;
-
-// renderWithIframe = embed => (
-//   // eslint-disable-next-line react/no-danger
-//   <div dangerouslySetInnerHTML={{ __html: embed }} />
-// );
-//
-// renderThumbFirst(thumb) {
-//   return (
-//     <div role="presentation" className="PostFeedEmbed" onClick={this.handleThumbClick}>
-//       <div className="PostFeedEmbed__playButton">
-//         <i className="iconfont icon-group icon-playon_fill" />
-//       </div>
-//       <img alt="thumbnail" className="PostFeedEmbed__preview" src={thumb} />
-//     </div>
-//   );
-// }
-//

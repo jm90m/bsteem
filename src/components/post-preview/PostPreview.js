@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Modal } from 'react-native';
+import { Modal, Dimensions } from 'react-native';
 import styled from 'styled-components/native';
 import { connect } from 'react-redux';
 import _ from 'lodash';
@@ -23,6 +23,8 @@ import PreviewImage from './PreviewImage';
 import PostMenu from 'components/post-menu/PostMenu';
 import EmbedContent from 'components/post-preview/EmbedContent';
 import { getPostPreviewComponents, getEmbeds } from '../../util/postPreviewUtils';
+
+const { width: deviceWidth } = Dimensions.get('screen');
 
 const Container = styled.View`
   background-color: ${COLORS.WHITE.WHITE};
@@ -308,7 +310,8 @@ class PostPreview extends Component {
     const images = _.get(postJSONMetaData, 'image', []);
     const previewImage = _.head(images);
     const hasPreviewImage = images.length > 0 && !_.isEmpty(previewImage);
-    const embeds = getEmbeds(postData);
+    const embedOptions = {};
+    const embeds = getEmbeds(postData, embedOptions);
     const firstEmbed = _.head(embeds);
     const hasVideo = !_.isEmpty(firstEmbed);
 

@@ -1,7 +1,10 @@
 import _ from 'lodash';
+import { Dimensions } from 'react-native';
 import { getHtml } from './postUtils';
 import steemEmbed from './steemEmbed';
 import { getProxyImageURL } from './imageUtils';
+
+const { width: deviceWidth } = Dimensions.get('screen');
 
 const START_WITH_PERCENT = 5;
 
@@ -80,18 +83,19 @@ export const getPostPreviewComponents = (
   return previewComponents;
 };
 
-export const getEmbeds = postData => {
+export const getEmbeds = (postData, embedOptions = {}) => {
   const jsonMetadata = _.attempt(JSON.parse, postData.json_metadata);
   const postJSONMetadata = _.isError(jsonMetadata) ? {} : jsonMetadata;
-  const embeds = steemEmbed.getAll(postData.body);
+  const embeds = steemEmbed.getAll(postData.body, embedOptions);
   const video = _.get(postJSONMetadata, 'video');
   const hasDtubeVideo = _.has(video, 'content.videohash') && _.has(video, 'info.snaphash');
 
   if (hasDtubeVideo) {
     const author = _.get(video, 'info.author', '');
     const permlink = _.get(video, 'info.permlink', '');
-    const dTubeEmbedUrl = `https://emb.d.tube/#!/${author}/${permlink}/true`;
-    const dTubeIFrame = `<iframe width="400" height="400" src="${dTubeEmbedUrl}" allowFullScreen></iframe>`;
+    const dTubeEmbedUrl = `https://emb.d.tube/#!/${author}/${permlink}`;
+    const dTubeIFrame = `<iframe width="${deviceWidth -
+      20}" height="340" src="${dTubeEmbedUrl}" allowFullScreen></iframe>`;
     embeds[0] = {
       type: 'video',
       provider_name: 'DTube',
