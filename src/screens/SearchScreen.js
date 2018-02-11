@@ -28,7 +28,7 @@ const NoResultsFoundText = styled.Text`
 `;
 
 const StyledListView = styled.ListView`
-  background-color: ${COLORS.WHITE.WHITE_SMOKE};
+  background-color: ${COLORS.LIST_VIEW_BACKGROUND};
 `;
 
 const Loading = styled.ActivityIndicator`

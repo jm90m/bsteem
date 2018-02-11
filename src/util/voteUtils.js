@@ -11,3 +11,12 @@ export const isPostVoted = (postData, authUsername) => {
   const userVote = _.find(postData.active_votes, { voter: authUsername }) || {};
   return userVote.percent > 0;
 };
+
+export const getRatio = postData => {
+  const totalPayout =
+    parseFloat(postData.pending_payout_value) +
+    parseFloat(postData.total_payout_value) +
+    parseFloat(postData.curator_payout_value);
+  const voteRshares = postData.active_votes.reduce((a, b) => a + parseFloat(b.rshares), 0);
+  return totalPayout / voteRshares;
+};
