@@ -59,13 +59,6 @@ class FollowButton extends Component {
     this.handleUnfollow = this.handleUnfollow.bind(this);
   }
 
-  componentWillReceiveProps(nextProps) {
-    const isFollowing = _.get(nextProps.currentUserFollowList, nextProps.username, false);
-    this.setState({
-      isFollowing,
-    });
-  }
-
   loadingFollowing() {
     this.setState({
       loadingIsFollowing: true,

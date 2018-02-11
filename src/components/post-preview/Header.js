@@ -11,6 +11,7 @@ import Tag from 'components/post/Tag';
 import * as navigationConstants from 'constants/navigation';
 import ReputationScore from 'components/post/ReputationScore';
 import Avatar from 'components/common/Avatar';
+import TimeAgo from 'components/common/TimeAgo';
 
 const Container = styled.View`
   padding: 16px 5px;
@@ -30,11 +31,6 @@ const AuthorText = styled.Text`
 `;
 const HeaderContents = styled.View`
   margin: 0 12px;
-`;
-
-const PostCreated = styled.Text`
-  color: ${COLORS.TERTIARY_COLOR};
-  font-size: 14px;
 `;
 
 const RebloggedUsername = styled.Text`
@@ -174,7 +170,7 @@ class Header extends Component {
             <Author>
               <View>
                 {this.renderAuthor()}
-                <PostCreated>{`${moment(created).fromNow(true)} ago`}</PostCreated>
+                <TimeAgo created={created} />
               </View>
               <ReputationScore reputation={getReputation(author_reputation)} />
             </Author>

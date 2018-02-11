@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { TouchableOpacity } from 'react-native';
 import styled from 'styled-components/native';
 import { COLORS } from 'constants/styles';
-import _ from 'lodash';
 import moment from 'moment-timezone';
 import Avatar from 'components/common/Avatar';
 
