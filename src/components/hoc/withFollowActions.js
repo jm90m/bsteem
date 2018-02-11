@@ -64,15 +64,6 @@ export default function withFollowActions(WrappedComponent) {
       this.handleUnfollow = this.handleUnfollow.bind(this);
     }
 
-    componentWillReceiveProps(nextProps) {
-      const isFollowing = _.get(nextProps.currentUserFollowList, this.props.username, false);
-      if (isFollowing !== this.state.isFollowing) {
-        this.setState({
-          isFollowing,
-        });
-      }
-    }
-
     loadingFollowing() {
       this.setState({
         loadingIsFollowing: true,
@@ -81,24 +72,32 @@ export default function withFollowActions(WrappedComponent) {
 
     successFollow() {
       const { username, authUsername } = this.props;
-      this.setState({
-        isFollowing: true,
-        loadingIsFollowing: false,
-      });
-      this.props.fetchCurrentUserFollowList();
-      this.props.fetchUserFollowCount(username);
-      this.props.fetchUserFollowCount(authUsername);
+      this.setState(
+        {
+          isFollowing: true,
+          loadingIsFollowing: false,
+        },
+        () => {
+          this.props.fetchCurrentUserFollowList();
+          this.props.fetchUserFollowCount(username);
+          this.props.fetchUserFollowCount(authUsername);
+        },
+      );
     }
 
     successUnfollow() {
       const { username, authUsername } = this.props;
-      this.setState({
-        isFollowing: false,
-        loadingIsFollowing: false,
-      });
-      this.props.fetchCurrentUserFollowList();
-      this.props.fetchUserFollowCount(username);
-      this.props.fetchUserFollowCount(authUsername);
+      this.setState(
+        {
+          isFollowing: false,
+          loadingIsFollowing: false,
+        },
+        () => {
+          this.props.fetchCurrentUserFollowList();
+          this.props.fetchUserFollowCount(username);
+          this.props.fetchUserFollowCount(authUsername);
+        },
+      );
     }
 
     failFollow() {

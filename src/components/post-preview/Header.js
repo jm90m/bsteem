@@ -33,7 +33,7 @@ const HeaderContents = styled.View`
 `;
 
 const PostCreated = styled.Text`
-  color: ${COLORS.BLUE.BOTICELLI};
+  color: ${COLORS.TERTIARY_COLOR};
   font-size: 14px;
 `;
 
@@ -53,11 +53,14 @@ const Touchable = styled.TouchableOpacity``;
 
 const TagContainer = styled.View`
   padding: 5px 0;
-  justify-content: space-between;
   flex-direction: row;
+  align-items: center;
 `;
 
-const PostedFrom = styled.Text``;
+const PostedFrom = styled.Text`
+  margin-left: 10px;
+  color: ${COLORS.TERTIARY_COLOR};
+`;
 
 class Header extends Component {
   static propTypes = {

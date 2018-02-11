@@ -4,6 +4,7 @@ import { TouchableWithoutFeedback } from 'react-native';
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import styled from 'styled-components/native';
 import { connect } from 'react-redux';
+import _ from 'lodash';
 import i18n from 'i18n/i18n';
 import {
   COLORS,
@@ -35,13 +36,8 @@ const MenuModalContents = styled.View`
   align-items: center;
 `;
 
-@connect(state => ({
-  authUsername: getAuthUsername(state),
-  followingList: getCurrentUserFollowList(state),
-}))
 class PostMenu extends Component {
   static propTypes = {
-    handleFollowUser: PropTypes.func,
     handleLikePost: PropTypes.func,
     handleNavigateToComments: PropTypes.func,
     handleReblog: PropTypes.func,
@@ -54,34 +50,35 @@ class PostMenu extends Component {
       id: PropTypes.number,
     }),
     authUsername: PropTypes.string.isRequired,
+    likedPost: PropTypes.bool,
   };
 
   static defaultProps = {
+    postData: {},
     hideMenu: () => {},
-    handleFollowUser: () => {},
     handleLikePost: () => {},
     handleNavigateToComments: () => {},
     handleReblog: () => {},
     handleReportPost: () => {},
+    likedPost: false,
   };
-
-  renderFollowOption() {
-    const { followingList } = this.props;
-  }
 
   render() {
     const {
       hideMenu,
-      handleFollowUser,
       handleLikePost,
       handleNavigateToComments,
       handleReblog,
       handleReportPost,
       postData,
       authUsername,
+      rebloggedList,
+      likedPost,
     } = this.props;
     const { title, permlink, author, id, created } = postData;
     const displayMenuButton = authUsername !== author;
+    const isReblogged = _.includes(rebloggedList, `${id}`);
+    const renderReportPost = false;
 
     return (
       <TouchableWithoutFeedback onPress={hideMenu}>
@@ -112,33 +109,35 @@ class PostMenu extends Component {
                   color={COLORS.PRIMARY_COLOR}
                   name={MATERIAL_ICONS.like}
                 />
-                <MenuText>{i18n.postMenu.likePost}</MenuText>
+                <MenuText>{likedPost ? i18n.postMenu.unlikePost : i18n.postMenu.likePost}</MenuText>
               </MenuModalContents>
             </MenuModalButton>
-            {displayMenuButton && (
-              <MenuModalButton onPress={handleReblog}>
-                <MenuModalContents>
-                  <MaterialCommunityIcons
-                    size={ICON_SIZES.menuModalOptionIcon}
-                    color={COLORS.PRIMARY_COLOR}
-                    name={MATERIAL_COMMUNITY_ICONS.reblog}
-                  />
-                  <MenuText>{i18n.postMenu.reblog}</MenuText>
-                </MenuModalContents>
-              </MenuModalButton>
-            )}
-            {displayMenuButton && (
-              <MenuModalButton onPress={handleReportPost}>
-                <MenuModalContents>
-                  <MaterialIcons
-                    size={ICON_SIZES.menuModalOptionIcon}
-                    color={COLORS.PRIMARY_COLOR}
-                    name={MATERIAL_ICONS.report}
-                  />
-                  <MenuText>{i18n.postMenu.reportPost}</MenuText>
-                </MenuModalContents>
-              </MenuModalButton>
-            )}
+            {displayMenuButton &&
+              !isReblogged && (
+                <MenuModalButton onPress={handleReblog}>
+                  <MenuModalContents>
+                    <MaterialCommunityIcons
+                      size={ICON_SIZES.menuModalOptionIcon}
+                      color={COLORS.PRIMARY_COLOR}
+                      name={MATERIAL_COMMUNITY_ICONS.reblog}
+                    />
+                    <MenuText>{i18n.postMenu.reblog}</MenuText>
+                  </MenuModalContents>
+                </MenuModalButton>
+              )}
+            {displayMenuButton &&
+              renderReportPost && (
+                <MenuModalButton onPress={handleReportPost}>
+                  <MenuModalContents>
+                    <MaterialIcons
+                      size={ICON_SIZES.menuModalOptionIcon}
+                      color={COLORS.PRIMARY_COLOR}
+                      name={MATERIAL_ICONS.report}
+                    />
+                    <MenuText>{i18n.postMenu.reportPost}</MenuText>
+                  </MenuModalContents>
+                </MenuModalButton>
+              )}
           </MenuWrapper>
         </Container>
       </TouchableWithoutFeedback>
@@ -146,4 +145,7 @@ class PostMenu extends Component {
   }
 }
 
-export default PostMenu;
+export default connect(state => ({
+  authUsername: getAuthUsername(state),
+  followingList: getCurrentUserFollowList(state),
+}))(PostMenu);

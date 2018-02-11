@@ -26,6 +26,6 @@ export default {
     likePost: 'Like Post',
     unlikePost: 'Unlike Post',
     reblog: 'Reblog',
-    reportPost: 'ReportPost',
+    reportPost: 'Report Post',
   },
 };

@@ -46,6 +46,7 @@ const appColors = {
   BORDER_COLOR: colorsMap.WHITE.GAINSBORO,
   PRIMARY_BACKGROUND_COLOR: colorsMap.WHITE.WHITE,
   SECONDARY_COLOR: colorsMap.GREEN.DARK_GREEN,
+  TERTIARY_COLOR: colorsMap.BLUE.BOTICELLI,
 };
 
 export const COLORS = {
@@ -108,6 +109,9 @@ export const MATERIAL_ICONS = {
   star: 'star',
   flashOn: 'flash-on',
   modeComment: 'mode-comment',
+
+  // video
+  playCircle: 'play-circle-outline',
 };
 
 export const MATERIAL_COMMUNITY_ICONS = {

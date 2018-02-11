@@ -239,7 +239,7 @@ class PostCreationScreen extends Component {
 
     const metaData = {
       community: 'bsteem',
-      app: 'bsteem v0.0',
+      app: 'bsteem-beta',
       format: 'markdown',
     };
 

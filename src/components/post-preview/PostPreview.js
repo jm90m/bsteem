@@ -21,6 +21,8 @@ import Header from './Header';
 import BodyShort from './BodyShort';
 import PreviewImage from './PreviewImage';
 import PostMenu from 'components/post-menu/PostMenu';
+import EmbedContent from 'components/post-preview/EmbedContent';
+import { getPostPreviewComponents, getEmbeds } from '../../util/postPreviewUtils';
 
 const Container = styled.View`
   background-color: ${COLORS.WHITE.WHITE};
@@ -83,7 +85,7 @@ const mapDispatchToProps = dispatch => ({
       }),
     ),
 });
-@connect(mapStateToProps, mapDispatchToProps)
+
 class PostPreview extends Component {
   static propTypes = {
     authenticated: PropTypes.bool,
@@ -169,6 +171,7 @@ class PostPreview extends Component {
 
   handleOnPressVote() {
     const { navigation, authenticated, postData } = this.props;
+    this.handleHideMenu();
     if (authenticated) {
       const { author, permlink } = postData;
       const { likedPost } = this.state;
@@ -216,6 +219,7 @@ class PostPreview extends Component {
   }
 
   showReblogModal() {
+    this.handleHideMenu();
     const { authenticated, navigation } = this.props;
     if (authenticated) {
       this.setState({
@@ -284,6 +288,7 @@ class PostPreview extends Component {
   }
 
   handleNavigateToComments() {
+    this.handleHideMenu();
     const { postData } = this.props;
     const { category, author, permlink, id } = postData;
     this.props.navigation.navigate(navigationConstants.COMMENTS, {
@@ -293,6 +298,35 @@ class PostPreview extends Component {
       postId: id,
       postData,
     });
+  }
+
+  renderPreview() {
+    const { postData } = this.props;
+    const { json_metadata, body } = postData;
+    const jsonMetadata = _.attempt(JSON.parse, json_metadata);
+    const postJSONMetaData = _.isError(jsonMetadata) ? {} : jsonMetadata;
+    const images = _.get(postJSONMetaData, 'image', []);
+    const previewImage = _.head(images);
+    const hasPreviewImage = images.length > 0 && !_.isEmpty(previewImage);
+    const embeds = getEmbeds(postData);
+    const firstEmbed = _.head(embeds);
+    const hasVideo = !_.isEmpty(firstEmbed);
+
+    const textComponent = (
+      <Touchable onPress={this.handleNavigateToPost} key="text-component">
+        <BodyShort content={body} />
+      </Touchable>
+    );
+    const imageComponent = hasPreviewImage ? (
+      <Touchable onPress={this.handleDisplayPhotoBrowser} key="image-component">
+        <PreviewImage images={images} />
+      </Touchable>
+    ) : null;
+    const embedComponent = hasVideo ? (
+      <EmbedContent embedContent={firstEmbed} key="embed-component" />
+    ) : null;
+
+    return getPostPreviewComponents(body, textComponent, imageComponent, embedComponent);
   }
 
   render() {
@@ -305,12 +339,11 @@ class PostPreview extends Component {
       displayPhotoBrowser,
       displayMenu,
     } = this.state;
-    const { title, json_metadata, body } = postData;
+    const { title, json_metadata } = postData;
     const parsedJsonMetadata = JSON.parse(json_metadata);
     const images = parsedJsonMetadata.image || [];
-    const previewImage = _.head(images);
-    const hasPreviewImage = images.length > 0 && !_.isEmpty(previewImage);
     const formattedImages = _.map(images, image => ({ photo: image }));
+
     return (
       <Container>
         <Header
@@ -323,12 +356,7 @@ class PostPreview extends Component {
           <Touchable onPress={this.handleNavigateToPost}>
             <Title>{title}</Title>
           </Touchable>
-          <Touchable onPress={this.handleDisplayPhotoBrowser}>
-            {hasPreviewImage && <PreviewImage images={images} />}
-          </Touchable>
-          <Touchable onPress={this.handleNavigateToPost}>
-            <BodyShort content={body} />
-          </Touchable>
+          {this.renderPreview()}
         </Content>
         <Footer
           authUsername={authUsername}
@@ -361,11 +389,19 @@ class PostPreview extends Component {
           visible={displayMenu}
           onRequestClose={this.handleHideMenu}
         >
-          <PostMenu hideMenu={this.handleHideMenu} postData={postData} />
+          <PostMenu
+            hideMenu={this.handleHideMenu}
+            postData={postData}
+            handleNavigateToComments={this.handleNavigateToComments}
+            handleReblog={this.showReblogModal}
+            handleLikePost={this.handleOnPressVote}
+            rebloggedList={rebloggedList}
+            likedPost={likedPost}
+          />
         </Modal>
       </Container>
     );
   }
 }
 
-export default PostPreview;
+export default connect(mapStateToProps, mapDispatchToProps)(PostPreview);
