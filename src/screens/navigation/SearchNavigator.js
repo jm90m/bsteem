@@ -11,6 +11,7 @@ import UserActivityScreen from 'screens/stack-screens/UserActivityScreen';
 import UserWalletScreen from 'screens/stack-screens/UserWalletScreen';
 import FollowingScreen from 'screens/stack-screens/FollowingScreen';
 import FollowersScreen from 'screens/stack-screens/FollowersScreen';
+import VotesScreen from '../stack-screens/VotesScreen';
 
 const screenNavigationOptions = {
   tabBarIcon: ({ tintColor }) => (
@@ -49,6 +50,10 @@ const SearchNavigator = StackNavigator(
     },
     [navigationConstants.USER_FOLLOWING]: {
       screen: FollowingScreen,
+      navigationOptions: screenNavigationOptions,
+    },
+    [navigationConstants.VOTES]: {
+      screen: VotesScreen,
       navigationOptions: screenNavigationOptions,
     },
   },

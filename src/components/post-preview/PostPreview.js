@@ -136,6 +136,7 @@ class PostPreview extends Component {
     this.handleNavigateToPost = this.handleNavigateToPost.bind(this);
     this.handleNavigateToComments = this.handleNavigateToComments.bind(this);
     this.handleHidePhotoBrowser = this.handleHidePhotoBrowser.bind(this);
+    this.handleNavigateToVotes = this.handleNavigateToVotes.bind(this);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -302,6 +303,13 @@ class PostPreview extends Component {
     });
   }
 
+  handleNavigateToVotes() {
+    const { postData } = this.props;
+    this.props.navigation.navigate(navigationConstants.VOTES, {
+      postData,
+    });
+  }
+
   renderPreview() {
     const { postData } = this.props;
     const { json_metadata, body } = postData;
@@ -371,6 +379,7 @@ class PostPreview extends Component {
           postData={postData}
           reblogPost={this.showReblogModal}
           rebloggedList={rebloggedList}
+          handleNavigateToVotes={this.handleNavigateToVotes}
         />
         <Modal
           animationType="slide"

@@ -30,4 +30,4 @@ export const TRENDING = {
   label: 'Trending',
 };
 
-export const FEED_FILTERS = [PROMOTED, HOT, ACTIVE, NEW, TRENDING];
+export const FEED_FILTERS = [HOT, ACTIVE, NEW, TRENDING];
