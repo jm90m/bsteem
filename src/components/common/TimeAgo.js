@@ -10,9 +10,10 @@ const Container = styled.Text`
 `;
 
 const TimeAgo = ({ created, style }) => {
+  const createdTime = `${created}Z`;
   return (
     <Container style={style}>
-      {`${moment(created)
+      {`${moment(createdTime)
         .tz(moment.tz.guess())
         .fromNow()}`}
     </Container>
