@@ -18,7 +18,7 @@ const defaultOpts = {
   lineBreak: '\n',
   paragraphBreak: '\n\n',
   bullet: '\u2022 ',
-  TextComponent: Text,
+  TextComponent: props => <Text selectable {...props} />,
   textComponentProps: null,
   NodeComponent: View,
   nodeComponentProps: null,
@@ -82,7 +82,7 @@ export default function htmlToElement(rawHtml, customOpts = {}, done) {
       if (node.type === 'text') {
         const defaultStyle = opts.textComponentProps ? opts.textComponentProps.style : null;
         const customStyle = inheritedStyle(parent);
-        console.log('htmlToElement', node.data);
+        console.log('htmlToElement - TEXT NODE TYPE', node.data);
         if (_.isEmpty(node.data)) {
           return <Text style={{ width: 0, height: 0 }} />;
         } else {

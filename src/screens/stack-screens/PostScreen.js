@@ -34,18 +34,10 @@ function renderNode(node, index, siblings, parent, defaultRenderer) {
 
   console.log('NODE', node.name);
 
-  // if (node.name === 'img') {
-  //   return (
-  //     <View>
-  //       <Image
-  //         key={node.attribs.src}
-  //         source={{ uri: node.attribs.src }}
-  //         style={{ height: null, width }}
-  //         resizeMode="contain"
-  //       />
-  //     </View>
-  //   );
-  // // }
+  if (node.name === 'br') {
+    return null;
+  }
+  // }
   //
   // console.log('NODE', node.name);
 }

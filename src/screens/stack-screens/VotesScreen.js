@@ -85,12 +85,15 @@ class VotesScreen extends Component {
   renderActiveVotesRow(rowData) {
     const { ratio } = this.state;
     const { voter, rshares, percent } = rowData;
+    const calculatedVoteValue = rshares * ratio;
+    const voteValue = calculatedVoteValue > 0 ? calculatedVoteValue : 0;
+    const votePercent = Math.abs(percent / 10000 * 100);
     return (
       <Voter
         key={voter}
         voter={voter}
-        voteValue={Math.abs(rshares * ratio)}
-        votePercent={Math.abs(percent / 10000 * 100)}
+        voteValue={voteValue}
+        votePercent={votePercent}
         handleNavigateToUser={() => this.handleNavigateToUser(voter)}
       />
     );

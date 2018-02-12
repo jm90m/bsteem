@@ -12,6 +12,9 @@ import UserWalletScreen from 'screens/stack-screens/UserWalletScreen';
 import FollowingScreen from 'screens/stack-screens/FollowingScreen';
 import FollowersScreen from 'screens/stack-screens/FollowersScreen';
 import VotesScreen from '../stack-screens/VotesScreen';
+import CommentsScreen from '../stack-screens/CommentsScreen';
+import PostScreen from '../stack-screens/PostScreen';
+import SavedContentScreen from '../SavedContentScreen';
 
 const screenNavigationOptions = {
   tabBarIcon: ({ tintColor }) => (
@@ -26,6 +29,14 @@ const SearchNavigator = StackNavigator(
     },
     [navigationConstants.FEED]: {
       screen: FeedScreen,
+      navigationOptions: screenNavigationOptions,
+    },
+    [navigationConstants.POST]: {
+      screen: PostScreen,
+      navigationOptions: screenNavigationOptions,
+    },
+    [navigationConstants.COMMENTS]: {
+      screen: CommentsScreen,
       navigationOptions: screenNavigationOptions,
     },
     [navigationConstants.USER]: {
@@ -54,6 +65,10 @@ const SearchNavigator = StackNavigator(
     },
     [navigationConstants.VOTES]: {
       screen: VotesScreen,
+      navigationOptions: screenNavigationOptions,
+    },
+    [navigationConstants.SAVED_CONTENT]: {
+      screen: SavedContentScreen,
       navigationOptions: screenNavigationOptions,
     },
   },
