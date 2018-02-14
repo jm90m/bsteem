@@ -16,7 +16,7 @@ import PostPreview from 'components/post-preview/PostPreview';
 import LargeLoadingCenter from 'components/common/LargeLoadingCenter';
 
 const Container = styled.View`
- flex: 1;
+  flex: 1;
 `;
 
 const StyledListView = styled.ListView`
@@ -38,7 +38,6 @@ const mapDispatchToProps = dispatch => ({
 
 const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
 
-@connect(mapStateToProps, mapDispatchToProps)
 class CurrentUserFeed extends Component {
   static propTypes = {
     currentUserFeed: PropTypes.arrayOf(PropTypes.shape()),
@@ -111,4 +110,4 @@ class CurrentUserFeed extends Component {
   }
 }
 
-export default CurrentUserFeed;
+export default connect(mapStateToProps, mapDispatchToProps)(CurrentUserFeed);

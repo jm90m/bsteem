@@ -71,6 +71,8 @@ export default function htmlToElement(rawHtml, customOpts = {}, done) {
     const renderNode = opts.customRenderer;
     let orderedListCounter = 1;
 
+    console.log('DOM', dom);
+
     return dom.map((node, index, list) => {
       if (renderNode) {
         const rendered = renderNode(node, index, list, parent, domToElement);
