@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import _ from 'lodash';
 import { AsyncStorage } from 'react-native';
 import Expo, { AuthSession } from 'expo';
 import { connect } from 'react-redux';
@@ -15,6 +14,7 @@ import {
   AUTH_USERNAME,
 } from 'constants/asyncStorageKeys';
 import { authenticateUserError, authenticateUserSuccess } from 'state/actions/authActions';
+import i18n from 'i18n/i18n';
 
 const mapDispatchToProps = dispatch => ({
   authenticateUserSuccess: payload => dispatch(authenticateUserSuccess(payload)),
@@ -86,9 +86,7 @@ class SteemConnectLogin extends Component {
   render() {
     return (
       <Container>
-        <Description>
-          Sign in with SteemConnect so that you can vote, like, comment, and create posts.
-        </Description>
+        <Description>{i18n.login.description}</Description>
         <Button
           onPress={this.handleSteemConnectLogin}
           title="Login with SteemConnect"

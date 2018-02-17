@@ -28,4 +28,7 @@ export default {
     reblog: 'Reblog',
     reportPost: 'Report Post',
   },
+  login: {
+    description: 'Sign in with SteemConnect so that you can vote, like, comment, and create posts.',
+  },
 };
