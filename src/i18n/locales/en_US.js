@@ -31,4 +31,11 @@ export default {
   login: {
     description: 'Sign in with SteemConnect so that you can vote, like, comment, and create posts.',
   },
+  logout: {
+    switchAccountsDescription:
+      'If you want to switch accounts you will need to revoke the SteemConnect token by following the revoke form below and after it has completed press the logout button above.',
+    revokeToken: 'Revoke SteemConnect token',
+    logoutButtonDescription:
+      ' If you want to logout of your account, you can press the logout button below',
+  },
 };

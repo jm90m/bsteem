@@ -6,6 +6,8 @@ import sc2 from 'api/sc2';
 import Header from 'components/common/Header';
 import BackButton from 'components/common/BackButton';
 import PrimaryButton from 'components/common/PrimaryButton';
+import i18n from 'i18n/i18n';
+
 import {
   AUTH_EXPIRATION,
   AUTH_MAX_EXPIRATION_AGE,
@@ -87,15 +89,10 @@ class LogoutScreen extends Component {
         <Header>
           <BackButton navigateBack={handleHide} />
         </Header>
-        <Description>
-          If you want to logout of your account, you can press the logout button below.
-        </Description>
+        <Description>{i18n.logout.logoutButtonDescription}</Description>
         <PrimaryButton onPress={this.handleLogout} title="Logout" />
-        <RevokeTitle>Revoke SteemConnect token</RevokeTitle>
-        <Description>
-          If you want to switch accounts you will need to revoke the SteemConnect token by following
-          the revoke form below and after it has completed press the logout button above.
-        </Description>
+        <RevokeTitle>{i18n.logout.revokeToken}</RevokeTitle>
+        <Description>{i18n.logout.switchAccountsDescription}</Description>
         <StyledWebView
           source={{ uri: sc2RevokeURL }}
           onNavigationStateChange={this.onNavigationStateChange}
