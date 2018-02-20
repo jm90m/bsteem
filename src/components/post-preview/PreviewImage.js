@@ -4,8 +4,9 @@ import { Dimensions, Image } from 'react-native';
 import styled from 'styled-components/native';
 import _ from 'lodash';
 import { getValidImageUrl } from 'util/imageUtils';
+import SmallLoading from '../common/SmallLoading';
 
-const { width } = Dimensions.get('screen');
+const { width: deviceWidth } = Dimensions.get('screen');
 
 const StyledImage = styled.Image``;
 
@@ -20,7 +21,7 @@ class PreviewImage extends Component {
   static defaultProps = {
     images: [],
     height: 300,
-    width,
+    width: deviceWidth,
     onError: undefined,
   };
 
@@ -30,9 +31,31 @@ class PreviewImage extends Component {
     this.state = {
       imageUrl: _.head(props.images),
       noImage: false,
+      width: props.width,
+      height: props.height,
+      loading: false,
     };
 
     this.handlePreviewImageError = this.handlePreviewImageError.bind(this);
+  }
+
+  componentDidMount() {
+    const { imageUrl } = this.state;
+    this.setState({ loading: true });
+    Image.getSize(
+      imageUrl,
+      (width, height) => {
+        this.setState({
+          width,
+          height,
+          loading: false,
+        });
+        console.log(`The image dimensions are ${width}x${height}`);
+      },
+      error => {
+        console.error(`Couldn't get the image size: ${error.message}`);
+      },
+    );
   }
 
   handlePreviewImageError() {
@@ -50,13 +73,29 @@ class PreviewImage extends Component {
   }
 
   render() {
-    const { imageUrl, noImage } = this.state;
-    const { height, width: imageWidth, onError } = this.props;
+    const { imageUrl, noImage, height, width: imgWidth, loading } = this.state;
+    const { onError, height: maxHeight } = this.props;
     const onErrorHandler = onError || this.handlePreviewImageError;
+    let imageHeight = height;
+    let imageWidth = imgWidth;
+
     if (noImage) return null;
+
+    if (height > maxHeight) {
+      imageHeight = maxHeight;
+    }
+
+    if (imgWidth > deviceWidth) {
+      imageWidth = deviceWidth;
+    }
+
+    if (loading) {
+      return <SmallLoading style={{ padding: 10 }} />;
+    }
+
     return (
       <StyledImage
-        style={{ width: imageWidth, height }}
+        style={{ width: imageWidth, height: imageHeight }}
         source={{ uri: imageUrl }}
         resizeMode={Image.resizeMode.contain}
         onError={onErrorHandler}
