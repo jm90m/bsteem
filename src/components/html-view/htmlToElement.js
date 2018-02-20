@@ -85,8 +85,9 @@ export default function htmlToElement(rawHtml, customOpts = {}, done) {
         const defaultStyle = opts.textComponentProps ? opts.textComponentProps.style : null;
         const customStyle = inheritedStyle(parent);
         console.log('htmlToElement - TEXT NODE TYPE', node.data);
-        if (_.isEmpty(node.data)) {
-          return <Text style={{ width: 0, height: 0 }} />;
+        const nodeText = _.replace(node.data, /\n/g, '').trim();
+        if (_.isEmpty(nodeText)) {
+          return <Text style={{ width: 5, height: 5 }} key={index} />;
         } else {
           return (
             <TextComponent
@@ -94,7 +95,7 @@ export default function htmlToElement(rawHtml, customOpts = {}, done) {
               key={index}
               style={[defaultStyle, customStyle]}
             >
-              {entities.decodeHTML(node.data)}
+              {entities.decodeHTML(_.replace(node.data, /\n/g, ''))}
             </TextComponent>
           );
         }
@@ -135,6 +136,10 @@ export default function htmlToElement(rawHtml, customOpts = {}, done) {
           }
         }
 
+        if (node.name === 'br') {
+          return <View style={{ width: '100%', height: 5 }} key={index} />;
+        }
+
         const { NodeComponent, styles } = opts;
 
         return (
@@ -145,9 +150,11 @@ export default function htmlToElement(rawHtml, customOpts = {}, done) {
           >
             <NodeComponent
               {...opts.nodeComponentProps}
-              onPress={linkPressHandler}
-              onLongPress={linkLongPressHandler}
-              style={{ flexDirection: 'row', flexWrap: 'wrap' }}
+              style={{
+                flexDirection: 'row',
+                flexWrap: 'wrap',
+                maxWidth: width,
+              }}
             >
               {listItemPrefix}
               {domToElement(node.children, node)}

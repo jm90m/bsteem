@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Modal, ScrollView, Dimensions, WebView } from 'react-native';
+import { Modal, ScrollView, Dimensions, WebView, TouchableOpacity, Text } from 'react-native';
 import { connect } from 'react-redux';
 import styled from 'styled-components/native';
 import _ from 'lodash';
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import { getHtml } from 'util/postUtils';
+import entities from 'entities';
 import { COLORS, MATERIAL_ICONS, MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
 import * as navigationConstants from 'constants/navigation';
 import { getIsAuthenticated } from 'state/rootReducer';
@@ -15,31 +16,9 @@ import HTMLView from 'components/html-view/HTMLView';
 import FooterTags from 'components/post/FooterTags';
 import Footer from 'components/post/Footer';
 import Header from 'components/common/Header';
+import PostImage from 'components/post/PostImage';
 
 const { width } = Dimensions.get('screen');
-
-function renderNode(node, index, siblings, parent, defaultRenderer) {
-  if (node.name === 'iframe') {
-    return (
-      <WebView
-        key={`iframe-${node.attribs.src}`}
-        source={{ uri: node.attribs.src }}
-        style={{ height: 400, width: width - 20 }}
-        height={400}
-        width={width - 20}
-      />
-    );
-  }
-
-  console.log('NODE', node.name);
-
-  if (node.name === 'br') {
-    return null;
-  }
-  // }
-  //
-  // console.log('NODE', node.name);
-}
 
 const Container = styled.View`
   flex: 1;
@@ -97,6 +76,7 @@ class PostScreen extends Component {
     this.handleImagePress = this.handleImagePress.bind(this);
     this.handleFeedNavigation = this.handleFeedNavigation.bind(this);
     this.handleHidePhotoBrowser = this.handleHidePhotoBrowser.bind(this);
+    this.renderNode = this.renderNode.bind(this);
   }
 
   setModalVisible(visible) {
@@ -171,6 +151,39 @@ class PostScreen extends Component {
     });
   }
 
+  renderNode(node, index, siblings, parent, defaultRenderer) {
+    const widthOffset = 20;
+    const fullPostMaxHeight = 400;
+    if (node.name === 'iframe') {
+      return (
+        <WebView
+          key={`iframe-${node.attribs.src}`}
+          source={{ uri: node.attribs.src }}
+          style={{ height: fullPostMaxHeight, width: width - widthOffset }}
+          height={fullPostMaxHeight}
+          width={width - widthOffset}
+        />
+      );
+    }
+
+    console.log('NODE', node.type, node.name, node);
+
+    if (node.type === 'tag') {
+      if (node.name === 'img') {
+        const imageSRC = node.attribs.src;
+        console.log('NODE_IMAGE_ATTRIBS', node.attribs);
+        return (
+          <TouchableOpacity
+            onPress={() => this.handleImagePress(imageSRC, node.attribs.alt)}
+            key={`post-image-${index}`}
+          >
+            <PostImage images={[imageSRC]} widthOffset={widthOffset} height={300} />
+          </TouchableOpacity>
+        );
+      }
+    }
+  }
+
   render() {
     const { body, parsedJsonMetadata, postData, author } = this.props.navigation.state.params;
     const { displayPhotoBrowser, modalVisible, initialPhotoIndex } = this.state;
@@ -185,6 +198,7 @@ class PostScreen extends Component {
     console.log('POST DATA ---> START');
     console.log(parsedJsonMetadata, postData);
     console.log('POST DATA ---> END');
+    console.log('HTML DATA PARSED', parsedHtmlBody);
 
     return (
       <Container>
@@ -202,7 +216,7 @@ class PostScreen extends Component {
         <ScrollView style={{ padding: 10, backgroundColor: COLORS.WHITE.WHITE }}>
           <HTMLView
             value={parsedHtmlBody}
-            renderNode={renderNode}
+            renderNode={this.renderNode}
             onLinkPress={this.handlePostLinkPress}
             addLineBreaks={false}
             handleImagePress={this.handleImagePress}

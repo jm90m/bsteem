@@ -10,11 +10,12 @@ const { width: deviceWidth } = Dimensions.get('screen');
 
 const StyledImage = styled.Image``;
 
-class PreviewImage extends Component {
+class PostImage extends Component {
   static propTypes = {
     images: PropTypes.arrayOf(PropTypes.string),
     height: PropTypes.number,
     width: PropTypes.number,
+    widthOffset: PropTypes.number,
     onError: PropTypes.func,
   };
 
@@ -23,6 +24,7 @@ class PreviewImage extends Component {
     height: 300,
     width: deviceWidth,
     onError: undefined,
+    widthOffset: 0,
   };
 
   constructor(props) {
@@ -74,7 +76,7 @@ class PreviewImage extends Component {
 
   render() {
     const { imageUrl, noImage, height, width: imgWidth, loading } = this.state;
-    const { onError, height: maxHeight } = this.props;
+    const { onError, height: maxHeight, widthOffset } = this.props;
     const onErrorHandler = onError || this.handlePreviewImageError;
     let imageHeight = height;
     let imageWidth = imgWidth;
@@ -95,13 +97,16 @@ class PreviewImage extends Component {
 
     return (
       <StyledImage
-        style={{ width: imageWidth, height: imageHeight }}
+        style={{
+          width: imageWidth - widthOffset,
+          height: imageHeight,
+        }}
         source={{ uri: imageUrl }}
-        resizeMode={Image.resizeMode.contain}
+        resizeMode={Image.resizeMode.cover}
         onError={onErrorHandler}
       />
     );
   }
 }
 
-export default PreviewImage;
+export default PostImage;

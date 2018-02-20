@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Modal, Dimensions } from 'react-native';
+import { Modal } from 'react-native';
 import styled from 'styled-components/native';
 import { connect } from 'react-redux';
 import _ from 'lodash';
@@ -16,15 +16,13 @@ import * as navigationConstants from 'constants/navigation';
 import * as postConstants from 'constants/postConstants';
 import PostPhotoBrowser from 'components/post/PostPhotoBrowser';
 import ReblogModal from 'components/post/ReblogModal';
+import PostMenu from 'components/post-menu/PostMenu';
+import EmbedContent from 'components/post-preview/EmbedContent';
 import Footer from './Footer';
 import Header from './Header';
 import BodyShort from './BodyShort';
-import PreviewImage from './PreviewImage';
-import PostMenu from 'components/post-menu/PostMenu';
-import EmbedContent from 'components/post-preview/EmbedContent';
+import PostImage from '../post/PostImage';
 import { getPostPreviewComponents, getEmbeds } from '../../util/postPreviewUtils';
-
-const { width: deviceWidth } = Dimensions.get('screen');
 
 const Container = styled.View`
   background-color: ${COLORS.WHITE.WHITE};
@@ -330,7 +328,7 @@ class PostPreview extends Component {
     );
     const imageComponent = hasPreviewImage ? (
       <Touchable onPress={this.handleDisplayPhotoBrowser} key="image-component">
-        <PreviewImage images={images} />
+        <PostImage images={images} />
       </Touchable>
     ) : null;
     const embedComponent = hasVideo ? (
