@@ -9,6 +9,7 @@ import embedjs from 'embedjs';
 import linksRe from './steemitLinks';
 import { validateAccountName } from './chainValidation';
 import { getProxyImageURL } from './imageUtils';
+import { POST_HTML_BODY_TAG, POST_HTML_BODY_USER } from '../constants/postConstants';
 
 const noop = () => {};
 const DOMParser = new xmldom.DOMParser({
@@ -221,7 +222,7 @@ function linkify(content, mutate, hashtags, usertags, images, links) {
     const tagLower = tag2.toLowerCase();
     if (hashtags) hashtags.add(tagLower);
     if (!mutate) return tag;
-    return `${space}<a href="/trending/${tagLower}">${tag}</a>`;
+    return `${space}<a href="${POST_HTML_BODY_TAG}${tagLower}">${tag}</a>`;
   });
 
   // usertag (mention)
@@ -232,7 +233,9 @@ function linkify(content, mutate, hashtags, usertags, images, links) {
     const valid = validateAccountName(userLower) == null;
     if (valid && usertags) usertags.add(userLower);
     if (!mutate) return user;
-    return space + (valid ? `<a href="/@${userLower}">@${user2}</a>` : `@${user2}`);
+    return (
+      space + (valid ? `<a href="${POST_HTML_BODY_USER}${userLower}">@${user2}</a>` : `@${user2}`)
+    );
   });
 
   content = content.replace(linksRe.any, ln => {

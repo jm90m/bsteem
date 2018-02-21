@@ -1,23 +1,22 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Modal, ScrollView, Dimensions, WebView, TouchableOpacity, Text } from 'react-native';
+import { Modal, ScrollView, Dimensions } from 'react-native';
 import { connect } from 'react-redux';
+import Expo from 'expo';
 import styled from 'styled-components/native';
 import _ from 'lodash';
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import { getHtml } from 'util/postUtils';
 import { COLORS, MATERIAL_ICONS, MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
+import { POST_HTML_BODY_TAG, POST_HTML_BODY_USER } from '../../constants/postConstants';
 import * as navigationConstants from 'constants/navigation';
 import { getIsAuthenticated } from 'state/rootReducer';
 import PostPhotoBrowser from 'components/post/PostPhotoBrowser';
 import PostMenu from 'components/post-menu/PostMenu';
-import HTMLView from 'react-native-htmlview';
 import HTML from 'react-native-render-html';
 import FooterTags from 'components/post/FooterTags';
 import Footer from 'components/post/Footer';
 import Header from 'components/common/Header';
-import PostImage from 'components/post/PostImage';
-import { image } from '../../util/steemitLinks';
 
 const { width: deviceWidth } = Dimensions.get('screen');
 
@@ -77,6 +76,7 @@ class PostScreen extends Component {
     this.handleImagePress = this.handleImagePress.bind(this);
     this.handleFeedNavigation = this.handleFeedNavigation.bind(this);
     this.handleHidePhotoBrowser = this.handleHidePhotoBrowser.bind(this);
+    this.navigateToFeed = this.navigateToFeed.bind(this);
   }
 
   setModalVisible(visible) {
@@ -99,6 +99,10 @@ class PostScreen extends Component {
 
   navigateToUser(username) {
     this.props.navigation.navigate(navigationConstants.USER, { username });
+  }
+
+  navigateToFeed(tag) {
+    this.props.navigation.navigate(navigationConstants.FEED, { tag });
   }
 
   navigateToLoginTab() {
@@ -126,11 +130,19 @@ class PostScreen extends Component {
 
   handlePostLinkPress(e, url) {
     console.log('clicked link: ', url);
-    const urlArray = _.split(url, '');
-    const isUserURL = urlArray[0] === '/' && urlArray[1] === '@';
-    if (isUserURL) {
-      const user = _.slice(urlArray, 2, urlArray.length);
-      this.navigateToUser(user.join(''));
+    const isTag = _.includes(url, POST_HTML_BODY_TAG);
+    const isUser = _.includes(url, POST_HTML_BODY_USER);
+
+    if (isUser) {
+      const user = _.get(_.split(url, POST_HTML_BODY_USER), 1, 'bsteem');
+      this.navigateToUser(user);
+    } else if (isTag) {
+      const tag = _.get(_.split(url, POST_HTML_BODY_TAG), 1, 'bsteem');
+      this.navigateToFeed(tag);
+    } else {
+      Expo.WebBrowser.openBrowserAsync(url).catch(error => {
+        console.log('invalid url', error, url);
+      });
     }
   }
 
