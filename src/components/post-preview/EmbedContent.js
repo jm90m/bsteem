@@ -30,7 +30,6 @@ class EmbedContent extends Component {
           width,
           height,
         }}
-        scalesPageToFit={false}
       />
     );
   }

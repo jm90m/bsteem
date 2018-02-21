@@ -13,6 +13,8 @@ import CommentContent from './CommentContent';
 
 const { width: deviceWidth } = Dimensions.get('screen');
 
+const COMMENT_PADDING = 30;
+
 const Container = styled.View`
   background-color: ${COLORS.WHITE.WHITE};
   margin-top: 2px;
@@ -29,7 +31,7 @@ const AvatarContainer = styled.View`
 `;
 
 const CommentChildrenContainer = styled.View`
-  margin-left: 30px;
+  margin-left: ${COMMENT_PADDING}px;
 `;
 
 class Comment extends Component {
@@ -93,7 +95,7 @@ class Comment extends Component {
           onLikeClick={onLikeClick}
           onDislikeClick={onDislikeClick}
           onSendComment={onSendComment}
-          currentWidth={currentWidth - 70}
+          currentWidth={currentWidth - COMMENT_PADDING}
         />
       ));
     }

@@ -1,14 +1,11 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Dimensions, View } from 'react-native';
 import styled from 'styled-components/native';
 import { COLORS } from 'constants/styles';
 import TimeAgo from 'components/common/TimeAgo';
 import HTML from 'react-native-render-html';
 import ReputationScore from '../ReputationScore';
 import { getHtml } from '../../../util/postUtils';
-
-const { width: deviceWidth } = Dimensions.get('screen');
 
 const Container = styled.View``;
 
@@ -33,11 +30,11 @@ const CommentBody = styled.View`
 class CommentContent extends Component {
   static propTypes = {
     username: PropTypes.string.isRequired,
+    currentWidth: PropTypes.number.isRequired,
     reputation: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     created: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     body: PropTypes.string,
     depth: PropTypes.number,
-    currentWidth: PropTypes.number,
   };
 
   static defaultProps = {
@@ -50,11 +47,7 @@ class CommentContent extends Component {
   render() {
     const { username, reputation, created, body, depth, currentWidth } = this.props;
     const bodyWidthPadding = depth === 1 ? 70 : 100;
-
-    if (depth > 1) console.log('DEPTH', depth);
-
-    const maxWidth = deviceWidth - bodyWidthPadding;
-    console.log('CURRENT WIDTH', currentWidth);
+    const maxWidth = currentWidth - bodyWidthPadding;
     const parsedHtmlBody = getHtml(body, {});
 
     return (
@@ -64,10 +57,10 @@ class CommentContent extends Component {
             <Username> {username}</Username>
             <ReputationScore reputation={reputation} />
           </HeaderContent>
-          <TimeAgo created={created} />
+          <TimeAgo created={created} style={{ marginLeft: 3 }} />
         </Header>
-        <CommentBody maxWidth={currentWidth}>
-          <HTML html={parsedHtmlBody} imagesMaxWidth={currentWidth} />
+        <CommentBody maxWidth={maxWidth}>
+          <HTML html={parsedHtmlBody} imagesMaxWidth={maxWidth} />
         </CommentBody>
       </Container>
     );
