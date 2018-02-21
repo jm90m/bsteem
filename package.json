@@ -25,6 +25,7 @@
     "react-native-elements": "^0.18.5",
     "react-native-htmlview": "^0.12.1",
     "react-native-photo-browser": "^0.4.0",
+    "react-native-render-html": "^3.8.1",
     "react-navigation": "^1.0.0-beta.13",
     "react-redux": "^5.0.6",
     "redux": "^3.7.2",

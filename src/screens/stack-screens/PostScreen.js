@@ -6,19 +6,20 @@ import styled from 'styled-components/native';
 import _ from 'lodash';
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import { getHtml } from 'util/postUtils';
-import entities from 'entities';
 import { COLORS, MATERIAL_ICONS, MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
 import * as navigationConstants from 'constants/navigation';
 import { getIsAuthenticated } from 'state/rootReducer';
 import PostPhotoBrowser from 'components/post/PostPhotoBrowser';
 import PostMenu from 'components/post-menu/PostMenu';
-import HTMLView from 'components/html-view/HTMLView';
+import HTMLView from 'react-native-htmlview';
+import HTML from 'react-native-render-html';
 import FooterTags from 'components/post/FooterTags';
 import Footer from 'components/post/Footer';
 import Header from 'components/common/Header';
 import PostImage from 'components/post/PostImage';
+import { image } from '../../util/steemitLinks';
 
-const { width } = Dimensions.get('screen');
+const { width: deviceWidth } = Dimensions.get('screen');
 
 const Container = styled.View`
   flex: 1;
@@ -76,7 +77,6 @@ class PostScreen extends Component {
     this.handleImagePress = this.handleImagePress.bind(this);
     this.handleFeedNavigation = this.handleFeedNavigation.bind(this);
     this.handleHidePhotoBrowser = this.handleHidePhotoBrowser.bind(this);
-    this.renderNode = this.renderNode.bind(this);
   }
 
   setModalVisible(visible) {
@@ -124,7 +124,7 @@ class PostScreen extends Component {
     this.props.navigation.navigate(navigationConstants.FEED, { tag });
   }
 
-  handlePostLinkPress(url) {
+  handlePostLinkPress(e, url) {
     console.log('clicked link: ', url);
     const urlArray = _.split(url, '');
     const isUserURL = urlArray[0] === '/' && urlArray[1] === '@';
@@ -151,39 +151,6 @@ class PostScreen extends Component {
     });
   }
 
-  renderNode(node, index, siblings, parent, defaultRenderer) {
-    const widthOffset = 20;
-    const fullPostMaxHeight = 400;
-    if (node.name === 'iframe') {
-      return (
-        <WebView
-          key={`iframe-${node.attribs.src}`}
-          source={{ uri: node.attribs.src }}
-          style={{ height: fullPostMaxHeight, width: width - widthOffset }}
-          height={fullPostMaxHeight}
-          width={width - widthOffset}
-        />
-      );
-    }
-
-    console.log('NODE', node.type, node.name, node);
-
-    if (node.type === 'tag') {
-      if (node.name === 'img') {
-        const imageSRC = node.attribs.src;
-        console.log('NODE_IMAGE_ATTRIBS', node.attribs);
-        return (
-          <TouchableOpacity
-            onPress={() => this.handleImagePress(imageSRC, node.attribs.alt)}
-            key={`post-image-${index}`}
-          >
-            <PostImage images={[imageSRC]} widthOffset={widthOffset} height={300} />
-          </TouchableOpacity>
-        );
-      }
-    }
-  }
-
   render() {
     const { body, parsedJsonMetadata, postData, author } = this.props.navigation.state.params;
     const { displayPhotoBrowser, modalVisible, initialPhotoIndex } = this.state;
@@ -194,6 +161,7 @@ class PostScreen extends Component {
       caption: image.caption || '',
     }));
     const tags = _.compact(_.get(parsedJsonMetadata, 'tags', []));
+    const widthOffset = 20;
 
     console.log('POST DATA ---> START');
     console.log(parsedJsonMetadata, postData);
@@ -214,12 +182,10 @@ class PostScreen extends Component {
           </Menu>
         </Header>
         <ScrollView style={{ padding: 10, backgroundColor: COLORS.WHITE.WHITE }}>
-          <HTMLView
-            value={parsedHtmlBody}
-            renderNode={this.renderNode}
+          <HTML
+            html={parsedHtmlBody}
+            imagesMaxWidth={deviceWidth - widthOffset}
             onLinkPress={this.handlePostLinkPress}
-            addLineBreaks={false}
-            handleImagePress={this.handleImagePress}
           />
           <FooterTags tags={tags} handleFeedNavigation={this.handleFeedNavigation} />
           <Footer postData={postData} navigation={this.props.navigation} />
