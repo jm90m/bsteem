@@ -10,7 +10,7 @@ import CommentsContainer from 'components/post/comments/CommentsContainer';
 import { ICON_SIZES, MATERIAL_ICONS, COLORS } from 'constants/styles';
 import { getCommentsByPostId, getLoadingComments } from 'state/rootReducer';
 import Header from 'components/common/Header';
-import LargeLoadingCenter from 'components/common/LargeLoadingCenter';
+import LargeLoading from 'components/common/LargeLoading';
 import HeaderEmptyView from 'components/common/HeaderEmptyView';
 
 const Container = styled.View``;
@@ -80,8 +80,8 @@ class CommentScreen extends Component {
   }
 
   render() {
-    const { postId, postData } = this.props.navigation.state.params;
-    const { loadingComments } = this.props;
+    const { loadingComments, navigation } = this.props;
+    const { postId, postData } = navigation.state.params;
     return (
       <Container>
         <Header>
@@ -98,11 +98,12 @@ class CommentScreen extends Component {
           </TitleContainer>
           <HeaderEmptyView />
         </Header>
-        <CommentsContainer postId={postId} postData={postData} />
-        {loadingComments && (
+        {loadingComments ? (
           <LoadingContainer>
-            <LargeLoadingCenter />
+            <LargeLoading />
           </LoadingContainer>
+        ) : (
+          <CommentsContainer postId={postId} postData={postData} navigation={navigation} />
         )}
       </Container>
     );

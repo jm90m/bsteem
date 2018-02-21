@@ -55,19 +55,23 @@ class PostMenu extends Component {
     likedPost: PropTypes.bool,
     loadingVote: PropTypes.bool,
     hideReblogMenu: PropTypes.bool,
+    displayPhotoBrowserMenu: PropTypes.bool,
+    handleDisplayPhotoBrowser: PropTypes.func,
   };
 
   static defaultProps = {
     postData: {},
+    rebloggedList: [],
+    likedPost: false,
+    loadingVote: false,
+    hideReblogMenu: false,
+    displayPhotoBrowserMenu: false,
     hideMenu: () => {},
     handleLikePost: () => {},
     handleNavigateToComments: () => {},
     handleReblog: () => {},
     handleReportPost: () => {},
-    likedPost: false,
-    loadingVote: false,
-    rebloggedList: [],
-    hideReblogMenu: false,
+    handleDisplayPhotoBrowser: () => {},
   };
 
   render() {
@@ -83,6 +87,8 @@ class PostMenu extends Component {
       likedPost,
       loadingVote,
       hideReblogMenu,
+      displayPhotoBrowserMenu,
+      handleDisplayPhotoBrowser,
     } = this.props;
     const { title, permlink, author, id, created } = postData;
     const displayMenuButton = authUsername !== author && !_.isEmpty(authUsername);
@@ -135,6 +141,18 @@ class PostMenu extends Component {
                     name={MATERIAL_COMMUNITY_ICONS.reblog}
                   />
                   <MenuText>{i18n.postMenu.reblog}</MenuText>
+                </MenuModalContents>
+              </MenuModalButton>
+            )}
+            {displayPhotoBrowserMenu && (
+              <MenuModalButton onPress={handleDisplayPhotoBrowser}>
+                <MenuModalContents>
+                  <MaterialCommunityIcons
+                    size={ICON_SIZES.menuModalOptionIcon}
+                    color={COLORS.PRIMARY_COLOR}
+                    name={MATERIAL_COMMUNITY_ICONS.image}
+                  />
+                  <MenuText>{i18n.postMenu.postImages}</MenuText>
                 </MenuModalContents>
               </MenuModalButton>
             )}

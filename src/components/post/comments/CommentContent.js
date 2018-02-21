@@ -1,18 +1,21 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Dimensions } from 'react-native';
+import { Dimensions, View } from 'react-native';
 import styled from 'styled-components/native';
 import { COLORS } from 'constants/styles';
-import Body from 'components/post/Body';
+import TimeAgo from 'components/common/TimeAgo';
+import HTML from 'react-native-render-html';
 import ReputationScore from '../ReputationScore';
+import { getHtml } from '../../../util/postUtils';
 
-const { width } = Dimensions.get('screen');
+const { width: deviceWidth } = Dimensions.get('screen');
 
 const Container = styled.View``;
 
-const Header = styled.View`
+const Header = styled.View``;
+
+const HeaderContent = styled.View`
   flex-direction: row;
-  align-items: center;
 `;
 
 const Username = styled.Text`
@@ -20,15 +23,9 @@ const Username = styled.Text`
   color: ${COLORS.PRIMARY_COLOR};
 `;
 
-const CommentCreated = styled.Text`
-  margin-left: 5px;
-  color: ${COLORS.BLUE.BOTICELLI};
-  font-size: 14px;
-`;
-
 const CommentBody = styled.View`
   flex-wrap: wrap;
-  width: ${props => width - props.bodyWidthPadding}
+  max-width: ${props => props.maxWidth}
   margin-left: 3px;
   padding: 5px 0;
 `;
@@ -40,6 +37,7 @@ class CommentContent extends Component {
     created: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     body: PropTypes.string,
     depth: PropTypes.number,
+    currentWidth: PropTypes.number,
   };
 
   static defaultProps = {
@@ -50,17 +48,26 @@ class CommentContent extends Component {
   };
 
   render() {
-    const { username, reputation, created, body, depth } = this.props;
+    const { username, reputation, created, body, depth, currentWidth } = this.props;
     const bodyWidthPadding = depth === 1 ? 70 : 100;
+
+    if (depth > 1) console.log('DEPTH', depth);
+
+    const maxWidth = deviceWidth - bodyWidthPadding;
+    console.log('CURRENT WIDTH', currentWidth);
+    const parsedHtmlBody = getHtml(body, {});
+
     return (
       <Container>
         <Header>
-          <Username> {username}</Username>
-          <ReputationScore reputation={reputation} />
-          <CommentCreated>{created}</CommentCreated>
+          <HeaderContent>
+            <Username> {username}</Username>
+            <ReputationScore reputation={reputation} />
+          </HeaderContent>
+          <TimeAgo created={created} />
         </Header>
-        <CommentBody bodyWidthPadding={bodyWidthPadding}>
-          <Body body={body} />
+        <CommentBody maxWidth={currentWidth}>
+          <HTML html={parsedHtmlBody} imagesMaxWidth={currentWidth} />
         </CommentBody>
       </Container>
     );

@@ -20,6 +20,7 @@ class CommentsContainer extends Component {
   static propTypes = {
     postId: PropTypes.number.isRequired,
     postData: PropTypes.shape().isRequired,
+    navigation: PropTypes.shape().isRequired,
   };
 
   getNestedComments(postComments, commentsIdArray, nestedComments) {

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components/native';
+import { Dimensions } from 'react-native';
 import { SORT_COMMENTS } from 'constants/comments';
 import { getReputation } from 'util/steemitFormatters';
 import { sortComments } from 'util/sortUtils';
@@ -9,6 +10,8 @@ import _ from 'lodash';
 import Avatar from 'components/common/Avatar';
 import CommentFooter from './CommentFooter';
 import CommentContent from './CommentContent';
+
+const { width: deviceWidth } = Dimensions.get('screen');
 
 const Container = styled.View`
   background-color: ${COLORS.WHITE.WHITE};
@@ -48,6 +51,7 @@ class Comment extends Component {
     onLikeClick: PropTypes.func,
     onDislikeClick: PropTypes.func,
     onSendComment: PropTypes.func,
+    currentWidth: PropTypes.number,
   };
 
   static defaultProps = {
@@ -56,6 +60,7 @@ class Comment extends Component {
     commentsChildren: undefined,
     pendingVotes: [],
     depth: 0,
+    currentWidth: deviceWidth,
     onLikeClick: () => {},
     onDislikeClick: () => {},
     onSendComment: () => {},
@@ -72,6 +77,7 @@ class Comment extends Component {
       onLikeClick,
       onDislikeClick,
       onSendComment,
+      currentWidth,
     } = this.props;
     console.log('COMMENTS CHILDREN', commentsChildren, comment.id);
     if (!_.isEmpty(commentsChildren[comment.id])) {
@@ -87,6 +93,7 @@ class Comment extends Component {
           onLikeClick={onLikeClick}
           onDislikeClick={onDislikeClick}
           onSendComment={onSendComment}
+          currentWidth={currentWidth - 70}
         />
       ));
     }
@@ -94,7 +101,7 @@ class Comment extends Component {
   }
 
   render() {
-    const { comment, authUsername } = this.props;
+    const { comment, authUsername, currentWidth } = this.props;
     const anchorId = `@${comment.author}/${comment.permlink}`;
     const anchorLink = `${comment.url.slice(0, comment.url.indexOf('#'))}#${anchorId}`;
     const editable =
@@ -114,6 +121,7 @@ class Comment extends Component {
             created={comment.created}
             body={comment.body}
             commentDepth={comment.depth}
+            currentWidth={currentWidth}
           />
         </CommentContentContainer>
         <CommentFooter />

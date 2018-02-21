@@ -122,7 +122,6 @@ class PostScreen extends Component {
     this.state = {
       menuVisible: false,
       displayPhotoBrowser: false,
-      initialPhotoIndex: 0,
       loadingVote: false,
       likedPost: isPostVoted(postData, props.authUsername),
       postDetails: postData,
@@ -130,6 +129,8 @@ class PostScreen extends Component {
 
     this.setModalVisible = this.setModalVisible.bind(this);
     this.handleHideMenu = this.handleHideMenu.bind(this);
+    this.handleHidePhotoBrowser = this.handleHidePhotoBrowser.bind(this);
+    this.handleDisplayPhotoBrowser = this.handleDisplayPhotoBrowser.bind(this);
 
     this.navigateBack = this.navigateBack.bind(this);
     this.navigateToComments = this.navigateToComments.bind(this);
@@ -140,8 +141,6 @@ class PostScreen extends Component {
 
     this.handleLikePost = this.handleLikePost.bind(this);
     this.handlePostLinkPress = this.handlePostLinkPress.bind(this);
-    this.handleImagePress = this.handleImagePress.bind(this);
-    this.handleHidePhotoBrowser = this.handleHidePhotoBrowser.bind(this);
 
     this.loadingVote = this.loadingVote.bind(this);
     this.likedVoteSuccess = this.likedVoteSuccess.bind(this);
@@ -302,27 +301,16 @@ class PostScreen extends Component {
     });
   }
 
-  handleImagePress(url, alt) {
-    const { parsedJsonMetadata } = this.props.navigation.state.params;
-    const images = _.get(parsedJsonMetadata, 'image', []);
-    const photoIndex = _.findIndex(images, imageURL => _.includes(imageURL, alt));
-    console.log('IMAGE PRESSED', `URL: ${url}]\nALT: ${alt}`, `PhotoIndex: ${photoIndex}`, images);
+  handleDisplayPhotoBrowser() {
     this.setState({
       displayPhotoBrowser: true,
-      initialPhotoIndex: photoIndex >= 0 ? photoIndex : 0,
+      menuVisible: false,
     });
   }
 
   render() {
     const { body, parsedJsonMetadata, postData, author } = this.props.navigation.state.params;
-    const {
-      displayPhotoBrowser,
-      menuVisible,
-      initialPhotoIndex,
-      likedPost,
-      loadingVote,
-      postDetails,
-    } = this.state;
+    const { displayPhotoBrowser, menuVisible, likedPost, loadingVote, postDetails } = this.state;
     const parsedHtmlBody = getHtml(body, parsedJsonMetadata);
     const images = _.get(parsedJsonMetadata, 'image', []);
     const formattedImages = _.map(images, image => ({
@@ -331,11 +319,7 @@ class PostScreen extends Component {
     }));
     const tags = _.compact(_.get(parsedJsonMetadata, 'tags', []));
     const widthOffset = 20;
-
-    console.log('POST DATA ---> START');
-    console.log(parsedJsonMetadata, postData);
-    console.log('POST DATA ---> END');
-    console.log('HTML DATA PARSED', parsedHtmlBody);
+    const displayPhotoBrowserMenu = !_.isEmpty(formattedImages);
 
     return (
       <Container>
@@ -384,13 +368,15 @@ class PostScreen extends Component {
             loadingVote={loadingVote}
             handleNavigateToComments={this.navigateToComments}
             postData={postDetails}
+            displayPhotoBrowserMenu={displayPhotoBrowserMenu}
+            handleDisplayPhotoBrowser={this.handleDisplayPhotoBrowser}
             hideReblogMenu
           />
         </Modal>
         <PostPhotoBrowser
           displayPhotoBrowser={displayPhotoBrowser}
           mediaList={formattedImages}
-          initialPhotoIndex={initialPhotoIndex}
+          initialPhotoIndex={0}
           handleClose={this.handleHidePhotoBrowser}
         />
       </Container>

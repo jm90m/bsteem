@@ -216,14 +216,14 @@ class Footer extends Component {
         >
           <FooterValue>{upVotes.length}</FooterValue>
         </TouchableOpacity>
-        <TouchableOpacity onPress={this.handleNavigateToComments}>
+        <TouchableOpacity onPress={this.handleNavigateToComments} style={{ flexDirection: 'row' }}>
           <MaterialCommunityIcons
             name={MATERIAL_COMMUNITY_ICONS.comment}
             size={24}
             color={COLORS.BLUE.LINK_WATER}
           />
+          <FooterValue>{children}</FooterValue>
         </TouchableOpacity>
-        <FooterValue>{children}</FooterValue>
         {this.renderReblogLink()}
         <TouchableOpacity
           onPress={handleNavigateToVotes}

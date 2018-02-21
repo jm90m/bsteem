@@ -144,6 +144,8 @@ export const MATERIAL_COMMUNITY_ICONS = {
   savedPost: 'star',
 
   closeCircle: 'close-circle-outline',
+
+  image: 'image',
 };
 
 export const FEATHER_ICONS = {

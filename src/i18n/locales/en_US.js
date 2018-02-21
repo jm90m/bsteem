@@ -27,6 +27,7 @@ export default {
     unlikePost: 'Unlike Post',
     reblog: 'Reblog',
     reportPost: 'Report Post',
+    postImages: 'Post Images',
   },
   login: {
     description: 'Sign in with SteemConnect so that you can vote, like, comment, and create posts.',
