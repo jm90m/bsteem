@@ -310,6 +310,7 @@ class PostPreview extends Component {
 
   renderPreview() {
     const { postData } = this.props;
+    const { id } = postData;
     const { json_metadata, body } = postData;
     const jsonMetadata = _.attempt(JSON.parse, json_metadata);
     const postJSONMetaData = _.isError(jsonMetadata) ? {} : jsonMetadata;
@@ -322,17 +323,17 @@ class PostPreview extends Component {
     const hasVideo = !_.isEmpty(firstEmbed);
 
     const textComponent = (
-      <Touchable onPress={this.handleNavigateToPost} key="text-component">
+      <Touchable onPress={this.handleNavigateToPost} key={`text-component-${id}`}>
         <BodyShort content={body} />
       </Touchable>
     );
     const imageComponent = hasPreviewImage ? (
-      <Touchable onPress={this.handleDisplayPhotoBrowser} key="image-component">
+      <Touchable onPress={this.handleDisplayPhotoBrowser} key={`image-component-${id}`}>
         <PostImage images={images} />
       </Touchable>
     ) : null;
     const embedComponent = hasVideo ? (
-      <EmbedContent embedContent={firstEmbed} key="embed-component" />
+      <EmbedContent embedContent={firstEmbed} key={`embed-component-${id}`} />
     ) : null;
 
     return getPostPreviewComponents(body, textComponent, imageComponent, embedComponent);

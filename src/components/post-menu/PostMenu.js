@@ -17,6 +17,7 @@ import MenuWrapper from '../common/menu/MenuWrapper';
 import SavePostMenuButton from './SavePostMenuButton';
 import { getAuthUsername, getCurrentUserFollowList } from '../../state/rootReducer';
 import FollowMenuButton from './FollowMenuButton';
+import SmallLoading from '../common/SmallLoading';
 
 const Container = styled.View`
   align-items: center;
@@ -50,7 +51,10 @@ class PostMenu extends Component {
       id: PropTypes.number,
     }),
     authUsername: PropTypes.string.isRequired,
+    rebloggedList: PropTypes.arrayOf(PropTypes.string),
     likedPost: PropTypes.bool,
+    loadingVote: PropTypes.bool,
+    hideReblogMenu: PropTypes.bool,
   };
 
   static defaultProps = {
@@ -61,6 +65,9 @@ class PostMenu extends Component {
     handleReblog: () => {},
     handleReportPost: () => {},
     likedPost: false,
+    loadingVote: false,
+    rebloggedList: [],
+    hideReblogMenu: false,
   };
 
   render() {
@@ -74,10 +81,13 @@ class PostMenu extends Component {
       authUsername,
       rebloggedList,
       likedPost,
+      loadingVote,
+      hideReblogMenu,
     } = this.props;
     const { title, permlink, author, id, created } = postData;
-    const displayMenuButton = authUsername !== author;
+    const displayMenuButton = authUsername !== author && !_.isEmpty(authUsername);
     const isReblogged = _.includes(rebloggedList, `${id}`);
+    const hideReblog = !(displayMenuButton && !isReblogged) || hideReblogMenu;
     const renderReportPost = false;
 
     return (
@@ -104,27 +114,30 @@ class PostMenu extends Component {
             </MenuModalButton>
             <MenuModalButton onPress={handleLikePost}>
               <MenuModalContents>
-                <MaterialIcons
-                  size={ICON_SIZES.menuModalOptionIcon}
-                  color={COLORS.PRIMARY_COLOR}
-                  name={MATERIAL_ICONS.like}
-                />
+                {loadingVote ? (
+                  <SmallLoading />
+                ) : (
+                  <MaterialIcons
+                    size={ICON_SIZES.menuModalOptionIcon}
+                    color={COLORS.PRIMARY_COLOR}
+                    name={MATERIAL_ICONS.like}
+                  />
+                )}
                 <MenuText>{likedPost ? i18n.postMenu.unlikePost : i18n.postMenu.likePost}</MenuText>
               </MenuModalContents>
             </MenuModalButton>
-            {displayMenuButton &&
-              !isReblogged && (
-                <MenuModalButton onPress={handleReblog}>
-                  <MenuModalContents>
-                    <MaterialCommunityIcons
-                      size={ICON_SIZES.menuModalOptionIcon}
-                      color={COLORS.PRIMARY_COLOR}
-                      name={MATERIAL_COMMUNITY_ICONS.reblog}
-                    />
-                    <MenuText>{i18n.postMenu.reblog}</MenuText>
-                  </MenuModalContents>
-                </MenuModalButton>
-              )}
+            {!hideReblog && (
+              <MenuModalButton onPress={handleReblog}>
+                <MenuModalContents>
+                  <MaterialCommunityIcons
+                    size={ICON_SIZES.menuModalOptionIcon}
+                    color={COLORS.PRIMARY_COLOR}
+                    name={MATERIAL_COMMUNITY_ICONS.reblog}
+                  />
+                  <MenuText>{i18n.postMenu.reblog}</MenuText>
+                </MenuModalContents>
+              </MenuModalButton>
+            )}
             {displayMenuButton &&
               renderReportPost && (
                 <MenuModalButton onPress={handleReportPost}>

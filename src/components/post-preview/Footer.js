@@ -44,6 +44,7 @@ class Footer extends Component {
     loadingReblog: PropTypes.bool,
     rebloggedList: PropTypes.arrayOf(PropTypes.string),
     handleNavigateToComments: PropTypes.func,
+    handleNavigateToVotes: PropTypes.func,
   };
 
   static defaultProps = {
@@ -56,6 +57,7 @@ class Footer extends Component {
     loadingReblog: false,
     rebloggedList: [],
     handleNavigateToComments: () => {},
+    handleNavigateToVotes: () => {},
   };
 
   renderVoteButton() {
@@ -132,7 +134,12 @@ class Footer extends Component {
         </TouchableOpacity>
         <FooterValue>{children}</FooterValue>
         {this.renderReblogLink()}
-        <Payout>${formattedDisplayedPayout}</Payout>
+        <TouchableOpacity
+          onPress={handleNavigateToVotes}
+          style={{ marginLeft: 'auto', alignItems: 'center' }}
+        >
+          <Payout>${formattedDisplayedPayout}</Payout>
+        </TouchableOpacity>
       </Container>
     );
   }

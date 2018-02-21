@@ -17,6 +17,8 @@ import FooterTags from 'components/post/FooterTags';
 import Footer from 'components/post/Footer';
 import Header from 'components/common/Header';
 import BackButton from 'components/common/BackButton';
+import Expo from "expo";
+import { POST_HTML_BODY_TAG, POST_HTML_BODY_USER } from "../../constants/postConstants";
 
 const { width } = Dimensions.get('screen');
 
@@ -137,13 +139,21 @@ class SearchPostScreen extends Component {
     this.props.navigation.navigate(navigationConstants.FEED, { tag });
   }
 
-  handlePostLinkPress(url) {
+  handlePostLinkPress(e, url) {
     console.log('clicked link: ', url);
-    const urlArray = _.split(url, '');
-    const isUserURL = urlArray[0] === '/' && urlArray[1] === '@';
-    if (isUserURL) {
-      const user = _.slice(urlArray, 2, urlArray.length);
-      this.navigateToUser(user.join(''));
+    const isTag = _.includes(url, POST_HTML_BODY_TAG);
+    const isUser = _.includes(url, POST_HTML_BODY_USER);
+
+    if (isUser) {
+      const user = _.get(_.split(url, POST_HTML_BODY_USER), 1, 'bsteem');
+      this.navigateToUser(user);
+    } else if (isTag) {
+      const tag = _.get(_.split(url, POST_HTML_BODY_TAG), 1, 'bsteem');
+      this.navigateToFeed(tag);
+    } else {
+      Expo.WebBrowser.openBrowserAsync(url).catch(error => {
+        console.log('invalid url', error, url);
+      });
     }
   }
 

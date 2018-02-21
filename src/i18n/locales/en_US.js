@@ -38,4 +38,7 @@ export default {
     logoutButtonDescription:
       ' If you want to logout of your account, you can press the logout button below',
   },
+  post: {
+    loadComments: 'Load Comments',
+  },
 };

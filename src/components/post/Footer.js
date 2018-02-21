@@ -7,15 +7,10 @@ import styled from 'styled-components/native';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS, MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
 import { sortVotes } from 'util/sortUtils';
-import { getUpvotes, isPostVoted } from 'util/voteUtils';
+import { getUpvotes } from 'util/voteUtils';
 import { calculatePayout } from 'util/steemitUtils';
-import {
-  getIsAuthenticated,
-  getAuthUsername,
-  getCurrentUserRebloggedList,
-} from 'state/rootReducer';
-import { currentUserVotePost, currentUserReblogPost } from 'state/actions/currentUserActions';
-import * as postConstants from 'constants/postConstants';
+import { getAuthUsername, getCurrentUserRebloggedList } from 'state/rootReducer';
+import { currentUserReblogPost } from 'state/actions/currentUserActions';
 import * as navigationConstants from 'constants/navigation';
 import ReblogModal from './ReblogModal';
 
@@ -44,28 +39,11 @@ const Payout = styled.Text`
 const Loading = styled.ActivityIndicator``;
 
 const mapStateToProps = state => ({
-  authenticated: getIsAuthenticated(state),
   authUsername: getAuthUsername(state),
   rebloggedList: getCurrentUserRebloggedList(state),
 });
 
 const mapDispatchToProps = dispatch => ({
-  currentUserVotePost: (
-    postAuthor,
-    postPermlink,
-    voteWeight,
-    voteSuccessCallback,
-    voteFailCallback,
-  ) =>
-    dispatch(
-      currentUserVotePost.action({
-        postAuthor,
-        postPermlink,
-        voteWeight,
-        voteSuccessCallback,
-        voteFailCallback,
-      }),
-    ),
   currentUserReblogPost: (
     postId,
     postAuthor,
@@ -87,27 +65,26 @@ const mapDispatchToProps = dispatch => ({
 @connect(mapStateToProps, mapDispatchToProps)
 class Footer extends Component {
   static propTypes = {
-    authenticated: PropTypes.bool.isRequired,
     authUsername: PropTypes.string.isRequired,
     currentUserReblogPost: PropTypes.func.isRequired,
-    currentUserVotePost: PropTypes.func.isRequired,
+    handleLikePost: PropTypes.func,
     navigation: PropTypes.shape(),
     postData: PropTypes.shape(),
     rebloggedList: PropTypes.arrayOf(PropTypes.string).isRequired,
+    handleNavigateToVotes: PropTypes.func,
   };
 
   static defaultProps = {
     navigation: {},
     postData: {},
+    handleNavigateToVotes: () => {},
+    handleLikePost: () => {},
   };
 
   constructor(props) {
     super(props);
-    const { postData } = props;
 
     this.state = {
-      likedPost: isPostVoted(postData),
-      loadingVote: false,
       displayReblogModal: false,
       loadingReblog: false,
     };
@@ -115,33 +92,9 @@ class Footer extends Component {
     this.hideReblogModal = this.hideReblogModal.bind(this);
     this.handleNavigateToComments = this.handleNavigateToComments.bind(this);
     this.handleReblogConfirm = this.handleReblogConfirm.bind(this);
-    this.handleOnPressVote = this.handleOnPressVote.bind(this);
-    this.loadingVote = this.loadingVote.bind(this);
-    this.likedVoteSuccess = this.likedVoteSuccess.bind(this);
-    this.unlikedVoteSuccess = this.unlikedVoteSuccess.bind(this);
     this.loadingReblogStart = this.loadingReblogStart.bind(this);
     this.loadingReblogEnd = this.loadingReblogEnd.bind(this);
     this.showReblogModal = this.showReblogModal.bind(this);
-  }
-
-  loadingVote() {
-    this.setState({
-      loadingVote: true,
-    });
-  }
-
-  likedVoteSuccess() {
-    this.setState({
-      likedPost: true,
-      loadingVote: false,
-    });
-  }
-
-  unlikedVoteSuccess() {
-    this.setState({
-      likedPost: false,
-      loadingVote: false,
-    });
   }
 
   loadingReblogStart() {
@@ -195,44 +148,8 @@ class Footer extends Component {
     });
   }
 
-  handleOnPressVote() {
-    const { navigation, authenticated, postData } = this.props;
-    if (authenticated) {
-      const { author, permlink } = postData;
-      const { likedPost } = this.state;
-
-      this.loadingVote();
-
-      if (likedPost) {
-        const voteSuccessCallback = this.unlikedVoteSuccess;
-        const voteFailCalback = this.likedVoteSuccess;
-        this.props.currentUserVotePost(
-          author,
-          permlink,
-          postConstants.DEFAULT_UNVOTE_WEIGHT,
-          voteSuccessCallback,
-          voteFailCalback,
-        );
-      } else {
-        const voteSuccessCallback = this.likedVoteSuccess;
-        const voteFailCallback = this.unlikedVoteSuccess;
-        this.props.currentUserVotePost(
-          author,
-          permlink,
-          postConstants.DEFAULT_VOTE_WEIGHT,
-          voteSuccessCallback,
-          voteFailCallback,
-        );
-      }
-    } else {
-      navigation.navigate(navigationConstants.LOGIN);
-    }
-  }
-
   renderVoteButton() {
-    const { likedPost, loadingVote } = this.state;
-
-    console.log('LOADING VOTE', loadingVote);
+    const { likedPost, loadingVote } = this.props;
 
     if (loadingVote) {
       return <Loading color={COLORS.PRIMARY_COLOR} size="small" />;
@@ -240,14 +157,14 @@ class Footer extends Component {
 
     if (likedPost) {
       return (
-        <TouchableOpacity onPress={this.handleOnPressVote}>
+        <TouchableOpacity onPress={this.props.handleLikePost}>
           <MaterialIcons name="thumb-up" size={24} color={COLORS.PRIMARY_COLOR} />
         </TouchableOpacity>
       );
     }
 
     return (
-      <TouchableOpacity onPress={this.handleOnPressVote}>
+      <TouchableOpacity onPress={this.props.handleLikePost}>
         <MaterialIcons name="thumb-up" size={24} color={COLORS.BLUE.LINK_WATER} />
       </TouchableOpacity>
     );
@@ -279,7 +196,7 @@ class Footer extends Component {
   }
 
   render() {
-    const { postData } = this.props;
+    const { postData, handleNavigateToVotes } = this.props;
     const { displayReblogModal } = this.state;
     const { active_votes, children } = postData;
     const activeVotes = Array.isArray(active_votes) ? active_votes : [];
@@ -293,7 +210,12 @@ class Footer extends Component {
     return (
       <Container>
         {this.renderVoteButton()}
-        <FooterValue>{upVotes.length}</FooterValue>
+        <TouchableOpacity
+          onPress={handleNavigateToVotes}
+          style={{ justifyContent: 'center', alignItems: 'center' }}
+        >
+          <FooterValue>{upVotes.length}</FooterValue>
+        </TouchableOpacity>
         <TouchableOpacity onPress={this.handleNavigateToComments}>
           <MaterialCommunityIcons
             name={MATERIAL_COMMUNITY_ICONS.comment}
@@ -303,7 +225,12 @@ class Footer extends Component {
         </TouchableOpacity>
         <FooterValue>{children}</FooterValue>
         {this.renderReblogLink()}
-        <Payout>${formattedDisplayedPayout}</Payout>
+        <TouchableOpacity
+          onPress={handleNavigateToVotes}
+          style={{ marginLeft: 'auto', alignItems: 'center' }}
+        >
+          <Payout>${formattedDisplayedPayout}</Payout>
+        </TouchableOpacity>
         <Modal
           animationType="slide"
           transparent
