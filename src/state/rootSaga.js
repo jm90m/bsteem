@@ -35,11 +35,12 @@ const rootSaga = function*() {
     spawn(currentUserSaga.watchFetchCurrentUserFeed),
     spawn(currentUserSaga.watchFetchMoreCurrentUserFeed),
     spawn(currentUserSaga.watchCurrentUserVotePost),
+    spawn(currentUserSaga.watchCurrentUserVoteComment),
     spawn(currentUserSaga.watchCurrentUserReblogPost),
     spawn(currentUserSaga.watchCurrentUserOnboarding),
     spawn(currentUserSaga.watchCurrentUserFollowList),
     spawn(currentUserSaga.watchCurrentUserFollowUser),
-    spawn(currentUserSaga.watchCurrentuserUnfollowUser),
+    spawn(currentUserSaga.watchCurrentUserUnfollowUser),
 
     // User Activity Sagas
     spawn(userActivitySaga.watchFetchUserAccountHistory),

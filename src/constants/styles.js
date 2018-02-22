@@ -131,6 +131,7 @@ export const MATERIAL_COMMUNITY_ICONS = {
   voteFill: 'thumb-up',
   voteOutline: 'thumb-up-outline',
   unvoteFill: 'thumb-down',
+  reply: 'reply',
 
   // wallet
   claimReward: 'check-circle',

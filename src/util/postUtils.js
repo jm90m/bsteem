@@ -1,10 +1,8 @@
 import React from 'react';
 import _ from 'lodash';
 import Remarkable from 'remarkable';
-import { Dimensions } from 'react-native';
 import htmlReady from '../util/steemitHtmlReady';
 import sanitizeHtml from 'sanitize-html';
-const { width, height } = Dimensions.get('screen');
 import sanitizeConfig from './sanitizeConfig';
 import SteemEmbed from './steemEmbed';
 

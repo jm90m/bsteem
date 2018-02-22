@@ -4,6 +4,8 @@ import _ from 'lodash';
 import styled from 'styled-components/native';
 import { connect } from 'react-redux';
 import { getAuthUsername, getCommentsByPostId } from 'state/rootReducer';
+import { currentUserVoteComment } from 'state/actions/currentUserActions';
+import { getIsAuthenticated } from 'state/rootReducer';
 import CommentsList from './CommentsList';
 
 const Container = styled.View``;
@@ -11,16 +13,28 @@ const Container = styled.View``;
 const mapStateToProps = state => ({
   authUsername: getAuthUsername(state),
   commentsByPostId: getCommentsByPostId(state),
+  authenticated: getIsAuthenticated(state),
 });
 
-// const mapDispatchToProps = dispatch => ({});
+const mapDispatchToProps = dispatch => ({
+  currentUserVoteComment: (commentId, postId, weight, voteSuccessCallback, voteFailCallback) =>
+    dispatch(
+      currentUserVoteComment.action({
+        commentId,
+        postId,
+        weight,
+        voteSuccessCallback,
+        voteFailCallback,
+      }),
+    ),
+});
 
-@connect(mapStateToProps)
 class CommentsContainer extends Component {
   static propTypes = {
     postId: PropTypes.number.isRequired,
     postData: PropTypes.shape().isRequired,
     navigation: PropTypes.shape().isRequired,
+    currentUserVoteComment: PropTypes.func.isRequired,
   };
 
   getNestedComments(postComments, commentsIdArray, nestedComments) {
@@ -36,7 +50,14 @@ class CommentsContainer extends Component {
   }
 
   render() {
-    const { authUsername, postId, postData, commentsByPostId } = this.props;
+    const {
+      authUsername,
+      postId,
+      postData,
+      commentsByPostId,
+      navigation,
+      authenticated,
+    } = this.props;
     const postComments = _.get(commentsByPostId, postId, null);
     const comments = _.get(postComments, 'comments', {});
     const rootNode = _.get(postComments, `childrenById.${postId}`, null);
@@ -65,10 +86,13 @@ class CommentsContainer extends Component {
           commentsChildren={commentsChildren}
           postId={postId}
           postData={postData}
+          navigation={navigation}
+          currentUserVoteComment={this.props.currentUserVoteComment}
+          authenticated={authenticated}
         />
       </Container>
     );
   }
 }
 
-export default CommentsContainer;
+export default connect(mapStateToProps, mapDispatchToProps)(CommentsContainer);

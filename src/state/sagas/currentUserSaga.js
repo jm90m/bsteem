@@ -2,11 +2,12 @@ import _ from 'lodash';
 import { takeLatest, all, call, put, select, takeEvery } from 'redux-saga/effects';
 import API from 'api/api';
 import sc2 from 'api/sc2';
-import { getAuthUsername, getCurrentUserFeed } from '../rootReducer';
+import { getAuthUsername, getCurrentUserFeed, getCommentsByPostId } from '../rootReducer';
 import {
   FETCH_CURRENT_USER_FEED,
   FETCH_MORE_CURRENT_USER_FEED,
   CURRENT_USER_VOTE_POST,
+  CURRENT_USER_VOTE_COMMENT,
   CURRENT_USER_REBLOG_POST,
   CURRENT_USER_ONBOARDING,
   FETCH_CURRENT_USER_FOLLOW_LIST,
@@ -69,6 +70,26 @@ const votePost = function*(action) {
     const { voteFailCallback } = action.payload;
     voteFailCallback();
     yield put(currentUserActions.currentUserVotePost.fail(error));
+  }
+};
+
+const voteComment = function*(action) {
+  try {
+    const { commentId, postId, weight, voteSuccessCallback } = action.payload;
+    const currentUsername = yield select(getAuthUsername);
+    const commentsByPostId = yield select(getCommentsByPostId);
+    const postCommentsDetails = _.get(commentsByPostId, postId, {});
+    const comment = _.get(postCommentsDetails, `comments.${commentId}`, {});
+    const { author, permlink } = comment;
+    const result = yield call(sc2.vote, currentUsername, author, permlink, weight);
+
+    voteSuccessCallback();
+    yield put(currentUserActions.currentUserVoteComment.success(result));
+  } catch (error) {
+    const { voteFailCallback } = action.payload;
+    console.log('FAIL VOTE COMMENT', error);
+    voteFailCallback();
+    yield put(currentUserActions.currentUserVoteComment.fail(error));
   }
 };
 
@@ -170,6 +191,10 @@ export const watchCurrentUserVotePost = function*() {
   yield takeEvery(CURRENT_USER_VOTE_POST.ACTION, votePost);
 };
 
+export const watchCurrentUserVoteComment = function*() {
+  yield takeEvery(CURRENT_USER_VOTE_COMMENT.ACTION, voteComment);
+};
+
 export const watchCurrentUserReblogPost = function*() {
   yield takeEvery(CURRENT_USER_REBLOG_POST.ACTION, reblogPost);
 };
@@ -186,6 +211,6 @@ export const watchCurrentUserFollowUser = function*() {
   yield takeEvery(CURRENT_USER_FOLLOW_USER.ACTION, followUser);
 };
 
-export const watchCurrentuserUnfollowUser = function*() {
+export const watchCurrentUserUnfollowUser = function*() {
   yield takeEvery(CURRENT_USER_UNFOLLOW_USER.ACTION, unfollowUser);
 };
