@@ -52,7 +52,7 @@ class CommentsList extends Component {
 
     if (_.size(sortedComments) === _.size(displayedComments)) return;
 
-    const lastDisplayedCommentIndex = _.size(displayedComments) - 1;
+    const lastDisplayedCommentIndex = _.size(displayedComments);
     const moreCommentsLastIndex = lastDisplayedCommentIndex + DISPLAY_LIMIT;
     const moreComments = _.slice(sortedComments, lastDisplayedCommentIndex, moreCommentsLastIndex);
 
