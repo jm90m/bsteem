@@ -13,6 +13,8 @@ import FollowersScreen from 'screens/stack-screens/FollowersScreen';
 import FollowingScreen from 'screens/stack-screens/FollowingScreen';
 import UserActivityScreen from 'screens/stack-screens/UserActivityScreen';
 import UserWalletScreen from 'screens/stack-screens/UserWalletScreen';
+import VotesScreen from '../stack-screens/VotesScreen';
+import FetchPostScreen from '../stack-screens/FetchPostScreen';
 
 const screenNavigationOptions = {
   tabBarIcon: ({ tintColor }) => (
@@ -59,6 +61,14 @@ const LoginNavigator = StackNavigator(
     },
     [navigationConstants.USER_WALLET]: {
       screen: UserWalletScreen,
+      navigationOptions: screenNavigationOptions,
+    },
+    [navigationConstants.FETCH_POST]: {
+      screen: FetchPostScreen,
+      navigationOptions: screenNavigationOptions,
+    },
+    [navigationConstants.VOTES]: {
+      screen: VotesScreen,
       navigationOptions: screenNavigationOptions,
     },
   },

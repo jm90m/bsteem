@@ -196,7 +196,7 @@ class Comment extends Component {
       navigation,
       currentUserVoteComment,
     } = this.props;
-    console.log('COMMENTS CHILDREN', commentsChildren, comment.id);
+
     if (!_.isEmpty(commentsChildren[comment.id])) {
       return sortComments(commentsChildren[comment.id], sort).map(child => (
         <Comment

@@ -55,7 +55,7 @@ class PostImage extends Component {
         console.log(`The image dimensions are ${width}x${height}`);
       },
       error => {
-        console.error(`Couldn't get the image size: ${error.message}`);
+        console.log(`Couldn't get the image size: ${error.message}`);
       },
     );
   }

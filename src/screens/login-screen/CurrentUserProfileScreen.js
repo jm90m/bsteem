@@ -270,7 +270,7 @@ class CurrentUserProfileScreen extends Component {
       const query = { start_author: username, limit: 10 };
       this.props.fetchUserComments(username, query, true);
     } else {
-      const lastComment = _.last(userComments);
+      const lastComment = _.last(userComments) || {};
       const query = { start_author: username, limit: 10, start_permlink: lastComment.permlink };
       this.props.fetchUserComments(username, query);
     }
