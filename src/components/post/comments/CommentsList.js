@@ -4,14 +4,24 @@ import styled from 'styled-components/native';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { sortComments } from 'util/sortUtils';
+import { COLORS } from 'constants/styles';
+import LargeLoading from 'components/common/LargeLoading';
+import { SORT_COMMENTS } from 'constants/comments';
 import Comment from './Comment';
-import { SORT_COMMENTS } from '../../../constants/comments';
 
 const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
 
 const EmptyView = styled.View`
   height: 150px;
   width: 50px;
+`;
+
+const LoadingContainer = styled.View`
+  padding: 40px 0;
+  background: ${COLORS.WHITE.WHITE}
+  width: 100%;
+  justify-content: center;
+  align-items: center;
 `;
 
 const DISPLAY_LIMIT = 10;
@@ -44,6 +54,7 @@ class CommentsList extends Component {
     };
 
     this.renderComment = this.renderComment.bind(this);
+    this.renderLoader = this.renderLoader.bind(this);
     this.displayMoreComments = this.displayMoreComments.bind(this);
   }
 
@@ -63,7 +74,7 @@ class CommentsList extends Component {
 
   renderComment(commentData) {
     if (_.get(commentData, 'bsteemEmptyView', false)) {
-      return <EmptyView />;
+      return this.renderLoader();
     }
 
     const {
@@ -92,6 +103,19 @@ class CommentsList extends Component {
         currentUserVoteComment={currentUserVoteComment}
       />
     );
+  }
+
+  renderLoader() {
+    const { displayedComments, sortedComments } = this.state;
+
+    if (_.size(sortedComments) !== _.size(displayedComments)) {
+      return (
+        <LoadingContainer>
+          <LargeLoading />
+        </LoadingContainer>
+      );
+    }
+    return <EmptyView />;
   }
 
   render() {
