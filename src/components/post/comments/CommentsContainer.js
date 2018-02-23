@@ -5,6 +5,7 @@ import styled from 'styled-components/native';
 import { connect } from 'react-redux';
 import { getAuthUsername, getCommentsByPostId } from 'state/rootReducer';
 import { currentUserVoteComment } from 'state/actions/currentUserActions';
+import * as editorActions from 'state/actions/editorActions';
 import { getIsAuthenticated } from 'state/rootReducer';
 import CommentsList from './CommentsList';
 
@@ -27,6 +28,16 @@ const mapDispatchToProps = dispatch => ({
         voteFailCallback,
       }),
     ),
+  createComment: (parentPost, isUpdating, originalComment, commentBody, successCallback) =>
+    dispatch(
+      editorActions.action({
+        parentPost,
+        isUpdating,
+        originalComment,
+        commentBody,
+        successCallback,
+      }),
+    ),
 });
 
 class CommentsContainer extends Component {
@@ -35,6 +46,15 @@ class CommentsContainer extends Component {
     postData: PropTypes.shape().isRequired,
     navigation: PropTypes.shape().isRequired,
     currentUserVoteComment: PropTypes.func.isRequired,
+    authUsername: PropTypes.string,
+    authenticated: PropTypes.bool,
+    commentsByPostId: PropTypes.shape(),
+  };
+
+  static defaultProps = {
+    authUsername: '',
+    authenticated: false,
+    commentsByPostId: {},
   };
 
   getNestedComments(postComments, commentsIdArray, nestedComments) {

@@ -55,6 +55,7 @@ const rootSaga = function*() {
     // Editor Sagas
     spawn(editorSaga.watchCreatePost),
     spawn(editorSaga.watchUploadImage),
+    spawn(editorSaga.watchCreateComment),
 
     // Firebase Sagas
     spawn(firebaseSaga.watchFetchSavedTags),

@@ -7,6 +7,7 @@ import { getReputation } from 'util/steemitFormatters';
 import { sortComments } from 'util/sortUtils';
 import { COLORS } from 'constants/styles';
 import _ from 'lodash';
+import * as navigationConstants from 'constants/navigation';
 import Avatar from 'components/common/Avatar';
 import CommentFooter from './CommentFooter';
 import CommentContent from './CommentContent';
@@ -85,15 +86,18 @@ class Comment extends Component {
       disliked,
       loadingLike: false,
       loadingDislike: false,
+      newReplyComment: {},
     };
 
     this.setLiked = this.setLiked.bind(this);
     this.setDisliked = this.setDisliked.bind(this);
     this.setLoadingLike = this.setLoadingLike.bind(this);
     this.setLoadingDislike = this.setLoadingDislike.bind(this);
+    this.setNewReplyComment = this.setNewReplyComment.bind(this);
 
     this.handleLike = this.handleLike.bind(this);
     this.handleDislike = this.handleDislike.bind(this);
+    this.handleReply = this.handleReply.bind(this);
   }
 
   setLiked(liked) {
@@ -129,6 +133,12 @@ class Comment extends Component {
   setLoadingDislike(loadingDislike) {
     this.setState({
       loadingDislike,
+    });
+  }
+
+  setNewReplyComment(newReplyComment) {
+    this.setState({
+      newReplyComment,
     });
   }
 
@@ -180,6 +190,63 @@ class Comment extends Component {
     );
   }
 
+  handleReply() {
+    const { authenticated, comment } = this.props;
+
+    if (!authenticated) {
+      return;
+    }
+
+    this.props.navigation.navigate(navigationConstants.REPLY, {
+      comment,
+      parentPost: comment,
+      successCreateReply: this.setNewReplyComment,
+    });
+  }
+
+  renderReplyComment() {
+    const { newReplyComment } = this.state;
+    const {
+      commentsChildren,
+      comment,
+      authUsername,
+      authenticated,
+      depth,
+      rootPostAuthor,
+      onLikeClick,
+      onDislikeClick,
+      onSendComment,
+      currentWidth,
+      navigation,
+      currentUserVoteComment,
+      rootPostId,
+    } = this.props;
+
+    if (!_.isEmpty(newReplyComment)) {
+      return (
+        <Comment
+          key={`reply-comment-${newReplyComment.id}`}
+          authUsername={authUsername}
+          depth={depth + 1}
+          comment={newReplyComment}
+          parent={comment}
+          rootPostAuthor={rootPostAuthor}
+          commentsChildren={commentsChildren}
+          onLikeClick={onLikeClick}
+          onDislikeClick={onDislikeClick}
+          onSendComment={onSendComment}
+          currentWidth={currentWidth - COMMENT_PADDING}
+          navigation={navigation}
+          authenticated={authenticated}
+          currentUserVoteComment={currentUserVoteComment}
+          rootPostId={rootPostId}
+        />
+      );
+    }
+
+    return null;
+  }
+
   renderCommentsChildren() {
     const {
       commentsChildren,
@@ -195,6 +262,7 @@ class Comment extends Component {
       currentWidth,
       navigation,
       currentUserVoteComment,
+      rootPostId,
     } = this.props;
 
     if (!_.isEmpty(commentsChildren[comment.id])) {
@@ -214,6 +282,7 @@ class Comment extends Component {
           navigation={navigation}
           authenticated={authenticated}
           currentUserVoteComment={currentUserVoteComment}
+          rootPostId={rootPostId}
         />
       ));
     }
@@ -224,13 +293,11 @@ class Comment extends Component {
     const { comment, authUsername, currentWidth, navigation } = this.props;
     const { liked, disliked, loadingLike, loadingDislike } = this.state;
     const anchorId = `@${comment.author}/${comment.permlink}`;
-    const anchorLink = `${comment.url.slice(0, comment.url.indexOf('#'))}#${anchorId}`;
+    // const anchorLink = `${comment.url.slice(0, comment.url.indexOf('#'))}#${anchorId}`;
     const editable =
       comment.author === authUsername.name && comment.cashout_time !== '1969-12-31T23:59:59';
     const commentAuthorReputation = getReputation(comment.author_reputation);
     const avatarSize = comment.depth === 1 ? 40 : 32;
-    //    const userUpVoted = userVote && userVote.percent > 0;
-    // const userDownVoted = userVote && userVote.percent < 0;
 
     return (
       <Container>
@@ -257,7 +324,11 @@ class Comment extends Component {
           handleDislike={this.handleDislike}
           handleReply={this.handleReply}
         />
-        <CommentChildrenContainer>{this.renderCommentsChildren()}</CommentChildrenContainer>
+
+        <CommentChildrenContainer>
+          {this.renderReplyComment()}
+          {this.renderCommentsChildren()}
+        </CommentChildrenContainer>
       </Container>
     );
   }

@@ -20,7 +20,9 @@ const BackTouchable = styled.TouchableOpacity`
   padding: 10px;
 `;
 
-const Title = styled.Text``;
+const Title = styled.Text`
+  margin-left: 3px;
+`;
 
 const LoadingContainer = styled.View`
   margin-top: 50px;

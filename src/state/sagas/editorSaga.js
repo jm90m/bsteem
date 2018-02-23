@@ -1,10 +1,11 @@
-import API from 'api/api';
 import sc2 from 'api/sc2';
 import { takeLatest, call, all, put, select } from 'redux-saga/effects';
-import { createPermlink } from 'util/steemitUtils';
-import { CREATE_POST, UPLOAD_IMAGE } from '../actions/actionTypes';
+import _ from 'lodash';
+import { createPermlink, createCommentPermlink } from 'util/steemitUtils';
+import { CREATE_COMMENT, CREATE_POST, UPLOAD_IMAGE } from '../actions/actionTypes';
 import { getAuthUsername } from '../rootReducer';
 import * as editorActions from '../actions/editorActions';
+import { getBodyPatchIfSmaller } from '../../util/steemitUtils';
 
 export const rewardsValues = {
   all: '100',
@@ -12,7 +13,7 @@ export const rewardsValues = {
   none: '0',
 };
 
-const broadcastComment = (
+const broadcastPost = (
   parentAuthor,
   parentPermlink,
   author,
@@ -72,6 +73,48 @@ const broadcastComment = (
   return sc2.broadcast(operations);
 };
 
+function broadcastComment(
+  parentAuthor,
+  parentPermlink,
+  author,
+  permlink,
+  title,
+  body,
+  jsonMetadata,
+  isUpdating,
+) {
+  const operations = [];
+
+  operations.push([
+    'comment',
+    {
+      parent_author: parentAuthor,
+      parent_permlink: parentPermlink,
+      author,
+      permlink,
+      title,
+      body,
+      json_metadata: JSON.stringify(jsonMetadata),
+    },
+  ]);
+
+  if (!isUpdating) {
+    operations.push([
+      'comment_options',
+      {
+        author,
+        permlink,
+        allow_votes: true,
+        allow_curation_rewards: false,
+        max_accepted_payout: '1000000.000 SBD',
+        percent_steem_dollars: 10000,
+      },
+    ]);
+  }
+
+  return sc2.broadcast(operations);
+}
+
 const createPost = function*(action) {
   try {
     const { postData, callback } = action.payload;
@@ -103,7 +146,7 @@ const createPost = function*(action) {
     // use getBodyPatchIfSmall func in steemitUtils
     const newBody = isUpdating ? postData.originalBody : body;
     const result = yield call(
-      broadcastComment,
+      broadcastPost,
       parentAuthor,
       parentPermlink,
       author,
@@ -114,7 +157,7 @@ const createPost = function*(action) {
       upvote,
       permlink,
     );
-    console.log('RESULT', result);
+    console.log('POST CREATION RESULTS', result);
     const payload = result.result;
 
     if (callback) callback(postData);
@@ -123,6 +166,61 @@ const createPost = function*(action) {
   } catch (error) {
     console.log(error);
     yield put(editorActions.createPost.fail(error));
+  }
+};
+
+const createComment = function*(action) {
+  try {
+    const {
+      parentPost,
+      isUpdating,
+      originalComment,
+      successCallback,
+      commentBody,
+    } = action.payload;
+    const { category, id, permlink: parentPermlink, author: parentAuthor } = parentPost;
+    const author = yield select(getAuthUsername);
+    const permlink = isUpdating
+      ? originalComment.permlink
+      : createCommentPermlink(parentAuthor, parentPermlink);
+    const jsonMetadata = { tags: [category], community: 'bsteem', app: 'bsteem' };
+    const title = '';
+    const newBody = isUpdating
+      ? getBodyPatchIfSmaller(originalComment.body, commentBody)
+      : commentBody;
+    const result = yield call(
+      broadcastComment,
+      parentAuthor,
+      parentPermlink,
+      author,
+      permlink,
+      title,
+      newBody,
+      jsonMetadata,
+      isUpdating,
+    );
+    const payload = result.result;
+    const operations = _.get(payload, 'operations', []);
+    const commentData = _.get(operations, 0, {});
+    const commentDetails = _.get(commentData, 1, {});
+    const commentDetailsPayload = {
+      ...commentDetails,
+    };
+
+    // need created timestamp in right format & author reputaiton
+
+    successCallback(commentDetails);
+
+    console.log('SUCCESS COMMENT REPLY - ORIGINAL COMMENT', originalComment);
+    console.log('SUCCESS COMMENT REPLY - NEW COMMENT DATA', commentData);
+    console.log('SUCCESS COMMENT REPLY - NEW COMMENT DETAILS', commentDetails);
+
+    yield put(editorActions.createComment.success(payload));
+  } catch (error) {
+    console.log('FAIL COMMENT REPLY', error);
+    const { failCallback } = action.payload;
+    if (failCallback) failCallback(error);
+    yield put(editorActions.createComment.fail(error));
   }
 };
 
@@ -182,4 +280,8 @@ export const watchCreatePost = function*() {
 
 export const watchUploadImage = function*() {
   yield takeLatest(UPLOAD_IMAGE.ACTION, uploadImage);
+};
+
+export const watchCreateComment = function*() {
+  yield takeLatest(CREATE_COMMENT.ACTION, createComment);
 };

@@ -11,6 +11,7 @@ export const LOGOUT = 'LOGOUT';
 export const POST_CREATION = 'POST_CREATION';
 export const FETCH_POST = 'FETCH_POST';
 export const VOTES = 'VOTES';
+export const REPLY = 'REPLY';
 
 // user navigations
 export const USER_BLOG = 'USER_BLOG';

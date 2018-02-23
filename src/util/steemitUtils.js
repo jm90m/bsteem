@@ -1,9 +1,10 @@
 import base58 from 'bs58';
 import getSlug from 'speakingurl';
-import secureRandom from 'secure-random';
 import API from 'api/api';
+import diff_match_patch from 'diff-match-patch';
 import * as steemitFormatters from 'util/steemitFormatters';
 
+const dmp = new diff_match_patch();
 /**
  * https://github.com/steemit/steemit.com/blob/47fd0e0846bd8c7c941ee4f95d5f971d3dc3981d/app/utils/ParsersAndFormatters.js
  */
@@ -151,3 +152,49 @@ export const calculateTotalDelegatedSP = (user, totalVestingShares, totalVesting
   );
   return receivedSP - delegatedSP;
 };
+
+/**
+ * This function is extracted from steemit.com source code and does the same tasks with some slight-
+ * adjustments to meet our needs. Refer to the main one in case of future problems:
+ * https://github.com/steemit/steemit.com/blob/edac65e307bffc23f763ed91cebcb4499223b356/app/redux/TransactionSaga.js#L340
+ */
+
+export const createCommentPermlink = (parentAuthor, parentPermlink) => {
+  let permlink;
+
+  // comments: re-parentauthor-parentpermlink-time
+  const timeStr = new Date().toISOString().replace(/[^a-zA-Z0-9]+/g, '');
+  const newParentPermlink = parentPermlink.replace(/(-\d{8}t\d{9}z)/g, '');
+  permlink = `re-${parentAuthor}-${newParentPermlink}-${timeStr}`;
+
+  if (permlink.length > 255) {
+    // STEEMIT_MAX_PERMLINK_LENGTH
+    permlink = permlink.substring(permlink.length - 255, permlink.length);
+  }
+  // only letters numbers and dashes shall survive
+  permlink = permlink.toLowerCase().replace(/[^a-z0-9-]+/g, '');
+  return permlink;
+};
+
+/**
+ * https://github.com/steemit/steemit.com/blob/ded8ecfcc9caf2d73b6ef12dbd0191bd9dbf990b/app/redux/TransactionSaga.js#L412
+ */
+function createPatch(text1, text2) {
+  if (!text1 && text1 === '') return undefined;
+  const patches = dmp.patch_make(text1, text2);
+  const patch = dmp.patch_toText(patches);
+  return patch;
+}
+
+/**
+ * https://github.com/steemit/steemit.com/blob/ded8ecfcc9caf2d73b6ef12dbd0191bd9dbf990b/app/redux/TransactionSaga.js#L329
+ */
+export function getBodyPatchIfSmaller(originalBody, body) {
+  if (!originalBody) return body;
+  const patch = createPatch(originalBody, body);
+  // Putting body into buffer will expand Unicode characters into their true length
+  if (patch && patch.length < new Buffer(body, 'utf-8').length) {
+    body = patch;
+  }
+  return body;
+}

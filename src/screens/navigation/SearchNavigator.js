@@ -15,6 +15,7 @@ import VotesScreen from '../stack-screens/VotesScreen';
 import CommentsScreen from '../stack-screens/CommentsScreen';
 import PostScreen from '../stack-screens/PostScreen';
 import SavedContentScreen from '../SavedContentScreen';
+import ReplyScreen from '../stack-screens/ReplyScreen';
 
 const screenNavigationOptions = {
   tabBarIcon: ({ tintColor }) => (
@@ -69,6 +70,10 @@ const SearchNavigator = StackNavigator(
     },
     [navigationConstants.SAVED_CONTENT]: {
       screen: SavedContentScreen,
+      navigationOptions: screenNavigationOptions,
+    },
+    [navigationConstants.REPLY]: {
+      screen: ReplyScreen,
       navigationOptions: screenNavigationOptions,
     },
   },

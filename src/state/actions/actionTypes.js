@@ -32,7 +32,9 @@ export const FETCH_MORE_CURRENT_USER_FEED = createAsyncActionType(
   '@current-user/fetch_more_current_user_feed',
 );
 export const CURRENT_USER_VOTE_POST = createAsyncActionType('@current-user/current_user_vote_post');
-export const CURRENT_USER_VOTE_COMMENT = createAsyncActionType('@current-user/current-user-vote-comment');
+export const CURRENT_USER_VOTE_COMMENT = createAsyncActionType(
+  '@current-user/current-user-vote-comment',
+);
 export const CURRENT_USER_REBLOG_POST = createAsyncActionType(
   '@current-user/current_user_reblog_post',
 );
@@ -73,6 +75,7 @@ export const SET_TRANSLATIONS = createAsyncActionType('@app/set-translations');
 
 // Editor Actions
 export const CREATE_POST = createAsyncActionType('@editor/create-post');
+export const CREATE_COMMENT = createAsyncActionType('@editor/create-comment');
 export const UPLOAD_IMAGE = createAsyncActionType('@editor/upload-image');
 
 // Firebase Actions
