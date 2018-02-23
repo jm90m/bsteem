@@ -3,7 +3,7 @@ import { takeLatest, call, all, put, select } from 'redux-saga/effects';
 import _ from 'lodash';
 import { createPermlink, createCommentPermlink } from 'util/steemitUtils';
 import { CREATE_COMMENT, CREATE_POST, UPLOAD_IMAGE } from '../actions/actionTypes';
-import { getAuthUsername } from '../rootReducer';
+import { getAuthUsername, getUsersDetails } from '../rootReducer';
 import * as editorActions from '../actions/editorActions';
 import { getBodyPatchIfSmaller } from '../../util/steemitUtils';
 
@@ -179,7 +179,10 @@ const createComment = function*(action) {
       commentBody,
     } = action.payload;
     const { category, id, permlink: parentPermlink, author: parentAuthor } = parentPost;
+    const usersDetails = yield select(getUsersDetails);
     const author = yield select(getAuthUsername);
+    const authorDetails = _.get(usersDetails, author, {});
+
     const permlink = isUpdating
       ? originalComment.permlink
       : createCommentPermlink(parentAuthor, parentPermlink);
@@ -203,17 +206,22 @@ const createComment = function*(action) {
     const operations = _.get(payload, 'operations', []);
     const commentData = _.get(operations, 0, {});
     const commentDetails = _.get(commentData, 1, {});
+    const created = _.replace(new Date().toISOString(), 'Z', '');
     const commentDetailsPayload = {
       ...commentDetails,
+      created,
+      author_reputation: authorDetails.author_reputation,
+      id: `tempID-${permlink}-${created}`,
     };
 
     // need created timestamp in right format & author reputaiton
 
-    successCallback(commentDetails);
+    successCallback(commentDetailsPayload);
 
     console.log('SUCCESS COMMENT REPLY - ORIGINAL COMMENT', originalComment);
     console.log('SUCCESS COMMENT REPLY - NEW COMMENT DATA', commentData);
     console.log('SUCCESS COMMENT REPLY - NEW COMMENT DETAILS', commentDetails);
+    console.log('SUCCESS COMMENT REPLY - COMMENT DETAILS PAYLOAD', commentDetailsPayload);
 
     yield put(editorActions.createComment.success(payload));
   } catch (error) {

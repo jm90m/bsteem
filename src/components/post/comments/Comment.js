@@ -295,7 +295,7 @@ class Comment extends Component {
     const anchorId = `@${comment.author}/${comment.permlink}`;
     // const anchorLink = `${comment.url.slice(0, comment.url.indexOf('#'))}#${anchorId}`;
     const editable =
-      comment.author === authUsername.name && comment.cashout_time !== '1969-12-31T23:59:59';
+      comment.author === authUsername && comment.cashout_time !== '1969-12-31T23:59:59';
     const commentAuthorReputation = getReputation(comment.author_reputation);
     const avatarSize = comment.depth === 1 ? 40 : 32;
 
@@ -323,6 +323,7 @@ class Comment extends Component {
           handleLike={this.handleLike}
           handleDislike={this.handleDislike}
           handleReply={this.handleReply}
+          editable={editable}
         />
 
         <CommentChildrenContainer>

@@ -51,6 +51,7 @@ class CommentFooter extends Component {
       loadingLike,
       disliked,
       loadingDislike,
+      editable,
       handleLike,
       handleDislike,
       handleReply,
@@ -86,6 +87,15 @@ class CommentFooter extends Component {
             color={COLORS.TERTIARY_COLOR}
           />
         </TouchableOpacity>
+        {editable && (
+          <TouchableOpacity onPress={handleReply}>
+            <MaterialCommunityIcons
+              name={MATERIAL_COMMUNITY_ICONS.pencil}
+              size={ICON_SIZES.menuIcon}
+              color={COLORS.TERTIARY_COLOR}
+            />
+          </TouchableOpacity>
+        )}
       </Container>
     );
   }
