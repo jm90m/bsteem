@@ -30,9 +30,11 @@ class CommentFooter extends Component {
     loadingLike: PropTypes.bool,
     disliked: PropTypes.bool,
     loadingDislike: PropTypes.bool,
+    editable: PropTypes.bool,
     handleLike: PropTypes.func,
     handleDislike: PropTypes.func,
     handleReply: PropTypes.func,
+    handleEdit: PropTypes.func,
   };
 
   static defaultProps = {
@@ -40,9 +42,11 @@ class CommentFooter extends Component {
     loadingLike: false,
     disliked: false,
     loadingDislike: false,
+    editable: false,
     handleLike: () => {},
     handleDislike: () => {},
     handleReply: () => {},
+    handleEdit: () => {},
   };
 
   render() {
@@ -55,6 +59,7 @@ class CommentFooter extends Component {
       handleLike,
       handleDislike,
       handleReply,
+      handleEdit,
     } = this.props;
     return (
       <Container>
@@ -88,7 +93,7 @@ class CommentFooter extends Component {
           />
         </TouchableOpacity>
         {editable && (
-          <TouchableOpacity onPress={handleReply}>
+          <TouchableOpacity onPress={handleEdit}>
             <MaterialCommunityIcons
               name={MATERIAL_COMMUNITY_ICONS.pencil}
               size={ICON_SIZES.menuIcon}

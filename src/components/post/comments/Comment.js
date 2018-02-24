@@ -87,6 +87,7 @@ class Comment extends Component {
       loadingLike: false,
       loadingDislike: false,
       newReplyComment: {},
+      currentCommentBody: comment.body,
     };
 
     this.setLiked = this.setLiked.bind(this);
@@ -94,10 +95,12 @@ class Comment extends Component {
     this.setLoadingLike = this.setLoadingLike.bind(this);
     this.setLoadingDislike = this.setLoadingDislike.bind(this);
     this.setNewReplyComment = this.setNewReplyComment.bind(this);
+    this.setCurrentCommentBody = this.setCurrentCommentBody.bind(this);
 
     this.handleLike = this.handleLike.bind(this);
     this.handleDislike = this.handleDislike.bind(this);
     this.handleReply = this.handleReply.bind(this);
+    this.handleEdit = this.handleEdit.bind(this);
   }
 
   setLiked(liked) {
@@ -139,6 +142,13 @@ class Comment extends Component {
   setNewReplyComment(newReplyComment) {
     this.setState({
       newReplyComment,
+    });
+  }
+
+  setCurrentCommentBody(editedComment) {
+    const body = _.get(editedComment, 'body', '');
+    this.setState({
+      currentCommentBody: body,
     });
   }
 
@@ -201,6 +211,20 @@ class Comment extends Component {
       comment,
       parentPost: comment,
       successCreateReply: this.setNewReplyComment,
+    });
+  }
+
+  handleEdit() {
+    const { authenticated, parent, comment } = this.props;
+
+    if (!authenticated) {
+      return;
+    }
+
+    this.props.navigation.navigate(navigationConstants.EDIT_REPLY, {
+      parentPost: parent,
+      originalComment: comment,
+      successEditReply: this.setCurrentCommentBody,
     });
   }
 
@@ -291,13 +315,14 @@ class Comment extends Component {
 
   render() {
     const { comment, authUsername, currentWidth, navigation } = this.props;
-    const { liked, disliked, loadingLike, loadingDislike } = this.state;
+    const { liked, disliked, loadingLike, loadingDislike, currentCommentBody } = this.state;
     const anchorId = `@${comment.author}/${comment.permlink}`;
     // const anchorLink = `${comment.url.slice(0, comment.url.indexOf('#'))}#${anchorId}`;
     const editable =
       comment.author === authUsername && comment.cashout_time !== '1969-12-31T23:59:59';
     const commentAuthorReputation = getReputation(comment.author_reputation);
     const avatarSize = comment.depth === 1 ? 40 : 32;
+    const displayedBody = editable ? currentCommentBody : comment.body;
 
     return (
       <Container>
@@ -309,7 +334,7 @@ class Comment extends Component {
             username={comment.author}
             reputation={commentAuthorReputation}
             created={comment.created}
-            body={comment.body}
+            body={displayedBody}
             commentDepth={comment.depth}
             currentWidth={currentWidth}
             navigation={navigation}
@@ -323,6 +348,7 @@ class Comment extends Component {
           handleLike={this.handleLike}
           handleDislike={this.handleDislike}
           handleReply={this.handleReply}
+          handleEdit={this.handleEdit}
           editable={editable}
         />
 

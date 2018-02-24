@@ -3,13 +3,20 @@ import PropTypes from 'prop-types';
 import _ from 'lodash';
 import styled from 'styled-components/native';
 import { connect } from 'react-redux';
-import { getAuthUsername, getCommentsByPostId } from 'state/rootReducer';
+import { getAuthUsername, getCommentsByPostId, getIsAuthenticated } from 'state/rootReducer';
 import { currentUserVoteComment } from 'state/actions/currentUserActions';
 import * as editorActions from 'state/actions/editorActions';
-import { getIsAuthenticated } from 'state/rootReducer';
 import CommentsList from './CommentsList';
+import { COLORS } from '../../../constants/styles';
+import i18n from 'i18n/i18n';
 
 const Container = styled.View``;
+
+const EmptyCommentsTextContainer = styled.View`
+  padding: 20px;
+  background-color: ${COLORS.WHITE.WHITE};
+`;
+const EmptyCommentsText = styled.Text``;
 
 const mapStateToProps = state => ({
   authUsername: getAuthUsername(state),
@@ -85,7 +92,11 @@ class CommentsContainer extends Component {
     let fetchedCommentsList = [];
 
     if (_.isNull(postComments)) {
-      return null;
+      return (
+        <EmptyCommentsTextContainer>
+          <EmptyCommentsText>{i18n.comments.noCommentsToShow}</EmptyCommentsText>
+        </EmptyCommentsTextContainer>
+      );
     }
 
     if (Array.isArray(rootNode)) {
