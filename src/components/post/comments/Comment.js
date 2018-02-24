@@ -216,6 +216,7 @@ class Comment extends Component {
 
   handleEdit() {
     const { authenticated, parent, comment } = this.props;
+    const originalComment = { ...comment, body: this.state.currentCommentBody };
 
     if (!authenticated) {
       return;
@@ -223,7 +224,7 @@ class Comment extends Component {
 
     this.props.navigation.navigate(navigationConstants.EDIT_REPLY, {
       parentPost: parent,
-      originalComment: comment,
+      originalComment,
       successEditReply: this.setCurrentCommentBody,
     });
   }

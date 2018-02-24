@@ -6,6 +6,7 @@ import { CREATE_COMMENT, CREATE_POST, UPLOAD_IMAGE } from '../actions/actionType
 import { getAuthUsername, getUsersDetails } from '../rootReducer';
 import * as editorActions from '../actions/editorActions';
 import { getBodyPatchIfSmaller } from '../../util/steemitUtils';
+import API from '../../api/api';
 
 export const rewardsValues = {
   all: '100',
@@ -213,6 +214,10 @@ const createComment = function*(action) {
       author_reputation: authorDetails.author_reputation,
       id: `tempID-${permlink}-${created}`,
     };
+
+    // fetch comments list and find latest one
+    const postUrl = `/${category}/@${parentAuthor}/${parentPermlink}`;
+    const newComments = yield call(API.getComments, postUrl);
 
     // need created timestamp in right format & author reputaiton
 

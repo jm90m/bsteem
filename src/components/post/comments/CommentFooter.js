@@ -7,7 +7,7 @@ import SmallLoading from '../../common/SmallLoading';
 
 const Container = styled.View`
   flex-direction: row;
-  padding-left: 50px;
+  padding-left: 60px;
 `;
 
 const TouchableOpacity = styled.TouchableOpacity`

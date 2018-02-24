@@ -8,14 +8,15 @@ import { fetchComments } from 'state/actions/postsActions';
 import i18n from 'i18n/i18n';
 import CommentsContainer from 'components/post/comments/CommentsContainer';
 import { ICON_SIZES, MATERIAL_ICONS, COLORS } from 'constants/styles';
-import { getCommentsByPostId, getLoadingComments } from 'state/rootReducer';
+import { getCommentsByPostId, getLoadingComments, getIsAuthenticated } from 'state/rootReducer';
 import Header from 'components/common/Header';
 import LargeLoading from 'components/common/LargeLoading';
-import HeaderEmptyView from 'components/common/HeaderEmptyView';
+import * as editorActions from '../../state/actions/editorActions';
+import * as navigationConstants from '../../constants/navigation';
 
 const Container = styled.View``;
 
-const BackTouchable = styled.TouchableOpacity`
+const TouchableIcon = styled.TouchableOpacity`
   justify-content: center;
   padding: 10px;
 `;
@@ -36,10 +37,21 @@ const TitleContainer = styled.View`
 const mapStateToProps = state => ({
   commentsByPostId: getCommentsByPostId(state),
   loadingComments: getLoadingComments(state),
+  authenticated: getIsAuthenticated(state),
 });
 const mapDispatchToProps = dispatch => ({
   fetchComments: (category, author, permlink, postId) =>
     dispatch(fetchComments(category, author, permlink, postId)),
+  createComment: (parentPost, isUpdating, originalComment, commentBody, successCallback) =>
+    dispatch(
+      editorActions.action({
+        parentPost,
+        isUpdating,
+        originalComment,
+        commentBody,
+        successCallback,
+      }),
+    ),
 });
 
 @connect(mapStateToProps, mapDispatchToProps)
@@ -66,6 +78,8 @@ class CommentScreen extends Component {
     super(props);
 
     this.navigateBack = this.navigateBack.bind(this);
+    this.handleReplyToPost = this.handleReplyToPost.bind(this);
+    this.handleFetchCurrentComments = this.handleFetchCurrentComments.bind(this);
   }
 
   componentDidMount() {
@@ -77,8 +91,27 @@ class CommentScreen extends Component {
     }
   }
 
+  handleFetchCurrentComments() {
+    const { author, permlink, postId, category } = this.props.navigation.state.params;
+    this.props.fetchComments(category, author, permlink, postId);
+  }
+
   navigateBack() {
     this.props.navigation.goBack();
+  }
+
+  handleReplyToPost() {
+    const { authenticated } = this.props;
+    const { postData } = this.props.navigation.state.params;
+
+    if (!authenticated) {
+      return;
+    }
+
+    this.props.navigation.navigate(navigationConstants.REPLY, {
+      parentPost: postData,
+      successCreateReply: this.handleFetchCurrentComments,
+    });
   }
 
   render() {
@@ -87,9 +120,9 @@ class CommentScreen extends Component {
     return (
       <Container>
         <Header>
-          <BackTouchable onPress={this.navigateBack}>
+          <TouchableIcon onPress={this.navigateBack}>
             <MaterialIcons size={ICON_SIZES.menuIcon} name={MATERIAL_ICONS.back} />
-          </BackTouchable>
+          </TouchableIcon>
           <TitleContainer>
             <MaterialIcons
               size={ICON_SIZES.menuIcon}
@@ -98,7 +131,9 @@ class CommentScreen extends Component {
             />
             <Title>{i18n.titles.comments}</Title>
           </TitleContainer>
-          <HeaderEmptyView />
+          <TouchableIcon onPress={this.handleReplyToPost}>
+            <MaterialIcons size={ICON_SIZES.menuIcon} name={MATERIAL_ICONS.reply} />
+          </TouchableIcon>
         </Header>
         {loadingComments ? (
           <LoadingContainer>

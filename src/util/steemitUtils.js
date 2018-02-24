@@ -3,6 +3,7 @@ import getSlug from 'speakingurl';
 import API from 'api/api';
 import diff_match_patch from 'diff-match-patch';
 import * as steemitFormatters from 'util/steemitFormatters';
+import { Buffer } from 'buffer';
 
 const dmp = new diff_match_patch();
 /**

@@ -3,12 +3,18 @@ import PropTypes from 'prop-types';
 import _ from 'lodash';
 import styled from 'styled-components/native';
 import { connect } from 'react-redux';
-import { getAuthUsername, getCommentsByPostId, getIsAuthenticated } from 'state/rootReducer';
+import {
+  getAuthUsername,
+  getCommentsByPostId,
+  getIsAuthenticated,
+  getLoadingComments,
+} from 'state/rootReducer';
 import { currentUserVoteComment } from 'state/actions/currentUserActions';
+import { COLORS } from 'constants/styles';
+import i18n from 'i18n/i18n';
+import { fetchComments } from '/state/actions/postsActions';
 import * as editorActions from 'state/actions/editorActions';
 import CommentsList from './CommentsList';
-import { COLORS } from '../../../constants/styles';
-import i18n from 'i18n/i18n';
 
 const Container = styled.View``;
 
@@ -22,6 +28,7 @@ const mapStateToProps = state => ({
   authUsername: getAuthUsername(state),
   commentsByPostId: getCommentsByPostId(state),
   authenticated: getIsAuthenticated(state),
+  loadingComments: getLoadingComments(state),
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -45,6 +52,8 @@ const mapDispatchToProps = dispatch => ({
         successCallback,
       }),
     ),
+  fetchComments: (category, author, permlink, postId) =>
+    dispatch(fetchComments(category, author, permlink, postId)),
 });
 
 class CommentsContainer extends Component {
@@ -53,6 +62,8 @@ class CommentsContainer extends Component {
     postData: PropTypes.shape().isRequired,
     navigation: PropTypes.shape().isRequired,
     currentUserVoteComment: PropTypes.func.isRequired,
+    fetchComments: PropTypes.func.isRequired,
+    loadingComments: PropTypes.bool.isRequired,
     authUsername: PropTypes.string,
     authenticated: PropTypes.bool,
     commentsByPostId: PropTypes.shape(),
@@ -84,6 +95,7 @@ class CommentsContainer extends Component {
       commentsByPostId,
       navigation,
       authenticated,
+      loadingComments,
     } = this.props;
     const postComments = _.get(commentsByPostId, postId, null);
     const comments = _.get(postComments, 'comments', {});
@@ -109,6 +121,14 @@ class CommentsContainer extends Component {
       commentsChildren = this.getNestedComments(postComments, rootNode, {});
     }
 
+    if (_.isEmpty(fetchedCommentsList) && !loadingComments) {
+      return (
+        <EmptyCommentsTextContainer>
+          <EmptyCommentsText>{i18n.comments.noCommentsToShow}</EmptyCommentsText>
+        </EmptyCommentsTextContainer>
+      );
+    }
+
     return (
       <Container>
         <CommentsList
@@ -120,6 +140,8 @@ class CommentsContainer extends Component {
           navigation={navigation}
           currentUserVoteComment={this.props.currentUserVoteComment}
           authenticated={authenticated}
+          fetchComments={this.props.fetchComments}
+          loadingComments={loadingComments}
         />
       </Container>
     );

@@ -154,9 +154,9 @@ class ReplyScreen extends Component {
   }
 
   render() {
-    const { comment } = this.props.navigation.state.params;
+    const { parentPost } = this.props.navigation.state.params;
     const { replyText, replyLoading } = this.state;
-    const commentAuthorReputation = getReputation(comment.author_reputation);
+    const commentAuthorReputation = getReputation(parentPost.author_reputation);
     const contentWidth = deviceWidth - 30;
     const avatarSize = 40;
     return (
@@ -171,7 +171,7 @@ class ReplyScreen extends Component {
               name={MATERIAL_ICONS.reply}
               color={COLORS.PRIMARY_COLOR}
             />
-            <Title>{`${i18n.titles.replyTo} ${comment.author}`}</Title>
+            <Title>{`${i18n.titles.replyTo} ${parentPost.author}`}</Title>
           </TitleContainer>
           <HeaderEmptyView />
         </Header>
@@ -179,14 +179,14 @@ class ReplyScreen extends Component {
           <CommentContainer>
             <CommentContentContainer>
               <AvatarContainer>
-                <Avatar size={avatarSize} username={comment.author} />
+                <Avatar size={avatarSize} username={parentPost.author} />
               </AvatarContainer>
               <CommentContent
-                username={comment.author}
+                username={parentPost.author}
                 reputation={commentAuthorReputation}
-                created={comment.created}
-                body={comment.body}
-                commentDepth={comment.depth}
+                created={parentPost.created}
+                body={parentPost.body}
+                commentDepth={parentPost.depth}
                 currentWidth={contentWidth}
                 navigation={this.props.navigation}
               />

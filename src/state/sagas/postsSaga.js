@@ -5,17 +5,19 @@ import * as postsActions from '../actions/postsActions';
 
 const fetchComments = function*(action) {
   try {
-    const { category, author, permlink, postId } = action.payload;
+    const { category, author, permlink, postId, isUpdating } = action.payload;
     const postUrl = `/${category}/@${author}/${permlink}`;
     const response = yield call(API.getComments, postUrl);
+
     if (response.error) {
       yield put(postsActions.fetchCommentsFail(response.error));
     } else {
       const { result } = response;
       const { content } = result;
-      yield put(postsActions.fetchCommentsSuccess(content, postId));
+      yield put(postsActions.fetchCommentsSuccess(content, postId, isUpdating));
     }
   } catch (error) {
+    console.log(error);
     yield put(postsActions.fetchCommentsFail(error));
   } finally {
     yield put({ type: FETCH_COMMENTS.LOADING_END });

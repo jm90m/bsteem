@@ -42,10 +42,12 @@ export default (state = INITIAL_STATE, action) => {
       const { content, postId } = action.payload;
       const comments = mapCommentsBasedOnId(content);
       const childrenById = getCommentsChildrenLists(content);
+      const oldPostCommentsDetails = _.get(state.commentsByPostId, postId, {});
       return {
         ...state,
         commentsByPostId: {
           [postId]: {
+            ...oldPostCommentsDetails,
             comments,
             childrenById,
             isFetching: false,

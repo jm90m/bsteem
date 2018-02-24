@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { ListView, Dimensions } from 'react-native';
+import { ListView, RefreshControl } from 'react-native';
 import styled from 'styled-components/native';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
@@ -31,8 +31,11 @@ class CommentsList extends Component {
     postData: PropTypes.shape().isRequired,
     postId: PropTypes.number.isRequired,
     currentUserVoteComment: PropTypes.func.isRequired,
+    fetchComments: PropTypes.func.isRequired,
     comments: PropTypes.arrayOf(PropTypes.shape()),
+    commentsChildren: PropTypes.shape(),
     navigation: PropTypes.shape().isRequired,
+    loadingComments: PropTypes.bool.isRequired,
     authUsername: PropTypes.string,
     authenticated: PropTypes.bool,
   };
@@ -41,6 +44,7 @@ class CommentsList extends Component {
     comments: [],
     authenticated: false,
     authUsername: '',
+    commentsChildren: {},
   };
 
   constructor(props) {
@@ -56,7 +60,16 @@ class CommentsList extends Component {
     this.renderComment = this.renderComment.bind(this);
     this.renderLoader = this.renderLoader.bind(this);
     this.displayMoreComments = this.displayMoreComments.bind(this);
+    this.refreshCommentsList = this.refreshCommentsList.bind(this);
   }
+
+  refreshCommentsList() {
+    const { postData } = this.props;
+    const { author, permlink, postId, category } = postData;
+    this.props.fetchComments(category, author, permlink, postId);
+  }
+
+  componentWillReceiveProps(nextProps) {}
 
   displayMoreComments() {
     const { displayedComments, sortedComments } = this.state;
@@ -119,7 +132,7 @@ class CommentsList extends Component {
   }
 
   render() {
-    const { comments } = this.props;
+    const { comments, loadingComments } = this.props;
     const { displayedComments } = this.state;
 
     console.log('COMMENTS', comments, comments.length);
@@ -136,6 +149,13 @@ class CommentsList extends Component {
         renderRow={this.renderComment}
         onEndReached={this.displayMoreComments}
         onEndReachedThreshold={100}
+        refreshControl={
+          <RefreshControl
+            refreshing={loadingComments}
+            onRefresh={this.refreshCommentsList}
+            colors={[COLORS.PRIMARY_COLOR]}
+          />
+        }
       />
     );
   }
