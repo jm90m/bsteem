@@ -6,6 +6,7 @@ export default {
     saved: 'Saved',
     comments: 'Comments',
     replyTo: 'Reply to',
+    editComment: 'Edit Comment',
   },
   editor: {
     title: 'Title',
