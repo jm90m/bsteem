@@ -1,26 +1,29 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Modal, ScrollView, Dimensions, WebView } from 'react-native';
+import { Modal, ScrollView, Dimensions, Share } from 'react-native';
+import Expo from 'expo';
 import { connect } from 'react-redux';
 import styled from 'styled-components/native';
 import _ from 'lodash';
-import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { getHtml } from 'util/postUtils';
 import { COLORS, ICON_SIZES, MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
 import * as navigationConstants from 'constants/navigation';
 import { fetchPostDetails } from 'state/actions/postsActions';
-import { getIsAuthenticated, getPostsDetails, getPostLoading } from 'state/rootReducer';
+import { getPostsDetails, getPostLoading, getIsAuthenticated } from 'state/rootReducer';
 import PostPhotoBrowser from 'components/post/PostPhotoBrowser';
 import PostMenu from 'components/post-menu/PostMenu';
-import HTMLView from 'components/html-view/HTMLView';
+import HTML from 'react-native-render-html';
 import FooterTags from 'components/post/FooterTags';
 import Footer from 'components/post/Footer';
 import Header from 'components/common/Header';
 import BackButton from 'components/common/BackButton';
-import Expo from "expo";
-import { POST_HTML_BODY_TAG, POST_HTML_BODY_USER } from "../../constants/postConstants";
+import PrimaryButton from 'components/common/PrimaryButton';
+import * as postConstants from 'constants/postConstants';
+import i18n from 'i18n/i18n';
+import { currentUserVotePost } from 'state/actions/currentUserActions';
 
-const { width } = Dimensions.get('screen');
+const { width: deviceWidth } = Dimensions.get('screen');
 
 const Container = styled.View`
   flex: 1;
@@ -42,27 +45,30 @@ const Author = styled.Text`
   font-weight: bold;
 `;
 
-function renderNode(node, index, siblings, parent, defaultRenderer) {
-  if (node.name === 'iframe') {
-    return (
-      <WebView
-        key={`iframe-${node.attribs.src}`}
-        source={{ uri: node.attribs.src }}
-        style={{ height: 400, width: width - 20 }}
-        height={400}
-        width={width - 20}
-      />
-    );
-  }
-}
-
 const mapStateToProps = state => ({
   postsDetails: getPostsDetails(state),
   postLoading: getPostLoading(state),
+  authenticated: getIsAuthenticated(state),
 });
 
 const mapDispatchToProps = dispatch => ({
   fetchPostDetails: (author, permlink) => dispatch(fetchPostDetails.action({ author, permlink })),
+  currentUserVotePost: (
+    postAuthor,
+    postPermlink,
+    voteWeight,
+    voteSuccessCallback,
+    voteFailCallback,
+  ) =>
+    dispatch(
+      currentUserVotePost.action({
+        postAuthor,
+        postPermlink,
+        voteWeight,
+        voteSuccessCallback,
+        voteFailCallback,
+      }),
+    ),
 });
 
 class SearchPostScreen extends Component {
@@ -76,6 +82,7 @@ class SearchPostScreen extends Component {
     navigation: PropTypes.shape().isRequired,
     postsDetails: PropTypes.shape(),
     fetchPostDetails: PropTypes.func.isRequired,
+    currentUserVotePost: PropTypes.func.isRequired,
   };
 
   static defaultProps = {
@@ -94,12 +101,17 @@ class SearchPostScreen extends Component {
 
     this.handleHideMenu = this.handleHideMenu.bind(this);
     this.setMenuVisible = this.setMenuVisible.bind(this);
+
     this.navigateBack = this.navigateBack.bind(this);
+    this.navigateToVotes = this.navigateToVotes.bind(this);
+    this.navigateToLoginTab = this.navigateToLoginTab.bind(this);
+    this.navigateToUser = this.navigateToUser.bind(this);
+
     this.handlePostLinkPress = this.handlePostLinkPress.bind(this);
-    this.handleImagePress = this.handleImagePress.bind(this);
     this.handleFeedNavigation = this.handleFeedNavigation.bind(this);
     this.handleHidePhotoBrowser = this.handleHidePhotoBrowser.bind(this);
-    this.navigateToUser = this.navigateToUser.bind(this);
+    this.handlePhotoBrowserShare = this.handlePhotoBrowserShare.bind(this);
+
     this.getCurrentPostDetails = this.getCurrentPostDetails.bind(this);
   }
 
@@ -127,6 +139,42 @@ class SearchPostScreen extends Component {
     this.setMenuVisible(false);
   }
 
+  handleLikePost() {
+    const { authenticated } = this.props;
+    if (authenticated) {
+      const { postData } = this.props.navigation.state.params;
+      const { author, permlink } = postData;
+      const { likedPost } = this.state;
+
+      this.loadingVote();
+
+      if (likedPost) {
+        const voteSuccessCallback = this.unlikedVoteSuccess;
+        const voteFailCalback = this.likedVoteSuccess;
+        this.props.currentUserVotePost(
+          author,
+          permlink,
+          postConstants.DEFAULT_UNVOTE_WEIGHT,
+          voteSuccessCallback,
+          voteFailCalback,
+        );
+      } else {
+        const voteSuccessCallback = this.likedVoteSuccess;
+        const voteFailCallback = this.unlikedVoteSuccess;
+        this.props.currentUserVotePost(
+          author,
+          permlink,
+          postConstants.DEFAULT_VOTE_WEIGHT,
+          voteSuccessCallback,
+          voteFailCallback,
+        );
+      }
+    } else {
+      this.navigateToLoginTab();
+      this.handleHideMenu();
+    }
+  }
+
   navigateBack() {
     this.props.navigation.goBack();
   }
@@ -135,20 +183,34 @@ class SearchPostScreen extends Component {
     this.props.navigation.navigate(navigationConstants.USER, { username });
   }
 
+  navigateToLoginTab() {
+    this.props.navigation.navigate(navigationConstants.LOGIN);
+  }
+
   handleFeedNavigation(tag) {
     this.props.navigation.navigate(navigationConstants.FEED, { tag });
   }
 
+  handlePhotoBrowserShare(photoData) {
+    const { photo } = photoData;
+    const content = {
+      message: photo,
+      title: photo,
+      url: photo,
+    };
+    Share.share(content);
+  }
+
   handlePostLinkPress(e, url) {
     console.log('clicked link: ', url);
-    const isTag = _.includes(url, POST_HTML_BODY_TAG);
-    const isUser = _.includes(url, POST_HTML_BODY_USER);
+    const isTag = _.includes(url, postConstants.POST_HTML_BODY_TAG);
+    const isUser = _.includes(url, postConstants.POST_HTML_BODY_USER);
 
     if (isUser) {
-      const user = _.get(_.split(url, POST_HTML_BODY_USER), 1, 'bsteem');
+      const user = _.get(_.split(url, postConstants.POST_HTML_BODY_USER), 1, 'bsteem');
       this.navigateToUser(user);
     } else if (isTag) {
-      const tag = _.get(_.split(url, POST_HTML_BODY_TAG), 1, 'bsteem');
+      const tag = _.get(_.split(url, postConstants.POST_HTML_BODY_TAG), 1, 'bsteem');
       this.navigateToFeed(tag);
     } else {
       Expo.WebBrowser.openBrowserAsync(url).catch(error => {
@@ -157,30 +219,42 @@ class SearchPostScreen extends Component {
     }
   }
 
-  handleImagePress(url, alt) {
-    const currentPostDetails = this.getCurrentPostDetails();
-    const { json_metadata } = currentPostDetails;
-    const jsonParse = _.attempt(JSON.parse, json_metadata);
-    const parsedJsonMetadata = _.isError(jsonParse) ? {} : jsonParse;
-    const images = _.get(parsedJsonMetadata, 'image', []);
-    const photoIndex = _.findIndex(images, imageURL => _.includes(imageURL, alt));
-    console.log('IMAGE PRESSED', `URL: ${url}]\nALT: ${alt}`, `PhotoIndex: ${photoIndex}`, images);
-    this.setState({
-      displayPhotoBrowser: true,
-      initialPhotoIndex: photoIndex >= 0 ? photoIndex : 0,
-    });
-  }
-
   handleHidePhotoBrowser() {
     this.setState({
       displayPhotoBrowser: false,
     });
   }
 
+  navigateToComments() {
+    const currentPostDetails = this.getCurrentPostDetails();
+    const { author, category, permlink, postId, postData } = currentPostDetails;
+    this.props.navigation.navigate(navigationConstants.COMMENTS, {
+      author,
+      category,
+      permlink,
+      postId,
+      postData,
+    });
+    this.handleHideMenu();
+  }
+
+  navigateToVotes() {
+    const currentPostDetails = this.getCurrentPostDetails();
+    this.props.navigation.navigate(navigationConstants.VOTES, {
+      postData: currentPostDetails,
+    });
+  }
+
   render() {
     const { author } = this.props.navigation.state.params;
     const { postLoading } = this.props;
-    const { displayPhotoBrowser, menuVisible, initialPhotoIndex } = this.state;
+    const {
+      displayPhotoBrowser,
+      menuVisible,
+      initialPhotoIndex,
+      loadingVote,
+      likedPost,
+    } = this.state;
     const currentPostDetails = this.getCurrentPostDetails();
 
     console.log(currentPostDetails);
@@ -193,6 +267,7 @@ class SearchPostScreen extends Component {
     const parsedJsonMetadata = _.isError(jsonParse) ? {} : jsonParse;
     const parsedHtmlBody = getHtml(body, parsedJsonMetadata);
     const images = _.get(parsedJsonMetadata, 'image', []);
+    const widthOffset = 20;
     const formattedImages = _.map(images, image => ({ photo: image }));
     const tags = _.compact(_.get(parsedJsonMetadata, 'tags', []));
 
@@ -223,17 +298,28 @@ class SearchPostScreen extends Component {
           mediaList={formattedImages}
           handleClose={this.handleHidePhotoBrowser}
           initialPhotoIndex={initialPhotoIndex}
+          handleAction={this.handlePhotoBrowserShare}
         />
         <ScrollView style={{ padding: 10, backgroundColor: COLORS.WHITE.WHITE }}>
-          <HTMLView
-            value={parsedHtmlBody}
-            renderNode={renderNode}
+          <HTML
+            html={parsedHtmlBody}
+            imagesMaxWidth={deviceWidth - widthOffset}
             onLinkPress={this.handlePostLinkPress}
-            addLineBreaks={false}
-            handleImagePress={this.handleImagePress}
           />
           <FooterTags tags={tags} handleFeedNavigation={this.handleFeedNavigation} />
-          <Footer postData={currentPostDetails} navigation={this.props.navigation} />
+          <Footer
+            postData={currentPostDetails}
+            navigation={this.props.navigation}
+            loadingVote={loadingVote}
+            likedPost={likedPost}
+            handleLikePost={this.handleLikePost}
+            handleNavigateToVotes={this.navigateToVotes}
+          />
+          <PrimaryButton
+            onPress={this.navigateToComments}
+            title={i18n.post.viewComments}
+            style={{ marginTop: 20, marginBottom: 40 }}
+          />
         </ScrollView>
       </Container>
     );

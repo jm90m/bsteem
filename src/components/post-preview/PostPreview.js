@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Modal } from 'react-native';
+import { Modal, Share } from 'react-native';
 import styled from 'styled-components/native';
 import { connect } from 'react-redux';
 import _ from 'lodash';
@@ -135,6 +135,7 @@ class PostPreview extends Component {
     this.handleNavigateToComments = this.handleNavigateToComments.bind(this);
     this.handleHidePhotoBrowser = this.handleHidePhotoBrowser.bind(this);
     this.handleNavigateToVotes = this.handleNavigateToVotes.bind(this);
+    this.handlePhotoBrowserShare = this.handlePhotoBrowserShare.bind(this);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -272,6 +273,16 @@ class PostPreview extends Component {
     this.setState({ displayPhotoBrowser: false });
   }
 
+  handlePhotoBrowserShare(photoData) {
+    const { photo } = photoData;
+    const content = {
+      message: photo,
+      title: photo,
+      url: photo,
+    };
+    Share.share(content);
+  }
+
   handleNavigateToPost() {
     const { postData } = this.props;
     const { title, category, author, json_metadata, body, permlink, id } = postData;
@@ -393,6 +404,7 @@ class PostPreview extends Component {
           mediaList={formattedImages}
           handleClose={this.handleHidePhotoBrowser}
           initialPhotoIndex={0}
+          handleAction={this.handlePhotoBrowserShare}
         />
         <Modal
           animationType="slide"

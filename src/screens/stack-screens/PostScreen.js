@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Modal, ScrollView, Dimensions } from 'react-native';
+import { Modal, ScrollView, Dimensions, Share } from 'react-native';
 import { connect } from 'react-redux';
 import Expo from 'expo';
 import styled from 'styled-components/native';
@@ -24,7 +24,7 @@ import FooterTags from 'components/post/FooterTags';
 import Footer from 'components/post/Footer';
 import Header from 'components/common/Header';
 import PrimaryButton from '../../components/common/PrimaryButton';
-import { currentUserReblogPost, currentUserVotePost } from '../../state/actions/currentUserActions';
+import { currentUserVotePost } from '../../state/actions/currentUserActions';
 import * as postConstants from '../../constants/postConstants';
 import { isPostVoted } from '../../util/voteUtils';
 import { fetchPostDetails } from '../../state/actions/postsActions';
@@ -76,22 +76,6 @@ const mapDispatchToProps = dispatch => ({
         voteFailCallback,
       }),
     ),
-  currentUserReblogPost: (
-    postId,
-    postAuthor,
-    postPermlink,
-    reblogSuccessCallback,
-    reblogFailCallback,
-  ) =>
-    dispatch(
-      currentUserReblogPost.action({
-        postId,
-        postAuthor,
-        postPermlink,
-        reblogSuccessCallback,
-        reblogFailCallback,
-      }),
-    ),
   fetchPostDetails: (author, permlink) => dispatch(fetchPostDetails.action({ author, permlink })),
 });
 
@@ -131,6 +115,7 @@ class PostScreen extends Component {
     this.handleHideMenu = this.handleHideMenu.bind(this);
     this.handleHidePhotoBrowser = this.handleHidePhotoBrowser.bind(this);
     this.handleDisplayPhotoBrowser = this.handleDisplayPhotoBrowser.bind(this);
+    this.handlePhotoBrowserShare = this.handlePhotoBrowserShare.bind(this);
 
     this.navigateBack = this.navigateBack.bind(this);
     this.navigateToComments = this.navigateToComments.bind(this);
@@ -277,6 +262,16 @@ class PostScreen extends Component {
     this.handleHideMenu();
   }
 
+  handlePhotoBrowserShare(photoData) {
+    const { photo } = photoData;
+    const content = {
+      message: photo,
+      title: photo,
+      url: photo,
+    };
+    Share.share(content);
+  }
+
   handlePostLinkPress(e, url) {
     console.log('clicked link: ', url);
     const isTag = _.includes(url, POST_HTML_BODY_TAG);
@@ -378,6 +373,7 @@ class PostScreen extends Component {
           mediaList={formattedImages}
           initialPhotoIndex={0}
           handleClose={this.handleHidePhotoBrowser}
+          handleAction={this.handlePhotoBrowserShare}
         />
       </Container>
     );
