@@ -149,6 +149,10 @@ export const MATERIAL_COMMUNITY_ICONS = {
 
   image: 'image',
   pencil: 'pencil',
+
+  // for saved screen menu navigation
+  tag: 'tag',
+  posts: 'file-document-box',
 };
 
 export const FEATHER_ICONS = {

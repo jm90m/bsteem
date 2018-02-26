@@ -11,6 +11,7 @@ import * as navigationConstants from 'constants/navigation';
 import Avatar from 'components/common/Avatar';
 import CommentFooter from './CommentFooter';
 import CommentContent from './CommentContent';
+import { calculatePayout } from '../../../util/steemitUtils';
 
 const { width: deviceWidth } = Dimensions.get('screen');
 
@@ -101,6 +102,7 @@ class Comment extends Component {
     this.handleDislike = this.handleDislike.bind(this);
     this.handleReply = this.handleReply.bind(this);
     this.handleEdit = this.handleEdit.bind(this);
+    this.handlePayout = this.handlePayout.bind(this);
   }
 
   setLiked(liked) {
@@ -229,6 +231,13 @@ class Comment extends Component {
     });
   }
 
+  handlePayout() {
+    const { comment } = this.props;
+    this.props.navigation.navigate(navigationConstants.VOTES, {
+      postData: comment,
+    });
+  }
+
   renderReplyComment() {
     const { newReplyComment } = this.state;
     const {
@@ -324,6 +333,7 @@ class Comment extends Component {
     const commentAuthorReputation = getReputation(comment.author_reputation);
     const avatarSize = comment.depth === 1 ? 40 : 32;
     const displayedBody = editable ? currentCommentBody : comment.body;
+    const payout = calculatePayout(comment);
 
     return (
       <Container>
@@ -350,6 +360,8 @@ class Comment extends Component {
           handleDislike={this.handleDislike}
           handleReply={this.handleReply}
           handleEdit={this.handleEdit}
+          handlePayout={this.handlePayout}
+          payout={payout}
           editable={editable}
         />
 

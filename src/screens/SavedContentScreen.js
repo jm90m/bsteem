@@ -7,11 +7,11 @@ import Header from 'components/common/Header';
 import _ from 'lodash';
 import HeaderEmptyView from 'components/common/HeaderEmptyView';
 import Tag from 'components/post/Tag';
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import i18n from 'i18n/i18n';
 import * as navigationConstants from 'constants/navigation';
 import { fetchSavedTags, fetchSavedPosts } from 'state/actions/firebaseActions';
-import { COLORS, MATERIAL_ICONS, ICON_SIZES } from '../constants/styles';
+import { COLORS, MATERIAL_ICONS, ICON_SIZES, MATERIAL_COMMUNITY_ICONS } from '../constants/styles';
 import {
   getLoadingSavedTags,
   getSavedPosts,
@@ -28,11 +28,6 @@ const BackTouchable = styled.TouchableOpacity`
 
 const Container = styled.View``;
 
-const Title = styled.Text`
-  margin-left: 5px;
-  color: ${COLORS.PRIMARY_COLOR};
-`;
-
 const TitleContainer = styled.View`
   flex-direction: row;
   align-items: center;
@@ -47,6 +42,24 @@ const TagOption = styled.View`
 `;
 
 const TagTouchble = styled.TouchableOpacity``;
+
+const Menu = styled.View`
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  margin-right: 20px;
+`;
+
+const MenuTouchable = styled.TouchableOpacity`
+  flex-direction: row;
+  align-items: center;
+  margin-left: 10px;
+`;
+
+const MENU = {
+  TAGS: 'tags',
+  POSTS: 'posts',
+};
 
 @connect(
   state => ({
@@ -77,6 +90,7 @@ class SavedContentScreen extends Component {
     this.state = {
       currentSavedTags: props.savedTags,
       currentSavedPosts: props.savedPosts,
+      menu: MENU.TAGS,
     };
 
     this.navigateBack = this.navigateBack.bind(this);
@@ -84,6 +98,8 @@ class SavedContentScreen extends Component {
     this.handleNavigatePost = this.handleNavigatePost.bind(this);
     this.handleNavigateUser = this.handleNavigateUser.bind(this);
     this.onRefreshContent = this.onRefreshContent.bind(this);
+    this.handleShowTags = this.handleShowTags.bind(this);
+    this.handleShowPosts = this.handleShowPosts.bind(this);
   }
 
   componentDidMount() {
@@ -120,28 +136,79 @@ class SavedContentScreen extends Component {
     this.props.navigation.navigate(navigationConstants.USER, { username });
   }
 
+  handleShowTags() {
+    this.setState({
+      menu: MENU.TAGS,
+    });
+  }
+
+  handleShowPosts() {
+    this.setState({
+      menu: MENU.POSTS,
+    });
+  }
+
   navigateBack() {
     this.props.navigation.goBack();
+  }
+
+  renderSavedTags() {
+    if (_.isEqual(this.state.menu, MENU.TAGS)) {
+      return _.map(this.state.currentSavedTags, tag => (
+        <TagOption key={tag}>
+          <TagTouchble onPress={() => this.handleNavigateTag(tag)}>
+            <Tag tag={tag} />
+          </TagTouchble>
+          <SaveTagButton tag={tag} />
+        </TagOption>
+      ));
+    }
+
+    return null;
+  }
+
+  renderSavedPosts() {
+    if (_.isEqual(this.state.menu, MENU.POSTS)) {
+      return _.map(this.state.currentSavedPosts, post => (
+        <PostPreview
+          key={post.id}
+          handleNavigatePost={() => this.handleNavigatePost(post.author, post.permlink)}
+          handleNavigateUser={() => this.handleNavigateUser(post.author)}
+          author={post.author}
+          created={post.created}
+          title={post.title}
+        />
+      ));
+    }
+    return null;
   }
 
   render() {
     const { loadingSavedTags, loadingSavedPosts } = this.props;
     const loading = loadingSavedTags || loadingSavedPosts;
+    const { menu } = this.state;
     return (
       <Container>
         <Header>
           <BackTouchable onPress={this.navigateBack}>
             <MaterialIcons size={ICON_SIZES.menuIcon} name={MATERIAL_ICONS.back} />
           </BackTouchable>
-          <TitleContainer>
-            <MaterialIcons
-              size={ICON_SIZES.menuIcon}
-              name={MATERIAL_ICONS.star}
-              color={COLORS.PRIMARY_COLOR}
-            />
-            <Title>{i18n.titles.saved}</Title>
-          </TitleContainer>
-          <HeaderEmptyView />
+          <Menu>
+            <MenuTouchable onPress={this.handleShowTags}>
+              <MaterialCommunityIcons
+                size={ICON_SIZES.menuIcon}
+                name={MATERIAL_COMMUNITY_ICONS.tag}
+                color={menu === MENU.TAGS ? COLORS.PRIMARY_COLOR : COLORS.SECONDARY_COLOR}
+              />
+            </MenuTouchable>
+            <MenuTouchable onPress={this.handleShowPosts}>
+              <MaterialCommunityIcons
+                size={ICON_SIZES.menuIcon}
+                name={MATERIAL_COMMUNITY_ICONS.posts}
+                color={menu === MENU.POSTS ? COLORS.PRIMARY_COLOR : COLORS.SECONDARY_COLOR}
+              />
+            </MenuTouchable>
+          </Menu>
         </Header>
         <ScrollView
           refreshControl={
@@ -152,24 +219,8 @@ class SavedContentScreen extends Component {
             />
           }
         >
-          {_.map(this.state.currentSavedTags, tag => (
-            <TagOption key={tag}>
-              <TagTouchble onPress={() => this.handleNavigateTag(tag)}>
-                <Tag tag={tag} />
-              </TagTouchble>
-              <SaveTagButton tag={tag} />
-            </TagOption>
-          ))}
-          {_.map(this.state.currentSavedPosts, post => (
-            <PostPreview
-              key={post.id}
-              handleNavigatePost={() => this.handleNavigatePost(post.author, post.permlink)}
-              handleNavigateUser={() => this.handleNavigateUser(post.author)}
-              author={post.author}
-              created={post.created}
-              title={post.title}
-            />
-          ))}
+          {this.renderSavedTags()}
+          {this.renderSavedPosts()}
           <View style={{ height: 100 }} />
         </ScrollView>
       </Container>

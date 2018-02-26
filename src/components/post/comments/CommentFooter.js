@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import _ from 'lodash';
 import styled from 'styled-components/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS, ICON_SIZES, MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
@@ -16,6 +17,15 @@ const TouchableOpacity = styled.TouchableOpacity`
 
 const LoadingContainer = styled.View`
   padding-right: 10px;
+`;
+
+const Payout = styled.Text`
+  color: ${COLORS.TERTIARY_COLOR};
+  margin-right: 10px;
+`;
+
+const TouchablePayout = styled.TouchableOpacity`
+  margin-left: auto;
 `;
 
 const Loader = () => (
@@ -35,6 +45,8 @@ class CommentFooter extends Component {
     handleDislike: PropTypes.func,
     handleReply: PropTypes.func,
     handleEdit: PropTypes.func,
+    handlePayout: PropTypes.func,
+    payout: PropTypes.shape(),
   };
 
   static defaultProps = {
@@ -47,7 +59,25 @@ class CommentFooter extends Component {
     handleDislike: () => {},
     handleReply: () => {},
     handleEdit: () => {},
+    handlePayout: () => {},
+    payout: {},
   };
+
+  renderPayout() {
+    const { payout, handlePayout } = this.props;
+    const cashoutInTime = _.get(payout, 'cashoutInTime', false);
+    const displayedPayout = cashoutInTime
+      ? _.get(payout, 'potentialPayout')
+      : _.get(payout, 'pastPayouts');
+    const formattedDisplayedPayout = _.isUndefined(displayedPayout)
+      ? '0.00'
+      : parseFloat(displayedPayout).toFixed(2);
+    return (
+      <TouchablePayout onPress={handlePayout}>
+        <Payout>${formattedDisplayedPayout}</Payout>
+      </TouchablePayout>
+    );
+  }
 
   render() {
     const {
@@ -61,6 +91,7 @@ class CommentFooter extends Component {
       handleReply,
       handleEdit,
     } = this.props;
+
     return (
       <Container>
         {loadingLike ? (
@@ -101,6 +132,7 @@ class CommentFooter extends Component {
             />
           </TouchableOpacity>
         )}
+        {this.renderPayout()}
       </Container>
     );
   }

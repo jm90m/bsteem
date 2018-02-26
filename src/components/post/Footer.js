@@ -24,7 +24,7 @@ const FooterValue = styled.Text`
   margin-left: 5px;
   font-size: 14px;
   font-weight: 700;
-  color: ${COLORS.BLUE.LINK_WATER};
+  color: ${COLORS.TERTIARY_COLOR};
   align-self: center;
 `;
 
@@ -32,7 +32,7 @@ const Payout = styled.Text`
   margin-left: auto;
   font-size: 14px;
   font-weight: 700;
-  color: ${COLORS.BLUE.LINK_WATER};
+  color: ${COLORS.TERTIARY_COLOR};
   align-self: center;
 `;
 
@@ -220,7 +220,7 @@ class Footer extends Component {
           <MaterialCommunityIcons
             name={MATERIAL_COMMUNITY_ICONS.comment}
             size={24}
-            color={COLORS.BLUE.LINK_WATER}
+            color={COLORS.TERTIARY_COLOR}
           />
           <FooterValue>{children}</FooterValue>
         </TouchableOpacity>
