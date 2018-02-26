@@ -4,11 +4,12 @@ import styled from 'styled-components/native';
 import { View } from 'react-native';
 import { getReputation } from 'util/steemitFormatters';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import moment from 'moment-timezone';
+import _ from 'lodash';
 import APPS from 'constants/apps';
 import { COLORS, MATERIAL_COMMUNITY_ICONS, ICON_SIZES } from 'constants/styles';
 import Tag from 'components/post/Tag';
 import * as navigationConstants from 'constants/navigation';
+import i18n from 'i18n/i18n';
 import ReputationScore from 'components/post/ReputationScore';
 import Avatar from 'components/common/Avatar';
 import TimeAgo from 'components/common/TimeAgo';
@@ -100,13 +101,16 @@ class Header extends Component {
 
   renderReblogged() {
     const { postData } = this.props;
-    if (postData.first_reblogged_by) {
+    const firstRebloggedBy = _.get(postData, 'first_reblogged_by');
+    const firstRebloggedOn = _.get(postData, 'first_reblogged_on');
+
+    if (firstRebloggedBy) {
       return (
         <Reblogged>
           <MaterialCommunityIcons
             name={MATERIAL_COMMUNITY_ICONS.reblog}
             size={20}
-            color={COLORS.BLUE.LINK_WATER}
+            color={COLORS.TERTIARY_COLOR}
             style={{ marginRight: 5 }}
           />
           <Touchable onPress={this.handleReblogUserNavigation}>
@@ -115,7 +119,7 @@ class Header extends Component {
           <RebloggedText>{' reblogged'}</RebloggedText>
         </Reblogged>
       );
-    } else if (postData.first_reblogged_on) {
+    } else if (firstRebloggedOn) {
       console.log('POST_DATA FIRST REBLOGGED ON', postData.first_reblogged_on);
       console.log('POST DATA', postData);
       return (
@@ -123,10 +127,10 @@ class Header extends Component {
           <MaterialCommunityIcons
             name={MATERIAL_COMMUNITY_ICONS.reblog}
             size={20}
-            color={COLORS.BLUE.LINK_WATER}
+            color={COLORS.TERTIARY_COLOR}
             style={{ marginRight: 5 }}
           />
-          <RebloggedText>Reblogged</RebloggedText>
+          <RebloggedText>{i18n.post.reblogged}</RebloggedText>
         </Reblogged>
       );
     }
@@ -149,9 +153,10 @@ class Header extends Component {
   renderPostedFrom() {
     try {
       const { postData } = this.props;
-      const app = JSON.parse(postData.json_metadata).app.split('/');
-      const from = APPS[app[0]];
-      // version = app[1];
+      const jsonMetadata = _.attempt(JSON.parse, postData.json_metadata);
+      const app = _.isError(jsonMetadata) ? [] : _.split(jsonMetadata.app, '/');
+      const from = _.get(APPS, app[0], '');
+
       return <PostedFrom>{from}</PostedFrom>;
     } catch (e) {
       return <View />;

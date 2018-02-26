@@ -208,18 +208,19 @@ const createComment = function*(action) {
     const commentData = _.get(operations, 0, {});
     const commentDetails = _.get(commentData, 1, {});
     const created = _.replace(new Date().toISOString(), 'Z', '');
-    const commentDetailsPayload = {
-      ...commentDetails,
-      created,
-      author_reputation: authorDetails.author_reputation,
-      id: `tempID-${permlink}-${created}`,
-    };
 
-    // fetch comments list and find latest one
+    // fetch comments and get current comment details
     const postUrl = `/${category}/@${parentAuthor}/${parentPermlink}`;
     const newComments = yield call(API.getComments, postUrl);
-
-    // need created timestamp in right format & author reputaiton
+    const commentKey = `${author}/${permlink}`;
+    const fetchedCommentData = _.get(newComments, `result.content.${commentKey}`, {
+      author_reputation: authorDetails.author_reputation,
+      id: `tempID-${permlink}-${created}`,
+    });
+    const commentDetailsPayload = {
+      ...commentDetails,
+      ...fetchedCommentData,
+    };
 
     successCallback(commentDetailsPayload);
 

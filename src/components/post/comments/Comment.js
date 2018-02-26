@@ -175,6 +175,7 @@ class Comment extends Component {
       weight,
       voteSuccessCallback,
       voteFailCallback,
+      comment,
     );
   }
 
@@ -199,6 +200,7 @@ class Comment extends Component {
       weight,
       voteSuccessCallback,
       voteFailCallback,
+      comment,
     );
   }
 

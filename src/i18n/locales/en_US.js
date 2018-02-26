@@ -45,8 +45,13 @@ export default {
   },
   post: {
     viewComments: 'View Comments',
+    reblogged: 'Reblogged',
   },
   comments: {
     noCommentsToShow: 'No comments to show.',
+  },
+  votes: {
+    noUpvoted: 'No one has upvoted this content.',
+    noDownvoted: 'No one has downvoted this content.',
   },
 };

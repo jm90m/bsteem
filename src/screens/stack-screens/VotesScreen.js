@@ -5,6 +5,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { ListView } from 'react-native';
 import * as navigationConstants from 'constants/navigation';
 import styled from 'styled-components/native';
+import i18n from 'i18n/i18n';
 import Header from 'components/common/Header';
 import BackButton from 'components/common/BackButton';
 import Voter from 'components/votes/Voter';
@@ -34,6 +35,13 @@ const MenuTouchable = styled.TouchableOpacity`
 const VoteCounts = styled.Text`
   margin: 0 5px;
 `;
+
+const EmptyContainer = styled.View`
+  padding: 20px;
+  background-color: ${COLORS.WHITE.WHITE};
+`;
+
+const EmptyText = styled.Text``;
 
 const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
 
@@ -107,7 +115,10 @@ class VotesScreen extends Component {
     const downVotes = getDownvotes(activeVotes)
       .sort(sortVotes)
       .reverse();
-    const displayedVotes = menu === MENU.DOWN_VOTES ? downVotes : upVotes;
+    const selectedDownVotesMenu = _.isEqual(menu, MENU.DOWN_VOTES);
+    const displayedVotes = selectedDownVotesMenu ? downVotes : upVotes;
+    const displayEmptyText = _.isEmpty(displayedVotes);
+    const emptyText = selectedDownVotesMenu ? i18n.votes.noDownvoted : i18n.votes.noUpvoted;
 
     return (
       <Container>
@@ -132,6 +143,11 @@ class VotesScreen extends Component {
             </MenuTouchable>
           </Menu>
         </Header>
+        {displayEmptyText && (
+          <EmptyContainer>
+            <EmptyText>{emptyText}</EmptyText>
+          </EmptyContainer>
+        )}
         <StyledListView
           dataSource={ds.cloneWithRows(displayedVotes)}
           renderRow={this.renderActiveVotesRow}

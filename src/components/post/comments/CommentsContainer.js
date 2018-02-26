@@ -32,7 +32,14 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  currentUserVoteComment: (commentId, postId, weight, voteSuccessCallback, voteFailCallback) =>
+  currentUserVoteComment: (
+    commentId,
+    postId,
+    weight,
+    voteSuccessCallback,
+    voteFailCallback,
+    commentData,
+  ) =>
     dispatch(
       currentUserVoteComment.action({
         commentId,
@@ -40,6 +47,7 @@ const mapDispatchToProps = dispatch => ({
         weight,
         voteSuccessCallback,
         voteFailCallback,
+        commentData,
       }),
     ),
   createComment: (parentPost, isUpdating, originalComment, commentBody, successCallback) =>

@@ -75,11 +75,11 @@ const votePost = function*(action) {
 
 const voteComment = function*(action) {
   try {
-    const { commentId, postId, weight, voteSuccessCallback } = action.payload;
+    const { commentId, postId, weight, voteSuccessCallback, commentData } = action.payload;
     const currentUsername = yield select(getAuthUsername);
     const commentsByPostId = yield select(getCommentsByPostId);
     const postCommentsDetails = _.get(commentsByPostId, postId, {});
-    const comment = _.get(postCommentsDetails, `comments.${commentId}`, {});
+    const comment = _.get(postCommentsDetails, `comments.${commentId}`, commentData);
     const { author, permlink } = comment;
     const result = yield call(sc2.vote, currentUsername, author, permlink, weight);
 
