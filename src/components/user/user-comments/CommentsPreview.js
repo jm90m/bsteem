@@ -1,11 +1,16 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components/native';
+import { connect } from 'react-redux';
 import * as navigationConstants from 'constants/navigation';
 import { COLORS } from 'constants/styles';
+import { currentUserVotePost } from 'state/actions/currentUserActions';
 import Header from '../../post-preview/Header';
 import CommentFooter from './CommentsFooter';
+import * as postConstants from '../../../constants/postConstants';
 import BodyShort from '../../post-preview/BodyShort';
+import { isPostVoted } from '../../../util/voteUtils';
+import _ from 'lodash';
 
 const Container = styled.View`
   background-color: ${COLORS.WHITE.WHITE};
@@ -26,6 +31,7 @@ const Title = styled.Text`
 
 const TitleContainer = styled.View`
   flex-direction: row;
+  padding: 0 5px;
 `;
 
 const CommentTag = styled.View`
@@ -50,10 +56,30 @@ const CommentTagText = styled.Text`
 
 const Touchable = styled.TouchableOpacity``;
 
+const mapDispatchToProps = dispatch => ({
+  currentUserVotePost: (
+    postAuthor,
+    postPermlink,
+    voteWeight,
+    voteSuccessCallback,
+    voteFailCallback,
+  ) =>
+    dispatch(
+      currentUserVotePost.action({
+        postAuthor,
+        postPermlink,
+        voteWeight,
+        voteSuccessCallback,
+        voteFailCallback,
+      }),
+    ),
+});
+
 class CommentsPreview extends Component {
   static propTypes = {
     commentData: PropTypes.shape(),
     navigation: PropTypes.shape().isRequired,
+    currentUserVotePost: PropTypes.func.isRequired,
     currentUsername: PropTypes.string,
   };
 
@@ -65,8 +91,93 @@ class CommentsPreview extends Component {
   constructor(props) {
     super(props);
 
+    this.state = {
+      likedPost: isPostVoted(props.commentData, props.currentUsername),
+      loadingVote: false,
+    };
+
     this.navigateToFullComment = this.navigateToFullComment.bind(this);
     this.navigateToParent = this.navigateToParent.bind(this);
+    this.likedVoteSuccess = this.likedVoteSuccess.bind(this);
+    this.unlikedVoteSuccess = this.unlikedVoteSuccess.bind(this);
+    this.handleNavigateToVotes = this.handleNavigateToVotes.bind(this);
+    this.handleNavigateToComments = this.handleNavigateToComments.bind(this);
+    this.loadingVote = this.loadingVote.bind(this);
+    this.handleOnPressVote = this.handleOnPressVote.bind(this);
+  }
+
+  loadingVote() {
+    this.setState({
+      loadingVote: true,
+    });
+  }
+
+  likedVoteSuccess() {
+    this.setState({
+      likedPost: true,
+      loadingVote: false,
+    });
+  }
+
+  unlikedVoteSuccess() {
+    this.setState({
+      likedPost: false,
+      loadingVote: false,
+    });
+  }
+
+  handleNavigateToVotes() {
+    const { commentData } = this.props;
+    this.props.navigation.navigate(navigationConstants.VOTES, {
+      postData: commentData,
+    });
+  }
+
+  handleNavigateToComments() {
+    const { commentData } = this.props;
+    const { category, author, permlink, id } = commentData;
+    this.props.navigation.navigate(navigationConstants.COMMENTS, {
+      author,
+      category,
+      permlink,
+      postId: id,
+      postData: commentData,
+    });
+  }
+
+  handleOnPressVote() {
+    const { navigation, currentUsername, commentData } = this.props;
+
+    if (!_.isEmpty(currentUsername)) {
+      const { author, permlink } = commentData;
+      const { likedPost } = this.state;
+
+      this.loadingVote();
+
+      if (likedPost) {
+        const voteSuccessCallback = this.unlikedVoteSuccess;
+        const voteFailCalback = this.likedVoteSuccess;
+        this.props.currentUserVotePost(
+          author,
+          permlink,
+          postConstants.DEFAULT_UNVOTE_WEIGHT,
+          voteSuccessCallback,
+          voteFailCalback,
+        );
+      } else {
+        const voteSuccessCallback = this.likedVoteSuccess;
+        const voteFailCallback = this.unlikedVoteSuccess;
+        this.props.currentUserVotePost(
+          author,
+          permlink,
+          postConstants.DEFAULT_VOTE_WEIGHT,
+          voteSuccessCallback,
+          voteFailCallback,
+        );
+      }
+    } else {
+      navigation.navigate(navigationConstants.LOGIN);
+    }
   }
 
   navigateToParent() {
@@ -90,14 +201,20 @@ class CommentsPreview extends Component {
 
   render() {
     const { commentData, navigation, currentUsername } = this.props;
+    const { likedPost, loadingVote } = this.state;
 
     return (
       <Container>
-        <Header postData={commentData} navigation={navigation} currentUsername={currentUsername} />
+        <Header
+          postData={commentData}
+          navigation={navigation}
+          currentUsername={currentUsername}
+          hideMenuButton
+        />
         <Touchable onPress={this.navigateToParent}>
           <TitleContainer>
             <CommentTag>
-              <CommentTagText>{'RE'}</CommentTagText>
+              <CommentTagText>RE</CommentTagText>
             </CommentTag>
             <Title>{commentData.root_title}</Title>
           </TitleContainer>
@@ -105,10 +222,17 @@ class CommentsPreview extends Component {
         <Touchable onPress={this.navigateToFullComment}>
           <BodyShort content={commentData.body} />
         </Touchable>
-        <CommentFooter commentData={commentData} />
+        <CommentFooter
+          commentData={commentData}
+          handleNavigateToVotes={this.handleNavigateToVotes}
+          handleNavigateToComments={this.handleNavigateToComments}
+          loadingVote={loadingVote}
+          likedPost={likedPost}
+          onPressVote={this.handleOnPressVote}
+        />
       </Container>
     );
   }
 }
 
-export default CommentsPreview;
+export default connect(null, mapDispatchToProps)(CommentsPreview);

@@ -43,7 +43,7 @@ const Menu = styled.View`
 `;
 
 const Loading = styled.ActivityIndicator`
-  padding: 10px;
+  padding-top: 100px;
 `;
 
 const Author = styled.Text`

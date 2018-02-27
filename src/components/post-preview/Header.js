@@ -65,9 +65,11 @@ class Header extends Component {
     postData: PropTypes.shape().isRequired,
     currentUsername: PropTypes.string,
     displayMenu: PropTypes.func,
+    hideMenuButton: PropTypes.bool,
   };
 
   static defaultProps = {
+    hideMenuButton: false,
     currentUsername: '',
     displayMenu: () => {},
   };
@@ -163,7 +165,7 @@ class Header extends Component {
     }
   }
   render() {
-    const { postData, displayMenu } = this.props;
+    const { postData, displayMenu, hideMenuButton } = this.props;
 
     const { category, author, author_reputation, created } = postData;
     return (
@@ -180,16 +182,18 @@ class Header extends Component {
               <ReputationScore reputation={getReputation(author_reputation)} />
             </Author>
           </HeaderContents>
-          <Touchable
-            onPress={displayMenu}
-            style={{ marginLeft: 'auto', paddingLeft: 10, paddingRight: 10, paddingBottom: 10 }}
-          >
-            <MaterialCommunityIcons
-              name={MATERIAL_COMMUNITY_ICONS.menuHorizontal}
-              size={ICON_SIZES.menuIcon}
-              color={COLORS.PRIMARY_COLOR}
-            />
-          </Touchable>
+          {!hideMenuButton && (
+            <Touchable
+              onPress={displayMenu}
+              style={{ marginLeft: 'auto', paddingLeft: 10, paddingRight: 10, paddingBottom: 10 }}
+            >
+              <MaterialCommunityIcons
+                name={MATERIAL_COMMUNITY_ICONS.menuHorizontal}
+                size={ICON_SIZES.menuIcon}
+                color={COLORS.PRIMARY_COLOR}
+              />
+            </Touchable>
+          )}
         </UserHeaderContainer>
         <TagContainer>
           <Touchable onPress={this.handleFeedNavigation}>

@@ -19,7 +19,7 @@ const FooterValue = styled.Text`
   margin-left: 5px;
   font-size: 14px;
   font-weight: 700;
-  color: ${COLORS.BLUE.LINK_WATER};
+  color: ${COLORS.TERTIARY_COLOR};
   align-self: center;
 `;
 
@@ -27,7 +27,7 @@ const Payout = styled.Text`
   margin-left: auto;
   font-size: 14px;
   font-weight: 700;
-  color: ${COLORS.BLUE.LINK_WATER};
+  color: ${COLORS.TERTIARY_COLOR};
   align-self: center;
 `;
 
@@ -99,7 +99,7 @@ class Footer extends Component {
     if (showReblogLink) {
       return (
         <TouchableOpacity onPress={reblogPost}>
-          <MaterialCommunityIcons name="tumblr-reblog" size={24} color={COLORS.BLUE.LINK_WATER} />
+          <MaterialCommunityIcons name="tumblr-reblog" size={24} color={COLORS.TERTIARY_COLOR} />
         </TouchableOpacity>
       );
     }
@@ -129,7 +129,7 @@ class Footer extends Component {
           <MaterialCommunityIcons
             name="comment-processing"
             size={24}
-            color={COLORS.BLUE.LINK_WATER}
+            color={COLORS.TERTIARY_COLOR}
           />
           <FooterValue>{children}</FooterValue>
         </TouchableOpacity>

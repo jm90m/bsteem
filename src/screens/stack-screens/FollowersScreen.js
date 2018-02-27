@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import _ from 'lodash';
 import { ListView, RefreshControl } from 'react-native';
 import styled from 'styled-components/native';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -9,7 +10,7 @@ import * as navigationConstants from 'constants/navigation';
 import Header from 'components/common/Header';
 import HeaderEmptyView from 'components/common/HeaderEmptyView';
 import Avatar from 'components/common/Avatar';
-import LargeLoadingCenter from 'components/common/LargeLoadingCenter';
+import LargeLoading from 'components/common/LargeLoading';
 import FollowButton from 'components/common/FollowButton';
 
 const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
@@ -58,6 +59,8 @@ class FollowersScreen extends Component {
     navigation: PropTypes.shape().isRequired,
   };
 
+  static LIMIT = 50;
+
   constructor(props) {
     super(props);
 
@@ -69,39 +72,57 @@ class FollowersScreen extends Component {
     this.renderRow = this.renderRow.bind(this);
     this.navigateBack = this.navigateBack.bind(this);
     this.refreshFollowers = this.refreshFollowers.bind(this);
+    this.loadMoreFollowers = this.loadMoreFollowers.bind(this);
   }
 
   componentWillMount() {
-    const { username } = this.props.navigation.state.params;
     this.setState({ isLoading: true });
-    API.getAllFollowers(username)
-      .then(followers =>
+
+    this.fetchFollowers()
+      .then(response => {
+        const followers = _.get(response, 'result', []);
         this.setState({
           isLoading: false,
-          followers: followers.sort(),
-        }),
-      )
-      .catch(error => {
-        console.log('ERROR FOLLOWER SCREEN', error);
-      });
+          followers,
+        });
+      })
+      .catch(() => this.setState({ isLoading: false }));
   }
 
   refreshFollowers() {
-    const { username } = this.props.navigation.state.params;
     this.setState({ isRefreshing: true });
-    API.getAllFollowers(username)
-      .then(followers =>
+    this.fetchFollowers()
+      .then(response => {
+        const followers = _.get(response, 'result', []);
         this.setState({
           isRefreshing: false,
-          followers: followers.sort(),
-        }),
-      )
-      .catch(error => {
-        this.setState({
-          isRefreshing: false,
+          followers,
         });
-        console.log('ERROR FOLLOWER SCREEN', error);
-      });
+      })
+      .catch(() => this.setState({ isRefreshing: false }));
+  }
+
+  fetchFollowers(followData = {}) {
+    const startName = _.get(followData, 'follower', '');
+    const { username } = this.props.navigation.state.params;
+    return API.getFollowers(username, startName, 'blog', FollowersScreen.LIMIT);
+  }
+
+  loadMoreFollowers() {
+    const { followers } = this.state;
+    const lastFollower = _.last(followers);
+
+    this.setState({ isLoading: true });
+
+    this.fetchFollowers(lastFollower)
+      .then(response => {
+        const newFollowers = _.get(response, 'result', []);
+        this.setState({
+          isLoading: false,
+          followers: _.unionBy(followers, newFollowers, 'follower'),
+        });
+      })
+      .catch(() => this.setState({ isLoading: false }));
   }
 
   navigateBack() {
@@ -136,22 +157,20 @@ class FollowersScreen extends Component {
           <TitleText>{`${username} followers`}</TitleText>
           <HeaderEmptyView />
         </Header>
-        {isLoading ? (
-          <LargeLoadingCenter />
-        ) : (
-          <StyledListView
-            dataSource={ds.cloneWithRows(followers)}
-            renderRow={this.renderRow}
-            enableEmptySections
-            refreshControl={
-              <RefreshControl
-                refreshing={isRefreshing}
-                onRefresh={this.refreshFollowers}
-                colors={[COLORS.PRIMARY_COLOR]}
-              />
-            }
-          />
-        )}
+        <StyledListView
+          dataSource={ds.cloneWithRows(followers)}
+          renderRow={this.renderRow}
+          enableEmptySections
+          onEndReached={this.loadMoreFollowers}
+          refreshControl={
+            <RefreshControl
+              refreshing={isRefreshing}
+              onRefresh={this.refreshFollowers}
+              colors={[COLORS.PRIMARY_COLOR]}
+            />
+          }
+        />
+        {isLoading && <LargeLoading />}
       </Container>
     );
   }

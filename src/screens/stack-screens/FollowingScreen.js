@@ -3,16 +3,15 @@ import PropTypes from 'prop-types';
 import { ListView, RefreshControl } from 'react-native';
 import styled from 'styled-components/native';
 import { MaterialIcons } from '@expo/vector-icons';
+import _ from 'lodash';
 import { COLORS, MATERIAL_ICONS } from 'constants/styles';
 import FollowButton from 'components/common/FollowButton';
 import API from 'api/api';
 import * as navigationConstants from 'constants/navigation';
 import Header from 'components/common/Header';
 import HeaderEmptyView from 'components/common/HeaderEmptyView';
-import { connect } from 'react-redux';
 import Avatar from 'components/common/Avatar';
-import LargeLoadingCenter from 'components/common/LargeLoadingCenter';
-import { getCurrentUserFollowList } from '../../state/rootReducer';
+import LargeLoading from 'components/common/LargeLoading';
 
 const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
 
@@ -55,18 +54,12 @@ const UserTouchable = styled.TouchableOpacity`
 
 const StyledListView = styled.ListView``;
 
-@connect(state => ({
-  currentUserFollowList: getCurrentUserFollowList(state),
-}))
 class FollowingScreen extends Component {
   static propTypes = {
     navigation: PropTypes.shape().isRequired,
-    currentUserFollowList: PropTypes.shape(),
   };
 
-  static defaultProps = {
-    currentUserFollowList: {},
-  };
+  static LIMIT = 50;
 
   constructor(props) {
     super(props);
@@ -80,21 +73,21 @@ class FollowingScreen extends Component {
     this.navigateBack = this.navigateBack.bind(this);
     this.handleNavigateToUser = this.handleNavigateToUser.bind(this);
     this.refreshFollowing = this.refreshFollowing.bind(this);
+    this.loadMoreFollowing = this.loadMoreFollowing.bind(this);
   }
 
   componentWillMount() {
-    const { username } = this.props.navigation.state.params;
     this.setState({ isLoading: true });
-    API.getAllFollowing(username)
-      .then(followers =>
+
+    this.fetchFollowing()
+      .then(response => {
+        const followers = _.get(response, 'result', []);
         this.setState({
           isLoading: false,
-          followers: followers.sort(),
-        }),
-      )
-      .catch(error => {
-        console.log('ERROR FOLLOWING SCREEN', error);
-      });
+          followers,
+        });
+      })
+      .catch(() => this.setState({ isLoading: false }));
   }
 
   navigateBack() {
@@ -106,21 +99,39 @@ class FollowingScreen extends Component {
   }
 
   refreshFollowing() {
-    const { username } = this.props.navigation.state.params;
     this.setState({ isRefreshing: true });
-    API.getAllFollowing(username)
-      .then(followers =>
+    this.fetchFollowers()
+      .then(response => {
+        const followers = _.get(response, 'result', []);
         this.setState({
           isRefreshing: false,
-          followers: followers.sort(),
-        }),
-      )
-      .catch(error => {
-        this.setState({
-          isRefreshing: false,
+          followers,
         });
-        console.log('ERROR FOLLOWING SCREEN', error);
-      });
+      })
+      .catch(() => this.setState({ isRefreshing: false }));
+  }
+
+  fetchFollowing(followData = {}) {
+    const startName = _.get(followData, 'following', '');
+    const { username } = this.props.navigation.state.params;
+    return API.getFollowing(username, startName, 'blog', FollowingScreen.LIMIT);
+  }
+
+  loadMoreFollowing() {
+    const { followers } = this.state;
+    const lastFollower = _.last(followers);
+
+    this.setState({ isLoading: true });
+
+    this.fetchFollowing(lastFollower)
+      .then(response => {
+        const newFollowers = _.get(response, 'result', []);
+        this.setState({
+          isLoading: false,
+          followers: _.unionBy(followers, newFollowers, 'following'),
+        });
+      })
+      .catch(() => this.setState({ isLoading: false }));
   }
 
   renderRow(rowData) {
@@ -135,6 +146,7 @@ class FollowingScreen extends Component {
       </UserContainer>
     );
   }
+
   render() {
     const { followers, isLoading, isRefreshing } = this.state;
     const { username } = this.props.navigation.state.params;
@@ -147,22 +159,20 @@ class FollowingScreen extends Component {
           <TitleText>{`${username} following`}</TitleText>
           <HeaderEmptyView />
         </Header>
-        {isLoading ? (
-          <LargeLoadingCenter />
-        ) : (
-          <StyledListView
-            dataSource={ds.cloneWithRows(followers)}
-            renderRow={this.renderRow}
-            enableEmptySections
-            refreshControl={
-              <RefreshControl
-                refreshing={isRefreshing}
-                onRefresh={this.onRefreshCurrentFeed}
-                colors={[COLORS.PRIMARY_COLOR]}
-              />
-            }
-          />
-        )}
+        <StyledListView
+          dataSource={ds.cloneWithRows(followers)}
+          renderRow={this.renderRow}
+          enableEmptySections
+          onEndReached={this.loadMoreFollowing}
+          refreshControl={
+            <RefreshControl
+              refreshing={isRefreshing}
+              onRefresh={this.onRefreshCurrentFeed}
+              colors={[COLORS.PRIMARY_COLOR]}
+            />
+          }
+        />
+        {isLoading && <LargeLoading />}
       </Container>
     );
   }

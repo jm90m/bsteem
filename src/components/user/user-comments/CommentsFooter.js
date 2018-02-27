@@ -7,6 +7,7 @@ import { COLORS } from 'constants/styles';
 import { sortVotes } from 'util/sortUtils';
 import { getUpvotes } from 'util/voteUtils';
 import { calculatePayout } from 'util/steemitUtils';
+import { MATERIAL_ICONS } from '../../../constants/styles';
 
 const Container = styled.View`
   flex-direction: row;
@@ -30,17 +31,48 @@ const Payout = styled.Text`
   align-self: center;
 `;
 
+const TouchableOpacity = styled.TouchableOpacity``;
+
+const Loading = styled.ActivityIndicator``;
+
 class CommentsFooter extends Component {
   static propTypes = {
     commentData: PropTypes.shape(),
+    handleNavigateToVotes: PropTypes.func.isRequired,
+    handleNavigateToComments: PropTypes.func.isRequired,
+    loadingVote: PropTypes.bool.isRequired,
+    likedPost: PropTypes.bool.isRequired,
+    onPressVote: PropTypes.func.isRequired,
   };
 
   static defaultProps = {
     commentData: {},
   };
 
+  renderVoteButton() {
+    const { likedPost, onPressVote, loadingVote } = this.props;
+    console.log('LOADING VOTE', loadingVote);
+    if (loadingVote) {
+      return <Loading color={COLORS.PRIMARY_COLOR} size="small" />;
+    }
+
+    if (likedPost) {
+      return (
+        <TouchableOpacity onPress={onPressVote}>
+          <MaterialIcons name={MATERIAL_ICONS.voteFill} size={24} color={COLORS.PRIMARY_COLOR} />
+        </TouchableOpacity>
+      );
+    }
+
+    return (
+      <TouchableOpacity onPress={onPressVote}>
+        <MaterialIcons name={MATERIAL_ICONS.voteFill} size={24} color={COLORS.TERTIARY_COLOR} />
+      </TouchableOpacity>
+    );
+  }
+
   render() {
-    const { commentData } = this.props;
+    const { commentData, handleNavigateToVotes, handleNavigateToComments } = this.props;
     const { active_votes, children } = commentData;
     const upVotes = getUpvotes(active_votes).sort(sortVotes);
     const payout = calculatePayout(commentData);
@@ -51,15 +83,27 @@ class CommentsFooter extends Component {
 
     return (
       <Container>
-        <MaterialIcons name="thumb-up" size={24} color={COLORS.BLUE.LINK_WATER} />
-        <FooterValue>{upVotes.length}</FooterValue>
-        <MaterialCommunityIcons
-          name="comment-processing"
-          size={24}
-          color={COLORS.BLUE.LINK_WATER}
-        />
-        <FooterValue>{children}</FooterValue>
-        <Payout>${formattedDisplayedPayout}</Payout>
+        {this.renderVoteButton()}
+        <TouchableOpacity
+          onPress={handleNavigateToVotes}
+          style={{ justifyContent: 'center', alignItems: 'center' }}
+        >
+          <FooterValue>{upVotes.length}</FooterValue>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={handleNavigateToComments} style={{ flexDirection: 'row' }}>
+          <MaterialCommunityIcons
+            name="comment-processing"
+            size={24}
+            color={COLORS.TERTIARY_COLOR}
+          />
+          <FooterValue>{children}</FooterValue>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={handleNavigateToVotes}
+          style={{ marginLeft: 'auto', alignItems: 'center' }}
+        >
+          <Payout>${formattedDisplayedPayout}</Payout>
+        </TouchableOpacity>
       </Container>
     );
   }
