@@ -122,7 +122,7 @@ class UserActivityScreen extends Component {
             <MaterialCommunityIcons
               size={24}
               name={MATERIAL_COMMUNITY_ICONS.filter}
-              color={COLORS.PRIMARY_COLOR}
+              color={'transparent'}
             />
           </FilterTouchable>
         </Header>
