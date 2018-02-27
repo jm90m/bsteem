@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
 import styled from 'styled-components/native';
 import { COLORS, FONT_AWESOME_ICONS, MATERIAL_ICONS } from 'constants/styles';
-import { vestToSteem } from 'util/steemitFormatters';
+import { vestToSteem, numberWithCommas } from 'util/steemitFormatters';
 import SmallLoading from 'components/common/SmallLoading';
 import { calculateEstAccountValue, calculateTotalDelegatedSP } from 'util/steemitUtils';
 
@@ -13,14 +13,14 @@ const Container = styled.View`
   background-color: ${COLORS.WHITE.WHITE};
   margin-bottom: 10px;
   border-top-width: 1px;
-  border-top-color: ${COLORS.WHITE.GAINSBORO};
+  border-top-color: ${COLORS.PRIMARY_BORDER_COLOR};
   border-bottom-width: 1px;
-  border-bottom-color: ${COLORS.WHITE.GAINSBORO};
+  border-bottom-color: ${COLORS.PRIMARY_BORDER_COLOR};
 `;
 
 const UserWalletSummaryItem = styled.View`
   border-bottom-width: 1px;
-  border-bottom-color: ${COLORS.WHITE.GAINSBORO};
+  border-bottom-color: ${COLORS.PRIMARY_BORDER_COLOR};
   align-items: center;
   margin: 0 15px;
   flex-direction: row;
@@ -62,9 +62,9 @@ const getFormattedTotalDelegatedSP = (user, totalVestingShares, getTotalVestingF
     getTotalVestingFundSteem,
   );
   const totalDelegatedSPTextPrefix = totalDelegatedSPValue > 0 ? '(+' : '(';
-  const totalDelegatedSP = `${totalDelegatedSPTextPrefix}${parseFloat(
-    totalDelegatedSPValue,
-  ).toFixed(3)} SP)`;
+  const totalDelegatedSP = `${totalDelegatedSPTextPrefix}${numberWithCommas(
+    parseFloat(totalDelegatedSPValue).toFixed(3),
+  )} SP)`;
   if (totalDelegatedSPValue !== 0) {
     return <TotalDelegatedSPText>{totalDelegatedSP}</TotalDelegatedSPText>;
   }
@@ -91,7 +91,7 @@ const UserWalletSummary = ({
         {loading ? (
           <SmallLoading style={loaderStyles} />
         ) : (
-          <Value>{`${parseFloat(user.balance)} STEEEM`}</Value>
+          <Value>{`${numberWithCommas(parseFloat(user.balance))} STEEEM`}</Value>
         )}
       </UserWalletSummaryItem>
       <UserWalletSummaryItem>
@@ -103,9 +103,11 @@ const UserWalletSummary = ({
           <SmallLoading style={loaderStyles} />
         ) : (
           <Value>
-            {`${parseFloat(
-              vestToSteem(user.vesting_shares, totalVestingShares, totalVestingFundSteem).toFixed(
-                3,
+            {`${numberWithCommas(
+              parseFloat(
+                vestToSteem(user.vesting_shares, totalVestingShares, totalVestingFundSteem).toFixed(
+                  3,
+                ),
               ),
             )} SP `}
             {getFormattedTotalDelegatedSP(user, totalVestingShares, totalVestingFundSteem)}
@@ -120,7 +122,7 @@ const UserWalletSummary = ({
         {loading ? (
           <SmallLoading style={loaderStyles} />
         ) : (
-          <Value>{`${parseFloat(user.sbd_balance).toFixed(3)} SBD`}</Value>
+          <Value>{`${numberWithCommas(parseFloat(user.sbd_balance).toFixed(3))} SBD`}</Value>
         )}
       </UserWalletSummaryItem>
       <UserWalletSummaryItem>
@@ -132,7 +134,7 @@ const UserWalletSummary = ({
           <SmallLoading style={loaderStyles} />
         ) : (
           <Value>
-            {`${parseFloat(user.savings_balance).toFixed(3)} STEEM, ${parseFloat(
+            {`${numberWithCommas(parseFloat(user.savings_balance).toFixed(3))} STEEM, ${parseFloat(
               user.savings_sbd_balance,
             ).toFixed(3)} SBD`}
           </Value>
@@ -147,9 +149,16 @@ const UserWalletSummary = ({
           <SmallLoading style={loaderStyles} />
         ) : (
           <Value>
-            {`$${parseFloat(
-              calculateEstAccountValue(user, totalVestingShares, totalVestingFundSteem, steemRate),
-            ).toFixed(2)}`}
+            {`$${numberWithCommas(
+              parseFloat(
+                calculateEstAccountValue(
+                  user,
+                  totalVestingShares,
+                  totalVestingFundSteem,
+                  steemRate,
+                ),
+              ).toFixed(2),
+            )}`}
           </Value>
         )}
       </LastUserWalletSummaryItem>

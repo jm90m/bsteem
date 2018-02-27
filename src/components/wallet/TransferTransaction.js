@@ -1,19 +1,18 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components/native';
-import moment from 'moment';
 import { COLORS } from 'constants/styles';
 import Avatar from 'components/common/Avatar';
 import * as navigationConstants from 'constants/navigation';
+import { numberWithCommas } from 'util/steemitFormatters';
+import i18n from 'i18n/i18n';
+import TimeAgo from 'components/common/TimeAgo';
 import WalletTransactionContainer from './WalletTransactionContainer';
 
-const TransferContent = styled.View`
+const TransferContent = styled.Text`
   padding-left: 10px;
-`;
-
-const TimeStamp = styled.Text`
-  color: ${COLORS.BLUE.BOTICELLI};
-  font-size: 14px;
+  flex-wrap: wrap;
+  width: 200px;
 `;
 
 const Label = styled.Text`
@@ -26,11 +25,13 @@ const Transfer = styled.Text`
   color: ${COLORS.RED.VALENCIA};
 `;
 
-const TransferTextContainer = styled.View`
+const TransferTextContainer = styled.Text`
   flex-direction: row;
 `;
 
 const Memo = styled.Text`
+  flex-wrap: wrap;
+  z-index: 1;
 `;
 
 const Username = styled.Text`
@@ -38,27 +39,26 @@ const Username = styled.Text`
   font-weight: bold;
 `;
 
-const Touchable = styled.TouchableOpacity``;
+const Touchable = styled.TouchableWithoutFeedback``;
 
 const TransferTransaction = ({ to, memo, amount, timestamp, navigation }) => (
   <WalletTransactionContainer>
     <Avatar username={to} size={40} />
     <TransferContent>
       <TransferTextContainer>
-        <Label>
-          {'Transferred to '}
-        </Label>
+        <Label>{`${i18n.activity.transferredTo} `}</Label>
         <Touchable onPress={() => navigation.navigate(navigationConstants.USER, { username: to })}>
           <Username>{to}</Username>
         </Touchable>
       </TransferTextContainer>
-      <TimeStamp>
-        {moment(timestamp).fromNow()}
-      </TimeStamp>
+      {'\n'}
+      <TimeAgo created={timestamp} />
+      {'\n'}
       <Memo>{memo}</Memo>
     </TransferContent>
     <Transfer>
-      {'- '}{amount}
+      {'-'}
+      {numberWithCommas(amount)}
     </Transfer>
   </WalletTransactionContainer>
 );

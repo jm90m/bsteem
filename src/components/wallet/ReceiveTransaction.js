@@ -1,21 +1,18 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components/native';
-import moment from 'moment';
 import { COLORS } from 'constants/styles';
 import Avatar from 'components/common/Avatar';
+import TimeAgo from 'components/common/TimeAgo';
+import { numberWithCommas } from 'util/steemitFormatters';
+import i18n from 'i18n/i18n';
 import * as navigationConstants from 'constants/navigation';
 import WalletTransactionContainer from './WalletTransactionContainer';
 
-const ReceiveContent = styled.View`
+const ReceiveContent = styled.Text`
   padding-left: 10px;
   flex-wrap: wrap;
   width: 200px;
-`;
-
-const TimeStamp = styled.Text`
-  color: ${COLORS.BLUE.BOTICELLI};
-  font-size: 14px;
 `;
 
 const Label = styled.Text`
@@ -30,6 +27,7 @@ const Received = styled.Text`
 
 const Memo = styled.Text`
   flex-wrap: wrap;
+  z-index: 1;
 `;
 
 const Username = styled.Text`
@@ -37,31 +35,32 @@ const Username = styled.Text`
   font-weight: bold;
 `;
 
-const ReceivedTextContainer = styled.View`
+const ReceivedTextContainer = styled.Text`
   flex-direction: row;
 `;
 
-const Touchable = styled.TouchableOpacity``;
+const Touchable = styled.TouchableWithoutFeedback``;
 
 const ReceiveTransaction = ({ from, memo, amount, timestamp, navigation }) => (
   <WalletTransactionContainer>
     <Avatar username={from} size={40} />
     <ReceiveContent>
       <ReceivedTextContainer>
-        <Label>{'Received from '}</Label>
+        <Label>{`${i18n.activity.receivedFrom} `}</Label>
         <Touchable
           onPress={() => navigation.navigate(navigationConstants.USER, { username: from })}
         >
           <Username>{from}</Username>
         </Touchable>
       </ReceivedTextContainer>
-      <TimeStamp>
-        {moment(timestamp).fromNow()}
-      </TimeStamp>
+      {'\n'}
+      <TimeAgo created={timestamp} />
+      {'\n'}
       <Memo>{memo}</Memo>
     </ReceiveContent>
     <Received>
-      {'+'}{amount}
+      {'+'}
+      {numberWithCommas(amount)}
     </Received>
   </WalletTransactionContainer>
 );

@@ -3,15 +3,11 @@ import PropTypes from 'prop-types';
 import { View } from 'react-native';
 import styled from 'styled-components/native';
 import { FontAwesome } from '@expo/vector-icons';
-import { COLORS, FONT_AWESOME_ICONS, ICON_COLORS, ICON_SIZES } from 'constants/styles';
+import { FONT_AWESOME_ICONS, ICON_COLORS, ICON_SIZES } from 'constants/styles';
+import TimeAgo from 'components/common/TimeAgo';
+import i18n from 'i18n/i18n';
 import WalletTransactionContainer from './WalletTransactionContainer';
 import IconContainer from './IconContainer';
-
-const TimeStamp = styled.Text`
-  color: ${COLORS.BLUE.BOTICELLI};
-  font-size: 14px;
-  padding-left: 10px;
-`;
 
 const Label = styled.Text`
   font-weight: bold;
@@ -32,16 +28,10 @@ const PowerUpTransaction = ({ timestamp, amount }) => (
       />
     </IconContainer>
     <View>
-      <Label>
-        {'Power up'}
-      </Label>
-      <TimeStamp>
-        {timestamp}
-      </TimeStamp>
+      <Label>{i18n.activity.powerUp}</Label>
+      <TimeAgo created={timestamp} style={{ marginLeft: 10 }} />
     </View>
-    <Value>
-      {amount}
-    </Value>
+    <Value>{amount}</Value>
   </WalletTransactionContainer>
 );
 

@@ -1,8 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { View, Text } from 'react-native';
+import { Text } from 'react-native';
 import _ from 'lodash';
 import * as accountHistoryConstants from 'constants/accountHistory';
+import i18n from 'i18n/i18n';
 import * as navigationConstants from 'constants/navigation';
 import styled from 'styled-components/native';
 import { COLORS } from 'constants/styles';
@@ -13,7 +14,7 @@ const Container = styled.View`
   flex-wrap: wrap;
 `;
 
-const Touchable = styled.TouchableOpacity`
+const Touchable = styled.TouchableWithoutFeedback`
   padding-right: 10px;
 `;
 
@@ -40,7 +41,8 @@ const CustomJSONMessage = ({ actionDetails, currentUsername, navigation }) => {
             onPress={() =>
               navigation.navigate(navigationConstants.USER, {
                 username: following,
-              })}
+              })
+            }
           >
             <LinkText>{following}</LinkText>
           </Touchable>
@@ -54,7 +56,8 @@ const CustomJSONMessage = ({ actionDetails, currentUsername, navigation }) => {
           onPress={() =>
             navigation.navigate(navigationConstants.USER, {
               username: customActionDetails.follower,
-            })}
+            })
+          }
         >
           <LinkText>{customActionDetails.follower}</LinkText>
         </Touchable>
@@ -63,7 +66,8 @@ const CustomJSONMessage = ({ actionDetails, currentUsername, navigation }) => {
           onPress={() =>
             navigation.navigate(navigationConstants.USER, {
               username: customActionDetails.following,
-            })}
+            })
+          }
         >
           <LinkText>{customActionDetails.following}</LinkText>
         </Touchable>
@@ -72,11 +76,16 @@ const CustomJSONMessage = ({ actionDetails, currentUsername, navigation }) => {
   } else if (customActionType === accountHistoryConstants.REBLOG) {
     return (
       <Container>
-        <Text>{'reblogged '}</Text>
-        <Touchable onPress={() => {}}>
-          <LinkText>
-            {`@${customActionDetails.author}/${customActionDetails.permlink}`}
-          </LinkText>
+        <Text>{`${i18n.activity.reblogged} `}</Text>
+        <Touchable
+          onPress={() =>
+            navigation.navigate(navigationConstants.FETCH_POST, {
+              author: customActionDetails.author,
+              permlink: customActionDetails.permlink,
+            })
+          }
+        >
+          <LinkText>{`@${customActionDetails.author}/${customActionDetails.permlink}`}</LinkText>
         </Touchable>
       </Container>
     );

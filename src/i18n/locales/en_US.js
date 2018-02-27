@@ -55,4 +55,10 @@ export default {
     noUpvoted: 'No one has upvoted this content.',
     noDownvoted: 'No one has downvoted this content.',
   },
+  activity: {
+    powerUp: 'Power up',
+    receivedFrom: 'Received from',
+    transferredTo: 'Transferred to',
+    reblogged: 'reblogged',
+  },
 };

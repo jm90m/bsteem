@@ -2,8 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 import styled from 'styled-components/native';
-import moment from 'moment';
 import { COLORS } from 'constants/styles';
+import TimeAgo from 'components/common/TimeAgo';
 import UserActionIcon from './UserActionIcon';
 import UserActionMessage from './UserActionMessage';
 
@@ -13,19 +13,11 @@ const Container = styled.View`
   margin-top: 2px;
   margin-bottom: 2px;
   border-color: ${COLORS.WHITE.WHITE_SMOKE};
-  border-width: 2px;
+  border-width: 1px;
   padding: 5px;
 `;
 
-const MessageContainer = styled.View`
-  
-`;
-
-const TimeStamp = styled.Text`
-  color: ${COLORS.BLUE.BOTICELLI};
-  font-size: 14px;
-  padding-left: 10px;
-`;
+const MessageContainer = styled.View``;
 
 const UserAction = ({
   action,
@@ -51,9 +43,7 @@ const UserAction = ({
           currentUsername={currentUsername}
           navigation={navigation}
         />
-        <TimeStamp>
-          {`${moment(action.timestamp).fromNow(true)} ago`}
-        </TimeStamp>
+        <TimeAgo created={action.timestamp} style={{ marginLeft: 10 }} />
       </MessageContainer>
     </Container>
   );

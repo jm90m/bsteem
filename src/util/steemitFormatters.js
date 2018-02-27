@@ -1,8 +1,9 @@
 // https://github.com/steemit/steem-js/blob/1ebe788987d395af5fd8c80c1bbf06e24614a86c/src/api/methods.js
 import API from 'api/api';
+import _ from 'lodash';
 
-export function numberWithCommas(x) {
-  return x.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+export function numberWithCommas(number) {
+  return _.replace(number, /\B(?=(\d{3})+(?!\d))/g, ',');
 }
 
 export function vestingSteem(account, gprops) {

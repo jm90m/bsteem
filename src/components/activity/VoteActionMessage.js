@@ -6,7 +6,7 @@ import * as accountHistoryConstants from 'constants/accountHistory';
 import * as navigationConstants from 'constants/navigation';
 import { COLORS } from 'constants/styles';
 
-const Container = styled.View`
+const Container = styled.Text`
   flex-direction: row;
   align-items: center;
   flex-wrap: wrap;
@@ -28,22 +28,17 @@ const CurrentUserVote = styled.Text`
   margin-right: 5px;
 `;
 
-const VoteMessageContainer = styled.View`
+const VoteMessageContainer = styled.Text`
   flex-direction: row;
 `;
 
-const Touchable = styled.TouchableOpacity`
-`;
+const Touchable = styled.TouchableWithoutFeedback``;
 
 const VoteActionMessage = ({ actionDetails, currentUsername, navigation }) => {
-  const postLink = `@${actionDetails.author}/${actionDetails.permlink}`;
+  const { author, permlink } = actionDetails;
   let voteType = 'unvoted';
   const voteWeightValue = Math.abs(actionDetails.weight) / 10000 * 100;
-  const voteWeight = (
-    <VoteWeight>
-      {`(${voteWeightValue}%)`}
-    </VoteWeight>
-  );
+  const voteWeight = <VoteWeight>{` (${voteWeightValue}%) `}</VoteWeight>;
 
   if (actionDetails.weight > 0) {
     voteType = 'upvoted';
@@ -53,29 +48,38 @@ const VoteActionMessage = ({ actionDetails, currentUsername, navigation }) => {
 
   return (
     <Container>
-      {currentUsername === actionDetails.voter
-        ? <CurrentUserVote>
-            {voteType}
-          </CurrentUserVote>
-        : <VoteMessageContainer>
-            <Touchable
-              onPress={() =>
-                navigation.navigate(navigationConstants.USER, {
-                  username: actionDetails.voter,
-                })}
-            >
-              <LinkText>{actionDetails.voter}</LinkText>
-            </Touchable>
-            <Text>{` ${voteType} `}</Text>
-          </VoteMessageContainer>}
+      {currentUsername === actionDetails.voter ? (
+        <CurrentUserVote>{voteType}</CurrentUserVote>
+      ) : (
+        <VoteMessageContainer>
+          <Touchable
+            onPress={() =>
+              navigation.navigate(navigationConstants.USER, {
+                username: actionDetails.voter,
+              })
+            }
+          >
+            <LinkText>{actionDetails.voter}</LinkText>
+          </Touchable>
+          <Text>{` ${voteType} `}</Text>
+        </VoteMessageContainer>
+      )}
       {actionDetails.weight === 0 ? null : voteWeight}
       <Touchable
-        onPress={() =>
-          navigation.navigate(navigationConstants.USER, { username: actionDetails.author })}
+        onPress={() => navigation.navigate(navigationConstants.USER, { username: author })}
       >
-        <LinkText>{actionDetails.author}</LinkText>
+        <LinkText>{` ${author} `}</LinkText>
       </Touchable>
-      <LinkText>{`(${actionDetails.permlink})`}</LinkText>
+      <Touchable
+        onPress={() =>
+          navigation.navigate(navigationConstants.FETCH_POST, {
+            author,
+            permlink,
+          })
+        }
+      >
+        <LinkText>{`(${permlink})`}</LinkText>
+      </Touchable>
     </Container>
   );
 };
