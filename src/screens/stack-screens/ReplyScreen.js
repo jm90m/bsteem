@@ -57,6 +57,7 @@ const ReplyInputContainer = styled.View`
 
 const ReplyButtonContainer = styled.View`
   padding-top: 20px;
+  padding-bottom: 200px;
 `;
 
 const mapStateToProps = state => ({});

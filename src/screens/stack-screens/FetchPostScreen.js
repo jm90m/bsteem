@@ -10,7 +10,12 @@ import { getHtml } from 'util/postUtils';
 import { COLORS, ICON_SIZES, MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
 import * as navigationConstants from 'constants/navigation';
 import { fetchPostDetails } from 'state/actions/postsActions';
-import { getPostsDetails, getPostLoading, getIsAuthenticated } from 'state/rootReducer';
+import {
+  getPostsDetails,
+  getPostLoading,
+  getIsAuthenticated,
+  getAuthUsername,
+} from 'state/rootReducer';
 import PostPhotoBrowser from 'components/post/PostPhotoBrowser';
 import PostMenu from 'components/post-menu/PostMenu';
 import HTML from 'react-native-render-html';
@@ -22,6 +27,7 @@ import PrimaryButton from 'components/common/PrimaryButton';
 import * as postConstants from 'constants/postConstants';
 import i18n from 'i18n/i18n';
 import { currentUserVotePost } from 'state/actions/currentUserActions';
+import { isPostVoted } from '../../util/voteUtils';
 
 const { width: deviceWidth } = Dimensions.get('screen');
 
@@ -45,10 +51,18 @@ const Author = styled.Text`
   font-weight: bold;
 `;
 
+const NoPostFoundContainer = styled.View`
+  padding: 20px;
+  background-color: ${COLORS.WHITE.WHITE};
+`;
+
+const NoPostFoundText = styled.Text``;
+
 const mapStateToProps = state => ({
   postsDetails: getPostsDetails(state),
   postLoading: getPostLoading(state),
   authenticated: getIsAuthenticated(state),
+  authUsername: getAuthUsername(state),
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -71,7 +85,7 @@ const mapDispatchToProps = dispatch => ({
     ),
 });
 
-class SearchPostScreen extends Component {
+class FetchPostScreen extends Component {
   static navigationOptions = {
     headerMode: 'none',
     tabBarVisible: false,
@@ -81,38 +95,50 @@ class SearchPostScreen extends Component {
     postLoading: PropTypes.bool,
     navigation: PropTypes.shape().isRequired,
     postsDetails: PropTypes.shape(),
+    authenticated: PropTypes.bool.isRequired,
     fetchPostDetails: PropTypes.func.isRequired,
     currentUserVotePost: PropTypes.func.isRequired,
+    authUsername: PropTypes.string,
   };
 
   static defaultProps = {
     postsDetails: {},
     postLoading: false,
+    authUsername: '',
   };
 
   constructor(props) {
     super(props);
-
+    const currentPostDetails = this.getCurrentPostDetails();
     this.state = {
       menuVisible: false,
       displayPhotoBrowser: false,
       initialPhotoIndex: 0,
+      loadingVote: false,
+      likedPost: isPostVoted(currentPostDetails, props.authUsername),
     };
 
     this.handleHideMenu = this.handleHideMenu.bind(this);
     this.setMenuVisible = this.setMenuVisible.bind(this);
+    this.loadingVote = this.loadingVote.bind(this);
+    this.likedVoteSuccess = this.likedVoteSuccess.bind(this);
+    this.unlikedVoteSuccess = this.unlikedVoteSuccess.bind(this);
 
     this.navigateBack = this.navigateBack.bind(this);
     this.navigateToVotes = this.navigateToVotes.bind(this);
     this.navigateToLoginTab = this.navigateToLoginTab.bind(this);
     this.navigateToUser = this.navigateToUser.bind(this);
+    this.navigateToComments = this.navigateToComments.bind(this);
 
     this.handlePostLinkPress = this.handlePostLinkPress.bind(this);
+    this.handleLikePost = this.handleLikePost.bind(this);
     this.handleFeedNavigation = this.handleFeedNavigation.bind(this);
+    this.handleDisplayPhotoBrowser = this.handleDisplayPhotoBrowser.bind(this);
     this.handleHidePhotoBrowser = this.handleHidePhotoBrowser.bind(this);
     this.handlePhotoBrowserShare = this.handlePhotoBrowserShare.bind(this);
 
     this.getCurrentPostDetails = this.getCurrentPostDetails.bind(this);
+    this.fetchCurrentPostDetails = this.fetchCurrentPostDetails.bind(this);
   }
 
   componentDidMount() {
@@ -135,15 +161,40 @@ class SearchPostScreen extends Component {
     this.setState({ menuVisible: visible });
   }
 
+  fetchCurrentPostDetails() {
+    const { author, permlink } = this.props.navigation.state.params;
+    this.props.fetchPostDetails(author, permlink);
+  }
+
   handleHideMenu() {
     this.setMenuVisible(false);
+  }
+
+  loadingVote() {
+    this.setState({
+      loadingVote: true,
+    });
+  }
+
+  likedVoteSuccess() {
+    this.setState({
+      likedPost: true,
+      loadingVote: false,
+    });
+  }
+
+  unlikedVoteSuccess() {
+    this.setState({
+      likedPost: false,
+      loadingVote: false,
+    });
   }
 
   handleLikePost() {
     const { authenticated } = this.props;
     if (authenticated) {
-      const { postData } = this.props.navigation.state.params;
-      const { author, permlink } = postData;
+      const currentPostDetails = this.getCurrentPostDetails();
+      const { author, permlink } = currentPostDetails;
       const { likedPost } = this.state;
 
       this.loadingVote();
@@ -191,6 +242,19 @@ class SearchPostScreen extends Component {
     this.props.navigation.navigate(navigationConstants.FEED, { tag });
   }
 
+  handleHidePhotoBrowser() {
+    this.setState({
+      displayPhotoBrowser: false,
+    });
+  }
+
+  handleDisplayPhotoBrowser() {
+    this.setState({
+      displayPhotoBrowser: true,
+      menuVisible: false,
+    });
+  }
+
   handlePhotoBrowserShare(photoData) {
     const { photo } = photoData;
     const content = {
@@ -213,27 +277,25 @@ class SearchPostScreen extends Component {
       const tag = _.get(_.split(url, postConstants.POST_HTML_BODY_TAG), 1, 'bsteem');
       this.navigateToFeed(tag);
     } else {
-      Expo.WebBrowser.openBrowserAsync(url).catch(error => {
-        console.log('invalid url', error, url);
-      });
+      try {
+        Expo.WebBrowser.openBrowserAsync(url).catch(error => {
+          console.log('invalid url', error, url);
+        });
+      } catch (error) {
+        console.log('unable to open url', error, url);
+      }
     }
-  }
-
-  handleHidePhotoBrowser() {
-    this.setState({
-      displayPhotoBrowser: false,
-    });
   }
 
   navigateToComments() {
     const currentPostDetails = this.getCurrentPostDetails();
-    const { author, category, permlink, postId, postData } = currentPostDetails;
+    const { author, category, permlink, id } = currentPostDetails;
     this.props.navigation.navigate(navigationConstants.COMMENTS, {
       author,
       category,
       permlink,
-      postId,
-      postData,
+      postId: id,
+      postData: currentPostDetails,
     });
     this.handleHideMenu();
   }
@@ -243,6 +305,19 @@ class SearchPostScreen extends Component {
     this.props.navigation.navigate(navigationConstants.VOTES, {
       postData: currentPostDetails,
     });
+  }
+
+  renderNoPostFound() {
+    return (
+      <Container>
+        <Header>
+          <BackButton navigateBack={this.navigateBack} />
+        </Header>
+        <NoPostFoundContainer>
+          <NoPostFoundText>{i18n.post.noPostFound}</NoPostFoundText>
+        </NoPostFoundContainer>
+      </Container>
+    );
   }
 
   render() {
@@ -257,9 +332,10 @@ class SearchPostScreen extends Component {
     } = this.state;
     const currentPostDetails = this.getCurrentPostDetails();
 
-    console.log(currentPostDetails);
-    if (_.isEmpty(currentPostDetails) || postLoading) {
+    if (postLoading) {
       return <Loading color={COLORS.PRIMARY_COLOR} size="large" />;
+    } else if (_.isEmpty(currentPostDetails)) {
+      return this.renderNoPostFound();
     }
 
     const { body, json_metadata } = currentPostDetails;
@@ -270,6 +346,7 @@ class SearchPostScreen extends Component {
     const widthOffset = 20;
     const formattedImages = _.map(images, image => ({ photo: image }));
     const tags = _.compact(_.get(parsedJsonMetadata, 'tags', []));
+    const displayPhotoBrowserMenu = !_.isEmpty(formattedImages);
 
     return (
       <Container>
@@ -291,7 +368,17 @@ class SearchPostScreen extends Component {
           visible={menuVisible}
           onRequestClose={this.handleHideMenu}
         >
-          <PostMenu hideMenu={this.handleHideMenu} />
+          <PostMenu
+            hideMenu={this.handleHideMenu}
+            handleLikePost={this.handleLikePost}
+            likedPost={likedPost}
+            loadingVote={loadingVote}
+            handleNavigateToComments={this.navigateToComments}
+            postData={currentPostDetails}
+            displayPhotoBrowserMenu={displayPhotoBrowserMenu}
+            handleDisplayPhotoBrowser={this.handleDisplayPhotoBrowser}
+            hideReblogMenu
+          />
         </Modal>
         <PostPhotoBrowser
           displayPhotoBrowser={displayPhotoBrowser}
@@ -326,4 +413,4 @@ class SearchPostScreen extends Component {
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(SearchPostScreen);
+export default connect(mapStateToProps, mapDispatchToProps)(FetchPostScreen);

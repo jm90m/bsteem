@@ -304,7 +304,7 @@ class PostScreen extends Component {
   }
 
   render() {
-    const { body, parsedJsonMetadata, postData, author } = this.props.navigation.state.params;
+    const { body, parsedJsonMetadata, author } = this.props.navigation.state.params;
     const { displayPhotoBrowser, menuVisible, likedPost, loadingVote, postDetails } = this.state;
     const parsedHtmlBody = getHtml(body, parsedJsonMetadata);
     const images = _.get(parsedJsonMetadata, 'image', []);

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components/native';
+import * as navigationConstants from 'constants/navigation';
 import { COLORS } from 'constants/styles';
 import Header from '../../post-preview/Header';
 import CommentFooter from './CommentsFooter';
@@ -47,6 +48,8 @@ const CommentTagText = styled.Text`
   border-radius: 4px;
 `;
 
+const Touchable = styled.TouchableOpacity``;
+
 class CommentsPreview extends Component {
   static propTypes = {
     commentData: PropTypes.shape(),
@@ -59,21 +62,49 @@ class CommentsPreview extends Component {
     currentUsername: '',
   };
 
+  constructor(props) {
+    super(props);
+
+    this.navigateToFullComment = this.navigateToFullComment.bind(this);
+    this.navigateToParent = this.navigateToParent.bind(this);
+  }
+
+  navigateToParent() {
+    const { commentData } = this.props;
+    const { parent_author, parent_permlink } = commentData;
+
+    this.props.navigation.navigate(navigationConstants.FETCH_POST, {
+      author: parent_author,
+      permlink: parent_permlink,
+    });
+  }
+
+  navigateToFullComment() {
+    const { commentData } = this.props;
+    const { author, permlink } = commentData;
+    this.props.navigation.navigate(navigationConstants.FETCH_POST, {
+      author,
+      permlink,
+    });
+  }
+
   render() {
     const { commentData, navigation, currentUsername } = this.props;
 
     return (
       <Container>
         <Header postData={commentData} navigation={navigation} currentUsername={currentUsername} />
-        <TitleContainer>
-          <CommentTag>
-            <CommentTagText>{'RE'}</CommentTagText>
-          </CommentTag>
-          <Title>
-            {commentData.root_title}
-          </Title>
-        </TitleContainer>
-        <BodyShort content={commentData.body} />
+        <Touchable onPress={this.navigateToParent}>
+          <TitleContainer>
+            <CommentTag>
+              <CommentTagText>{'RE'}</CommentTagText>
+            </CommentTag>
+            <Title>{commentData.root_title}</Title>
+          </TitleContainer>
+        </Touchable>
+        <Touchable onPress={this.navigateToFullComment}>
+          <BodyShort content={commentData.body} />
+        </Touchable>
         <CommentFooter commentData={commentData} />
       </Container>
     );
