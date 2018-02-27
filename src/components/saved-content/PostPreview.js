@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 import { TouchableOpacity } from 'react-native';
 import styled from 'styled-components/native';
 import { COLORS } from 'constants/styles';
-import moment from 'moment-timezone';
 import Avatar from 'components/common/Avatar';
+import TimeAgo from 'components/common/TimeAgo';
 
 const Container = styled.View`
   background-color: ${COLORS.WHITE.WHITE};
@@ -33,11 +33,6 @@ const PostTitle = styled.Text`
   padding-bottom: 10px;
   font-weight: 700;
   font-size: 20px;
-`;
-
-const PostCreated = styled.Text`
-  color: ${COLORS.BLUE.BOTICELLI};
-  font-size: 14px;
 `;
 
 class PostPreview extends Component {
@@ -70,7 +65,7 @@ class PostPreview extends Component {
             <TouchableOpacity onPress={handleNavigateUser}>
               <AuthorText>{`@${author}`}</AuthorText>
             </TouchableOpacity>
-            <PostCreated>{moment(created).fromNow(true)}</PostCreated>
+            <TimeAgo created={created} />
           </AuthorContents>
         </AuthorContainer>
         <TouchableOpacity onPress={handleNavigatePost}>

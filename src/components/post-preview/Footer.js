@@ -77,7 +77,7 @@ class Footer extends Component {
 
     return (
       <TouchableOpacity onPress={onPressVote}>
-        <MaterialIcons name="thumb-up" size={24} color={COLORS.BLUE.LINK_WATER} />
+        <MaterialIcons name="thumb-up" size={24} color={COLORS.TERTIARY_COLOR} />
       </TouchableOpacity>
     );
   }

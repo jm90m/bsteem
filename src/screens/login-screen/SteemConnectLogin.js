@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { AsyncStorage } from 'react-native';
+import { AsyncStorage, View } from 'react-native';
 import Expo, { AuthSession } from 'expo';
 import { connect } from 'react-redux';
 import sc2 from 'api/sc2';
 import styled from 'styled-components/native';
 import { COLORS } from 'constants/styles';
 import { Button } from 'react-native-elements';
+import DEBUG from 'constants/debug';
 import {
   STEEM_ACCESS_TOKEN,
   AUTH_EXPIRATION,
@@ -83,6 +84,17 @@ class SteemConnectLogin extends Component {
     }
   }
 
+  renderDebugText() {
+    if (DEBUG) {
+      return (
+        <View>
+          <DebugText>{`LinkingURI: ${Expo.Constants.linkingUri}/redirect`}</DebugText>
+          <DebugText>{`RedirectURI: ${AuthSession.getRedirectUrl()}`}</DebugText>
+        </View>
+      );
+    }
+  }
+
   render() {
     return (
       <Container>
@@ -94,8 +106,7 @@ class SteemConnectLogin extends Component {
           borderRadius={10}
           backgroundColor={COLORS.PRIMARY_COLOR}
         />
-        <DebugText>{`LinkingURI: ${Expo.Constants.linkingUri}/redirect`}</DebugText>
-        <DebugText>{`RedirectURI: ${AuthSession.getRedirectUrl()}`}</DebugText>
+        {this.renderDebugText()}
       </Container>
     );
   }

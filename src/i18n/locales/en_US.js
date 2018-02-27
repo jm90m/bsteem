@@ -35,6 +35,8 @@ export default {
   },
   login: {
     description: 'Sign in with SteemConnect so that you can vote, like, comment, and create posts.',
+    loginWithSC: 'Login with SteemConnect',
+    signUp: 'Sign up',
   },
   logout: {
     switchAccountsDescription:

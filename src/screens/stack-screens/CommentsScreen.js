@@ -10,6 +10,7 @@ import CommentsContainer from 'components/post/comments/CommentsContainer';
 import { ICON_SIZES, MATERIAL_ICONS, COLORS } from 'constants/styles';
 import { getCommentsByPostId, getLoadingComments, getIsAuthenticated } from 'state/rootReducer';
 import Header from 'components/common/Header';
+import withAuthActions from 'components/common/withAuthActions';
 import LargeLoading from 'components/common/LargeLoading';
 import * as editorActions from '../../state/actions/editorActions';
 import * as navigationConstants from '../../constants/navigation';
@@ -59,8 +60,10 @@ class CommentScreen extends Component {
   static propTypes = {
     navigation: PropTypes.shape(),
     fetchComments: PropTypes.func.isRequired,
+    onActionInitiated: PropTypes.func.isRequired,
     commentsByPostId: PropTypes.shape(),
     loadingComments: PropTypes.bool,
+    authenticated: PropTypes.bool.isRequired,
   };
 
   static defaultProps = {
@@ -78,6 +81,7 @@ class CommentScreen extends Component {
     super(props);
 
     this.navigateBack = this.navigateBack.bind(this);
+    this.navigateToReplyScreen = this.navigateToReplyScreen.bind(this);
     this.handleReplyToPost = this.handleReplyToPost.bind(this);
     this.handleFetchCurrentComments = this.handleFetchCurrentComments.bind(this);
   }
@@ -100,18 +104,16 @@ class CommentScreen extends Component {
     this.props.navigation.goBack();
   }
 
-  handleReplyToPost() {
-    const { authenticated } = this.props;
+  navigateToReplyScreen() {
     const { postData } = this.props.navigation.state.params;
-
-    if (!authenticated) {
-      return;
-    }
-
     this.props.navigation.navigate(navigationConstants.REPLY, {
       parentPost: postData,
       successCreateReply: this.handleFetchCurrentComments,
     });
+  }
+
+  handleReplyToPost() {
+    this.props.onActionInitiated(this.navigateToReplyScreen);
   }
 
   render() {
@@ -147,4 +149,4 @@ class CommentScreen extends Component {
   }
 }
 
-export default CommentScreen;
+export default withAuthActions(CommentScreen);

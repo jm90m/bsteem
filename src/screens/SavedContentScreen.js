@@ -54,6 +54,7 @@ const MenuTouchable = styled.TouchableOpacity`
   flex-direction: row;
   align-items: center;
   margin-left: 10px;
+  padding: 0 20px;
 `;
 
 const MENU = {

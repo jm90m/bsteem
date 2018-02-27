@@ -165,7 +165,7 @@ class Footer extends Component {
 
     return (
       <TouchableOpacity onPress={this.props.handleLikePost}>
-        <MaterialIcons name="thumb-up" size={24} color={COLORS.BLUE.LINK_WATER} />
+        <MaterialIcons name="thumb-up" size={24} color={COLORS.TERTIARY_COLOR} />
       </TouchableOpacity>
     );
   }
@@ -188,7 +188,7 @@ class Footer extends Component {
     if (showReblogLink) {
       return (
         <TouchableOpacity onPress={this.showReblogModal}>
-          <MaterialCommunityIcons name="tumblr-reblog" size={24} color={COLORS.BLUE.LINK_WATER} />
+          <MaterialCommunityIcons name="tumblr-reblog" size={24} color={COLORS.TERTIARY_COLOR} />
         </TouchableOpacity>
       );
     }
