@@ -399,13 +399,15 @@ class PostPreview extends Component {
         >
           <ReblogModal closeModal={this.hideReblogModal} confirmReblog={this.handleReblogConfirm} />
         </Modal>
-        <PostPhotoBrowser
-          displayPhotoBrowser={displayPhotoBrowser}
-          mediaList={formattedImages}
-          handleClose={this.handleHidePhotoBrowser}
-          initialPhotoIndex={0}
-          handleAction={this.handlePhotoBrowserShare}
-        />
+        {displayPhotoBrowser && (
+          <PostPhotoBrowser
+            displayPhotoBrowser={displayPhotoBrowser}
+            mediaList={formattedImages}
+            handleClose={this.handleHidePhotoBrowser}
+            initialPhotoIndex={0}
+            handleAction={this.handlePhotoBrowserShare}
+          />
+        )}
         <Modal
           animationType="slide"
           transparent
