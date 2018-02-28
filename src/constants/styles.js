@@ -118,6 +118,7 @@ export const MATERIAL_ICONS = {
 };
 
 export const MATERIAL_COMMUNITY_ICONS = {
+  account: 'account',
   reblog: 'tumblr-reblog',
   comment: 'comment-processing',
   menuVertical: 'dots-vertical',

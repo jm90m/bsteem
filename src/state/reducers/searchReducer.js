@@ -1,13 +1,26 @@
 import _ from 'lodash';
-import { SEARCH_ASK_STEEM, SEARCH_FETCH_POST_DETAILS } from 'state/actions/actionTypes';
+import {
+  SEARCH_ASK_STEEM,
+  SEARCH_FETCH_POST_DETAILS,
+  SEARCH_SET_TRENDING_TAGS,
+  SEARCH_FETCH_USERS,
+  SEARCH_FETCH_TAGS,
+} from 'state/actions/actionTypes';
 
 const INITIAL_STATE = {
   loading: false,
   searchError: false,
   searchResults: [],
-  currentSearchPageOptions: {},
-  currentSearchedPosts: {}, //postID -> postDetails
-  searchFetchPostLoading: false,
+
+  allTrendingTags: [],
+
+  searchUserResults: [],
+  searchPostResults: [],
+  searchTagsResults: [],
+
+  loadingSearchUser: false,
+  loadingSearchPost: false,
+  loadingSearchTag: false,
 };
 
 export default function(state = INITIAL_STATE, action) {
@@ -39,27 +52,14 @@ export default function(state = INITIAL_STATE, action) {
         searchResults: [],
       };
 
-    case SEARCH_FETCH_POST_DETAILS.ACTION:
+    case SEARCH_FETCH_USERS.ACTION:
+
+
+
+    case SEARCH_SET_TRENDING_TAGS:
       return {
         ...state,
-        searchFetchPostLoading: true,
-      };
-    case SEARCH_FETCH_POST_DETAILS.SUCCESS: {
-      const { author, permlink } = action.payload;
-      const postKey = `${author}/${permlink}`;
-      return {
-        ...state,
-        searchFetchPostLoading: false,
-        currentSearchedPosts: {
-          ...state.currentSearchedPosts,
-          [postKey]: action.payload,
-        },
-      };
-    }
-    case SEARCH_FETCH_POST_DETAILS.ERROR:
-      return {
-        ...state,
-        searchFetchPostLoading: false,
+        allTrendingTags: action.payload,
       };
     default:
       return state;
@@ -68,5 +68,10 @@ export default function(state = INITIAL_STATE, action) {
 
 export const getSearchLoading = state => state.loading;
 export const getSearchResults = state => state.searchResults;
-export const getCurrentSearchedPosts = state => state.currentSearchedPosts;
-export const getSearchFetchPostLoading = state => state.searchFetchPostLoading;
+export const getAllTrendingTags = state => state.allTrendingTags;
+export const getSearchUserResults = state => state.searchUserResults;
+export const getSearchPostResults = state => state.searchPostResults;
+export const getSearchTagsResults = state => state.searchTagsResults;
+export const getLoadingSearchUser = state => state.loadingSearchUser;
+export const getLoadingSearchPost = state => state.loadingSearchPost;
+export const getLoadingSearchTag = state => state.loadingSearchTag;

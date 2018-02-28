@@ -1,9 +1,16 @@
 import _ from 'lodash';
-import { SEARCH_ASK_STEEM } from 'state/actions/actionTypes';
-import { takeLatest, call, all, put } from 'redux-saga/effects';
-import { searchAskSteem, searchFetchPostDetails } from 'state/actions/searchActions';
+import {
+  SEARCH_ASK_STEEM,
+  SEARCH_FETCH_USERS,
+  SEARCH_FETCH_POST_DETAILS,
+  SEARCH_FETCH_TAGS,
+} from 'state/actions/actionTypes';
+import { getAllTrendingTags } from 'state/rootReducer';
+import { takeLatest, call, all, put, select } from 'redux-saga/effects';
+import * as searchActions from 'state/actions/searchActions';
 import API from 'api/api';
-import { SEARCH_FETCH_POST_DETAILS } from '../actions/actionTypes';
+
+// todo split up search into 3 sections, posts, users, tags
 
 const fetchAskSteemSearchResults = function*(action) {
   try {
@@ -31,24 +38,44 @@ const fetchAskSteemSearchResults = function*(action) {
       steemAccountLookupResults: formattedSteemAccountReputationResults,
     };
 
-    yield put(searchAskSteem.success(payload));
+    yield put(searchActions.searchAskSteem.success(payload));
   } catch (error) {
     console.log(error);
-    yield put(searchAskSteem.fail(error));
+    yield put(searchActions.searchAskSteem.fail(error));
   }
 };
 
-const fetchSearchPostDetails = function*(action) {
+const fetchUsersSearchResults = function*(action) {
   try {
-    const { author, permlink } = action.payload;
-    const result = yield call(API.getContent, author, permlink);
-    if (result.error) {
-      yield put(searchFetchPostDetails.fail());
+    const search = action.payload;
+    const response = yield call(API.getAccountReputation, search);
+    yield put(searchActions.searchFetchUsers.success(response.result));
+  } catch (error) {
+    yield put(searchActions.searchFetchUsers.fail(error));
+  } finally {
+    yield put(searchActions.searchFetchUsers.loadingEnd());
+  }
+};
+
+const fetchTagsSearchResults = function*(action) {
+  try {
+    const search = action.payload;
+    const allTrendingTags = yield select(getAllTrendingTags);
+
+    if (_.isEmpty(allTrendingTags)) {
+      const tagsLimit = 500;
+      const trendingTags = yield call(API.getTags, tagsLimit);
+      const matchingTags = _.filter(trendingTags.result, tag => _.includes(tag.name, search));
+      yield put(searchActions.setTrendingTags(trendingTags.result));
+      yield put(searchActions.searchFetchTags.success(matchingTags));
     } else {
-      yield put(searchFetchPostDetails.success(result.result));
+      const matchingTags = _.filter(allTrendingTags, tag => _.includes(tag.name, search));
+      yield put(searchActions.searchFetchTags.success(matchingTags));
     }
   } catch (error) {
-    yield put(searchFetchPostDetails.fail(error));
+    yield put(searchActions.searchFetchTags.fail(error));
+  } finally {
+    yield put(searchActions.searchFetchTags.loadingEnd());
   }
 };
 
@@ -56,8 +83,10 @@ export const watchSearchAskSteem = function*() {
   yield takeLatest(SEARCH_ASK_STEEM.ACTION, fetchAskSteemSearchResults);
 };
 
-export const watchSearchFetchPostDetails = function*() {
-  yield takeLatest(SEARCH_FETCH_POST_DETAILS.ACTION, fetchSearchPostDetails);
+export const watchFetchUsersSearchResults = function*() {
+  yield takeLatest(SEARCH_FETCH_USERS.ACTION, fetchUsersSearchResults);
 };
 
-export default null;
+export const watchFetchTagsSearchResults = function*() {
+  yield takeLatest(SEARCH_FETCH_TAGS.ACTION, fetchTagsSearchResults);
+};

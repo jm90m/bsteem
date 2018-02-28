@@ -2,15 +2,14 @@ import React, { Component } from 'react';
 import { ListView } from 'react-native';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { SearchBar } from 'react-native-elements';
 import { connect } from 'react-redux';
-import firebase from 'firebase';
 import * as navigationConstants from 'constants/navigation';
 import styled from 'styled-components/native';
 import { fetchTags } from 'state/actions/homeActions';
 import { searchAskSteem } from 'state/actions/searchActions';
-import { COLORS, MATERIAL_ICONS } from 'constants/styles';
+import { COLORS, MATERIAL_ICONS, MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
 import { getSearchResults, getSearchLoading, getIsAuthenticated } from 'state/rootReducer';
 import SearchPostPreview from 'components/search/SearchPostPreview';
 import SearchUserPreview from 'components/search/SearchUserPreview';
@@ -34,6 +33,18 @@ const StyledListView = styled.ListView`
 const Loading = styled.ActivityIndicator`
   padding: 10px;
 `;
+
+const Menu = styled.View`
+  justify-content: space-around;
+  flex-direction: row;
+  padding: 10px 0;
+`;
+
+const MenuContent = styled.View`
+  flex-direction: row;
+`;
+
+const MenuAmount = styled.Text``;
 
 const mapStateToProps = state => ({
   authenticated: getIsAuthenticated(state),
@@ -157,6 +168,22 @@ class SearchScreen extends Component {
     }
 
     return null;
+  }
+
+  renderMenu() {
+    return (
+      <Menu>
+        <MenuContent>
+          <MaterialCommunityIcons name={MATERIAL_COMMUNITY_ICONS.account} size={24} />
+        </MenuContent>
+        <MenuContent>
+          <MaterialCommunityIcons name={MATERIAL_COMMUNITY_ICONS.tag} size={24} />
+        </MenuContent>
+        <MenuContent>
+          <MaterialCommunityIcons name={MATERIAL_COMMUNITY_ICONS.posts} size={24} />
+        </MenuContent>
+      </Menu>
+    );
   }
 
   render() {

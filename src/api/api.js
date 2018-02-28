@@ -67,8 +67,8 @@ class API {
     return sendPostRequest(API.BASE_URL, requestQuery);
   }
 
-  static async getTags() {
-    const requestQuery = API.createRequestQuery('get_trending_tags', [null, 50]);
+  static async getTags(limit = 50) {
+    const requestQuery = API.createRequestQuery('get_trending_tags', [null, limit]);
     return sendPostRequest(API.BASE_URL, requestQuery);
   }
 

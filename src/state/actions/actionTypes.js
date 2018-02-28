@@ -19,6 +19,9 @@ export const SEARCH_ASK_STEEM = createAsyncActionType('@search/search-ask-steem'
 export const SEARCH_FETCH_POST_DETAILS = createAsyncActionType(
   "@'@search/search-fetch-post-details",
 );
+export const SEARCH_FETCH_USERS = createAsyncActionType('@search/search-fetch-users');
+export const SEARCH_FETCH_TAGS = createAsyncActionType('@search/search-fetch-tags');
+export const SEARCH_SET_TRENDING_TAGS = '@search/search-set-trending-tags';
 
 // Auth Actions
 export const AUTHENTICATE_USER = createAsyncActionType('@authenticate-user');
