@@ -6,7 +6,8 @@ import { connect } from 'react-redux';
 import sc2 from 'api/sc2';
 import styled from 'styled-components/native';
 import { COLORS } from 'constants/styles';
-import { Button } from 'react-native-elements';
+import PrimaryButton from 'components/common/PrimaryButton';
+import SecondaryButton from 'components/common/SecondaryButton';
 import DEBUG from 'constants/debug';
 import {
   STEEM_ACCESS_TOKEN,
@@ -16,6 +17,7 @@ import {
 } from 'constants/asyncStorageKeys';
 import { authenticateUserError, authenticateUserSuccess } from 'state/actions/authActions';
 import i18n from 'i18n/i18n';
+import BsteemIcon from '../../../assets/icon.png';
 
 const mapDispatchToProps = dispatch => ({
   authenticateUserSuccess: payload => dispatch(authenticateUserSuccess(payload)),
@@ -37,9 +39,15 @@ const Description = styled.Text`
   padding: 20px;
   text-align: center;
   font-weight: bold;
+  font-size: 22px;
 `;
 
-@connect(null, mapDispatchToProps)
+const ButtonContainer = styled.View`
+  margin-top: 20px;
+`;
+
+const Logo = styled.Image``;
+
 class SteemConnectLogin extends Component {
   static propTypes = {
     authenticateUserSuccess: PropTypes.func.isRequired,
@@ -49,6 +57,7 @@ class SteemConnectLogin extends Component {
     super(props);
 
     this.handleSteemConnectLogin = this.handleSteemConnectLogin.bind(this);
+    this.handleSignUp = this.handleSignUp.bind(this);
   }
 
   async handleSteemConnectLogin() {
@@ -84,6 +93,17 @@ class SteemConnectLogin extends Component {
     }
   }
 
+  async handleSignUp() {
+    const signUpURL = 'https://signup.steemit.com/?ref=bsteem';
+    try {
+      Expo.WebBrowser.openBrowserAsync(signUpURL).catch(error => {
+        console.log('invalid url', error, signUpURL);
+      });
+    } catch (error) {
+      console.log('unable to open url', error, signUpURL);
+    }
+  }
+
   renderDebugText() {
     if (DEBUG) {
       return (
@@ -98,18 +118,27 @@ class SteemConnectLogin extends Component {
   render() {
     return (
       <Container>
+        <Logo source={BsteemIcon} style={{ width: 200, height: 200 }} resizeMode="contain" />
         <Description>{i18n.login.description}</Description>
-        <Button
-          onPress={this.handleSteemConnectLogin}
-          title="Login with SteemConnect"
-          fontWeight="bold"
-          borderRadius={10}
-          backgroundColor={COLORS.PRIMARY_COLOR}
-        />
+        <ButtonContainer>
+          <PrimaryButton
+            onPress={this.handleSteemConnectLogin}
+            title={i18n.login.loginWithSC}
+            fontWeight="bold"
+            backgroundColor={COLORS.PRIMARY_COLOR}
+          />
+        </ButtonContainer>
+        <ButtonContainer>
+          <SecondaryButton
+            onPress={this.handleSignUp}
+            fontWeight="bold"
+            title={i18n.login.signUp}
+          />
+        </ButtonContainer>
         {this.renderDebugText()}
       </Container>
     );
   }
 }
 
-export default SteemConnectLogin;
+export default connect(null, mapDispatchToProps)(SteemConnectLogin);

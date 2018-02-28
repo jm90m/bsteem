@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components/native';
 import Expo, { AuthSession } from 'expo';
-import { Modal, Dimensions, AsyncStorage } from 'react-native';
+import { Modal, AsyncStorage } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import i18n from 'i18n/i18n';
 import { COLORS, MATERIAL_ICONS } from 'constants/styles';
@@ -17,15 +17,14 @@ import {
 } from '../../constants/asyncStorageKeys';
 import BsteemIcon from '../../../assets/icon.png';
 
-const { width: deviceWidth } = Dimensions.get('screen');
-
 const Container = styled.View`
   justify-content: center;
   align-items: center;
 `;
 
 const TitleText = styled.Text`
-  max-width: ${deviceWidth - 100}px;
+  padding: 20px;
+  text-align: center;
   font-weight: bold;
   font-size: 22px;
 `;
