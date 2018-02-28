@@ -55,6 +55,11 @@ const Author = styled.Text`
   font-weight: bold;
 `;
 
+const PostTitle = styled.Text`
+  font-weight: 700;
+  font-size: 20px;
+`;
+
 const mapStateToProps = state => ({
   authenticated: getIsAuthenticated(state),
   authUsername: getAuthUsername(state),
@@ -324,6 +329,7 @@ class PostScreen extends Component {
     const { authUsername } = this.props;
     const { body, parsedJsonMetadata, author } = this.props.navigation.state.params;
     const { displayPhotoBrowser, menuVisible, likedPost, loadingVote, postDetails } = this.state;
+    const title = _.get(postDetails, 'title', '');
     const parsedHtmlBody = getHtml(body, parsedJsonMetadata);
     const images = _.get(parsedJsonMetadata, 'image', []);
     const formattedImages = _.map(images, image => ({
@@ -354,6 +360,7 @@ class PostScreen extends Component {
             currentUsername={authUsername}
             hideMenuButton
           />
+          <PostTitle>{title}</PostTitle>
           {this.renderEmbed()}
           <HTML
             html={parsedHtmlBody}

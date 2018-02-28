@@ -61,6 +61,11 @@ const NoPostFoundContainer = styled.View`
 
 const NoPostFoundText = styled.Text``;
 
+const PostTitle = styled.Text`
+  font-weight: 700;
+  font-size: 20px;
+`;
+
 const mapStateToProps = state => ({
   postsDetails: getPostsDetails(state),
   postLoading: getPostLoading(state),
@@ -355,7 +360,7 @@ class FetchPostScreen extends Component {
       return this.renderNoPostFound();
     }
 
-    const { body, json_metadata } = currentPostDetails;
+    const { body, json_metadata, title } = currentPostDetails;
     const jsonParse = _.attempt(JSON.parse, json_metadata);
     const parsedJsonMetadata = _.isError(jsonParse) ? {} : jsonParse;
     const parsedHtmlBody = getHtml(body, parsedJsonMetadata);
@@ -415,6 +420,7 @@ class FetchPostScreen extends Component {
             currentUsername={authUsername}
             hideMenuButton
           />
+          <PostTitle>{title}</PostTitle>
           {this.renderEmbed()}
           <HTML
             html={parsedHtmlBody}
