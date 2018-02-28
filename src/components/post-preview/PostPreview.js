@@ -23,6 +23,7 @@ import Header from './Header';
 import BodyShort from './BodyShort';
 import PostImage from '../post/PostImage';
 import { getPostPreviewComponents, getEmbeds } from '../../util/postPreviewUtils';
+import withAuthActions from '../common/withAuthActions';
 
 const Container = styled.View`
   background-color: ${COLORS.WHITE.WHITE};
@@ -92,6 +93,7 @@ class PostPreview extends Component {
     authUsername: PropTypes.string,
     currentUserReblogPost: PropTypes.func.isRequired,
     currentUserVotePost: PropTypes.func.isRequired,
+    onActionInitiated: PropTypes.func.isRequired,
     navigation: PropTypes.shape().isRequired,
     postData: PropTypes.shape(),
     rebloggedList: PropTypes.arrayOf(PropTypes.string),
@@ -136,6 +138,8 @@ class PostPreview extends Component {
     this.handleHidePhotoBrowser = this.handleHidePhotoBrowser.bind(this);
     this.handleNavigateToVotes = this.handleNavigateToVotes.bind(this);
     this.handlePhotoBrowserShare = this.handlePhotoBrowserShare.bind(this);
+    this.handleAuthVote = this.handleAuthVote.bind(this);
+    this.handleReblogIconPress = this.handleReblogIconPress.bind(this);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -171,39 +175,39 @@ class PostPreview extends Component {
     });
   }
 
-  handleOnPressVote() {
-    const { navigation, authenticated, postData } = this.props;
-    this.handleHideMenu();
-    if (authenticated) {
-      const { author, permlink } = postData;
-      const { likedPost } = this.state;
+  handleAuthVote() {
+    const { postData } = this.props;
+    const { author, permlink } = postData;
+    const { likedPost } = this.state;
 
-      this.loadingVote();
+    this.loadingVote();
 
-      if (likedPost) {
-        const voteSuccessCallback = this.unlikedVoteSuccess;
-        const voteFailCalback = this.likedVoteSuccess;
-        this.props.currentUserVotePost(
-          author,
-          permlink,
-          postConstants.DEFAULT_UNVOTE_WEIGHT,
-          voteSuccessCallback,
-          voteFailCalback,
-        );
-      } else {
-        const voteSuccessCallback = this.likedVoteSuccess;
-        const voteFailCallback = this.unlikedVoteSuccess;
-        this.props.currentUserVotePost(
-          author,
-          permlink,
-          postConstants.DEFAULT_VOTE_WEIGHT,
-          voteSuccessCallback,
-          voteFailCallback,
-        );
-      }
+    if (likedPost) {
+      const voteSuccessCallback = this.unlikedVoteSuccess;
+      const voteFailCalback = this.likedVoteSuccess;
+      this.props.currentUserVotePost(
+        author,
+        permlink,
+        postConstants.DEFAULT_UNVOTE_WEIGHT,
+        voteSuccessCallback,
+        voteFailCalback,
+      );
     } else {
-      navigation.navigate(navigationConstants.LOGIN);
+      const voteSuccessCallback = this.likedVoteSuccess;
+      const voteFailCallback = this.unlikedVoteSuccess;
+      this.props.currentUserVotePost(
+        author,
+        permlink,
+        postConstants.DEFAULT_VOTE_WEIGHT,
+        voteSuccessCallback,
+        voteFailCallback,
+      );
     }
+  }
+
+  handleOnPressVote() {
+    this.handleHideMenu();
+    this.props.onActionInitiated(this.handleAuthVote);
   }
 
   loadingReblogStart() {
@@ -221,15 +225,14 @@ class PostPreview extends Component {
   }
 
   showReblogModal() {
+    this.setState({
+      displayReblogModal: true,
+    });
+  }
+
+  handleReblogIconPress() {
     this.handleHideMenu();
-    const { authenticated, navigation } = this.props;
-    if (authenticated) {
-      this.setState({
-        displayReblogModal: true,
-      });
-    } else {
-      navigation.navigate(navigationConstants.LOGIN);
-    }
+    this.props.onActionInitiated(this.showReblogModal);
   }
 
   hideReblogModal() {
@@ -387,7 +390,7 @@ class PostPreview extends Component {
           onPressVote={this.handleOnPressVote}
           handleNavigateToComments={this.handleNavigateToComments}
           postData={postData}
-          reblogPost={this.showReblogModal}
+          reblogPost={this.handleReblogIconPress}
           rebloggedList={rebloggedList}
           handleNavigateToVotes={this.handleNavigateToVotes}
         />
@@ -418,7 +421,7 @@ class PostPreview extends Component {
             hideMenu={this.handleHideMenu}
             postData={postData}
             handleNavigateToComments={this.handleNavigateToComments}
-            handleReblog={this.showReblogModal}
+            handleReblog={this.handleReblogIconPress}
             handleLikePost={this.handleOnPressVote}
             rebloggedList={rebloggedList}
             likedPost={likedPost}
@@ -429,4 +432,4 @@ class PostPreview extends Component {
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(PostPreview);
+export default connect(mapStateToProps, mapDispatchToProps)(withAuthActions(PostPreview));
