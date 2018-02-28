@@ -28,6 +28,7 @@ import * as postConstants from 'constants/postConstants';
 import i18n from 'i18n/i18n';
 import { currentUserVotePost } from 'state/actions/currentUserActions';
 import { isPostVoted } from '../../util/voteUtils';
+import PostHeader from 'components/post-preview/Header';
 
 const { width: deviceWidth } = Dimensions.get('screen');
 
@@ -322,7 +323,7 @@ class FetchPostScreen extends Component {
 
   render() {
     const { author } = this.props.navigation.state.params;
-    const { postLoading } = this.props;
+    const { postLoading, authUsername } = this.props;
     const {
       displayPhotoBrowser,
       menuVisible,
@@ -388,6 +389,12 @@ class FetchPostScreen extends Component {
           handleAction={this.handlePhotoBrowserShare}
         />
         <ScrollView style={{ padding: 10, backgroundColor: COLORS.WHITE.WHITE }}>
+          <PostHeader
+            navigation={this.props.navigation}
+            postData={currentPostDetails}
+            currentUsername={authUsername}
+            hideMenuButton
+          />
           <HTML
             html={parsedHtmlBody}
             imagesMaxWidth={deviceWidth - widthOffset}
