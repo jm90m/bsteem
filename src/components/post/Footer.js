@@ -231,14 +231,19 @@ class Footer extends Component {
         >
           <Payout>${formattedDisplayedPayout}</Payout>
         </TouchableOpacity>
-        <Modal
-          animationType="slide"
-          transparent
-          visible={displayReblogModal}
-          onRequestClose={this.hideReblogModal}
-        >
-          <ReblogModal closeModal={this.hideReblogModal} confirmReblog={this.handleReblogConfirm} />
-        </Modal>
+        {displayReblogModal && (
+          <Modal
+            animationType="slide"
+            transparent
+            visible={displayReblogModal}
+            onRequestClose={this.hideReblogModal}
+          >
+            <ReblogModal
+              closeModal={this.hideReblogModal}
+              confirmReblog={this.handleReblogConfirm}
+            />
+          </Modal>
+        )}
       </Container>
     );
   }

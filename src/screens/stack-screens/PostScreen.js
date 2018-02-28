@@ -22,13 +22,15 @@ import PostMenu from 'components/post-menu/PostMenu';
 import HTML from 'react-native-render-html';
 import FooterTags from 'components/post/FooterTags';
 import Footer from 'components/post/Footer';
+import PostHeader from 'components/post-preview/Header';
 import Header from 'components/common/Header';
 import PrimaryButton from '../../components/common/PrimaryButton';
 import { currentUserVotePost } from '../../state/actions/currentUserActions';
 import * as postConstants from '../../constants/postConstants';
 import { isPostVoted } from '../../util/voteUtils';
 import { fetchPostDetails } from '../../state/actions/postsActions';
-import PostHeader from 'components/post-preview/Header';
+import EmbedContent from 'components/post-preview/EmbedContent';
+import { getEmbeds } from '../../util/postPreviewUtils';
 
 const { width: deviceWidth } = Dimensions.get('screen');
 
@@ -304,6 +306,20 @@ class PostScreen extends Component {
     });
   }
 
+  renderEmbed() {
+    const { postDetails } = this.state;
+    const embedOptions = {};
+    const embeds = getEmbeds(postDetails, embedOptions);
+    const firstEmbed = _.head(embeds);
+    const hasVideo = !_.isEmpty(firstEmbed);
+
+    if (hasVideo) {
+      return <EmbedContent embedContent={firstEmbed} />;
+    }
+
+    return null;
+  }
+
   render() {
     const { authUsername } = this.props;
     const { body, parsedJsonMetadata, author } = this.props.navigation.state.params;
@@ -338,6 +354,7 @@ class PostScreen extends Component {
             currentUsername={authUsername}
             hideMenuButton
           />
+          {this.renderEmbed()}
           <HTML
             html={parsedHtmlBody}
             imagesMaxWidth={deviceWidth - widthOffset}
@@ -358,31 +375,35 @@ class PostScreen extends Component {
             style={{ marginTop: 20, marginBottom: 40 }}
           />
         </ScrollView>
-        <Modal
-          animationType="slide"
-          transparent
-          visible={menuVisible}
-          onRequestClose={this.handleHideMenu}
-        >
-          <PostMenu
-            hideMenu={this.handleHideMenu}
-            handleLikePost={this.handleLikePost}
-            likedPost={likedPost}
-            loadingVote={loadingVote}
-            handleNavigateToComments={this.navigateToComments}
-            postData={postDetails}
-            displayPhotoBrowserMenu={displayPhotoBrowserMenu}
-            handleDisplayPhotoBrowser={this.handleDisplayPhotoBrowser}
-            hideReblogMenu
+        {menuVisible && (
+          <Modal
+            animationType="slide"
+            transparent
+            visible={menuVisible}
+            onRequestClose={this.handleHideMenu}
+          >
+            <PostMenu
+              hideMenu={this.handleHideMenu}
+              handleLikePost={this.handleLikePost}
+              likedPost={likedPost}
+              loadingVote={loadingVote}
+              handleNavigateToComments={this.navigateToComments}
+              postData={postDetails}
+              displayPhotoBrowserMenu={displayPhotoBrowserMenu}
+              handleDisplayPhotoBrowser={this.handleDisplayPhotoBrowser}
+              hideReblogMenu
+            />
+          </Modal>
+        )}
+        {displayPhotoBrowser && (
+          <PostPhotoBrowser
+            displayPhotoBrowser={displayPhotoBrowser}
+            mediaList={formattedImages}
+            initialPhotoIndex={0}
+            handleClose={this.handleHidePhotoBrowser}
+            handleAction={this.handlePhotoBrowserShare}
           />
-        </Modal>
-        <PostPhotoBrowser
-          displayPhotoBrowser={displayPhotoBrowser}
-          mediaList={formattedImages}
-          initialPhotoIndex={0}
-          handleClose={this.handleHidePhotoBrowser}
-          handleAction={this.handlePhotoBrowserShare}
-        />
+        )}
       </Container>
     );
   }

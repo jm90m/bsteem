@@ -23,12 +23,12 @@ import FooterTags from 'components/post/FooterTags';
 import Footer from 'components/post/Footer';
 import Header from 'components/common/Header';
 import BackButton from 'components/common/BackButton';
+import PostHeader from 'components/post-preview/Header';
 import PrimaryButton from 'components/common/PrimaryButton';
 import * as postConstants from 'constants/postConstants';
 import i18n from 'i18n/i18n';
 import { currentUserVotePost } from 'state/actions/currentUserActions';
 import { isPostVoted } from '../../util/voteUtils';
-import PostHeader from 'components/post-preview/Header';
 
 const { width: deviceWidth } = Dimensions.get('screen');
 

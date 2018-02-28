@@ -13,6 +13,7 @@ const Container = styled.View`
   flex: 1;
   flex-direction: column-reverse;
   align-items: center;
+  background-color: rgba(0, 0, 0, 0.5);
 `;
 
 const MenuText = styled.Text`
@@ -45,9 +46,7 @@ class CurrentUserMenu extends Component {
               >
                 <MenuModalContents>
                   <MaterialIcons size={20} name={option.icon} color={COLORS.PRIMARY_COLOR} />
-                  <MenuText>
-                    {option.label}
-                  </MenuText>
+                  <MenuText>{option.label}</MenuText>
                 </MenuModalContents>
               </MenuModalButton>
             ))}

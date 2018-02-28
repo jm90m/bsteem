@@ -394,14 +394,19 @@ class PostPreview extends Component {
           rebloggedList={rebloggedList}
           handleNavigateToVotes={this.handleNavigateToVotes}
         />
-        <Modal
-          animationType="slide"
-          transparent
-          visible={displayReblogModal}
-          onRequestClose={this.hideReblogModal}
-        >
-          <ReblogModal closeModal={this.hideReblogModal} confirmReblog={this.handleReblogConfirm} />
-        </Modal>
+        {displayReblogModal && (
+          <Modal
+            animationType="slide"
+            transparent
+            visible={displayReblogModal}
+            onRequestClose={this.hideReblogModal}
+          >
+            <ReblogModal
+              closeModal={this.hideReblogModal}
+              confirmReblog={this.handleReblogConfirm}
+            />
+          </Modal>
+        )}
         {displayPhotoBrowser && (
           <PostPhotoBrowser
             displayPhotoBrowser={displayPhotoBrowser}
@@ -411,22 +416,24 @@ class PostPreview extends Component {
             handleAction={this.handlePhotoBrowserShare}
           />
         )}
-        <Modal
-          animationType="slide"
-          transparent
-          visible={displayMenu}
-          onRequestClose={this.handleHideMenu}
-        >
-          <PostMenu
-            hideMenu={this.handleHideMenu}
-            postData={postData}
-            handleNavigateToComments={this.handleNavigateToComments}
-            handleReblog={this.handleReblogIconPress}
-            handleLikePost={this.handleOnPressVote}
-            rebloggedList={rebloggedList}
-            likedPost={likedPost}
-          />
-        </Modal>
+        {displayMenu && (
+          <Modal
+            animationType="slide"
+            transparent
+            visible={displayMenu}
+            onRequestClose={this.handleHideMenu}
+          >
+            <PostMenu
+              hideMenu={this.handleHideMenu}
+              postData={postData}
+              handleNavigateToComments={this.handleNavigateToComments}
+              handleReblog={this.handleReblogIconPress}
+              handleLikePost={this.handleOnPressVote}
+              rebloggedList={rebloggedList}
+              likedPost={likedPost}
+            />
+          </Modal>
+        )}
       </Container>
     );
   }

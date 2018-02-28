@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { TouchableWithoutFeedback } from 'react-native';
-import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons } from '@expo/vector-icons';
 import _ from 'lodash';
 import styled from 'styled-components/native';
 import { COLORS } from 'constants/styles';
@@ -13,6 +13,7 @@ const Container = styled.View`
   flex: 1;
   flex-direction: column-reverse;
   align-items: center;
+  background-color: rgba(0, 0, 0, 0.5);
 `;
 
 const MenuModalContents = styled.View`
@@ -42,9 +43,7 @@ class FeedSort extends Component {
               <MenuModalButton onPress={() => this.props.handleSortPost(filter)} key={filter.label}>
                 <MenuModalContents>
                   <MaterialIcons size={20} color={COLORS.PRIMARY_COLOR} name={filter.icon} />
-                  <MenuText>
-                    {filter.label}
-                  </MenuText>
+                  <MenuText>{filter.label}</MenuText>
                 </MenuModalContents>
               </MenuModalButton>
             ))}

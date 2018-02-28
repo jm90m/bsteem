@@ -40,17 +40,9 @@ const FilterMenuIcon = styled.View`
 
 const LoadingMoreContainer = styled.View`
   align-items: center;
-  background-color: transparent;
-  bottom: 0;
-  flex: 1;
-  height: 100%;
   justify-content: center;
-  left: 0;
-  position: absolute;
-  right: 0;
-  top: 0;
-  width: 100%;
   z-index: 1;
+  margin-top: 20px;
 `;
 
 const mapStateToProps = state => ({
@@ -180,18 +172,15 @@ class HomeScreen extends Component {
             />
           </TouchableOpacity>
         </Header>
-        <Modal
-          animationType="slide"
-          transparent
-          visible={menuVisible}
-          onRequestClose={this.handleHideMenu}
-        >
-          <FeedSort hideMenu={this.handleHideMenu} handleSortPost={this.handleSortPost} />
-        </Modal>
-        {loadingFetchMoreDiscussions && (
-          <LoadingMoreContainer>
-            <LargeLoading />
-          </LoadingMoreContainer>
+        {menuVisible && (
+          <Modal
+            animationType="slide"
+            transparent
+            visible={menuVisible}
+            onRequestClose={this.handleHideMenu}
+          >
+            <FeedSort hideMenu={this.handleHideMenu} handleSortPost={this.handleSortPost} />
+          </Modal>
         )}
         <StyledListView
           dataSource={dataSource}
@@ -206,6 +195,11 @@ class HomeScreen extends Component {
             />
           }
         />
+        {(loadingFetchMoreDiscussions || loadingFetchDiscussions) && (
+          <LoadingMoreContainer>
+            <LargeLoading />
+          </LoadingMoreContainer>
+        )}
       </View>
     );
   }
