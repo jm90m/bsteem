@@ -9,6 +9,7 @@ import { COLORS } from 'constants/styles';
 import _ from 'lodash';
 import * as navigationConstants from 'constants/navigation';
 import Avatar from 'components/common/Avatar';
+import withAuthActions from 'components/common/withAuthActions';
 import CommentFooter from './CommentFooter';
 import CommentContent from './CommentContent';
 import { calculatePayout } from '../../../util/steemitUtils';
@@ -36,6 +37,7 @@ const CommentChildrenContainer = styled.View`
   margin-left: ${COMMENT_PADDING}px;
 `;
 
+@withAuthActions
 class Comment extends Component {
   static propTypes = {
     authUsername: PropTypes.string.isRequired,
@@ -44,6 +46,7 @@ class Comment extends Component {
     parent: PropTypes.shape().isRequired,
     navigation: PropTypes.shape().isRequired,
     currentUserVoteComment: PropTypes.func.isRequired,
+    onActionInitiated: PropTypes.func,
     sort: PropTypes.oneOf([SORT_COMMENTS.BEST, SORT_COMMENTS.NEWEST, SORT_COMMENTS.OLDEST]),
     //rewardFund: PropTypes.shape().isRequired,
     rootPostAuthor: PropTypes.string,
@@ -72,6 +75,7 @@ class Comment extends Component {
     onLikeClick: () => {},
     onDislikeClick: () => {},
     onSendComment: () => {},
+    onActionInitiated: undefined,
   };
 
   constructor(props) {
@@ -103,6 +107,10 @@ class Comment extends Component {
     this.handleReply = this.handleReply.bind(this);
     this.handleEdit = this.handleEdit.bind(this);
     this.handlePayout = this.handlePayout.bind(this);
+
+    this.likeComment = this.likeComment.bind(this);
+    this.dislikeComment = this.dislikeComment.bind(this);
+    this.replyComment = this.replyComment.bind(this);
   }
 
   setLiked(liked) {
@@ -154,14 +162,9 @@ class Comment extends Component {
     });
   }
 
-  handleLike() {
+  likeComment() {
     const { liked } = this.state;
-    const { comment, rootPostId, authenticated } = this.props;
-
-    if (!authenticated) {
-      // display login screen
-      return;
-    }
+    const { comment, rootPostId } = this.props;
 
     this.setLoadingLike(true);
 
@@ -179,15 +182,18 @@ class Comment extends Component {
     );
   }
 
-  handleDislike() {
-    const { disliked } = this.state;
-    const { comment, rootPostId, authenticated } = this.props;
-
-    if (!authenticated) {
-      // display login screen
-      return;
+  handleLike() {
+    const { authenticated, onActionInitiated } = this.props;
+    if (!_.isUndefined(onActionInitiated)) {
+      onActionInitiated(this.likeComment);
+    } else if (authenticated) {
+      this.likeComment();
     }
+  }
 
+  dislikeComment() {
+    const { disliked } = this.state;
+    const { comment, rootPostId } = this.props;
     this.setLoadingDislike(true);
 
     const weight = disliked ? 0 : -10000;
@@ -204,18 +210,33 @@ class Comment extends Component {
     );
   }
 
-  handleReply() {
-    const { authenticated, comment } = this.props;
+  handleDislike() {
+    const { authenticated, onActionInitiated } = this.props;
 
-    if (!authenticated) {
-      return;
+    if (!_.isUndefined(onActionInitiated)) {
+      this.props.onActionInitiated(this.dislikeComment);
+    } else if (authenticated) {
+      this.dislikeComment();
     }
+  }
 
+  replyComment() {
+    const { comment } = this.props;
     this.props.navigation.navigate(navigationConstants.REPLY, {
       comment,
       parentPost: comment,
       successCreateReply: this.setNewReplyComment,
     });
+  }
+
+  handleReply() {
+    const { authenticated, onActionInitiated } = this.props;
+
+    if (!_.isUndefined(onActionInitiated)) {
+      this.props.onActionInitiated(this.replyComment);
+    } else if (authenticated) {
+      this.replyComment();
+    }
   }
 
   handleEdit() {
