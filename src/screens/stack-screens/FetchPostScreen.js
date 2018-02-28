@@ -28,7 +28,9 @@ import PrimaryButton from 'components/common/PrimaryButton';
 import * as postConstants from 'constants/postConstants';
 import i18n from 'i18n/i18n';
 import { currentUserVotePost } from 'state/actions/currentUserActions';
+import EmbedContent from 'components/post-preview/EmbedContent';
 import { isPostVoted } from '../../util/voteUtils';
+import { getEmbeds } from '../../util/postPreviewUtils';
 
 const { width: deviceWidth } = Dimensions.get('screen');
 
@@ -276,7 +278,7 @@ class FetchPostScreen extends Component {
       this.navigateToUser(user);
     } else if (isTag) {
       const tag = _.get(_.split(url, postConstants.POST_HTML_BODY_TAG), 1, 'bsteem');
-      this.navigateToFeed(tag);
+      this.handleFeedNavigation(tag);
     } else {
       try {
         Expo.WebBrowser.openBrowserAsync(url).catch(error => {
@@ -321,6 +323,20 @@ class FetchPostScreen extends Component {
     );
   }
 
+  renderEmbed() {
+    const currentPostDetails = this.getCurrentPostDetails();
+    const embedOptions = {};
+    const embeds = getEmbeds(currentPostDetails, embedOptions);
+    const firstEmbed = _.head(embeds);
+    const hasVideo = !_.isEmpty(firstEmbed);
+
+    if (hasVideo) {
+      return <EmbedContent embedContent={firstEmbed} width={deviceWidth - 20} />;
+    }
+
+    return null;
+  }
+
   render() {
     const { author } = this.props.navigation.state.params;
     const { postLoading, authUsername } = this.props;
@@ -363,31 +379,35 @@ class FetchPostScreen extends Component {
             </Touchable>
           </Menu>
         </Header>
-        <Modal
-          animationType="slide"
-          transparent
-          visible={menuVisible}
-          onRequestClose={this.handleHideMenu}
-        >
-          <PostMenu
-            hideMenu={this.handleHideMenu}
-            handleLikePost={this.handleLikePost}
-            likedPost={likedPost}
-            loadingVote={loadingVote}
-            handleNavigateToComments={this.navigateToComments}
-            postData={currentPostDetails}
-            displayPhotoBrowserMenu={displayPhotoBrowserMenu}
-            handleDisplayPhotoBrowser={this.handleDisplayPhotoBrowser}
-            hideReblogMenu
+        {menuVisible && (
+          <Modal
+            animationType="slide"
+            transparent
+            visible={menuVisible}
+            onRequestClose={this.handleHideMenu}
+          >
+            <PostMenu
+              hideMenu={this.handleHideMenu}
+              handleLikePost={this.handleLikePost}
+              likedPost={likedPost}
+              loadingVote={loadingVote}
+              handleNavigateToComments={this.navigateToComments}
+              postData={currentPostDetails}
+              displayPhotoBrowserMenu={displayPhotoBrowserMenu}
+              handleDisplayPhotoBrowser={this.handleDisplayPhotoBrowser}
+              hideReblogMenu
+            />
+          </Modal>
+        )}
+        {displayPhotoBrowser && (
+          <PostPhotoBrowser
+            displayPhotoBrowser={displayPhotoBrowser}
+            mediaList={formattedImages}
+            handleClose={this.handleHidePhotoBrowser}
+            initialPhotoIndex={initialPhotoIndex}
+            handleAction={this.handlePhotoBrowserShare}
           />
-        </Modal>
-        <PostPhotoBrowser
-          displayPhotoBrowser={displayPhotoBrowser}
-          mediaList={formattedImages}
-          handleClose={this.handleHidePhotoBrowser}
-          initialPhotoIndex={initialPhotoIndex}
-          handleAction={this.handlePhotoBrowserShare}
-        />
+        )}
         <ScrollView style={{ padding: 10, backgroundColor: COLORS.WHITE.WHITE }}>
           <PostHeader
             navigation={this.props.navigation}
@@ -395,6 +415,7 @@ class FetchPostScreen extends Component {
             currentUsername={authUsername}
             hideMenuButton
           />
+          {this.renderEmbed()}
           <HTML
             html={parsedHtmlBody}
             imagesMaxWidth={deviceWidth - widthOffset}

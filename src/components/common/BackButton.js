@@ -9,14 +9,19 @@ const BackTouchable = styled.TouchableOpacity`
   padding: 10px;
 `;
 
-const BackButton = ({ navigateBack }) => (
+const BackButton = ({ navigateBack, iconName }) => (
   <BackTouchable onPress={navigateBack}>
-    <MaterialIcons size={ICON_SIZES.menuIcon} name={MATERIAL_ICONS.back} />
+    <MaterialIcons size={ICON_SIZES.menuIcon} name={iconName} />
   </BackTouchable>
 );
 
 BackButton.propTypes = {
   navigateBack: PropTypes.func.isRequired,
+  iconName: PropTypes.string,
+};
+
+BackButton.defaultProps = {
+  iconName: MATERIAL_ICONS.back,
 };
 
 export default BackButton;

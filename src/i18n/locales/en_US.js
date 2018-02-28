@@ -7,6 +7,7 @@ export default {
     comments: 'Comments',
     replyTo: 'Reply to',
     editComment: 'Edit Comment',
+    postPreview: 'Post Preview',
   },
   editor: {
     title: 'Title',

@@ -13,7 +13,7 @@ import {
 } from 'state/rootReducer';
 import { currentUserFeedFetch, currentUserFeedFetchMore } from 'state/actions/currentUserActions';
 import PostPreview from 'components/post-preview/PostPreview';
-import LargeLoadingCenter from 'components/common/LargeLoadingCenter';
+import LargeLoading from 'components/common/LargeLoadingCenter';
 
 const Container = styled.View`
   flex: 1;
@@ -22,6 +22,13 @@ const Container = styled.View`
 const StyledListView = styled.ListView`
   flex: 1;
   background-color: ${COLORS.WHITE.WHITE_SMOKE};
+`;
+
+const LoadingMoreContainer = styled.View`
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+  margin-top: 20px;
 `;
 
 const mapStateToProps = state => ({
@@ -104,7 +111,11 @@ class CurrentUserFeed extends Component {
             />
           }
         />
-        {loadingFetchMoreCurrentUserFeed && <LargeLoadingCenter />}
+        {(loadingFetchMoreCurrentUserFeed || loadingFetchCurrentUserFeed) && (
+          <LoadingMoreContainer>
+            <LargeLoading />
+          </LoadingMoreContainer>
+        )}
       </Container>
     );
   }

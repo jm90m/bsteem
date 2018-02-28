@@ -314,7 +314,7 @@ class PostScreen extends Component {
     const hasVideo = !_.isEmpty(firstEmbed);
 
     if (hasVideo) {
-      return <EmbedContent embedContent={firstEmbed} />;
+      return <EmbedContent embedContent={firstEmbed} width={deviceWidth - 20} />;
     }
 
     return null;

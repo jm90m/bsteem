@@ -20,6 +20,7 @@ import SmallLoading from 'components/common/SmallLoading';
 import PrimaryButton from 'components/common/PrimaryButton';
 import HeaderEmptyView from 'components/common/HeaderEmptyView';
 import { MATERIAL_COMMUNITY_ICONS } from '../../constants/styles';
+import PostCreationPreviewModal from './PostCreationPreviewModal';
 
 const { width: deviceWidth } = Dimensions.get('screen');
 
@@ -96,6 +97,8 @@ class PostCreationScreen extends Component {
     bodyError: '',
     additionalPostContents: [],
     additionalInputCounter: 0,
+    previewVisible: false,
+    currentPostData: { body: '' },
   };
 
   constructor(props) {
@@ -116,6 +119,9 @@ class PostCreationScreen extends Component {
     this.addTextInput = this.addTextInput.bind(this);
     this.renderAdditionalContents = this.renderAdditionalContents.bind(this);
     this.removeAdditionalContent = this.removeAdditionalContent.bind(this);
+
+    this.hidePreview = this.hidePreview.bind(this);
+    this.showPreview = this.showPreview.bind(this);
   }
 
   onChangeTitle(value) {
@@ -168,7 +174,6 @@ class PostCreationScreen extends Component {
   async pickImage() {
     const result = await ImagePicker.launchImageLibraryAsync({
       allowsEditing: true,
-      aspect: [4, 4],
     });
 
     console.log('IMAGE PICKER', result);
@@ -254,6 +259,19 @@ class PostCreationScreen extends Component {
     data.jsonMetadata = metaData;
 
     return data;
+  }
+
+  hidePreview() {
+    this.setState({
+      previewVisible: false,
+    });
+  }
+
+  showPreview() {
+    this.setState({
+      previewVisible: true,
+      currentPostData: this.getPostData(),
+    });
   }
 
   removeTag(tag) {
@@ -408,6 +426,8 @@ class PostCreationScreen extends Component {
       tagError,
       imageLoading,
       titleError,
+      previewVisible,
+      currentPostData,
     } = this.state;
     const displayTitleError = !_.isEmpty(titleError);
 
@@ -416,11 +436,11 @@ class PostCreationScreen extends Component {
         <Header>
           <HeaderEmptyView />
           <CreatePostText>{i18n.titles.createPost}</CreatePostText>
-          <TouchableMenu onPress={() => {}}>
+          <TouchableMenu onPress={this.showPreview}>
             <TouchableMenuContainer>
               <MaterialCommunityIcons
                 size={ICON_SIZES.menuIcon}
-                name={MATERIAL_COMMUNITY_ICONS.menuVertical}
+                name={MATERIAL_COMMUNITY_ICONS.magnify}
               />
             </TouchableMenuContainer>
           </TouchableMenu>
@@ -477,6 +497,11 @@ class PostCreationScreen extends Component {
             </ActionButtons>
           </ActionButtonsContainer>
         </StyledScrollView>
+        <PostCreationPreviewModal
+          handleHidePreview={this.hidePreview}
+          previewVisible={previewVisible}
+          postData={currentPostData}
+        />
       </Container>
     );
   }
