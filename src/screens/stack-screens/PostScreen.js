@@ -28,6 +28,7 @@ import { currentUserVotePost } from '../../state/actions/currentUserActions';
 import * as postConstants from '../../constants/postConstants';
 import { isPostVoted } from '../../util/voteUtils';
 import { fetchPostDetails } from '../../state/actions/postsActions';
+import PostHeader from 'components/post-preview/Header';
 
 const { width: deviceWidth } = Dimensions.get('screen');
 
@@ -304,6 +305,7 @@ class PostScreen extends Component {
   }
 
   render() {
+    const { authUsername } = this.props;
     const { body, parsedJsonMetadata, author } = this.props.navigation.state.params;
     const { displayPhotoBrowser, menuVisible, likedPost, loadingVote, postDetails } = this.state;
     const parsedHtmlBody = getHtml(body, parsedJsonMetadata);
@@ -330,6 +332,12 @@ class PostScreen extends Component {
           </Menu>
         </Header>
         <ScrollView style={{ padding: 10, backgroundColor: COLORS.WHITE.WHITE }}>
+          <PostHeader
+            navigation={this.props.navigation}
+            postData={postDetails}
+            currentUsername={authUsername}
+            hideMenuButton
+          />
           <HTML
             html={parsedHtmlBody}
             imagesMaxWidth={deviceWidth - widthOffset}
