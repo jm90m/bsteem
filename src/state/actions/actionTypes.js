@@ -85,6 +85,9 @@ export const UNSAVE_TAG = createAsyncActionType('@firebase/unsave-tag');
 export const FETCH_SAVED_POSTS = createAsyncActionType('@firebase/fetch-saved-posts');
 export const SAVE_POST = createAsyncActionType('@firebase/save-post');
 export const UNSAVE_POST = createAsyncActionType('@firebase/unsave-post');
+export const FETCH_SAVED_USERS = createAsyncActionType('@firebase/fetch-saved-users');
+export const SAVE_USER = createAsyncActionType('@firebase/save-user');
+export const UNSAVE_USER = createAsyncActionType('@firebase/unsave-user');
 
 // Posts Actions
 export const FETCH_POST_DETAILS = createAsyncActionType('@posts/fetch-post-details');

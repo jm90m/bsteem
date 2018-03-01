@@ -30,7 +30,7 @@ export const getLoadingFetchDiscussions = state => fromHome.getLoadingFetchDiscu
 export const getLoadingFetchMoreDiscussions = state =>
   fromHome.getLoadingFetchMoreDiscussions(state.home);
 export const getHomeFeedPosts = state => fromHome.getHomeFeedPosts(state.home);
-export const getHomeTags = state => fromHome.getHomeTags(state.home)
+export const getHomeTags = state => fromHome.getHomeTags(state.home);
 
 // User Selectors
 export const getUsersDetails = state => fromUsers.getUsersDetails(state.users);
@@ -98,10 +98,13 @@ export const getCreatePostLoading = state => fromEditor.getCreatePostLoading(sta
 // Firebase Selectors
 export const getLoadingSavedTags = state => fromFirebase.getLoadingSavedTags(state.firebase);
 export const getLoadingSavedPosts = state => fromFirebase.getLoadingSavedPosts(state.firebase);
+export const getLoadingSavedUsers = state => fromFirebase.getLoadingSavedUsers(state.firebase);
 export const getSavedTags = state => fromFirebase.getSavedTags(state.firebase);
+export const getSavedPosts = state => fromFirebase.getSavedPosts(state.firebase);
+export const getSavedUsers = state => fromFirebase.getSavedUsers(state.firebase);
 export const getPendingSavingTags = state => fromFirebase.getPendingSavingTags(state.firebase);
 export const getPendingSavingPosts = state => fromFirebase.getPendingSavingPosts(state.firebase);
-export const getSavedPosts = state => fromFirebase.getSavedPosts(state.firebase);
+export const getPendingSavingUsers = state => fromFirebase.getPendingSavingUsers(state.firebase);
 
 // Posts Selectors
 export const getPostsDetails = state => fromPosts.getPostsDetails(state.posts);

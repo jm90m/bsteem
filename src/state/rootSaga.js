@@ -65,6 +65,9 @@ const rootSaga = function*() {
     spawn(firebaseSaga.watchFetchSavedPosts),
     spawn(firebaseSaga.watchSavePost),
     spawn(firebaseSaga.watchUnsavePost),
+    spawn(firebaseSaga.watchFetchSavedUsers),
+    spawn(firebaseSaga.watchSaveUser),
+    spawn(firebaseSaga.watchUnsaveUser),
   ]);
 };
 

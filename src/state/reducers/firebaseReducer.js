@@ -1,13 +1,23 @@
 import _ from 'lodash';
-import { FETCH_SAVED_TAGS, SAVE_TAG, SAVE_POST, FETCH_SAVED_POSTS } from '../actions/actionTypes';
+import {
+  FETCH_SAVED_TAGS,
+  SAVE_TAG,
+  SAVE_POST,
+  FETCH_SAVED_POSTS,
+  FETCH_SAVED_USERS,
+  SAVE_USER,
+} from '../actions/actionTypes';
 
 const INITIAL_STATE = {
   savedTags: [],
+  savedPosts: [],
+  savedUsers: [],
   pendingSavingTags: [],
   pendingSavingPosts: [],
-  savedPosts: [],
+  pendingSavingUsers: [],
   loadingSavedTags: false,
   loadingSavedPosts: false,
+  loadingSavedUsers: false,
 };
 
 export default (state = INITIAL_STATE, action) => {
@@ -19,7 +29,6 @@ export default (state = INITIAL_STATE, action) => {
       };
     case FETCH_SAVED_TAGS.SUCCESS: {
       const savedTags = _.map(action.payload, (val, tag) => tag);
-      console.log(action.payload, savedTags);
       return {
         ...state,
         savedTags,
@@ -38,14 +47,14 @@ export default (state = INITIAL_STATE, action) => {
         ...state,
         pendingSavingTags: [...state.pendingSavingTags, action.payload],
       };
-
     case SAVE_TAG.SUCCESS:
     case SAVE_TAG.LOADING_END:
     case SAVE_TAG.ERROR:
       return {
         ...state,
-        pendingSavingPosts: _.remove(state.pendingSavingPosts, postID => postID !== action.payload),
+        pendingSavingTags: _.remove(state.pendingSavingTags, tag => tag !== action.payload),
       };
+
     case FETCH_SAVED_POSTS.ACTION:
       return {
         ...state,
@@ -53,7 +62,6 @@ export default (state = INITIAL_STATE, action) => {
       };
     case FETCH_SAVED_POSTS.SUCCESS: {
       const savedPosts = _.map(action.payload, post => post);
-      console.log(action.payload, savedPosts);
       return {
         ...state,
         savedPosts,
@@ -72,6 +80,42 @@ export default (state = INITIAL_STATE, action) => {
         ...state,
         pendingSavingPosts: _.remove(state.pendingSavingPosts, postID => postID !== action.payload),
       };
+
+    case FETCH_SAVED_USERS.ACTION:
+      return {
+        ...state,
+        loadingSavedUsers: true,
+      };
+    case FETCH_SAVED_USERS.SUCCESS: {
+      const savedUsers = _.map(action.payload, (val, user) => user);
+      return {
+        ...state,
+        savedUsers,
+        loadingSavedUsers: false,
+      };
+    }
+    case FETCH_SAVED_USERS.LOADING_END:
+    case FETCH_SAVED_USERS.ERROR:
+      return {
+        ...state,
+        loadingSavedUsers: false,
+      };
+
+    case SAVE_USER.ACTION:
+      return {
+        ...state,
+        pendingSavingUsers: [...state.pendingSavingUsers, action.payload],
+      };
+    case SAVE_USER.SUCCESS:
+    case SAVE_USER.LOADING_END:
+    case SAVE_USER.ERROR:
+      return {
+        ...state,
+        pendingSavingUsers: _.remove(
+          state.pendingSavingUsers,
+          user => user.username !== action.payload,
+        ),
+      };
     default:
       return state;
   }
@@ -79,7 +123,10 @@ export default (state = INITIAL_STATE, action) => {
 
 export const getLoadingSavedTags = state => state.loadingSavedTags;
 export const getLoadingSavedPosts = state => state.loadingSavedPosts;
+export const getLoadingSavedUsers = state => state.loadingSavedUsers;
 export const getPendingSavingTags = state => state.pendingSavingTags;
-export const getSavedTags = state => state.savedTags;
 export const getPendingSavingPosts = state => state.pendingSavingPosts;
+export const getPendingSavingUsers = state => state.pendingSavingUsers;
+export const getSavedTags = state => state.savedTags;
 export const getSavedPosts = state => state.savedPosts;
+export const getSavedUsers = state => state.savedUsers;

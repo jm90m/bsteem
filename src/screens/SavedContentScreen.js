@@ -6,18 +6,31 @@ import { ScrollView, RefreshControl, View } from 'react-native';
 import Header from 'components/common/Header';
 import _ from 'lodash';
 import Tag from 'components/post/Tag';
+import i18n from 'i18n/i18n';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import * as navigationConstants from 'constants/navigation';
-import { fetchSavedTags, fetchSavedPosts } from 'state/actions/firebaseActions';
+import { fetchSavedTags, fetchSavedPosts, fetchSavedUsers } from 'state/actions/firebaseActions';
 import { COLORS, MATERIAL_ICONS, ICON_SIZES, MATERIAL_COMMUNITY_ICONS } from '../constants/styles';
 import {
-  getLoadingSavedTags,
-  getSavedPosts,
   getSavedTags,
+  getSavedPosts,
+  getSavedUsers,
+  getLoadingSavedTags,
   getLoadingSavedPosts,
+  getLoadingSavedUsers,
 } from '../state/rootReducer';
 import PostPreview from '../components/saved-content/PostPreview';
 import SaveTagButton from '../components/common/SaveTagButton';
+import Avatar from '../components/common/Avatar';
+
+const MenuContent = styled.View`
+  flex-direction: row;
+  padding: 10px 0;
+  border-bottom-width: 2px;
+  border-bottom-color: ${props => (props.selected ? COLORS.PRIMARY_COLOR : 'transparent')};
+  width: 50px;
+  justify-content: center;
+`;
 
 const BackTouchable = styled.TouchableOpacity`
   justify-content: center;
@@ -50,21 +63,52 @@ const MenuTouchable = styled.TouchableOpacity`
   padding: 0 20px;
 `;
 
+const UserTouchable = styled.TouchableOpacity`
+  flex-direction: row;
+  align-items: center;
+`;
+
+const UserContainer = styled.View`
+  padding: 5px 10px;
+  margin: 5px 0;
+  background-color: ${COLORS.WHITE.WHITE};
+`;
+
+const Username = styled.Text`
+  margin: 0 5px;
+  color: ${COLORS.PRIMARY_COLOR};
+  font-size: 18px;
+  font-weight: bold;
+`;
+
+const EmptyContent = styled.View`
+  padding: 20px;
+  background-color: ${COLORS.WHITE.WHITE};
+`;
+
+const EmptyText = styled.Text`
+  font-size: 18px;
+`;
+
 const MENU = {
-  TAGS: 'tags',
-  POSTS: 'posts',
+  USERS: 'USERS',
+  TAGS: 'TAGS',
+  POSTS: 'POSTS',
 };
 
 @connect(
   state => ({
     loadingSavedTags: getLoadingSavedTags(state),
     loadingSavedPosts: getLoadingSavedPosts(state),
+    loadingSavedUsers: getLoadingSavedUsers(state),
     savedTags: getSavedTags(state),
     savedPosts: getSavedPosts(state),
+    savedUsers: getSavedUsers(state),
   }),
   dispatch => ({
     fetchSavedTags: () => dispatch(fetchSavedTags.action()),
     fetchSavedPosts: () => dispatch(fetchSavedPosts.action()),
+    fetchSavedUsers: () => dispatch(fetchSavedUsers.action()),
   }),
 )
 class SavedContentScreen extends Component {
@@ -72,8 +116,10 @@ class SavedContentScreen extends Component {
     navigation: PropTypes.shape().isRequired,
     fetchSavedTags: PropTypes.func.isRequired,
     fetchSavedPosts: PropTypes.func.isRequired,
+    fetchSavedUsers: PropTypes.func.isRequired,
     savedTags: PropTypes.arrayOf(PropTypes.string),
     savedPosts: PropTypes.arrayOf(PropTypes.shape()),
+    savedUsers: PropTypes.arrayOf(PropTypes.string),
     loadingSavedTags: PropTypes.bool.isRequired,
     loadingSavedPosts: PropTypes.bool.isRequired,
   };
@@ -84,6 +130,7 @@ class SavedContentScreen extends Component {
     this.state = {
       currentSavedTags: props.savedTags,
       currentSavedPosts: props.savedPosts,
+      currentSavedUsers: props.savedUsers,
       menu: MENU.TAGS,
     };
 
@@ -94,23 +141,27 @@ class SavedContentScreen extends Component {
     this.onRefreshContent = this.onRefreshContent.bind(this);
     this.handleShowTags = this.handleShowTags.bind(this);
     this.handleShowPosts = this.handleShowPosts.bind(this);
+    this.handleShowUsers = this.handleShowUsers.bind(this);
   }
 
   componentDidMount() {
     this.props.fetchSavedTags();
     this.props.fetchSavedPosts();
+    this.props.fetchSavedUsers();
   }
 
   componentWillReceiveProps(nextProps) {
     this.setState({
       currentSavedTags: _.union(this.state.currentSavedTags, nextProps.savedTags),
       currentSavedPosts: _.unionBy(this.state.currentSavedPosts, nextProps.savedPosts, 'id'),
+      currentSavedUsers: _.union(this.state.currentSavedUsers, nextProps.savedUsers),
     });
   }
 
   onRefreshContent() {
     this.props.fetchSavedTags();
     this.props.fetchSavedPosts();
+    this.props.fetchSavedUsers();
   }
 
   handleNavigateTag(tag) {
@@ -142,13 +193,20 @@ class SavedContentScreen extends Component {
     });
   }
 
+  handleShowUsers() {
+    this.setState({
+      menu: MENU.USERS,
+    });
+  }
+
   navigateBack() {
     this.props.navigation.goBack();
   }
 
   renderSavedTags() {
-    if (_.isEqual(this.state.menu, MENU.TAGS)) {
-      return _.map(this.state.currentSavedTags, tag => (
+    const { loadingSavedTags } = this.props;
+    if (_.isEqual(this.state.menu, MENU.TAGS) && !loadingSavedTags) {
+      const savedTags = _.map(this.state.currentSavedTags, tag => (
         <TagOption key={tag}>
           <TagTouchble onPress={() => this.handleNavigateTag(tag)}>
             <Tag tag={tag} />
@@ -156,14 +214,46 @@ class SavedContentScreen extends Component {
           <SaveTagButton tag={tag} />
         </TagOption>
       ));
+      return _.isEmpty(savedTags) ? (
+        <EmptyContent>
+          <EmptyText>{i18n.saved.emptyTags}</EmptyText>
+        </EmptyContent>
+      ) : (
+        savedTags
+      );
+    }
+
+    return null;
+  }
+
+  renderSavedUser() {
+    const { loadingSavedUsers } = this.props;
+    if (_.isEqual(this.state.menu, MENU.USERS) && !loadingSavedUsers) {
+      const savedUsers = _.map(this.state.currentSavedUsers, username => (
+        <UserContainer>
+          <UserTouchable onPress={() => this.handleNavigateUser(username)}>
+            <Avatar username={username} size={40} />
+            <Username>{`@${username}`}</Username>
+          </UserTouchable>
+        </UserContainer>
+      ));
+
+      return _.isEmpty(savedUsers) ? (
+        <EmptyContent>
+          <EmptyText>{i18n.saved.emptyUsers}</EmptyText>
+        </EmptyContent>
+      ) : (
+        savedUsers
+      );
     }
 
     return null;
   }
 
   renderSavedPosts() {
-    if (_.isEqual(this.state.menu, MENU.POSTS)) {
-      return _.map(this.state.currentSavedPosts, post => (
+    const { loadingSavedPosts } = this.props;
+    if (_.isEqual(this.state.menu, MENU.POSTS) && !loadingSavedPosts) {
+      const savedPosts = _.map(this.state.currentSavedPosts, post => (
         <PostPreview
           key={post.id}
           handleNavigatePost={() => this.handleNavigatePost(post.author, post.permlink)}
@@ -173,6 +263,13 @@ class SavedContentScreen extends Component {
           title={post.title}
         />
       ));
+      return _.isEmpty(savedPosts) ? (
+        <EmptyContent>
+          <EmptyText>{i18n.saved.emptyPosts}</EmptyText>
+        </EmptyContent>
+      ) : (
+        savedPosts
+      );
     }
     return null;
   }
@@ -181,6 +278,10 @@ class SavedContentScreen extends Component {
     const { loadingSavedTags, loadingSavedPosts } = this.props;
     const loading = loadingSavedTags || loadingSavedPosts;
     const { menu } = this.state;
+    const selectedUsers = _.isEqual(menu, MENU.USERS);
+    const selectedTags = _.isEqual(menu, MENU.TAGS);
+    const selectedPosts = _.isEqual(menu, MENU.POSTS);
+
     return (
       <Container>
         <Header>
@@ -189,18 +290,31 @@ class SavedContentScreen extends Component {
           </BackTouchable>
           <Menu>
             <MenuTouchable onPress={this.handleShowTags}>
-              <MaterialCommunityIcons
-                size={ICON_SIZES.menuIcon}
-                name={MATERIAL_COMMUNITY_ICONS.tag}
-                color={menu === MENU.TAGS ? COLORS.PRIMARY_COLOR : COLORS.SECONDARY_COLOR}
-              />
+              <MenuContent selected={selectedTags}>
+                <MaterialCommunityIcons
+                  name={MATERIAL_COMMUNITY_ICONS.tag}
+                  size={ICON_SIZES.menuIcon}
+                  color={selectedTags ? COLORS.PRIMARY_COLOR : COLORS.SECONDARY_COLOR}
+                />
+              </MenuContent>
+            </MenuTouchable>
+            <MenuTouchable onPress={this.handleShowUsers}>
+              <MenuContent selected={selectedUsers}>
+                <MaterialCommunityIcons
+                  name={MATERIAL_COMMUNITY_ICONS.account}
+                  size={ICON_SIZES.menuIcon}
+                  color={selectedUsers ? COLORS.PRIMARY_COLOR : COLORS.SECONDARY_COLOR}
+                />
+              </MenuContent>
             </MenuTouchable>
             <MenuTouchable onPress={this.handleShowPosts}>
-              <MaterialCommunityIcons
-                size={ICON_SIZES.menuIcon}
-                name={MATERIAL_COMMUNITY_ICONS.posts}
-                color={menu === MENU.POSTS ? COLORS.PRIMARY_COLOR : COLORS.SECONDARY_COLOR}
-              />
+              <MenuContent selected={selectedPosts}>
+                <MaterialCommunityIcons
+                  name={MATERIAL_COMMUNITY_ICONS.posts}
+                  size={ICON_SIZES.menuIcon}
+                  color={selectedPosts ? COLORS.PRIMARY_COLOR : COLORS.SECONDARY_COLOR}
+                />
+              </MenuContent>
             </MenuTouchable>
           </Menu>
         </Header>
@@ -215,6 +329,7 @@ class SavedContentScreen extends Component {
         >
           {this.renderSavedTags()}
           {this.renderSavedPosts()}
+          {this.renderSavedUser()}
           <View style={{ height: 100 }} />
         </ScrollView>
       </Container>

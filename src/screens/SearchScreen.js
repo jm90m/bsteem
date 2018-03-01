@@ -274,18 +274,6 @@ class SearchScreen extends Component {
 
     return (
       <Menu>
-        <TouchableMenu onPress={() => this.setCurrentMenu(MENU.USERS)}>
-          <MenuContent selected={selectedUsers}>
-            <MaterialCommunityIcons
-              name={MATERIAL_COMMUNITY_ICONS.account}
-              size={24}
-              color={selectedUsers ? COLORS.PRIMARY_COLOR : COLORS.SECONDARY_COLOR}
-            />
-            <Count selected={selectedUsers}>
-              {abbreviateLargeNumber(_.size(searchUserResults))}
-            </Count>
-          </MenuContent>
-        </TouchableMenu>
         <TouchableMenu onPress={() => this.setCurrentMenu(MENU.TAGS)}>
           <MenuContent selected={selectedTags}>
             <MaterialCommunityIcons
@@ -295,6 +283,18 @@ class SearchScreen extends Component {
             />
             <Count selected={selectedTags}>
               {abbreviateLargeNumber(_.size(searchTagsResults))}
+            </Count>
+          </MenuContent>
+        </TouchableMenu>
+        <TouchableMenu onPress={() => this.setCurrentMenu(MENU.USERS)}>
+          <MenuContent selected={selectedUsers}>
+            <MaterialCommunityIcons
+              name={MATERIAL_COMMUNITY_ICONS.account}
+              size={24}
+              color={selectedUsers ? COLORS.PRIMARY_COLOR : COLORS.SECONDARY_COLOR}
+            />
+            <Count selected={selectedUsers}>
+              {abbreviateLargeNumber(_.size(searchUserResults))}
             </Count>
           </MenuContent>
         </TouchableMenu>

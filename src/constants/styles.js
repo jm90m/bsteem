@@ -143,6 +143,9 @@ export const MATERIAL_COMMUNITY_ICONS = {
   saveTag: 'star-outline',
   savedTag: 'star',
 
+  save: 'star-outline',
+  saved: 'star',
+
   // post
   savePost: 'star-outline',
   savedPost: 'star',

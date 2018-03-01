@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import styled from 'styled-components/native';
 import _ from 'lodash';
 import { View } from 'react-native';
 import { connect } from 'react-redux';
@@ -12,9 +13,23 @@ import {
 } from 'state/rootReducer';
 import UserProfile from 'components/user/user-profile/UserProfile';
 import * as navigationConstants from 'constants/navigation';
+import { COLORS } from 'constants/styles';
+import SaveUserButton from 'components/common/SaveUserButton';
 import UserStats from './UserStats';
 import UserCover from './UserCover';
 import UserFollowButton from './UserFollowButton';
+
+const SaveUserButtonContainer = styled.View`
+  padding-right: 10px;
+`;
+
+const ActionButtonsContainer = styled.View`
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+  background-color: ${COLORS.WHITE.WHITE};
+  align-items: center;
+`;
 
 const mapStateToProps = state => ({
   usersDetails: getUsersDetails(state),
@@ -57,12 +72,20 @@ class UserHeader extends Component {
     this.props.navigation.navigate(navigationConstants.USER_FOLLOWING, { username });
   }
 
-  renderFollowButton() {
+  renderActionButtons() {
     const { hideFollowButton, username, authenticated, authUsername } = this.props;
     const isAuthUser = authUsername === username;
+
     if (hideFollowButton || !authenticated || isAuthUser) return <View />;
 
-    return <UserFollowButton username={username} />;
+    return (
+      <ActionButtonsContainer>
+        <UserFollowButton username={username} />
+        <SaveUserButtonContainer>
+          <SaveUserButton username={username} />
+        </SaveUserButtonContainer>
+      </ActionButtonsContainer>
+    );
   }
 
   render() {
@@ -82,7 +105,7 @@ class UserHeader extends Component {
     return (
       <View>
         <UserCover username={username} hasCover={hasCover} userReputation={userReputation} />
-        {this.renderFollowButton()}
+        {this.renderActionButtons()}
         <UserProfile userProfile={userProfile} />
         <UserStats
           postCount={postCount}

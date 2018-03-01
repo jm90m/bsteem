@@ -67,4 +67,9 @@ export default {
   search: {
     noResultsFound: 'No results found for your search',
   },
+  saved: {
+    emptyTags: 'No saved tags found.',
+    emptyPosts: 'No saved posts found.',
+    emptyUsers: 'No saved users found.',
+  }
 };

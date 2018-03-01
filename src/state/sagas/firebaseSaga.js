@@ -9,6 +9,9 @@ import {
   FETCH_SAVED_POSTS,
   SAVE_POST,
   UNSAVE_POST,
+  FETCH_SAVED_USERS,
+  SAVE_USER,
+  UNSAVE_USER,
 } from 'state/actions/actionTypes';
 import * as firebaseActions from '../actions/firebaseActions';
 import { getAuthUsername } from '../rootReducer';
@@ -16,8 +19,12 @@ import { getAuthUsername } from '../rootReducer';
 const baseUserSettingsRef = 'user-settings';
 const getUserSavedTagsRef = username => `${baseUserSettingsRef}/${username}/saved-tags`;
 const getSaveTagRef = (username, tag) => `${getUserSavedTagsRef(username)}/${tag}`;
+
 const getUserSavedPostsRef = username => `${baseUserSettingsRef}/${username}/saved-posts`;
 const getSavePostRef = (username, postID) => `${getUserSavedPostsRef(username)}/${postID}`;
+
+const getUserSavedUsersRef = username => `${baseUserSettingsRef}/${username}/saved-users`;
+const getSaveUserRef = (username, saveUser) => `${getUserSavedUsersRef(username)}/${saveUser}`;
 
 const getFirebaseValueOnce = (ref, key) =>
   firebase
@@ -166,6 +173,73 @@ const unsavePost = function*(action) {
   }
 };
 
+const fetchSavedUsers = function*() {
+  try {
+    const authUsername = yield select(getAuthUsername);
+    let userID;
+
+    if (_.isEmpty(authUsername)) {
+      userID = Expo.Constants.deviceId;
+    } else {
+      userID = authUsername;
+    }
+    const snapshot = yield call(getFirebaseValueOnce, getUserSavedUsersRef(userID), 'value');
+    const savedUsers = snapshot.val() || {};
+    yield put(firebaseActions.fetchSavedUsers.success(savedUsers));
+  } catch (error) {
+    console.log(error);
+    yield put(firebaseActions.fetchSavedUsers.fail({ error }));
+  } finally {
+    yield put(firebaseActions.fetchSavedUsers.loadingEnd());
+  }
+};
+
+const saveUser = function*(action) {
+  try {
+    const { username } = action.payload;
+    const authUsername = yield select(getAuthUsername);
+    let userID;
+    if (_.isEmpty(authUsername)) {
+      userID = Expo.Constants.deviceId;
+    } else {
+      userID = authUsername;
+    }
+    yield call(setFirebaseData, getSaveUserRef(userID, username), true);
+    yield call(fetchSavedUsers);
+    yield put(firebaseActions.saveUser.success(username));
+  } catch (error) {
+    console.log(error);
+    const { username } = action.payload;
+    yield put(firebaseActions.saveUser.fail({ error }, username));
+  } finally {
+    const { username } = action.payload;
+    yield put(firebaseActions.saveUser.loadingEnd(username));
+  }
+};
+
+const unsaveUser = function*(action) {
+  try {
+    const { username } = action.payload;
+    const authUsername = yield select(getAuthUsername);
+    let userID;
+    if (_.isEmpty(authUsername)) {
+      userID = Expo.Constants.deviceId;
+    } else {
+      userID = authUsername;
+    }
+    yield call(setFirebaseData, getSaveUserRef(userID, username), null);
+    yield put(firebaseActions.unsaveUser.success(username));
+    yield call(fetchSavedUsers);
+  } catch (error) {
+    console.log(error);
+    const { username } = action.payload;
+    yield put(firebaseActions.unsaveUser.fail({ error }, username));
+  } finally {
+    const { username } = action.payload;
+    yield put(firebaseActions.unsaveUser.loadingEnd(username));
+  }
+};
+
 export const watchFetchSavedTags = function*() {
   yield takeLatest(FETCH_SAVED_TAGS.ACTION, fetchSavedTags);
 };
@@ -188,4 +262,16 @@ export const watchSavePost = function*() {
 
 export const watchUnsavePost = function*() {
   yield takeEvery(UNSAVE_POST.ACTION, unsavePost);
+};
+
+export const watchFetchSavedUsers = function*() {
+  yield takeLatest(FETCH_SAVED_USERS.ACTION, fetchSavedUsers);
+};
+
+export const watchSaveUser = function*() {
+  yield takeEvery(SAVE_USER.ACTION, saveUser);
+};
+
+export const watchUnsaveUser = function*() {
+  yield takeEvery(UNSAVE_USER.ACTION, unsaveUser);
 };
