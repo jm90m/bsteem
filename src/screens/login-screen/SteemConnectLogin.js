@@ -15,13 +15,13 @@ import {
   AUTH_MAX_EXPIRATION_AGE,
   AUTH_USERNAME,
 } from 'constants/asyncStorageKeys';
-import { authenticateUserError, authenticateUserSuccess } from 'state/actions/authActions';
+import * as authActions from 'state/actions/authActions';
 import i18n from 'i18n/i18n';
 import BsteemIcon from '../../../assets/icon.png';
 
 const mapDispatchToProps = dispatch => ({
-  authenticateUserSuccess: payload => dispatch(authenticateUserSuccess(payload)),
-  authenticateUserError: error => dispatch(authenticateUserError(error)),
+  authenticateUserSuccess: payload => dispatch(authActions.authenticateUser.success(payload)),
+  authenticateUserError: error => dispatch(authActions.authenticateUser.fail(error)),
 });
 
 const Container = styled.View`

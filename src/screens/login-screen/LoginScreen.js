@@ -14,7 +14,7 @@ import { connect } from 'react-redux';
 import styled from 'styled-components/native';
 import sc2 from 'api/sc2';
 import { getAuthAccessToken } from 'state/rootReducer';
-import { authenticateUserSuccess } from 'state/actions/authActions';
+import * as authActions from 'state/actions/authActions';
 import SteemConnectLogin from './SteemConnectLogin';
 import CurrentUserProfileScreen from './CurrentUserProfileScreen';
 
@@ -26,9 +26,16 @@ const mapStateToProps = state => ({
   accessToken: getAuthAccessToken(state),
 });
 
-
 const mapDispatchToProps = dispatch => ({
-  authenticateUserSuccess: payload => dispatch(authenticateUserSuccess(payload)),
+  authenticateUser: (accessToken, expiresIn, username, maxAge) =>
+    dispatch(
+      authActions.authenticateUser.action({
+        accessToken,
+        expiresIn,
+        username,
+        maxAge,
+      }),
+    ),
 });
 
 @connect(mapStateToProps, mapDispatchToProps)
@@ -36,7 +43,7 @@ class LoginScreen extends Component {
   static propTypes = {
     accessToken: PropTypes.string,
     navigation: PropTypes.shape().isRequired,
-    authenticateUserSuccess: PropTypes.func.isRequired,
+    authenticateUser: PropTypes.func.isRequired,
   };
 
   static defaultProps = {
@@ -73,16 +80,10 @@ class LoginScreen extends Component {
     const username = await AsyncStorage.getItem(AUTH_USERNAME);
     const expiresIn = await AsyncStorage.getItem(AUTH_EXPIRATION);
     const maxAge = await AsyncStorage.getItem(AUTH_MAX_EXPIRATION_AGE);
-    const isAuthenticated = !_.isEmpty(accessToken) && !_.isEmpty(username);
+    const isAuthenticated = accessToken && expiresIn && !_.isEmpty(username);
     if (isAuthenticated) {
-      const payload = {
-        accessToken,
-        expiresIn,
-        username,
-        maxAge,
-      };
       sc2.setAccessToken(accessToken);
-      this.props.authenticateUserSuccess(payload);
+      this.props.authenticateUser(accessToken, expiresIn, username, maxAge);
     }
   }
 
@@ -96,7 +97,7 @@ class LoginScreen extends Component {
 
   renderUser() {
     if (!_.isEmpty(this.props.accessToken)) {
-      console.log("RENDER LOGIN SCREEN CURRENT USER SCREEN");
+      console.log('RENDER LOGIN SCREEN CURRENT USER SCREEN');
       return <CurrentUserProfileScreen navigation={this.props.navigation} />;
     }
     return null;

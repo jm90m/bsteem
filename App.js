@@ -4,8 +4,8 @@ import sc2 from 'api/sc2';
 import { Provider } from 'react-redux';
 import { Constants, AppLoading, Asset } from 'expo';
 import configureStore from 'state/configureStore';
-
 import AppNavigation from 'screens/navigation/AppNavigation';
+import SteemConnectErrorModal from 'components/common/steem-connect/SteemConnectErrorModalContainer';
 
 const store = configureStore();
 
@@ -20,9 +20,8 @@ export default class App extends React.Component {
 
   componentDidMount() {
     sc2.init({
-      app: 'busy-mobile',
+      app: 'bsteem',
       callbackURL: `${Constants.linkingUri}/redirect`,
-      scope: [],
     });
   }
 
@@ -47,6 +46,7 @@ export default class App extends React.Component {
       <Provider store={store}>
         <View style={{ flex: 1 }}>
           <AppNavigation />
+          <SteemConnectErrorModal />
         </View>
       </Provider>
     );

@@ -3,8 +3,8 @@ import { View } from 'react-native';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { getIsAuthenticated } from 'state/rootReducer';
+import * as authActions from 'state/actions/authActions';
 import LoginModal from './LoginModal';
-import { authenticateUserError, authenticateUserSuccess } from '../../state/actions/authActions';
 
 function getDisplayName(WrappedComponent) {
   return WrappedComponent.displayName || WrappedComponent.name || 'Component';
@@ -16,14 +16,14 @@ export default function withAuthActions(WrappedComponent) {
   });
 
   const mapDispatchToProps = dispatch => ({
-    authenticateUserSuccess: payload => dispatch(authenticateUserSuccess(payload)),
-    authenticateUserError: error => dispatch(authenticateUserError(error)),
+    authenticateUser: payload => dispatch(authActions.authenticateUser.action(payload)),
+    authenticateUserError: error => dispatch(authActions.authenticateUser.fail(error)),
   });
 
   class Wrapper extends React.Component {
     static propTypes = {
       authenticated: PropTypes.bool,
-      authenticateUserSuccess: PropTypes.func.isRequired,
+      authenticateUser: PropTypes.func.isRequired,
       authenticateUserError: PropTypes.func.isRequired,
     };
 
@@ -70,7 +70,7 @@ export default function withAuthActions(WrappedComponent) {
             <LoginModal
               visible={this.state.displayLoginModal}
               handleLoginModalCancel={this.hideLoginModal}
-              authenticateUserSuccess={this.props.authenticateUserSuccess}
+              authenticateUser={this.props.authenticateUser}
               authenticateUserError={this.props.authenticateUserError}
             />
           )}

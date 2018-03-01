@@ -8,6 +8,7 @@ import * as userActivitySaga from './sagas/userActivitySaga';
 import * as appSaga from './sagas/appSaga';
 import * as editorSaga from './sagas/editorSaga';
 import * as firebaseSaga from './sagas/firebaseSaga';
+import * as authSaga from './sagas/authSaga';
 
 const rootSaga = function*() {
   yield all([
@@ -68,6 +69,9 @@ const rootSaga = function*() {
     spawn(firebaseSaga.watchFetchSavedUsers),
     spawn(firebaseSaga.watchSaveUser),
     spawn(firebaseSaga.watchUnsaveUser),
+
+    // Auth Sagas
+    spawn(authSaga.watchAuthenticateUser),
   ]);
 };
 

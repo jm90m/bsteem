@@ -2,6 +2,7 @@ import {
   FETCH_STEEM_RATE,
   FETCH_STEEM_GLOBAL_PROPERTIES,
   FETCH_NETWORK_CONNECTION,
+  SET_STEEMCONNECT_ERROR_MODAL_DISPLAY,
 } from '../actions/actionTypes';
 
 const INITIAL_STATE = {
@@ -10,6 +11,7 @@ const INITIAL_STATE = {
   totalVestingFundSteem: '',
   totalVestingShares: '',
   networkConnection: false,
+  steemConnectDisplayErrorModal: false,
 };
 
 export default (state = INITIAL_STATE, action) => {
@@ -47,6 +49,12 @@ export default (state = INITIAL_STATE, action) => {
         networkConnection: hasNetworkConnection,
       };
     }
+
+    case SET_STEEMCONNECT_ERROR_MODAL_DISPLAY:
+      return {
+        ...state,
+        steemConnectDisplayErrorModal: action.payload,
+      };
     default:
       return state;
   }
@@ -57,3 +65,4 @@ export const getLoadingSteemGlobalProperties = state => state.loadingSteemGlobal
 export const getTotalVestingFundSteem = state => state.totalVestingFundSteem;
 export const getTotalVestingShares = state => state.totalVestingShares;
 export const getHasNetworkConnection = state => state.networkConnection;
+export const getSteemConnectDisplayErrorModal = state => state.steemConnectDisplayErrorModal;

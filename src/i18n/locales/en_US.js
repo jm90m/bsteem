@@ -40,8 +40,9 @@ export default {
     signUp: 'Sign up',
   },
   logout: {
+    logout: 'Logout',
     switchAccountsDescription:
-      'If you want to switch accounts you will need to revoke the SteemConnect token by following the revoke form below and after it has completed press the logout button above.',
+      'If you want to switch accounts you will need to revoke the SteemConnect token by clicking on the revoke token button below, and following the revoke form. After you have successfully revoked the token, press the logout button above.',
     revokeToken: 'Revoke SteemConnect token',
     logoutButtonDescription:
       ' If you want to logout of your account, you can press the logout button below',
@@ -71,5 +72,9 @@ export default {
     emptyTags: 'No saved tags found.',
     emptyPosts: 'No saved posts found.',
     emptyUsers: 'No saved users found.',
-  }
+  },
+  steemConnect: {
+    errorAuthenticate:
+      'There was an error using SteemConnect to perform an action. Please re-authenticate with SteemConnect',
+  },
 };

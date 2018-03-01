@@ -7,28 +7,18 @@ import Header from 'components/common/Header';
 import BackButton from 'components/common/BackButton';
 import PrimaryButton from 'components/common/PrimaryButton';
 import i18n from 'i18n/i18n';
-
+import SecondaryButton from 'components/common/SecondaryButton';
+import Expo from 'expo';
 import {
   AUTH_EXPIRATION,
   AUTH_MAX_EXPIRATION_AGE,
   AUTH_USERNAME,
   STEEM_ACCESS_TOKEN,
 } from '../../constants/asyncStorageKeys';
-import { FONT_SIZES } from '../../constants/styles';
-
-const StyledWebView = styled.WebView`
-  flex: 1;
-`;
 
 const Description = styled.Text`
   padding: 20px;
   font-weight: bold;
-`;
-
-const RevokeTitle = styled.Text`
-  font-size: ${FONT_SIZES.TITLE};
-  padding-top: 20px;
-  text-align: center;
 `;
 
 class LogoutScreen extends Component {
@@ -47,7 +37,6 @@ class LogoutScreen extends Component {
   constructor(props) {
     super(props);
 
-    this.onNavigationStateChange = this.onNavigationStateChange.bind(this);
     this.handleLogout = this.handleLogout.bind(this);
   }
 
@@ -77,26 +66,25 @@ class LogoutScreen extends Component {
       });
   }
 
-  onNavigationStateChange(status) {
-    console.log('ON STATE NAVIGATION', status);
+  handleRevoke() {
+    const sc2RevokeURL = 'https://v2.steemconnect.com/revoke/@bsteem';
+    Expo.WebBrowser.openBrowserAsync(sc2RevokeURL).catch(error => {
+      console.log('invalid url', error, sc2RevokeURL);
+    });
   }
 
   render() {
     const { visible, handleHide } = this.props;
-    const sc2RevokeURL = 'https://v2.steemconnect.com/revoke/@busy-mobile';
+
     return (
       <Modal animationType="slide" visible={visible} onRequestClose={handleHide}>
         <Header>
           <BackButton navigateBack={handleHide} />
         </Header>
         <Description>{i18n.logout.logoutButtonDescription}</Description>
-        <PrimaryButton onPress={this.handleLogout} title="Logout" />
-        <RevokeTitle>{i18n.logout.revokeToken}</RevokeTitle>
+        <PrimaryButton onPress={this.handleLogout} title={i18n.logout.logout} />
         <Description>{i18n.logout.switchAccountsDescription}</Description>
-        <StyledWebView
-          source={{ uri: sc2RevokeURL }}
-          onNavigationStateChange={this.onNavigationStateChange}
-        />
+        <SecondaryButton onPress={this.handleRevoke} title={i18n.logout.revokeToken} />
       </Modal>
     );
   }

@@ -87,6 +87,8 @@ export const getLoadingSteemGlobalProperties = state =>
 export const getTotalVestingFundSteem = state => fromApp.getTotalVestingFundSteem(state.app);
 export const getTotalVestingShares = state => fromApp.getTotalVestingShares(state.app);
 export const getHasNetworkConnection = state => fromApp.getHasNetworkConnection(state.app);
+export const getSteemConnectDisplayErrorModal = state =>
+  fromApp.getSteemConnectDisplayErrorModal(state.app);
 
 // Comments Selectors
 export const getCommentsByPostId = state => fromComments.getCommentsByPostId(state.comments);

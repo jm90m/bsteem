@@ -17,7 +17,7 @@ export default (state = INITIAL_STATE, action) => {
         expiresIn: action.payload.expiresIn,
         username: action.payload.username,
         maxAge: action.payload.maxAge,
-        authenticated: true
+        authenticated: true,
       };
     case LOGOUT_USER:
       return {

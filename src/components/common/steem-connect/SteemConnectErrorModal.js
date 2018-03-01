@@ -2,20 +2,20 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components/native';
 import Expo, { AuthSession } from 'expo';
+import { connect } from 'react-redux';
 import { Modal, AsyncStorage } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import i18n from 'i18n/i18n';
 import { COLORS, MATERIAL_ICONS } from 'constants/styles';
 import PrimaryButton from 'components/common/PrimaryButton';
-import SecondaryButton from 'components/common/SecondaryButton';
 import sc2 from 'api/sc2';
 import {
   AUTH_EXPIRATION,
   AUTH_MAX_EXPIRATION_AGE,
   AUTH_USERNAME,
   STEEM_ACCESS_TOKEN,
-} from '../../constants/asyncStorageKeys';
-import BsteemIcon from '../../../assets/icon.png';
+} from '../../../constants/asyncStorageKeys';
+import BsteemIcon from '../../../../assets/icon.png';
 
 const Container = styled.View`
   justify-content: center;
@@ -40,10 +40,10 @@ const ButtonContainer = styled.View`
   margin-top: 20px;
 `;
 
-class LoginModal extends Component {
+class SteemConnectErrorModal extends Component {
   static propTypes = {
     visible: PropTypes.bool.isRequired,
-    handleLoginModalCancel: PropTypes.func.isRequired,
+    closeSteemConnectErrorModal: PropTypes.func.isRequired,
     authenticateUser: PropTypes.func.isRequired,
     authenticateUserError: PropTypes.func.isRequired,
   };
@@ -52,22 +52,9 @@ class LoginModal extends Component {
     super(props);
 
     this.handleSteemConnectLogin = this.handleSteemConnectLogin.bind(this);
-    this.handleSignUp = this.handleSignUp.bind(this);
-  }
-
-  async handleSignUp() {
-    const signUpURL = 'https://signup.steemit.com/?ref=bsteem';
-    try {
-      Expo.WebBrowser.openBrowserAsync(signUpURL).catch(error => {
-        console.log('invalid url', error, signUpURL);
-      });
-    } catch (error) {
-      console.log('unable to open url', error, signUpURL);
-    }
   }
 
   async handleSteemConnectLogin() {
-    let redirectUrl = AuthSession.getRedirectUrl();
     const url = sc2.getLoginURL({ authenticated: true });
     try {
       let result = await AuthSession.startAsync({
@@ -100,16 +87,16 @@ class LoginModal extends Component {
   }
 
   render() {
-    const { visible, handleLoginModalCancel } = this.props;
+    const { visible, closeSteemConnectErrorModal } = this.props;
 
     return (
-      <Modal animationType="slide" visible={visible} onRequestClose={handleLoginModalCancel}>
+      <Modal animationType="slide" visible={visible} onRequestClose={closeSteemConnectErrorModal}>
         <Container>
-          <CloseTouchable onPress={handleLoginModalCancel}>
+          <CloseTouchable onPress={closeSteemConnectErrorModal}>
             <MaterialIcons name={MATERIAL_ICONS.close} size={40} />
           </CloseTouchable>
           <Logo source={BsteemIcon} style={{ width: 200, height: 200 }} resizeMode="contain" />
-          <TitleText>{i18n.login.description}</TitleText>
+          <TitleText>{i18n.steemConnect.errorAuthenticate}</TitleText>
           <ButtonContainer>
             <PrimaryButton
               onPress={this.handleSteemConnectLogin}
@@ -118,17 +105,10 @@ class LoginModal extends Component {
               backgroundColor={COLORS.PRIMARY_COLOR}
             />
           </ButtonContainer>
-          <ButtonContainer>
-            <SecondaryButton
-              onPress={this.handleSignUp}
-              fontWeight="bold"
-              title={i18n.login.signUp}
-            />
-          </ButtonContainer>
         </Container>
       </Modal>
     );
   }
 }
 
-export default LoginModal;
+export default SteemConnectErrorModal;

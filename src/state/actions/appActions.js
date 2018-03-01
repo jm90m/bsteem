@@ -4,9 +4,16 @@ import {
   FETCH_STEEM_GLOBAL_PROPERTIES,
   FETCH_NETWORK_CONNECTION,
   SET_TRANSLATIONS,
+  SET_STEEMCONNECT_ERROR_MODAL_DISPLAY,
 } from './actionTypes';
 
 export const fetchSteemRate = createAsyncSagaAction(FETCH_STEEM_RATE);
 export const fetchSteemGlobalProperties = createAsyncSagaAction(FETCH_STEEM_GLOBAL_PROPERTIES);
 export const fetchNetworkConnection = createAsyncSagaAction(FETCH_NETWORK_CONNECTION);
 export const setTranslations = createAsyncSagaAction(SET_TRANSLATIONS);
+
+export const setSteemConnectErrorModalDisplay = payload => ({
+  type: SET_STEEMCONNECT_ERROR_MODAL_DISPLAY,
+  payload,
+});
+export const showSteemConnectErrorModal = () => setSteemConnectErrorModalDisplay(true);
