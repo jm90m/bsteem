@@ -34,6 +34,7 @@ const Payout = styled.Text`
   font-weight: 700;
   color: ${COLORS.TERTIARY_COLOR};
   align-self: center;
+  ${props => (props.payoutIsDeclined ? 'text-decoration-line: line-through' : '')};
 `;
 
 const Loading = styled.ActivityIndicator``;
@@ -206,6 +207,7 @@ class Footer extends Component {
     const formattedDisplayedPayout = _.isUndefined(displayedPayout)
       ? '0.00'
       : parseFloat(displayedPayout).toFixed(2);
+    const payoutIsDeclined = _.get(payout, 'isPayoutDeclined', false);
 
     return (
       <Container>
@@ -229,7 +231,7 @@ class Footer extends Component {
           onPress={handleNavigateToVotes}
           style={{ marginLeft: 'auto', alignItems: 'center' }}
         >
-          <Payout>${formattedDisplayedPayout}</Payout>
+          <Payout payoutIsDeclined={payoutIsDeclined}>${formattedDisplayedPayout}</Payout>
         </TouchableOpacity>
         {displayReblogModal && (
           <Modal

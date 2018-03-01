@@ -22,6 +22,7 @@ const LoadingContainer = styled.View`
 const Payout = styled.Text`
   color: ${COLORS.TERTIARY_COLOR};
   margin-right: 10px;
+  ${props => (props.payoutIsDeclined ? 'text-decoration-line: line-through' : '')};
 `;
 
 const TouchablePayout = styled.TouchableOpacity`
@@ -72,9 +73,10 @@ class CommentFooter extends Component {
     const formattedDisplayedPayout = _.isUndefined(displayedPayout)
       ? '0.00'
       : parseFloat(displayedPayout).toFixed(2);
+    const payoutIsDeclined = _.get(payout, 'isPayoutDeclined', false);
     return (
       <TouchablePayout onPress={handlePayout}>
-        <Payout>${formattedDisplayedPayout}</Payout>
+        <Payout payoutIsDeclined={payoutIsDeclined}>${formattedDisplayedPayout}</Payout>
       </TouchablePayout>
     );
   }
