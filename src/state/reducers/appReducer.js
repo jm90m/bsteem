@@ -5,6 +5,7 @@ import {
   SET_STEEMCONNECT_ERROR_MODAL_DISPLAY,
   DISPLAY_NOTIFY_MODAL,
   HIDE_NOTIFY_MODAL,
+  APP_ONBOARDING,
 } from '../actions/actionTypes';
 
 const INITIAL_STATE = {
@@ -17,6 +18,7 @@ const INITIAL_STATE = {
   displayNotifyModal: false,
   notifyTitle: '',
   notifyDescription: '',
+  appLoading: false,
 };
 
 export default (state = INITIAL_STATE, action) => {
@@ -73,6 +75,18 @@ export default (state = INITIAL_STATE, action) => {
         ...state,
         displayNotifyModal: false,
       };
+    case APP_ONBOARDING.ACTION:
+      return {
+        ...state,
+        appLoading: true,
+      };
+    case APP_ONBOARDING.SUCCESS:
+    case APP_ONBOARDING.ERROR:
+    case APP_ONBOARDING.LOADING_END:
+      return {
+        ...state,
+        appLoading: false,
+      };
     default:
       return state;
   }
@@ -87,3 +101,4 @@ export const getSteemConnectDisplayErrorModal = state => state.steemConnectDispl
 export const getDisplayNotifyModal = state => state.displayNotifyModal;
 export const getNotifyTitle = state => state.notifyTitle;
 export const getNotifyDescription = state => state.notifyDescription;
+export const getIsAppLoading = state => state.appLoading;

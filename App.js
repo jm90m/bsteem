@@ -7,6 +7,7 @@ import configureStore from 'state/configureStore';
 import AppNavigation from 'screens/navigation/AppNavigation';
 import SteemConnectErrorModal from 'components/common/steem-connect/SteemConnectErrorModalContainer';
 import NotifyModal from 'components/common/notify/NotifyModal';
+import SplashScreen from 'components/common/SplashScreen';
 
 const store = configureStore();
 
@@ -45,16 +46,14 @@ export default class App extends React.Component {
   }
 
   render() {
-    if (!this.state.assetsAreLoaded) {
-      return <AppLoading />;
-    }
-
+    const { assetsAreLoaded } = this.state;
     return (
       <Provider store={store}>
         <View style={{ flex: 1 }}>
           <AppNavigation />
           <SteemConnectErrorModal />
           <NotifyModal />
+          <SplashScreen assetsAreLoaded={assetsAreLoaded} />
         </View>
       </Provider>
     );

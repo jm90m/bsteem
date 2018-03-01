@@ -75,6 +75,7 @@ export const SET_TRANSLATIONS = createAsyncActionType('@app/set-translations');
 export const SET_STEEMCONNECT_ERROR_MODAL_DISPLAY = '@app/set-steemconnect-error-modal-display';
 export const DISPLAY_NOTIFY_MODAL = '@app/display-notify-modal';
 export const HIDE_NOTIFY_MODAL = '@app/hide-notify-modal';
+export const APP_ONBOARDING = createAsyncActionType('@app/app-onboardig');
 
 // Editor Actions
 export const CREATE_POST = createAsyncActionType('@editor/create-post');

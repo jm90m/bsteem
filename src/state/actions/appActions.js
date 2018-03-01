@@ -7,6 +7,7 @@ import {
   SET_STEEMCONNECT_ERROR_MODAL_DISPLAY,
   HIDE_NOTIFY_MODAL,
   DISPLAY_NOTIFY_MODAL,
+  APP_ONBOARDING,
 } from './actionTypes';
 
 export const fetchSteemRate = createAsyncSagaAction(FETCH_STEEM_RATE);
@@ -30,3 +31,5 @@ export const displayNotifyModal = (notifyTitle, notifyDescription) => ({
     notifyDescription,
   },
 });
+
+export const appOnboarding = createAsyncSagaAction(APP_ONBOARDING);

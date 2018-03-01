@@ -92,7 +92,7 @@ export const getSteemConnectDisplayErrorModal = state =>
 export const getDisplayNotifyModal = state => fromApp.getDisplayNotifyModal(state.app);
 export const getNotifyTitle = state => fromApp.getNotifyTitle(state.app);
 export const getNotifyDescription = state => fromApp.getNotifyDescription(state.app);
-
+export const getIsAppLoading = state => fromApp.getIsAppLoading(state.app);
 // Comments Selectors
 export const getCommentsByPostId = state => fromComments.getCommentsByPostId(state.comments);
 export const getLoadingComments = state => fromComments.getLoadingComments(state.comments);

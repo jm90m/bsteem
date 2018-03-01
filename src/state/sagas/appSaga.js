@@ -1,16 +1,27 @@
-import { NetInfo } from 'react-native';
+import { AsyncStorage, NetInfo } from 'react-native';
 import { takeLatest, call, put } from 'redux-saga/effects';
 import _ from 'lodash';
 import API from 'api/api';
 import { i18nInit } from 'i18n/i18n';
 import * as appActions from 'state/actions/appActions';
-
+import * as homeActions from 'state/actions/homeActions';
+import * as authActions from 'state/actions/authActions';
+import * as currentUserActions from 'state/actions/currentUserActions';
+import * as feedFilters from 'constants/feedFilters';
 import {
   FETCH_STEEM_GLOBAL_PROPERTIES,
   FETCH_STEEM_RATE,
   FETCH_NETWORK_CONNECTION,
   SET_TRANSLATIONS,
+  APP_ONBOARDING,
 } from 'state/actions/actionTypes';
+import {
+  AUTH_EXPIRATION,
+  AUTH_MAX_EXPIRATION_AGE,
+  AUTH_USERNAME,
+  STEEM_ACCESS_TOKEN,
+} from 'constants/asyncStorageKeys';
+import sc2 from 'api/sc2';
 
 const fetchGlobalSteemProperties = function*() {
   try {
@@ -61,6 +72,37 @@ const setTranslations = function*(action) {
   }
 };
 
+const authenticateUser = function*() {
+  const accessToken = yield call(AsyncStorage.getItem, STEEM_ACCESS_TOKEN);
+  const username = yield call(AsyncStorage.getItem, AUTH_USERNAME);
+  const expiresIn = yield call(AsyncStorage.getItem, AUTH_EXPIRATION);
+  const maxAge = yield call(AsyncStorage.getItem, AUTH_MAX_EXPIRATION_AGE);
+  const isAuthenticated = accessToken && expiresIn && !_.isEmpty(username);
+
+  if (isAuthenticated) {
+    sc2.setAccessToken(accessToken);
+    yield put(authActions.authenticateUser.action({ accessToken, expiresIn, username, maxAge }));
+  }
+};
+
+const appOnboarding = function*() {
+  try {
+    // home screen onboarding
+    yield put(homeActions.fetchDiscussions(feedFilters.TRENDING));
+    yield put(homeActions.fetchTags());
+
+    // authenticate
+    yield call(authenticateUser);
+    yield put(currentUserActions.currentUserFeedFetch());
+
+    yield put(appActions.appOnboarding.success());
+  } catch (error) {
+    yield put(appActions.appOnboarding.fail(error));
+  } finally {
+    yield put(appActions.appOnboarding.loadingEnd());
+  }
+};
+
 export const watchFetchSteemGlobalProperties = function*() {
   yield takeLatest(FETCH_STEEM_GLOBAL_PROPERTIES.ACTION, fetchGlobalSteemProperties);
 };
@@ -75,4 +117,8 @@ export const watchFetchNetworkConnection = function*() {
 
 export const watchSetTranslations = function*() {
   yield takeLatest(SET_TRANSLATIONS.ACTION, setTranslations);
+};
+
+export const watchAppOnboarding = function*() {
+  yield takeLatest(APP_ONBOARDING.ACTION, appOnboarding);
 };

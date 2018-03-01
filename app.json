@@ -19,7 +19,11 @@
       "infoPlist": {
         "NSPhotoLibraryUsageDescription":
           "This app uses the photo library so that users can upload images when they create a post"
-      }
+      },
+      "bundleIdentifier": "com.bsteem.bsteemapp"
+    },
+    "android": {
+      "package": "com.bsteem.bsteemapp"
     }
   }
 }
