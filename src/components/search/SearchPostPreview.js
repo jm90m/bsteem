@@ -8,6 +8,7 @@ import _ from 'lodash';
 import moment from 'moment';
 import Tag from 'components/post/Tag';
 import Avatar from 'components/common/Avatar';
+import TimeAgo from 'components/common/TimeAgo';
 
 const Container = styled.View`
   background-color: ${COLORS.WHITE.WHITE};
@@ -112,7 +113,7 @@ class SearchPostPreview extends Component {
             <TouchableOpacity onPress={this.handleNavigateToUserScreen}>
               <AuthorText>{`@${author}`}</AuthorText>
             </TouchableOpacity>
-            <PostCreated>{moment(created).fromNow()}</PostCreated>
+            <TimeAgo created={created} />
           </AuthorContents>
         </AuthorContainer>
         <TouchableOpacity onPress={this.handleNavigateToPostScreen}>

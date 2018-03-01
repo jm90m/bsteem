@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { TouchableWithoutFeedback } from 'react-native';
+import { TouchableWithoutFeedback, Share } from 'react-native';
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import styled from 'styled-components/native';
 import { connect } from 'react-redux';
 import _ from 'lodash';
 import i18n from 'i18n/i18n';
+import { bsteemShareText, getBusyUrl } from 'util/bsteemUtils';
 import {
   COLORS,
   MATERIAL_ICONS,
@@ -74,6 +75,27 @@ class PostMenu extends Component {
     handleReportPost: () => {},
     handleDisplayPhotoBrowser: () => {},
   };
+
+  constructor(props) {
+    super(props);
+
+    this.handleShare = this.handleShare.bind(this);
+  }
+
+  handleShare() {
+    const { postData } = this.props;
+    const title = _.get(postData, 'title', '');
+    const message = bsteemShareText;
+    const author = _.get(postData, 'author', '');
+    const permlink = _.get(postData, 'permlink', '');
+    const url = getBusyUrl(author, permlink);
+    const content = {
+      message,
+      title,
+      url,
+    };
+    Share.share(content);
+  }
 
   render() {
     const {
@@ -170,6 +192,16 @@ class PostMenu extends Component {
                   </MenuModalContents>
                 </MenuModalButton>
               )}
+            <MenuModalButton onPress={this.handleShare}>
+              <MenuModalContents>
+                <MaterialCommunityIcons
+                  size={ICON_SIZES.menuModalOptionIcon}
+                  color={COLORS.PRIMARY_COLOR}
+                  name={MATERIAL_COMMUNITY_ICONS.shareVariant}
+                />
+                <MenuText>{i18n.postMenu.sharePost}</MenuText>
+              </MenuModalContents>
+            </MenuModalButton>
           </MenuWrapper>
         </Container>
       </TouchableWithoutFeedback>

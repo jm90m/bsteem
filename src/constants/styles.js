@@ -158,6 +158,7 @@ export const MATERIAL_COMMUNITY_ICONS = {
   // for saved screen menu navigation
   tag: 'tag',
   posts: 'file-document-box',
+  shareVariant: 'share-variant',
 };
 
 export const FEATHER_ICONS = {
