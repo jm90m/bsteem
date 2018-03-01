@@ -230,7 +230,7 @@ class SavedContentScreen extends Component {
     const { loadingSavedUsers } = this.props;
     if (_.isEqual(this.state.menu, MENU.USERS) && !loadingSavedUsers) {
       const savedUsers = _.map(this.state.currentSavedUsers, username => (
-        <UserContainer>
+        <UserContainer key={username}>
           <UserTouchable onPress={() => this.handleNavigateUser(username)}>
             <Avatar username={username} size={40} />
             <Username>{`@${username}`}</Username>
