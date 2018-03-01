@@ -9,6 +9,7 @@ import {
   currentUserFollowListFetch,
 } from 'state/actions/currentUserActions';
 import { fetchUserFollowCount } from 'state/actions/usersActions';
+import withAuthActions from 'components/common/withAuthActions';
 import PrimaryButton from './PrimaryButton';
 import DangerButton from './DangerButton';
 
@@ -28,6 +29,7 @@ const mapDispatchToProps = dispatch => ({
   fetchUserFollowCount: username => dispatch(fetchUserFollowCount.action({ username })),
 });
 
+@withAuthActions
 @connect(mapStateToProps, mapDispatchToProps)
 class FollowButton extends Component {
   static propTypes = {
@@ -38,6 +40,7 @@ class FollowButton extends Component {
     currentUserUnfollowUser: PropTypes.func.isRequired,
     fetchCurrentUserFollowList: PropTypes.func.isRequired,
     fetchUserFollowCount: PropTypes.func.isRequired,
+    onActionInitiated: PropTypes.func.isRequired,
   };
 
   constructor(props) {
@@ -114,12 +117,18 @@ class FollowButton extends Component {
   render() {
     const { loadingIsFollowing, isFollowing } = this.state;
 
-    console.log('RENDER FOLLOW', isFollowing);
-
     return isFollowing ? (
-      <DangerButton title="Unfollow" onPress={this.handleUnfollow} loading={loadingIsFollowing} />
+      <DangerButton
+        title="Unfollow"
+        onPress={() => this.props.onActionInitiated(this.handleUnfollow)}
+        loading={loadingIsFollowing}
+      />
     ) : (
-      <PrimaryButton title="Follow" onPress={this.handleFollow} loading={loadingIsFollowing} />
+      <PrimaryButton
+        title="Follow"
+        onPress={() => this.props.onActionInitiated(this.handleFollow)}
+        loading={loadingIsFollowing}
+      />
     );
   }
 }

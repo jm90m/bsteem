@@ -28,7 +28,13 @@ export default class App extends React.Component {
 
   async loadAssetsAsync() {
     try {
-      await Promise.all([Asset.loadAsync([require('./src/images/steem.png')])]);
+      await Promise.all([
+        Asset.loadAsync([
+          require('./src/images/steem.png'),
+          require('./assets/icon.png'),
+          require('./assets/splash.png'),
+        ]),
+      ]);
     } catch (e) {
       console.warn(
         'There was an error caching assets network timeout, so we skipped caching. Reload the app to try again.',

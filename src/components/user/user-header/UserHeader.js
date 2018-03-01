@@ -75,8 +75,9 @@ class UserHeader extends Component {
   renderActionButtons() {
     const { hideFollowButton, username, authenticated, authUsername } = this.props;
     const isAuthUser = authUsername === username;
+    const hideActions = hideFollowButton || isAuthUser;
 
-    if (hideFollowButton || !authenticated || isAuthUser) return <View />;
+    if (hideActions) return <View />;
 
     return (
       <ActionButtonsContainer>
