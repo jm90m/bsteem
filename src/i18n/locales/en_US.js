@@ -99,4 +99,7 @@ export default {
     errorAuthenticate:
       'There was an error using SteemConnect to perform an action. Please re-authenticate with SteemConnect',
   },
+  feed: {
+    emptyFeed: 'Feed is currently empty',
+  }
 };

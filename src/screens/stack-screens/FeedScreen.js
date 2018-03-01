@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { ListView, Modal, Text } from 'react-native';
+import { ListView, Modal } from 'react-native';
 import _ from 'lodash';
 import styled from 'styled-components/native';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
@@ -11,6 +11,7 @@ import PostPreview from 'components/post-preview/PostPreview';
 import FeedSort from 'components/feed-sort/FeedSort';
 import Header from 'components/common/Header';
 import SaveTagButton from 'components/common/SaveTagButton';
+import i18n from 'i18n/i18n';
 
 const Container = styled.View`
   flex: 1;
@@ -35,6 +36,15 @@ const Loading = styled.ActivityIndicator`
 
 const TagContainer = styled.View`
   flex-direction: row;
+`;
+
+const EmptyFeedView = styled.View`
+  padding: 20px;
+  background-color: ${COLORS.WHITE.WHITE};
+`;
+
+const EmptyFeedText = styled.View`
+  font-size: 18px;
 `;
 
 const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
@@ -125,7 +135,11 @@ class FeedScreen extends Component {
     if (loading) {
       return <Loading color={COLORS.PRIMARY_COLOR} size="large" />;
     } else if (dataSource.getRowCount() === 0) {
-      return <Text>Feed is currently empty</Text>;
+      return (
+        <EmptyFeedView>
+          <EmptyFeedText>{i18n.feed.emptyFeed}</EmptyFeedText>
+        </EmptyFeedView>
+      );
     }
   };
 
