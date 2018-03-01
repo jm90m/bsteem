@@ -5,6 +5,8 @@ import {
   FETCH_NETWORK_CONNECTION,
   SET_TRANSLATIONS,
   SET_STEEMCONNECT_ERROR_MODAL_DISPLAY,
+  HIDE_NOTIFY_MODAL,
+  DISPLAY_NOTIFY_MODAL,
 } from './actionTypes';
 
 export const fetchSteemRate = createAsyncSagaAction(FETCH_STEEM_RATE);
@@ -17,3 +19,14 @@ export const setSteemConnectErrorModalDisplay = payload => ({
   payload,
 });
 export const showSteemConnectErrorModal = () => setSteemConnectErrorModalDisplay(true);
+
+export const hideNotifyModal = () => ({
+  type: HIDE_NOTIFY_MODAL,
+});
+export const displayNotifyModal = (notifyTitle, notifyDescription) => ({
+  type: DISPLAY_NOTIFY_MODAL,
+  payload: {
+    notifyTitle,
+    notifyDescription,
+  },
+});

@@ -3,6 +3,8 @@ import {
   FETCH_STEEM_GLOBAL_PROPERTIES,
   FETCH_NETWORK_CONNECTION,
   SET_STEEMCONNECT_ERROR_MODAL_DISPLAY,
+  DISPLAY_NOTIFY_MODAL,
+  HIDE_NOTIFY_MODAL,
 } from '../actions/actionTypes';
 
 const INITIAL_STATE = {
@@ -12,6 +14,9 @@ const INITIAL_STATE = {
   totalVestingShares: '',
   networkConnection: false,
   steemConnectDisplayErrorModal: false,
+  displayNotifyModal: false,
+  notifyTitle: '',
+  notifyDescription: '',
 };
 
 export default (state = INITIAL_STATE, action) => {
@@ -55,6 +60,19 @@ export default (state = INITIAL_STATE, action) => {
         ...state,
         steemConnectDisplayErrorModal: action.payload,
       };
+
+    case DISPLAY_NOTIFY_MODAL:
+      return {
+        ...state,
+        displayNotifyModal: true,
+        notifyTitle: action.payload.notifyTitle,
+        notifyDescription: action.payload.notifyDescription,
+      };
+    case HIDE_NOTIFY_MODAL:
+      return {
+        ...state,
+        displayNotifyModal: false,
+      };
     default:
       return state;
   }
@@ -66,3 +84,6 @@ export const getTotalVestingFundSteem = state => state.totalVestingFundSteem;
 export const getTotalVestingShares = state => state.totalVestingShares;
 export const getHasNetworkConnection = state => state.networkConnection;
 export const getSteemConnectDisplayErrorModal = state => state.steemConnectDisplayErrorModal;
+export const getDisplayNotifyModal = state => state.displayNotifyModal;
+export const getNotifyTitle = state => state.notifyTitle;
+export const getNotifyDescription = state => state.notifyDescription;

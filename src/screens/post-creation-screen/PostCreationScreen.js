@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Image, TouchableOpacity, View, Dimensions } from 'react-native';
+import { Image, TouchableOpacity, View, Dimensions, Picker } from 'react-native';
 import _ from 'lodash';
 import uuidv4 from 'uuid/v4';
 import { connect } from 'react-redux';
@@ -20,6 +20,7 @@ import SmallLoading from 'components/common/SmallLoading';
 import PrimaryButton from 'components/common/PrimaryButton';
 import HeaderEmptyView from 'components/common/HeaderEmptyView';
 import { MATERIAL_COMMUNITY_ICONS } from '../../constants/styles';
+import * as postConstants from 'constants/postConstants';
 import PostCreationPreviewModal from './PostCreationPreviewModal';
 
 const { width: deviceWidth } = Dimensions.get('screen');
@@ -28,7 +29,9 @@ const Container = styled.View`
   flex: 1;
 `;
 
-const StyledScrollView = styled.ScrollView``;
+const StyledScrollView = styled.ScrollView`
+  padding-bottom: 200px;
+`;
 
 const CreatePostText = styled.Text`
   color: ${COLORS.PRIMARY_COLOR};
@@ -99,6 +102,7 @@ class PostCreationScreen extends Component {
     additionalInputCounter: 0,
     previewVisible: false,
     currentPostData: { body: '' },
+    rewards: postConstants.REWARDS.HALF,
   };
 
   constructor(props) {
@@ -110,6 +114,8 @@ class PostCreationScreen extends Component {
     this.onChangeTitle = this.onChangeTitle.bind(this);
     this.onChangeTags = this.onChangeTags.bind(this);
     this.onChangeBody = this.onChangeBody.bind(this);
+    this.onChangeRewards = this.onChangeRewards.bind(this);
+
     this.pickImage = this.pickImage.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.removeTag = this.removeTag.bind(this);
@@ -124,6 +130,11 @@ class PostCreationScreen extends Component {
     this.showPreview = this.showPreview.bind(this);
   }
 
+  onChangeRewards(rewards) {
+    this.setState({
+      rewards,
+    });
+  }
   onChangeTitle(value) {
     if (!_.isEmpty(value)) {
       this.setState({
@@ -225,8 +236,7 @@ class PostCreationScreen extends Component {
 
   getPostData() {
     const bsteemTag = 'bsteem';
-    // dont forget to put bsteem tag here
-    const tags = _.compact([...this.state.tags]);
+    const tags = _.compact([...this.state.tags, bsteemTag]);
     const images = _.map(this.state.currentImages, image => image.src);
     const postBody = this.getPostBody();
     const body = _.isEmpty(postBody) ? ' ' : postBody;
@@ -235,7 +245,7 @@ class PostCreationScreen extends Component {
     const data = {
       body,
       title: postTitle,
-      reward: '50',
+      reward: this.state.rewards,
       author: this.props.authUsername,
       parentAuthor: '',
       lastUpdated: Date.now(),
@@ -428,6 +438,7 @@ class PostCreationScreen extends Component {
       titleError,
       previewVisible,
       currentPostData,
+      rewards,
     } = this.state;
     const displayTitleError = !_.isEmpty(titleError);
 
@@ -470,6 +481,12 @@ class PostCreationScreen extends Component {
           />
           {this.renderAdditionalContents()}
           {imageLoading && <SmallLoading style={{ marginTop: 20, alignSelf: 'center' }} />}
+          <FormLabel>{i18n.editor.rewards}</FormLabel>
+          <Picker selectedValue={rewards} onValueChange={this.onChangeRewards}>
+            <Picker.Item label={i18n.editor.halfRewards} value={postConstants.REWARDS.HALF} />
+            <Picker.Item label={i18n.editor.allRewards} value={postConstants.REWARDS.ALL} />
+            <Picker.Item label={i18n.editor.noRewards} value={postConstants.REWARDS.NONE} />
+          </Picker>
           <ActionButtonsContainer>
             <PrimaryButton
               onPress={this.handleSubmit}

@@ -1,4 +1,21 @@
 export default {
+  general: {
+    cancel: 'Cancel',
+  },
+  errors: {
+    postInterval: 'You may only post once every 5 minutes',
+    postCreationError: 'Post Creation Error',
+    commentInterval: 'You may only comment once every 20 seconds.',
+    commentCreationError: 'Comment Creation Error',
+    voteError: 'Vote Error',
+    voteDuplicate: 'You have already voted in a similar way',
+    reblogError: 'Reblog Error',
+    reblogDuplicate: 'You have already reblogged this post',
+    reblogDuplicateFingerprint: 'Account has already reblogged this post',
+    postTooBig: 'Your post is too big.',
+    bandWidthError: 'Your bandwith has been exceeded. Please wait to transact or power up STEEM.',
+    bandWidthErrorTitle: 'Bandwidth Error',
+  },
   titles: {
     post: 'Post',
     createPost: 'Create Post',
@@ -23,6 +40,10 @@ export default {
       emptyTags: 'Must include atleast 1 tag.',
       emptyTitle: 'Title cannot be empty',
     },
+    rewards: 'Rewards',
+    allRewards: '100% Steem Power',
+    halfRewards: '50% SBD and 50% SP',
+    noRewards: 'Declined',
   },
   postMenu: {
     follow: 'Follow',

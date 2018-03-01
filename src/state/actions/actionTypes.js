@@ -73,6 +73,8 @@ export const FETCH_STEEM_GLOBAL_PROPERTIES = createAsyncActionType(
 export const FETCH_NETWORK_CONNECTION = createAsyncActionType('@app/fetch-network-connection');
 export const SET_TRANSLATIONS = createAsyncActionType('@app/set-translations');
 export const SET_STEEMCONNECT_ERROR_MODAL_DISPLAY = '@app/set-steemconnect-error-modal-display';
+export const DISPLAY_NOTIFY_MODAL = '@app/display-notify-modal';
+export const HIDE_NOTIFY_MODAL = '@app/hide-notify-modal';
 
 // Editor Actions
 export const CREATE_POST = createAsyncActionType('@editor/create-post');

@@ -6,6 +6,7 @@ import { Constants, AppLoading, Asset } from 'expo';
 import configureStore from 'state/configureStore';
 import AppNavigation from 'screens/navigation/AppNavigation';
 import SteemConnectErrorModal from 'components/common/steem-connect/SteemConnectErrorModalContainer';
+import NotifyModal from 'components/common/notify/NotifyModal';
 
 const store = configureStore();
 
@@ -47,6 +48,7 @@ export default class App extends React.Component {
         <View style={{ flex: 1 }}>
           <AppNavigation />
           <SteemConnectErrorModal />
+          <NotifyModal />
         </View>
       </Provider>
     );

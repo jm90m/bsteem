@@ -7,7 +7,7 @@ const Container = styled.View`
   flex-direction: row-reverse;
   border-bottom-color: ${COLORS.WHITE.WHITE_SMOKE};
   border-bottom-width: 1px;
-  padding: 10px 16px 10px 10px;;
+  padding: 10px 16px 10px 10px;
 `;
 
 const Button = styled.TouchableOpacity`
@@ -22,15 +22,17 @@ const ButtonText = styled.Text`
   color: ${props => props.color};
 `;
 
-const ModalFooter = ({ cancelText, cancelPress, successText, successPress }) => (
+const ModalFooter = ({ cancelText, cancelPress, successText, successPress, displaySuccess }) => (
   <Container>
-    <Button
-      backgroundColor={COLORS.PRIMARY_COLOR}
-      borderColor={COLORS.PRIMARY_COLOR}
-      onPress={successPress}
-    >
-      <ButtonText color={COLORS.WHITE.WHITE}>{successText}</ButtonText>
-    </Button>
+    {displaySuccess && (
+      <Button
+        backgroundColor={COLORS.PRIMARY_COLOR}
+        borderColor={COLORS.PRIMARY_COLOR}
+        onPress={successPress}
+      >
+        <ButtonText color={COLORS.WHITE.WHITE}>{successText}</ButtonText>
+      </Button>
+    )}
     <Button
       backgroundColor={COLORS.WHITE.WHITE}
       borderColor={COLORS.WHITE.WHITE_SMOKE}
@@ -46,6 +48,7 @@ ModalFooter.propTypes = {
   cancelPress: PropTypes.func,
   successText: PropTypes.string,
   successPress: PropTypes.func,
+  displaySuccess: PropTypes.bool,
 };
 
 ModalFooter.defaultProps = {
@@ -53,6 +56,7 @@ ModalFooter.defaultProps = {
   cancelPress: () => {},
   successText: '',
   successPress: () => {},
+  displaySuccess: true,
 };
 
 export default ModalFooter;

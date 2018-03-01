@@ -5,7 +5,9 @@ import { createPermlink, createCommentPermlink } from 'util/steemitUtils';
 import { CREATE_COMMENT, CREATE_POST, UPLOAD_IMAGE } from '../actions/actionTypes';
 import { getAuthUsername, getUsersDetails } from '../rootReducer';
 import * as editorActions from '../actions/editorActions';
+import * as appActions from '../actions/appActions';
 import { getBodyPatchIfSmaller } from '../../util/steemitUtils';
+import ERRORS from 'constants/errors';
 import API from '../../api/api';
 
 export const rewardsValues = {
@@ -166,6 +168,8 @@ const createPost = function*(action) {
     yield put(editorActions.createPost.success(payload));
   } catch (error) {
     console.log(error);
+    const postCreationError = ERRORS.POST_INTERVAL;
+    yield put(appActions.displayNotifyModal(postCreationError.title, postCreationError.message));
     yield put(editorActions.createPost.fail(error));
   }
 };
