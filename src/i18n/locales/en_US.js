@@ -64,4 +64,7 @@ export default {
     transferredTo: 'Transferred to',
     reblogged: 'reblogged',
   },
+  search: {
+    noResultsFound: 'No results found for your search',
+  },
 };

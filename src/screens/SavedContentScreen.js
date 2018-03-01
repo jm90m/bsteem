@@ -5,10 +5,8 @@ import styled from 'styled-components/native';
 import { ScrollView, RefreshControl, View } from 'react-native';
 import Header from 'components/common/Header';
 import _ from 'lodash';
-import HeaderEmptyView from 'components/common/HeaderEmptyView';
 import Tag from 'components/post/Tag';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
-import i18n from 'i18n/i18n';
 import * as navigationConstants from 'constants/navigation';
 import { fetchSavedTags, fetchSavedPosts } from 'state/actions/firebaseActions';
 import { COLORS, MATERIAL_ICONS, ICON_SIZES, MATERIAL_COMMUNITY_ICONS } from '../constants/styles';
@@ -27,11 +25,6 @@ const BackTouchable = styled.TouchableOpacity`
 `;
 
 const Container = styled.View``;
-
-const TitleContainer = styled.View`
-  flex-direction: row;
-  align-items: center;
-`;
 
 const TagOption = styled.View`
   flex-direction: row;

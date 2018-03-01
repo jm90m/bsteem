@@ -30,6 +30,7 @@ export const getLoadingFetchDiscussions = state => fromHome.getLoadingFetchDiscu
 export const getLoadingFetchMoreDiscussions = state =>
   fromHome.getLoadingFetchMoreDiscussions(state.home);
 export const getHomeFeedPosts = state => fromHome.getHomeFeedPosts(state.home);
+export const getHomeTags = state => fromHome.getHomeTags(state.home)
 
 // User Selectors
 export const getUsersDetails = state => fromUsers.getUsersDetails(state.users);
@@ -44,11 +45,9 @@ export const getLoadingUsersFollowCount = state =>
 export const getRefreshUserBlogLoading = state => fromUsers.getRefreshUserBlogLoading(state.users);
 
 // Search Selectors
-export const getSearchLoading = state => fromSearch.getSearchLoading(state.search);
-export const getSearchResults = state => fromSearch.getSearchResults(state.search);
 export const getAllTrendingTags = state => fromSearch.getAllTrendingTags(state.search);
-export const getSearchUserResults = state => fromSearch.getSearchUserResults(state.search);
-export const getSearchPostResults = state => fromSearch.getSearchPostResults(state.search);
+export const getSearchUsersResults = state => fromSearch.getSearchUserResults(state.search);
+export const getSearchPostsResults = state => fromSearch.getSearchPostResults(state.search);
 export const getSearchTagsResults = state => fromSearch.getSearchTagsResults(state.search);
 export const getLoadingSearchUser = state => fromSearch.getLoadingSearchUser(state.search);
 export const getLoadingSearchPost = state => fromSearch.getLoadingSearchPost(state.search);

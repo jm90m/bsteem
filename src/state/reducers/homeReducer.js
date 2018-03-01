@@ -64,3 +64,4 @@ export default (state = INITIAL_STATE, action) => {
 export const getLoadingFetchDiscussions = state => state.loadingFetchDiscussions;
 export const getLoadingFetchMoreDiscussions = state => state.loadingFetchMoreDiscussions;
 export const getHomeFeedPosts = state => state.posts;
+export const getHomeTags = state => state.tags;

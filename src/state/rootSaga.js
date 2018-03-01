@@ -28,7 +28,7 @@ const rootSaga = function*() {
     spawn(usersSaga.watchRefreshUserBlog),
 
     // Search Sagas
-    spawn(searchSaga.watchSearchAskSteem),
+    spawn(searchSaga.watchFetchPostsSearchResults),
     spawn(searchSaga.watchFetchUsersSearchResults),
     spawn(searchSaga.watchFetchTagsSearchResults),
 

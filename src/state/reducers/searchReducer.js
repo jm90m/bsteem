@@ -1,7 +1,6 @@
 import _ from 'lodash';
 import {
-  SEARCH_ASK_STEEM,
-  SEARCH_FETCH_POST_DETAILS,
+  SEARCH_FETCH_POSTS,
   SEARCH_SET_TRENDING_TAGS,
   SEARCH_FETCH_USERS,
   SEARCH_FETCH_TAGS,
@@ -10,7 +9,6 @@ import {
 const INITIAL_STATE = {
   loading: false,
   searchError: false,
-  searchResults: [],
 
   allTrendingTags: [],
 
@@ -25,37 +23,59 @@ const INITIAL_STATE = {
 
 export default function(state = INITIAL_STATE, action) {
   switch (action.type) {
-    case SEARCH_ASK_STEEM.ACTION:
+    case SEARCH_FETCH_POSTS.ACTION:
       return {
         ...state,
-        loading: true,
-        searchError: false,
+        loadingSearchPost: true,
+        searchPostResults: [],
       };
-    case SEARCH_ASK_STEEM.SUCCESS: {
-      const askSteemResults = _.get(action.payload, 'askSteemResults', []);
-      const steemAccountLookupResults = _.get(action.payload, 'steemAccountLookupResults', []);
-      const formattedSteemLookupResults = _.map(steemAccountLookupResults, name => ({
-        type: 'user',
-        name,
-      }));
-      const searchResults = _.compact(_.concat(formattedSteemLookupResults, askSteemResults));
+    case SEARCH_FETCH_POSTS.SUCCESS: {
       return {
-        searchResults,
-        loading: false,
+        ...state,
+        searchPostResults: _.compact(action.payload),
+        loadingSearchPost: false,
       };
     }
-    case SEARCH_ASK_STEEM.ERROR:
+    case SEARCH_FETCH_POSTS.ERROR:
       return {
         ...state,
-        loading: false,
-        searchError: true,
-        searchResults: [],
+        loadingSearchPost: false,
       };
 
     case SEARCH_FETCH_USERS.ACTION:
-
-
-
+      return {
+        ...state,
+        searchUserResults: [],
+        loadingSearchUser: true,
+      };
+    case SEARCH_FETCH_USERS.SUCCESS:
+      return {
+        ...state,
+        loadingSearchUser: false,
+        searchUserResults: action.payload,
+      };
+    case SEARCH_FETCH_USERS.ERROR:
+      return {
+        ...state,
+        loadingSearchUser: false,
+      };
+    case SEARCH_FETCH_TAGS.ACTION:
+      return {
+        ...state,
+        searchTagsResults: [],
+        loadingSearchTag: true,
+      };
+    case SEARCH_FETCH_TAGS.SUCCESS:
+      return {
+        ...state,
+        loadingSearchTag: false,
+        searchTagsResults: action.payload,
+      };
+    case SEARCH_FETCH_TAGS.ERROR:
+      return {
+        ...state,
+        loadingSearchTag: false,
+      };
     case SEARCH_SET_TRENDING_TAGS:
       return {
         ...state,
@@ -66,8 +86,6 @@ export default function(state = INITIAL_STATE, action) {
   }
 }
 
-export const getSearchLoading = state => state.loading;
-export const getSearchResults = state => state.searchResults;
 export const getAllTrendingTags = state => state.allTrendingTags;
 export const getSearchUserResults = state => state.searchUserResults;
 export const getSearchPostResults = state => state.searchPostResults;

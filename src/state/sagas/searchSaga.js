@@ -1,8 +1,7 @@
 import _ from 'lodash';
 import {
-  SEARCH_ASK_STEEM,
   SEARCH_FETCH_USERS,
-  SEARCH_FETCH_POST_DETAILS,
+  SEARCH_FETCH_POSTS,
   SEARCH_FETCH_TAGS,
 } from 'state/actions/actionTypes';
 import { getAllTrendingTags } from 'state/rootReducer';
@@ -10,9 +9,7 @@ import { takeLatest, call, all, put, select } from 'redux-saga/effects';
 import * as searchActions from 'state/actions/searchActions';
 import API from 'api/api';
 
-// todo split up search into 3 sections, posts, users, tags
-
-const fetchAskSteemSearchResults = function*(action) {
+const fetchPostsSearchResults = function*(action) {
   try {
     const search = action.payload;
     const askSteemResults = yield all([
@@ -22,26 +19,17 @@ const fetchAskSteemSearchResults = function*(action) {
       call(API.getAskSteemSearch, search, 4),
       call(API.getAskSteemSearch, search, 5),
     ]);
-    const steemAccountLookupResults = yield call(API.getAccountReputation, search);
 
     let mergedResults = [];
     _.each(askSteemResults, element => {
       mergedResults = _.concat(mergedResults, element.results);
     });
     const sortedAskSteemResults = _.reverse(_.sortBy(mergedResults, ['type', 'created']));
-    const formattedSteemAccountReputationResults = _.map(
-      steemAccountLookupResults.result,
-      user => user.account,
-    );
-    const payload = {
-      askSteemResults: sortedAskSteemResults,
-      steemAccountLookupResults: formattedSteemAccountReputationResults,
-    };
 
-    yield put(searchActions.searchAskSteem.success(payload));
+    yield put(searchActions.searchFetchPosts.success(sortedAskSteemResults));
   } catch (error) {
     console.log(error);
-    yield put(searchActions.searchAskSteem.fail(error));
+    yield put(searchActions.searchFetchPosts.fail(error));
   }
 };
 
@@ -49,8 +37,15 @@ const fetchUsersSearchResults = function*(action) {
   try {
     const search = action.payload;
     const response = yield call(API.getAccountReputation, search);
-    yield put(searchActions.searchFetchUsers.success(response.result));
+    const usersResult = _.map(response.result, user => ({
+      ...user,
+      type: 'user',
+      name: user.account,
+    }));
+    console.log(usersResult, response);
+    yield put(searchActions.searchFetchUsers.success(usersResult));
   } catch (error) {
+    console.log(error);
     yield put(searchActions.searchFetchUsers.fail(error));
   } finally {
     yield put(searchActions.searchFetchUsers.loadingEnd());
@@ -65,22 +60,30 @@ const fetchTagsSearchResults = function*(action) {
     if (_.isEmpty(allTrendingTags)) {
       const tagsLimit = 500;
       const trendingTags = yield call(API.getTags, tagsLimit);
-      const matchingTags = _.filter(trendingTags.result, tag => _.includes(tag.name, search));
+      const matchingTags = _.map(
+        _.filter(trendingTags.result, tag => _.includes(tag.name, search)),
+        tag => ({ ...tag, type: 'tag' }),
+      );
       yield put(searchActions.setTrendingTags(trendingTags.result));
       yield put(searchActions.searchFetchTags.success(matchingTags));
     } else {
-      const matchingTags = _.filter(allTrendingTags, tag => _.includes(tag.name, search));
+      const matchingTags = _.map(
+        _.filter(allTrendingTags, tag => _.includes(tag.name, search)),
+        tag => ({ ...tag, type: 'tag' }),
+      );
+      console.log(matchingTags);
       yield put(searchActions.searchFetchTags.success(matchingTags));
     }
   } catch (error) {
+    console.log(error);
     yield put(searchActions.searchFetchTags.fail(error));
   } finally {
     yield put(searchActions.searchFetchTags.loadingEnd());
   }
 };
 
-export const watchSearchAskSteem = function*() {
-  yield takeLatest(SEARCH_ASK_STEEM.ACTION, fetchAskSteemSearchResults);
+export const watchFetchPostsSearchResults = function*() {
+  yield takeLatest(SEARCH_FETCH_POSTS.ACTION, fetchPostsSearchResults);
 };
 
 export const watchFetchUsersSearchResults = function*() {
