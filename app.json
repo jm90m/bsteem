@@ -23,7 +23,8 @@
       "bundleIdentifier": "com.bsteem.bsteemapp"
     },
     "android": {
-      "package": "com.bsteem.bsteemapp"
+      "package": "com.bsteem.bsteemapp",
+      "permissions": ["READ_PHONE_STATE", "READ_CONTACTS", "CAMERA", "RECORD_AUDIO"]
     }
   }
 }
