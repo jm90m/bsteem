@@ -120,8 +120,7 @@ class SteemConnectLogin extends Component {
     if (DEBUG || this.state.displayDebug) {
       return (
         <View>
-          <DebugText>{`LinkingURI: ${Expo.Constants.linkingUri}/redirect`}</DebugText>
-          <DebugText>{`RedirectURI: ${AuthSession.getRedirectUrl()}`}</DebugText>
+          <DebugText>{`${Expo.Constants.linkingUri}/redirect`}</DebugText>
         </View>
       );
     }
