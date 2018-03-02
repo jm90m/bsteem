@@ -59,6 +59,7 @@
   },
   "scripts": {
     "exp-ios-build": "./node_modules/.bin/exp build:ios",
-    "exp-android-build": "././node_modules/.bin/exp build:android"
+    "exp-android-build": "./node_modules/.bin/exp build:android",
+    "exp-build-status": "./node_modules/.bin/exp build:status"
   }
 }
