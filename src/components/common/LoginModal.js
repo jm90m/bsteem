@@ -73,7 +73,7 @@ class LoginModal extends Component {
     try {
       let result = await AuthSession.startAsync({
         authUrl: url,
-        returnUrl: redirectAuthURL,
+        returnUrl: `${Expo.Constants.linkingUri}/redirect`,
       });
       if (result.type === 'success') {
         const accessToken = result.params.access_token;

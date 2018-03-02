@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { AsyncStorage, View } from 'react-native';
+import { AsyncStorage, View, TouchableWithoutFeedback } from 'react-native';
 import Expo, { AuthSession } from 'expo';
 import { connect } from 'react-redux';
 import sc2 from 'api/sc2';
@@ -57,8 +57,13 @@ class SteemConnectLogin extends Component {
   constructor(props) {
     super(props);
 
+    this.state = {
+      displayDebug: false,
+    };
+
     this.handleSteemConnectLogin = this.handleSteemConnectLogin.bind(this);
     this.handleSignUp = this.handleSignUp.bind(this);
+    this.displayDebugText = this.displayDebugText.bind(this);
   }
 
   async handleSteemConnectLogin() {
@@ -67,7 +72,7 @@ class SteemConnectLogin extends Component {
     try {
       let result = await AuthSession.startAsync({
         authUrl: url,
-        returnUrl: redirectAuthURL,
+        returnUrl: `${Expo.Constants.linkingUri}/redirect`,
       });
       if (result.type === 'success') {
         const accessToken = result.params.access_token;
@@ -105,8 +110,14 @@ class SteemConnectLogin extends Component {
     }
   }
 
+  displayDebugText() {
+    this.setState({
+      displayDebug: true,
+    });
+  }
+
   renderDebugText() {
-    if (DEBUG) {
+    if (DEBUG || this.state.displayDebug) {
       return (
         <View>
           <DebugText>{`LinkingURI: ${Expo.Constants.linkingUri}/redirect`}</DebugText>
@@ -119,7 +130,9 @@ class SteemConnectLogin extends Component {
   render() {
     return (
       <Container>
-        <Logo source={BsteemIcon} style={{ width: 200, height: 200 }} resizeMode="contain" />
+        <TouchableWithoutFeedback onLongPress={this.displayDebugText}>
+          <Logo source={BsteemIcon} style={{ width: 200, height: 200 }} resizeMode="contain" />
+        </TouchableWithoutFeedback>
         <Description>{i18n.login.description}</Description>
         <ButtonContainer>
           <PrimaryButton
