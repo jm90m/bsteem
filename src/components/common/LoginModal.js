@@ -16,6 +16,7 @@ import {
   STEEM_ACCESS_TOKEN,
 } from '../../constants/asyncStorageKeys';
 import BsteemIcon from '../../../assets/icon.png';
+import { redirectAuthURL } from 'constants/bsteem';
 
 const Container = styled.View`
   justify-content: center;
@@ -72,7 +73,7 @@ class LoginModal extends Component {
     try {
       let result = await AuthSession.startAsync({
         authUrl: url,
-        returnUrl: `${Expo.Constants.linkingUri}/redirect`,
+        returnUrl: redirectAuthURL,
       });
       if (result.type === 'success') {
         const accessToken = result.params.access_token;

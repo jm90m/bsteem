@@ -1,19 +1,20 @@
 {
   "expo": {
-    "name": "bsteem",
+    "name": "bSteem",
     "description": "The best mobile app on the steem blockchain",
     "slug": "bsteem",
     "privacy": "public",
     "sdkVersion": "23.0.0",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
-    "primaryColor": "#cccccc",
+    "primaryColor": "#4630EB",
     "icon": "./assets/icon.png",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#4630EB"
     },
+    "scheme": "bsteem",
     "ios": {
       "supportsTablet": true,
       "infoPlist": {
@@ -24,6 +25,7 @@
     },
     "android": {
       "package": "com.bsteem.bsteemapp",
+      "versionCode": 2,
       "permissions": ["READ_PHONE_STATE", "READ_CONTACTS", "CAMERA", "RECORD_AUDIO"]
     }
   }

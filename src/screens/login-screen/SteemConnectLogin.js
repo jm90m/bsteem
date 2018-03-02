@@ -18,6 +18,7 @@ import {
 import * as authActions from 'state/actions/authActions';
 import i18n from 'i18n/i18n';
 import BsteemIcon from '../../../assets/icon.png';
+import { redirectAuthURL } from 'constants/bsteem';
 
 const mapDispatchToProps = dispatch => ({
   authenticateUserSuccess: payload => dispatch(authActions.authenticateUser.success(payload)),
@@ -66,7 +67,7 @@ class SteemConnectLogin extends Component {
     try {
       let result = await AuthSession.startAsync({
         authUrl: url,
-        returnUrl: `${Expo.Constants.linkingUri}/redirect`,
+        returnUrl: redirectAuthURL,
       });
       if (result.type === 'success') {
         const accessToken = result.params.access_token;

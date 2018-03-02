@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react';
-import { Linking, Platform, StyleSheet, View, ViewPropTypes } from 'react-native';
+import { Platform, StyleSheet, View, ViewPropTypes } from 'react-native';
 import PropTypes from 'prop-types';
 import htmlToElement from './htmlToElement';
 
