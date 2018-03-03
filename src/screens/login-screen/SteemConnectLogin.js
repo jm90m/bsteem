@@ -17,7 +17,7 @@ import {
 } from 'constants/asyncStorageKeys';
 import * as authActions from 'state/actions/authActions';
 import i18n from 'i18n/i18n';
-import BsteemIcon from '../../../assets/icon.png';
+import BsteemIcon from '../../../assets/bsteem-logo-splash.png';
 import { redirectAuthURL } from 'constants/bsteem';
 
 const mapDispatchToProps = dispatch => ({

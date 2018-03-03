@@ -8,9 +8,9 @@
     "version": "1.0.4",
     "orientation": "portrait",
     "primaryColor": "#ffffff",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/bsteem-logo-splash.png",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/bsteem-logo-splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
