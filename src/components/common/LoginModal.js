@@ -15,12 +15,13 @@ import {
   AUTH_USERNAME,
   STEEM_ACCESS_TOKEN,
 } from '../../constants/asyncStorageKeys';
-import BsteemIcon from '../../../assets/bsteem-logo-splash.png';
+import BsteemIcon from '../../../assets/bsteem-icon.png';
 import { redirectAuthURL } from 'constants/bsteem';
 
 const Container = styled.View`
   justify-content: center;
   align-items: center;
+  background-color: ${COLORS.SPLASH_SCREEN_BACKGROUND};
 `;
 
 const TitleText = styled.Text`

@@ -17,7 +17,7 @@ import {
 } from 'constants/asyncStorageKeys';
 import * as authActions from 'state/actions/authActions';
 import i18n from 'i18n/i18n';
-import BsteemIcon from '../../../assets/bsteem-logo-splash.png';
+import BsteemIcon from '../../../assets/bsteem-icon.png';
 import { redirectAuthURL } from 'constants/bsteem';
 
 const mapDispatchToProps = dispatch => ({
@@ -27,7 +27,7 @@ const mapDispatchToProps = dispatch => ({
 
 const Container = styled.View`
   flex: 1;
-  background-color: ${COLORS.WHITE.WHITE};
+  background-color: ${COLORS.SPLASH_SCREEN_BACKGROUND};
   align-items: center;
   justify-content: center;
 `;

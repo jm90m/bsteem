@@ -5,14 +5,14 @@
     "slug": "bsteem",
     "privacy": "public",
     "sdkVersion": "23.0.0",
-    "version": "1.0.5",
+    "version": "1.0.6",
     "orientation": "portrait",
     "primaryColor": "#ffffff",
-    "icon": "./assets/bsteem-logo-splash.png",
+    "icon": "./assets/bsteem-icon.png",
     "splash": {
       "image": "./assets/bsteem-logo-splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#FCFCFC"
     },
     "scheme": "bsteem",
     "ios": {
@@ -25,7 +25,7 @@
     },
     "android": {
       "package": "com.bsteem.bsteemapp",
-      "versionCode": 7,
+      "versionCode": 8,
       "permissions": ["READ_PHONE_STATE", "READ_CONTACTS", "CAMERA", "RECORD_AUDIO"]
     }
   }
