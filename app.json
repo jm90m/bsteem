@@ -12,7 +12,7 @@
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#4630EB"
+      "backgroundColor": "#ffffff"
     },
     "scheme": "bsteem",
     "ios": {
