@@ -101,5 +101,6 @@ export default {
   },
   feed: {
     emptyFeed: 'Feed is currently empty',
-  }
+    userFeedEmpty: 'User currently has no blog posts.',
+  },
 };

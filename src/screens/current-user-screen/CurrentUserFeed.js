@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { ListView, RefreshControl } from 'react-native';
+import { RefreshControl } from 'react-native';
 import styled from 'styled-components/native';
 import _ from 'lodash';
 import { COLORS } from 'constants/styles';
@@ -19,7 +19,7 @@ const Container = styled.View`
   flex: 1;
 `;
 
-const StyledListView = styled.ListView`
+const StyledFlatList = styled.FlatList`
   flex: 1;
   background-color: ${COLORS.WHITE.WHITE_SMOKE};
 `;
@@ -42,8 +42,6 @@ const mapDispatchToProps = dispatch => ({
   currentUserFeedFetch: () => dispatch(currentUserFeedFetch.action()),
   currentUserFeedFetchMore: () => dispatch(currentUserFeedFetchMore.action()),
 });
-
-const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
 
 class CurrentUserFeed extends Component {
   static propTypes = {
@@ -86,7 +84,7 @@ class CurrentUserFeed extends Component {
   }
 
   renderRow(rowData) {
-    return <PostPreview postData={rowData} navigation={this.props.navigation} />;
+    return <PostPreview postData={rowData.item} navigation={this.props.navigation} />;
   }
 
   render() {
@@ -95,14 +93,14 @@ class CurrentUserFeed extends Component {
       currentUserFeed,
       loadingFetchMoreCurrentUserFeed,
     } = this.props;
-    const dataSource = ds.cloneWithRows(currentUserFeed);
     return (
       <Container>
-        <StyledListView
-          dataSource={dataSource}
-          renderRow={this.renderRow}
+        <StyledFlatList
+          data={currentUserFeed}
+          renderItem={this.renderRow}
           enableEmptySections
           onEndReached={this.onEndReached}
+          keyExtractor={(item, index) => `${_.get(item, 'item.id', '')}${index}`}
           refreshControl={
             <RefreshControl
               refreshing={loadingFetchCurrentUserFeed}

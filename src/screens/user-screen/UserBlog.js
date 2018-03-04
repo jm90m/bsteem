@@ -1,17 +1,29 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { RefreshControl, ListView } from 'react-native';
+import { RefreshControl } from 'react-native';
 import _ from 'lodash';
 import styled from 'styled-components/native';
 import { COLORS } from 'constants/styles';
 import PostPreview from 'components/post-preview/PostPreview';
 import UserHeader from 'components/user/user-header/UserHeader';
+import LargeLoading from 'components/common/LargeLoading';
+import i18n from 'i18n/i18n';
 
-const StyledListView = styled.ListView`
+const StyledFlatList = styled.FlatList`
   background-color: ${COLORS.WHITE.WHITE_SMOKE};
 `;
 
-const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
+const LoadingContainer = styled.View`
+  padding: 20px;
+  justify-content: center;
+  align-items: center;
+`;
+
+const EmptyContainer = styled.View`
+  padding: 20px;
+`;
+
+const EmptyText = styled.Text``;
 
 class UserBlog extends Component {
   static propTypes = {
@@ -35,36 +47,61 @@ class UserBlog extends Component {
   constructor(props) {
     super(props);
     this.renderUserPostRow = this.renderUserPostRow.bind(this);
+    this.renderEmptyComponent = this.renderEmptyComponent.bind(this);
+  }
+
+  renderEmptyComponent() {
+    const { loadingUserBlog } = this.props;
+    if (loadingUserBlog) {
+      return (
+        <LoadingContainer>
+          <LargeLoading />
+        </LoadingContainer>
+      );
+    }
+
+    return (
+      <EmptyContainer>
+        <EmptyText>{i18n.feed.userFeedEmpty}</EmptyText>
+      </EmptyContainer>
+    );
   }
 
   renderUserPostRow(rowData) {
-    const { username, navigation, isCurrentUser } = this.props;
-    if (_.has(rowData, 'renderUserHeader')) {
-      return (
-        <UserHeader username={username} navigation={navigation} hideFollowButton={isCurrentUser} />
-      );
-    }
-    return <PostPreview postData={rowData} navigation={navigation} currentUsername={username} />;
+    const postData = rowData.item;
+    const { username, navigation } = this.props;
+
+    return <PostPreview postData={postData} navigation={navigation} currentUsername={username} />;
   }
 
   render() {
-    const { userBlog, fetchMoreUserPosts, loadingUserBlog, refreshUserBlog } = this.props;
-    const userHeaderData = [{ renderUserHeader: true }];
-    const userBlogDataSource = _.concat(userHeaderData, userBlog);
+    const {
+      userBlog,
+      fetchMoreUserPosts,
+      loadingUserBlog,
+      refreshUserBlog,
+      username,
+      navigation,
+      isCurrentUser,
+    } = this.props;
+
     return (
-      <StyledListView
-        dataSource={ds.cloneWithRows(userBlogDataSource)}
-        renderRow={this.renderUserPostRow}
+      <StyledFlatList
+        data={userBlog}
+        renderItem={this.renderUserPostRow}
         enableEmptySections
         onEndReached={fetchMoreUserPosts}
-        refreshControl={
-          <RefreshControl
-            refreshing={loadingUserBlog}
-            onRefresh={refreshUserBlog}
-            colors={[COLORS.PRIMARY_COLOR]}
+        ListHeaderComponent={
+          <UserHeader
+            username={username}
+            navigation={navigation}
+            hideFollowButton={isCurrentUser}
           />
         }
-        // add on refresh
+        keyExtractor={(item, index) => `${_.get(item, 'item.id', '')}${index}`}
+        ListEmptyComponent={this.renderEmptyComponent}
+        refreshing={loadingUserBlog}
+        onRefresh={refreshUserBlog}
       />
     );
   }
