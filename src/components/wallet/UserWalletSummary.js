@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Dimensions } from 'react-native';
 import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
 import styled from 'styled-components/native';
 import { COLORS, FONT_AWESOME_ICONS, MATERIAL_ICONS } from 'constants/styles';
@@ -8,6 +9,8 @@ import SmallLoading from 'components/common/SmallLoading';
 import { calculateEstAccountValue, calculateTotalDelegatedSP } from 'util/steemitUtils';
 
 const SteemLogo = require('images/steem.png');
+
+const { width: deviceWidth } = Dimensions.get('screen');
 
 const Container = styled.View`
   background-color: ${COLORS.WHITE.WHITE};
@@ -39,6 +42,8 @@ const Value = styled.Text`
   margin-left: auto;
   color: ${COLORS.PRIMARY_COLOR};
   font-weight: bold;
+  flex-wrap: wrap;
+  max-width: ${deviceWidth - 100}px;
 `;
 
 const IconContainer = styled.View`
