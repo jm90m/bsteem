@@ -25,6 +25,7 @@
     "react-dom": "^16.1.1",
     "react-native": "https://github.com/expo/react-native/archive/sdk-23.0.0.tar.gz",
     "react-native-elements": "^0.18.5",
+    "react-native-expo-image-cache": "^1.1.0",
     "react-native-htmlview": "^0.12.1",
     "react-native-photo-browser": "^0.4.0",
     "react-native-render-html": "^3.8.1",
