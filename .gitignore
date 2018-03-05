@@ -5,3 +5,4 @@ node_modules/**/*
 npm-debug.*
 src/.DS_Store
 src/util/.DS_Store
+src/constants/config.js

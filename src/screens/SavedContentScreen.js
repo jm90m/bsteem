@@ -276,7 +276,7 @@ class SavedContentScreen extends Component {
 
   render() {
     const { loadingSavedTags, loadingSavedPosts } = this.props;
-    const loading = loadingSavedTags || loadingSavedPosts;
+    const loading = loadingSavedTags;
     const { menu } = this.state;
     const selectedUsers = _.isEqual(menu, MENU.USERS);
     const selectedTags = _.isEqual(menu, MENU.TAGS);

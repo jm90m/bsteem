@@ -13,6 +13,7 @@ import SearchNavigator from './SearchNavigator';
 import LoginNavigator from './LoginNavigator';
 import CurrentUserNavigator from './CurrentUserNavigator';
 import PostCreationScreen from '../post-creation-screen/PostCreationScreen';
+import { firebaseConfig } from 'constants/config';
 
 const tabNavigatorOptions = {
   tabBarPosition: 'bottom',
@@ -96,15 +97,7 @@ class AppNavigation extends React.Component {
     this.props.fetchSteemGlobalProperties();
     this.props.fetchNetworkConnection();
     this.props.setTranslations('en_US');
-    const config = {
-      apiKey: 'AIzaSyBEzVCm5Q6ygDXxZcFGV6mHDyT1RvuMzYc',
-      authDomain: 'bsteem-85a85.firebaseapp.com',
-      databaseURL: 'https://bsteem-85a85.firebaseio.com',
-      projectId: 'bsteem-85a85',
-      storageBucket: '',
-      messagingSenderId: '591405749824',
-    };
-    firebase.initializeApp(config);
+    firebase.initializeApp(firebaseConfig);
   }
 
   render() {
