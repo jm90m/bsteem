@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { ListView, Modal } from 'react-native';
+import { ListView } from 'react-native';
 import _ from 'lodash';
 import styled from 'styled-components/native';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
@@ -11,7 +11,9 @@ import PostPreview from 'components/post-preview/PostPreview';
 import FeedSort from 'components/feed-sort/FeedSort';
 import Header from 'components/common/Header';
 import SaveTagButton from 'components/common/SaveTagButton';
+import Modal from 'react-native-modal';
 import i18n from 'i18n/i18n';
+import BSteemModal from '../../components/common/BSteemModal';
 
 const Container = styled.View`
   flex: 1;
@@ -163,14 +165,11 @@ class FeedScreen extends Component {
             <MaterialCommunityIcons size={24} name={MATERIAL_COMMUNITY_ICONS.menuVertical} />
           </TouchableMenu>
         </Header>
-        <Modal
-          animationType="slide"
-          transparent
-          visible={menuVisible}
-          onRequestClose={this.handleHideMenu}
-        >
-          <FeedSort hideMenu={this.handleHideMenu} handleSortPost={this.handleSortPost} />
-        </Modal>
+        {menuVisible && (
+          <BSteemModal visible={menuVisible} handleOnClose={this.handleHideMenu}>
+            <FeedSort hideMenu={this.handleHideMenu} handleSortPost={this.handleSortPost} />
+          </BSteemModal>
+        )}
         {displayListView && (
           <StyledListView
             dataSource={this.state.dataSource}

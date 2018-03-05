@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Modal, ScrollView, Dimensions, Share } from 'react-native';
+import { ScrollView, Dimensions, Share } from 'react-native';
 import Expo from 'expo';
 import { connect } from 'react-redux';
 import styled from 'styled-components/native';
@@ -29,6 +29,7 @@ import * as postConstants from 'constants/postConstants';
 import i18n from 'i18n/i18n';
 import { currentUserVotePost } from 'state/actions/currentUserActions';
 import EmbedContent from 'components/post-preview/EmbedContent';
+import BSteemModal from 'components/common/BSteemModal';
 import { isPostVoted } from '../../util/voteUtils';
 import { getEmbeds } from '../../util/postPreviewUtils';
 
@@ -385,12 +386,7 @@ class FetchPostScreen extends Component {
           </Menu>
         </Header>
         {menuVisible && (
-          <Modal
-            animationType="slide"
-            transparent
-            visible={menuVisible}
-            onRequestClose={this.handleHideMenu}
-          >
+          <BSteemModal visible={menuVisible} handleOnClose={this.handleHideMenu}>
             <PostMenu
               hideMenu={this.handleHideMenu}
               handleLikePost={this.handleLikePost}
@@ -402,7 +398,7 @@ class FetchPostScreen extends Component {
               handleDisplayPhotoBrowser={this.handleDisplayPhotoBrowser}
               hideReblogMenu
             />
-          </Modal>
+          </BSteemModal>
         )}
         {displayPhotoBrowser && (
           <PostPhotoBrowser

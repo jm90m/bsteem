@@ -24,12 +24,13 @@ import FooterTags from 'components/post/FooterTags';
 import Footer from 'components/post/Footer';
 import PostHeader from 'components/post-preview/Header';
 import Header from 'components/common/Header';
+import BSteemModal from 'components/common/BSteemModal';
+import EmbedContent from 'components/post-preview/EmbedContent';
 import PrimaryButton from '../../components/common/PrimaryButton';
 import { currentUserVotePost } from '../../state/actions/currentUserActions';
 import * as postConstants from '../../constants/postConstants';
 import { isPostVoted } from '../../util/voteUtils';
 import { fetchPostDetails } from '../../state/actions/postsActions';
-import EmbedContent from 'components/post-preview/EmbedContent';
 import { getEmbeds } from '../../util/postPreviewUtils';
 
 const { width: deviceWidth } = Dimensions.get('screen');
@@ -383,12 +384,7 @@ class PostScreen extends Component {
           />
         </ScrollView>
         {menuVisible && (
-          <Modal
-            animationType="slide"
-            transparent
-            visible={menuVisible}
-            onRequestClose={this.handleHideMenu}
-          >
+          <BSteemModal visible={menuVisible} handleOnClose={this.handleHideMenu}>
             <PostMenu
               hideMenu={this.handleHideMenu}
               handleLikePost={this.handleLikePost}
@@ -400,7 +396,7 @@ class PostScreen extends Component {
               handleDisplayPhotoBrowser={this.handleDisplayPhotoBrowser}
               hideReblogMenu
             />
-          </Modal>
+          </BSteemModal>
         )}
         {displayPhotoBrowser && (
           <PostPhotoBrowser

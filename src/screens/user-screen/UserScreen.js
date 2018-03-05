@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components/native';
-import { Modal, Text } from 'react-native';
+import { Text } from 'react-native';
 import { connect } from 'react-redux';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import _ from 'lodash';
@@ -29,6 +29,7 @@ import {
 } from 'state/rootReducer';
 import UserMenu from 'components/user/UserMenu';
 import Header from 'components/common/Header';
+import Modal from 'react-native-modal';
 import UserBlog from './UserBlog';
 import UserComments from './UserComments';
 
@@ -259,6 +260,7 @@ class UserScreen extends Component {
       usersDetails,
       authUsername,
       refreshUserBlogLoading,
+      loadingUsersBlog,
       usersFollowCount,
     } = this.props;
     const { username } = this.props.navigation.state.params;
@@ -293,7 +295,8 @@ class UserScreen extends Component {
             usersDetails={usersDetails}
             authUsername={authUsername}
             usersFollowCount={usersFollowCount}
-            loadingUserBlog={refreshUserBlogLoading}
+            loadingUserBlog={loadingUsersBlog}
+            refreshUserBlogLoading={refreshUserBlogLoading}
             refreshUserBlog={this.handleUserBlogRefresh}
           />
         );
@@ -340,17 +343,18 @@ class UserScreen extends Component {
             </TouchableMenuContainer>
           </TouchableMenu>
         </Header>
-        <Modal
-          animationType="slide"
-          transparent
-          visible={this.state.menuVisible}
-          onRequestClose={this.handleHideMenu}
-        >
-          <UserMenu
-            hideMenu={this.handleHideMenu}
-            handleChangeUserMenu={this.handleChangeUserMenu}
-          />
-        </Modal>
+        {menuVisible && (
+          <Modal
+            isVisible={menuVisible}
+            onBackdropPress={this.handleHideMenu}
+            onBackButtonPress={this.handleHideMenu}
+          >
+            <UserMenu
+              hideMenu={this.handleHideMenu}
+              handleChangeUserMenu={this.handleChangeUserMenu}
+            />
+          </Modal>
+        )}
         {this.renderUserContent()}
         {this.renderLoader()}
       </Container>

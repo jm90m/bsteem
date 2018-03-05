@@ -1,16 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components/native';
 import { getAvatarImageUrl } from 'util/busyImageUtils';
 import { COLORS } from 'constants/styles';
-
-const AvatarImage = styled.Image`
-  height: ${props => props.size}px;
-  width: ${props => props.size}px;
-  border-radius: ${props => props.size / 2}px;
-  border-width: 1px;
-  border-color: ${COLORS.BORDER_COLOR};
-`;
+import { Image as ExpoImage } from 'react-native-expo-image-cache';
 
 const defaultImage =
   'https://res.cloudinary.com/hpiynhbhq/image/upload/v1506948447/p72avlprkfariyti7q2l.png';
@@ -63,7 +55,17 @@ class Avatar extends Component {
   render() {
     const { size } = this.props;
     const { imageUrl } = this.state;
-    return <AvatarImage size={size} onError={this.handleOnError} source={{ uri: imageUrl }} />;
+    const avatarStyle = {
+      height: size,
+      width: size,
+      borderRadius: size / 2,
+      borderWidth: 1,
+      borderColor: COLORS.BORDER_COLOR,
+    };
+
+    return (
+      <ExpoImage size={size} onError={this.handleOnError} uri={imageUrl} style={avatarStyle} />
+    );
   }
 }
 

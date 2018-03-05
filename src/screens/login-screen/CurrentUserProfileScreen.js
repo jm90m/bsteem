@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Modal, AsyncStorage, Linking } from 'react-native';
+import { Modal } from 'react-native';
 import _ from 'lodash';
-import sc2 from 'api/sc2';
 import styled from 'styled-components/native';
 import {
   fetchUser,
@@ -25,12 +24,6 @@ import {
   getCurrentUserFollowList,
   getRefreshUserBlogLoading,
 } from 'state/rootReducer';
-import {
-  STEEM_ACCESS_TOKEN,
-  AUTH_EXPIRATION,
-  AUTH_MAX_EXPIRATION_AGE,
-  AUTH_USERNAME,
-} from 'constants/asyncStorageKeys';
 import { logoutUser } from 'state/actions/authActions';
 import { currentUserFollowListFetch } from 'state/actions/currentUserActions';
 import { COLORS } from 'constants/styles';
@@ -38,6 +31,7 @@ import * as userMenuConstants from 'constants/userMenu';
 import * as navigationConstants from 'constants/navigation';
 import UserBlog from 'screens/user-screen/UserBlog';
 import UserComments from 'screens/user-screen/UserComments';
+import BSteemModal from 'components/common/BSteemModal';
 import CurrentUserHeader from './CurrentUserHeader';
 import CurrentUserMenu from './CurrentUserMenu';
 import LogoutScreen from './LogoutScreen';
@@ -339,17 +333,14 @@ class CurrentUserProfileScreen extends Component {
           handleHide={this.hideLogoutScreen}
           logoutUser={this.props.logoutUser}
         />
-        <Modal
-          animationType="slide"
-          transparent
-          visible={menuVisible}
-          onRequestClose={this.hideCurrentUserMenu}
-        >
-          <CurrentUserMenu
-            hideMenu={this.hideCurrentUserMenu}
-            handleChangeUserMenu={this.handleChangeUserMenu}
-          />
-        </Modal>
+        {menuVisible && (
+          <BSteemModal visible={menuVisible} handleOnClose={this.hideCurrentUserMenu}>
+            <CurrentUserMenu
+              hideMenu={this.hideCurrentUserMenu}
+              handleChangeUserMenu={this.handleChangeUserMenu}
+            />
+          </BSteemModal>
+        )}
       </Container>
     );
   }

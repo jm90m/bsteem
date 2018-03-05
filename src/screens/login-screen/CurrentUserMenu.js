@@ -13,7 +13,6 @@ const Container = styled.View`
   flex: 1;
   flex-direction: column-reverse;
   align-items: center;
-  background-color: rgba(0, 0, 0, 0.5);
 `;
 
 const MenuText = styled.Text`

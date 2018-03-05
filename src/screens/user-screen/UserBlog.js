@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { RefreshControl } from 'react-native';
 import _ from 'lodash';
 import styled from 'styled-components/native';
 import { COLORS } from 'constants/styles';
@@ -20,7 +19,9 @@ const LoadingContainer = styled.View`
 `;
 
 const EmptyContainer = styled.View`
+  margin: 5px 0;
   padding: 20px;
+  background-color: ${COLORS.WHITE.WHITE};
 `;
 
 const EmptyText = styled.Text``;
@@ -33,12 +34,14 @@ class UserBlog extends Component {
     userBlog: PropTypes.arrayOf(PropTypes.shape()),
     username: PropTypes.string,
     loadingUserBlog: PropTypes.bool,
+    refreshUserBlogLoading: PropTypes.bool,
     refreshUserBlog: PropTypes.func,
   };
 
   static defaultProps = {
     isCurrentUser: false,
     loadingUserBlog: false,
+    refreshUserBlogLoading: false,
     username: '',
     userBlog: [],
     refreshUserBlog: () => {},
@@ -52,6 +55,7 @@ class UserBlog extends Component {
 
   renderEmptyComponent() {
     const { loadingUserBlog } = this.props;
+
     if (loadingUserBlog) {
       return (
         <LoadingContainer>
@@ -78,8 +82,8 @@ class UserBlog extends Component {
     const {
       userBlog,
       fetchMoreUserPosts,
-      loadingUserBlog,
       refreshUserBlog,
+      refreshUserBlogLoading,
       username,
       navigation,
       isCurrentUser,
@@ -100,7 +104,7 @@ class UserBlog extends Component {
         }
         keyExtractor={(item, index) => `${_.get(item, 'item.id', '')}${index}`}
         ListEmptyComponent={this.renderEmptyComponent}
-        refreshing={loadingUserBlog}
+        refreshing={refreshUserBlogLoading}
         onRefresh={refreshUserBlog}
       />
     );

@@ -20,6 +20,7 @@ import LargeLoading from 'components/common/LargeLoading';
 import * as navigationConstants from 'constants/navigation';
 import Header from 'components/common/Header';
 import HeaderEmptyView from 'components/common/HeaderEmptyView';
+import BSteemModal from 'components/common/BSteemModal';
 
 const StyledListView = styled.ListView`
   background-color: ${COLORS.WHITE.WHITE_SMOKE};
@@ -173,14 +174,9 @@ class HomeScreen extends Component {
           </TouchableOpacity>
         </Header>
         {menuVisible && (
-          <Modal
-            animationType="slide"
-            transparent
-            visible={menuVisible}
-            onRequestClose={this.handleHideMenu}
-          >
+          <BSteemModal visible={menuVisible} handleOnClose={this.handleHideMenu}>
             <FeedSort hideMenu={this.handleHideMenu} handleSortPost={this.handleSortPost} />
-          </Modal>
+          </BSteemModal>
         )}
         <StyledListView
           dataSource={dataSource}

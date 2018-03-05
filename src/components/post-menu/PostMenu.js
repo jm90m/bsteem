@@ -24,7 +24,6 @@ const Container = styled.View`
   align-items: center;
   flex-direction: column-reverse;
   flex: 1;
-  background-color: rgba(0, 0, 0, 0.5);
 `;
 
 const MenuText = styled.Text`

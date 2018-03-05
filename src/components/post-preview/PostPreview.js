@@ -12,6 +12,7 @@ import {
 } from 'state/rootReducer';
 import { currentUserVotePost, currentUserReblogPost } from 'state/actions/currentUserActions';
 import { isPostVoted } from 'util/voteUtils';
+import BSteemModal from 'components/common/BSteemModal';
 import * as navigationConstants from 'constants/navigation';
 import * as postConstants from 'constants/postConstants';
 import PostPhotoBrowser from 'components/post/PostPhotoBrowser';
@@ -395,17 +396,12 @@ class PostPreview extends Component {
           handleNavigateToVotes={this.handleNavigateToVotes}
         />
         {displayReblogModal && (
-          <Modal
-            animationType="slide"
-            transparent
-            visible={displayReblogModal}
-            onRequestClose={this.hideReblogModal}
-          >
+          <BSteemModal visible={displayReblogModal} handleOnClose={this.hideReblogModal}>
             <ReblogModal
               closeModal={this.hideReblogModal}
               confirmReblog={this.handleReblogConfirm}
             />
-          </Modal>
+          </BSteemModal>
         )}
         {displayPhotoBrowser && (
           <PostPhotoBrowser
@@ -417,12 +413,7 @@ class PostPreview extends Component {
           />
         )}
         {displayMenu && (
-          <Modal
-            animationType="slide"
-            transparent
-            visible={displayMenu}
-            onRequestClose={this.handleHideMenu}
-          >
+          <BSteemModal visible={displayMenu} handleOnClose={this.handleHideMenu}>
             <PostMenu
               hideMenu={this.handleHideMenu}
               postData={postData}
@@ -432,7 +423,7 @@ class PostPreview extends Component {
               rebloggedList={rebloggedList}
               likedPost={likedPost}
             />
-          </Modal>
+          </BSteemModal>
         )}
       </Container>
     );

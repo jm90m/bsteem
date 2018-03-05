@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { WebView, Dimensions, View } from 'react-native';
+import LargeLoading from 'components/common/LargeLoading';
 
 const { width: deviceWidth } = Dimensions.get('screen');
 
@@ -21,6 +22,10 @@ class EmbedContent extends Component {
     width: deviceWidth,
   };
 
+  renderLoading() {
+    return <LargeLoading />;
+  }
+
   renderIframe() {
     const { height, width, embedContent } = this.props;
     return (
@@ -31,6 +36,7 @@ class EmbedContent extends Component {
           height,
         }}
         mediaPlaybackRequiresUserAction
+        renderLoading={this.renderLoading}
       />
     );
   }
