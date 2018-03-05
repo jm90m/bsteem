@@ -14,6 +14,7 @@ import {
 import { currentUserFeedFetch, currentUserFeedFetchMore } from 'state/actions/currentUserActions';
 import PostPreview from 'components/post-preview/PostPreview';
 import LargeLoading from 'components/common/LargeLoadingCenter';
+import i18n from '../../i18n/i18n';
 
 const Container = styled.View`
   flex: 1;
@@ -24,13 +25,19 @@ const StyledFlatList = styled.FlatList`
   background-color: ${COLORS.WHITE.WHITE_SMOKE};
 `;
 
-const LoadingMoreContainer = styled.View`
-  align-items: center;
+const LoadingContainer = styled.View`
+  padding: 20px;
   justify-content: center;
-  z-index: 1;
+  align-items: center;
+`;
+
+const EmptyContainer = styled.View`
+  margin: 5px 0;
   padding: 20px;
   background-color: ${COLORS.WHITE.WHITE};
 `;
+
+const EmptyText = styled.Text``;
 
 const mapStateToProps = state => ({
   currentAuthUsername: getAuthUsername(state),
@@ -65,13 +72,14 @@ class CurrentUserFeed extends Component {
     this.renderRow = this.renderRow.bind(this);
     this.renderLoader = this.renderLoader.bind(this);
     this.onEndReached = this.onEndReached.bind(this);
+    this.renderEmptyComponent = this.renderEmptyComponent.bind(this);
   }
 
   componentDidMount() {
     this.props.currentUserFeedFetch();
   }
 
-  componentWillReceiveProps(nextProps) {
+  componentWillReceiveProps() {
     if (_.isEmpty(this.props.currentUserFeed)) {
       this.props.currentUserFeedFetch();
     }
@@ -90,13 +98,27 @@ class CurrentUserFeed extends Component {
   }
 
   renderLoader() {
-    const { loadingFetchCurrentUserFeed, loadingFetchMoreCurrentUserFeed } = this.props;
+    const { loadingFetchMoreCurrentUserFeed } = this.props;
 
-    if (loadingFetchCurrentUserFeed || loadingFetchMoreCurrentUserFeed) {
+    if (loadingFetchMoreCurrentUserFeed) {
       return (
-        <LoadingMoreContainer>
+        <LoadingContainer>
           <LargeLoading />
-        </LoadingMoreContainer>
+        </LoadingContainer>
+      );
+    }
+
+    return null;
+  }
+
+  renderEmptyComponent() {
+    const { currentUserFeed, loadingFetchCurrentUserFeed } = this.props;
+
+    if (_.isEmpty(currentUserFeed) && !loadingFetchCurrentUserFeed) {
+      return (
+        <EmptyContainer>
+          <EmptyText>{i18n.feed.currentUserFeedEmpty}</EmptyText>
+        </EmptyContainer>
       );
     }
 
@@ -115,7 +137,8 @@ class CurrentUserFeed extends Component {
           keyExtractor={(item, index) => `${_.get(item, 'id', '')}${index}`}
           onRefresh={this.onRefreshCurrentFeed}
           refreshing={loadingFetchCurrentUserFeed}
-          ListFooterComponent={this.renderLoader()}
+          ListFooterComponent={this.renderLoader}
+          ListEmptyComponent={this.renderEmptyComponent}
         />
       </Container>
     );

@@ -17,7 +17,7 @@ const INITIAL_STATE = {
 
 export default (state = INITIAL_STATE, action) => {
   switch (action.type) {
-    case FETCH_CURRENT_USER_FEED.PENDING:
+    case FETCH_CURRENT_USER_FEED.ACTION:
       return {
         ...state,
         loadingFetchCurrentUserFeed: true,
@@ -33,7 +33,7 @@ export default (state = INITIAL_STATE, action) => {
         ...state,
         loadingFetchCurrentUserFeed: false,
       };
-    case FETCH_MORE_CURRENT_USER_FEED.PENDING:
+    case FETCH_MORE_CURRENT_USER_FEED.ACTION:
       return {
         ...state,
         loadingFetchMoreCurrentUserFeed: true,
