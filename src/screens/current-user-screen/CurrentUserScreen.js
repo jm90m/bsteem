@@ -3,10 +3,11 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components/native';
 import { connect } from 'react-redux';
 import { getAuthUsername } from 'state/rootReducer';
-import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Header from 'components/common/Header';
-import { ICON_SIZES, COLORS, MATERIAL_ICONS } from 'constants/styles';
+import { ICON_SIZES, COLORS } from 'constants/styles';
 import * as navigationConstants from 'constants/navigation';
+import HeaderEmptyView from 'components/common/HeaderEmptyView';
 import CurrentUserFeed from './CurrentUserFeed';
 
 const Container = styled.View`
@@ -15,9 +16,10 @@ const Container = styled.View`
 
 const Touchable = styled.TouchableOpacity``;
 
-const BackTouchable = styled.TouchableOpacity`
-  justify-content: center;
-  padding: 10px;
+const HeaderText = styled.Text`
+  color: ${COLORS.PRIMARY_COLOR};
+  align-self: center;
+  font-weight: bold;
 `;
 
 const mapStateToProps = state => ({
@@ -43,7 +45,9 @@ class CurrentUserScreen extends Component {
     const { navigation } = this.props;
     return (
       <Container>
-        <Header style={{ justifyContent: 'flex-end' }}>
+        <Header>
+          <HeaderEmptyView />
+          <HeaderText>bSteem</HeaderText>
           <Touchable onPress={this.handleNavigateToSavedTags}>
             <MaterialCommunityIcons
               name="star"
