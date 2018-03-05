@@ -7,12 +7,11 @@ import { COLORS } from 'constants/styles';
 
 const TouchableContainer = styled.TouchableOpacity`
   flex: 1;
-  background-color: rgba(0,0,0,.5);
 `;
 
 const Container = styled.View`
   padding-top: 10px;
-  background-color: ${COLORS.WHITE.WHITE}
+  background-color: ${COLORS.WHITE.WHITE};
 `;
 
 const ModalContent = styled.View`
@@ -21,8 +20,7 @@ const ModalContent = styled.View`
   border-bottom-width: 1px;
 `;
 
-const ModalContentText = styled.Text`
-`;
+const ModalContentText = styled.Text``;
 
 class ReblogModal extends Component {
   static propTypes = {
@@ -44,9 +42,7 @@ class ReblogModal extends Component {
         <Container>
           <ModalHeader title="Reblog this post?" closeModal={closeModal} />
           <ModalContent>
-            <ModalContentText>
-              {reblogConfirmText}
-            </ModalContentText>
+            <ModalContentText>{reblogConfirmText}</ModalContentText>
           </ModalContent>
           <ModalFooter
             cancelText="Cancel"
