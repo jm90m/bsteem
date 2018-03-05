@@ -53,9 +53,12 @@ class PostImage extends Component {
           height,
           loading: false,
         });
-        console.log(`The image dimensions are ${width}x${height}`);
       },
       error => {
+        this.setState({
+          noImage: true,
+          loading: false,
+        });
         console.log(`Couldn't get the image size: ${error.message}`);
       },
     );

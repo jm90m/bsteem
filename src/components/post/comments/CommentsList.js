@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { ListView, RefreshControl } from 'react-native';
+import { ListView, RefreshControl, FlatList } from 'react-native';
 import styled from 'styled-components/native';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
@@ -85,7 +85,9 @@ class CommentsList extends Component {
     });
   }
 
-  renderComment(commentData) {
+  renderComment(rowData) {
+    const commentData = _.get(rowData, 'item', {});
+
     if (_.get(commentData, 'bsteemEmptyView', false)) {
       return this.renderLoader();
     }
@@ -141,21 +143,17 @@ class CommentsList extends Component {
     const displayComments = _.concat(displayedComments, { bsteemEmptyView: true });
 
     return (
-      <ListView
+      <FlatList
         style={{ marginBottom: 30 }}
         initialListSize={_.size(comments)}
-        dataSource={ds.cloneWithRows(displayComments)}
+        data={displayComments}
         enableEmptySections
-        renderRow={this.renderComment}
+        renderItem={this.renderComment}
         onEndReached={this.displayMoreComments}
         onEndReachedThreshold={100}
-        refreshControl={
-          <RefreshControl
-            refreshing={loadingComments}
-            onRefresh={this.refreshCommentsList}
-            colors={[COLORS.PRIMARY_COLOR]}
-          />
-        }
+        refreshing={loadingComments}
+        onRefresh={this.refreshCommentsList}
+        keyExtractor={(item, index) => `${_.get(item, 'item.id', '')}${index}`}
       />
     );
   }

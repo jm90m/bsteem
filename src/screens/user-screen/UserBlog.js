@@ -33,14 +33,13 @@ class UserBlog extends Component {
     navigation: PropTypes.shape().isRequired,
     userBlog: PropTypes.arrayOf(PropTypes.shape()),
     username: PropTypes.string,
-    loadingUserBlog: PropTypes.bool,
+    loadingUserBlog: PropTypes.bool.isRequired,
     refreshUserBlogLoading: PropTypes.bool,
     refreshUserBlog: PropTypes.func,
   };
 
   static defaultProps = {
     isCurrentUser: false,
-    loadingUserBlog: false,
     refreshUserBlogLoading: false,
     username: '',
     userBlog: [],

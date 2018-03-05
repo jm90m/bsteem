@@ -305,13 +305,11 @@ class UserScreen extends Component {
 
   renderLoader() {
     const { currentMenuOption } = this.state;
-    const { loadingUsersComments, loadingUsersBlog } = this.props;
+    const { loadingUsersComments } = this.props;
 
     switch (currentMenuOption.id) {
       case userMenuConstants.COMMENTS.id:
         return loadingUsersComments && <Loading color={COLORS.PRIMARY_COLOR} size="large" />;
-      case userMenuConstants.BLOG.id:
-        return loadingUsersBlog && <Loading color={COLORS.PRIMARY_COLOR} size="large" />;
       default:
         return null;
     }

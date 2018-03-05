@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
-import { ListView, View, Modal, RefreshControl, TouchableOpacity } from 'react-native';
+import { ListView, View, RefreshControl, TouchableOpacity } from 'react-native';
 import { connect } from 'react-redux';
 import styled from 'styled-components/native';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
@@ -22,7 +22,7 @@ import Header from 'components/common/Header';
 import HeaderEmptyView from 'components/common/HeaderEmptyView';
 import BSteemModal from 'components/common/BSteemModal';
 
-const StyledListView = styled.ListView`
+const StyledFlatList = styled.FlatList`
   background-color: ${COLORS.WHITE.WHITE_SMOKE};
 `;
 
@@ -79,7 +79,6 @@ class HomeScreen extends Component {
     super(props);
 
     this.state = {
-      dataSource: ds.cloneWithRows(props.posts),
       menuVisible: false,
       currentFilter: TRENDING,
     };
@@ -95,12 +94,6 @@ class HomeScreen extends Component {
 
   componentDidMount() {
     this.props.fetchDiscussions(this.state.currentFilter);
-  }
-
-  componentWillReceiveProps(nextProps) {
-    this.setState({
-      dataSource: ds.cloneWithRows(nextProps.posts),
-    });
   }
 
   onEndReached() {
@@ -139,12 +132,13 @@ class HomeScreen extends Component {
   }
 
   renderRow(rowData) {
-    return <PostPreview postData={rowData} navigation={this.props.navigation} />;
+    const postData = rowData.item;
+    return <PostPreview postData={postData} navigation={this.props.navigation} />;
   }
 
   render() {
-    const { loadingFetchDiscussions, loadingFetchMoreDiscussions } = this.props;
-    const { menuVisible, currentFilter, dataSource } = this.state;
+    const { loadingFetchDiscussions, loadingFetchMoreDiscussions, posts } = this.props;
+    const { menuVisible, currentFilter } = this.state;
     return (
       <View>
         <Header>
@@ -178,18 +172,14 @@ class HomeScreen extends Component {
             <FeedSort hideMenu={this.handleHideMenu} handleSortPost={this.handleSortPost} />
           </BSteemModal>
         )}
-        <StyledListView
-          dataSource={dataSource}
-          renderRow={this.renderRow}
+        <StyledFlatList
+          data={posts}
+          renderItem={this.renderRow}
           enableEmptySections
           onEndReached={this.onEndReached}
-          refreshControl={
-            <RefreshControl
-              refreshing={loadingFetchDiscussions}
-              onRefresh={this.onRefreshCurrentFeed}
-              colors={[COLORS.PRIMARY_COLOR]}
-            />
-          }
+          refreshing={loadingFetchDiscussions}
+          onRefresh={this.onRefreshCurrentFeed}
+          keyExtractor={(item, index) => `${_.get(item, 'item.id', '')}${index}`}
         />
         {(loadingFetchMoreDiscussions || loadingFetchDiscussions) && (
           <LoadingMoreContainer>

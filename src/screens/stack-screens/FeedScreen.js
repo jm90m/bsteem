@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { ListView } from 'react-native';
 import _ from 'lodash';
 import styled from 'styled-components/native';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
@@ -11,7 +10,6 @@ import PostPreview from 'components/post-preview/PostPreview';
 import FeedSort from 'components/feed-sort/FeedSort';
 import Header from 'components/common/Header';
 import SaveTagButton from 'components/common/SaveTagButton';
-import Modal from 'react-native-modal';
 import i18n from 'i18n/i18n';
 import BSteemModal from '../../components/common/BSteemModal';
 
@@ -19,7 +17,7 @@ const Container = styled.View`
   flex: 1;
 `;
 
-const StyledListView = styled.ListView`
+const StyledFlatList = styled.FlatList`
   background-color: ${COLORS.WHITE.WHITE_SMOKE};
 `;
 
@@ -45,11 +43,9 @@ const EmptyFeedView = styled.View`
   background-color: ${COLORS.WHITE.WHITE};
 `;
 
-const EmptyFeedText = styled.View`
+const EmptyFeedText = styled.Text`
   font-size: 18px;
 `;
-
-const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
 
 class FeedScreen extends Component {
   static navigationOptions = {
@@ -60,25 +56,33 @@ class FeedScreen extends Component {
     super(props);
 
     this.state = {
-      dataSource: ds.cloneWithRows([]),
       loading: true,
       menuVisible: false,
       currentFilter: TRENDING,
+      posts: [],
     };
+
+    this.fetchInitialPostsForFilter = this.fetchInitialPostsForFilter.bind(this);
+    this.fetchMorePosts = this.fetchMorePosts.bind(this);
+    this.navigateBack = this.navigateBack.bind(this);
+    this.setMenuVisible = this.setMenuVisible.bind(this);
+    this.handleHideMenu = this.handleHideMenu.bind(this);
+    this.renderRow = this.renderRow.bind(this);
+    this.handleSortPost = this.handleSortPost.bind(this);
+    this.renderLoadingOrEmptyText = this.renderLoadingOrEmptyText.bind(this);
   }
 
-  fetchInitialPostsForFilter = () => {
+  fetchInitialPostsForFilter() {
     const { tag } = this.props.navigation.state.params;
     const query = { tag, limit: 10 };
     const api = getAPIByFilter(this.state.currentFilter.id);
     api(query).then(response => {
       this.setState({
         loading: false,
-        dataSource: ds.cloneWithRows(response.result),
         posts: response.result,
       });
     });
-  };
+  }
 
   componentDidMount() {
     try {
@@ -91,7 +95,7 @@ class FeedScreen extends Component {
     }
   }
 
-  fetchMorePosts = () => {
+  fetchMorePosts() {
     const { tag } = this.props.navigation.state.params;
     const { posts, currentFilter } = this.state;
     const lastPost = posts[posts.length - 1];
@@ -108,21 +112,28 @@ class FeedScreen extends Component {
       const { result } = response;
       const posts = this.state.posts.concat(result.slice(1, result.length - 1));
       this.setState({
-        dataSource: ds.cloneWithRows(posts),
         posts,
       });
     });
-  };
+  }
 
-  navigateBack = () => this.props.navigation.goBack();
+  navigateBack() {
+    this.props.navigation.goBack();
+  }
 
-  setMenuVisible = menuVisible => this.setState({ menuVisible });
+  setMenuVisible(menuVisible) {
+    this.setState({ menuVisible });
+  }
 
-  handleHideMenu = () => this.setMenuVisible(false);
+  handleHideMenu() {
+    this.setMenuVisible(false);
+  }
 
-  renderRow = rowData => <PostPreview postData={rowData} navigation={this.props.navigation} />;
+  renderRow(rowData) {
+    return <PostPreview postData={rowData.item} navigation={this.props.navigation} />;
+  }
 
-  handleSortPost = filter => {
+  handleSortPost(filter) {
     this.setState(
       {
         currentFilter: filter,
@@ -130,25 +141,26 @@ class FeedScreen extends Component {
       },
       () => this.fetchInitialPostsForFilter(),
     );
-  };
+  }
 
-  renderLoadingOrEmptyText = () => {
-    const { dataSource, loading } = this.state;
+  renderLoadingOrEmptyText() {
+    const { posts, loading } = this.state;
     if (loading) {
       return <Loading color={COLORS.PRIMARY_COLOR} size="large" />;
-    } else if (dataSource.getRowCount() === 0) {
+    } else if (_.size(posts) === 0) {
       return (
         <EmptyFeedView>
           <EmptyFeedText>{i18n.feed.emptyFeed}</EmptyFeedText>
         </EmptyFeedView>
       );
     }
-  };
+    return null;
+  }
 
   render() {
     const { tag } = this.props.navigation.state.params;
-    const { currentFilter, menuVisible } = this.state;
-    const displayListView = this.state.dataSource.getRowCount() > 0;
+    const { currentFilter, menuVisible, posts } = this.state;
+    const displayListView = _.size(posts) > 0;
 
     return (
       <Container>
@@ -171,11 +183,12 @@ class FeedScreen extends Component {
           </BSteemModal>
         )}
         {displayListView && (
-          <StyledListView
-            dataSource={this.state.dataSource}
-            renderRow={this.renderRow}
+          <StyledFlatList
+            data={posts}
+            renderItem={this.renderRow}
             enableEmptySections
             onEndReached={this.fetchMorePosts}
+            keyExtractor={(item, index) => `${_.get(item, 'item.id', '')}${index}`}
           />
         )}
         {this.renderLoadingOrEmptyText()}
