@@ -28,7 +28,8 @@ const LoadingMoreContainer = styled.View`
   align-items: center;
   justify-content: center;
   z-index: 1;
-  margin-top: 20px;
+  padding: 20px;
+  background-color: ${COLORS.WHITE.WHITE};
 `;
 
 const mapStateToProps = state => ({
@@ -62,6 +63,7 @@ class CurrentUserFeed extends Component {
 
     this.onRefreshCurrentFeed = this.onRefreshCurrentFeed.bind(this);
     this.renderRow = this.renderRow.bind(this);
+    this.renderLoader = this.renderLoader.bind(this);
     this.onEndReached = this.onEndReached.bind(this);
   }
 
@@ -87,12 +89,22 @@ class CurrentUserFeed extends Component {
     return <PostPreview postData={rowData.item} navigation={this.props.navigation} />;
   }
 
+  renderLoader() {
+    const { loadingFetchCurrentUserFeed, loadingFetchMoreCurrentUserFeed } = this.props;
+
+    if (loadingFetchCurrentUserFeed || loadingFetchMoreCurrentUserFeed) {
+      return (
+        <LoadingMoreContainer>
+          <LargeLoading />
+        </LoadingMoreContainer>
+      );
+    }
+
+    return null;
+  }
+
   render() {
-    const {
-      loadingFetchCurrentUserFeed,
-      currentUserFeed,
-      loadingFetchMoreCurrentUserFeed,
-    } = this.props;
+    const { currentUserFeed, loadingFetchCurrentUserFeed } = this.props;
     return (
       <Container>
         <StyledFlatList
@@ -100,20 +112,11 @@ class CurrentUserFeed extends Component {
           renderItem={this.renderRow}
           enableEmptySections
           onEndReached={this.onEndReached}
-          keyExtractor={(item, index) => `${_.get(item, 'item.id', '')}${index}`}
-          refreshControl={
-            <RefreshControl
-              refreshing={loadingFetchCurrentUserFeed}
-              onRefresh={this.onRefreshCurrentFeed}
-              colors={[COLORS.PRIMARY_COLOR]}
-            />
-          }
+          keyExtractor={(item, index) => `${_.get(item, 'id', '')}${index}`}
+          onRefresh={this.onRefreshCurrentFeed}
+          refreshing={loadingFetchCurrentUserFeed}
+          ListFooterComponent={this.renderLoader()}
         />
-        {(loadingFetchMoreCurrentUserFeed || loadingFetchCurrentUserFeed) && (
-          <LoadingMoreContainer>
-            <LargeLoading />
-          </LoadingMoreContainer>
-        )}
       </Container>
     );
   }
