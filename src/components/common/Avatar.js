@@ -22,17 +22,11 @@ class Avatar extends Component {
     super(props);
 
     this.state = {
-      imageUrl: defaultImage,
+      imageUrl: getAvatarImageUrl(props.username, props.size),
     };
 
     this.handleOnError = this.handleOnError.bind(this);
     this.setImageUrl = this.setImageUrl.bind(this);
-  }
-
-  componentDidMount() {
-    const { username, size } = this.props;
-
-    this.setImageUrl(username, size);
   }
 
   componentWillReceiveProps(nextProps) {
