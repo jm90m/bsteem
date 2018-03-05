@@ -30,6 +30,7 @@ class EmbedContent extends Component {
           width,
           height,
         }}
+        mediaPlaybackRequiresUserAction
       />
     );
   }
