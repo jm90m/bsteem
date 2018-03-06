@@ -1,18 +1,14 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components/native';
-import { Dimensions, Platform } from 'react-native';
 import { connect } from 'react-redux';
 import { getCryptosPriceHistory } from 'state/rootReducer';
-import { getCryptoDetails, getCurrentDaysOfTheWeek } from 'util/cryptoUtils';
-import { VictoryChart, VictoryLine, VictoryAxis, VictoryLabel } from 'victory-native';
+import { getCryptoDetails } from 'util/cryptoUtils';
 import _ from 'lodash';
 import { COLORS, MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as appActions from 'state/actions/appActions';
 import LargeLoading from 'components/common/LargeLoading';
-
-const { width: deviceWidth } = Dimensions.get('screen');
 
 const Container = styled.View`
   padding: 20px;
@@ -156,42 +152,6 @@ class CryptoChart extends Component {
     );
   }
 
-  renderChart() {
-    const { cryptosPriceHistory, locale } = this.props;
-    const { currentCrypto } = this.state;
-    const cryptoUSDPriceHistoryKey = `${currentCrypto.symbol}.usdPriceHistory`;
-    const chartData = _.get(cryptosPriceHistory, cryptoUSDPriceHistoryKey, []);
-    const daysOfTheWeek = getCurrentDaysOfTheWeek();
-    const formattedChartData = _.map(daysOfTheWeek, (day, index) => {
-      const price = _.get(chartData, index, 0);
-      return {
-        x: day,
-        y: price,
-        label: `$${price}`,
-        fill: COLORS.PRIMARY_COLOR,
-      };
-    });
-    return (
-      <VictoryChart
-        height={250}
-        padding={{ top: 100, bottom: 100, left: 40, right: 40 }}
-        width={deviceWidth - 40}
-      >
-        <VictoryLine
-          data={formattedChartData}
-          style={{
-            data: { stroke: COLORS.PRIMARY_COLOR, strokeWidth: 3, opacity: 0.5 },
-            labels: {
-              fontSize: 18,
-            },
-          }}
-          labelComponent={<VictoryLabel renderInPortal dy={-20} />}
-        />
-        <VictoryAxis style={{ axis: { stroke: 'none' } }} />
-      </VictoryChart>
-    );
-  }
-
   render() {
     const { cryptosPriceHistory } = this.props;
     const { currentCrypto } = this.state;
@@ -200,7 +160,6 @@ class CryptoChart extends Component {
     const cryptoUSDPriceHistoryKey = `${currentCrypto.symbol}.usdPriceHistory`;
     const usdPriceHistory = _.get(cryptosPriceHistory, cryptoUSDPriceHistoryKey, null);
     const loading = _.isNull(usdPriceHistory);
-    const renderChart = Platform.OS === 'ios';
 
     if (loading) {
       return (
@@ -217,7 +176,6 @@ class CryptoChart extends Component {
         <CryptoName>{currentCrypto.name}</CryptoName>
         {this.renderUSDPrice()}
         {this.renderBTCPrice()}
-        {renderChart && this.renderChart()}
       </Container>
     );
   }
