@@ -139,7 +139,6 @@ class CurrentUserFeed extends Component {
           keyExtractor={(item, index) => `${_.get(item, 'id', '')}${index}`}
           onRefresh={this.onRefreshCurrentFeed}
           refreshing={loadingFetchCurrentUserFeed}
-          ListFooterComponent={this.renderLoader}
           ListEmptyComponent={this.renderEmptyComponent}
         />
       </Container>
