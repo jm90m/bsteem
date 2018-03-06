@@ -5,9 +5,9 @@ import { connect } from 'react-redux';
 import { getAuthUsername } from 'state/rootReducer';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Header from 'components/common/Header';
-import { ICON_SIZES, COLORS } from 'constants/styles';
+import { ICON_SIZES, COLORS, MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
+import { displayPriceModal } from 'state/actions/appActions';
 import * as navigationConstants from 'constants/navigation';
-import HeaderEmptyView from 'components/common/HeaderEmptyView';
 import CurrentUserFeed from './CurrentUserFeed';
 
 const Container = styled.View`
@@ -26,15 +26,24 @@ const mapStateToProps = state => ({
   username: getAuthUsername(state),
 });
 
-@connect(mapStateToProps)
+const mapDispatchToProps = dispatch => ({
+  displayPriceModal: symbols => dispatch(displayPriceModal(symbols)),
+});
+
 class CurrentUserScreen extends Component {
   static propTypes = {
     navigation: PropTypes.shape().isRequired,
+    displayPriceModal: PropTypes.func.isRequired,
   };
 
   constructor(props) {
     super(props);
     this.handleNavigateToSavedTags = this.handleNavigateToSavedTags.bind(this);
+    this.handleDisplayPriceModal = this.handleDisplayPriceModal.bind(this);
+  }
+
+  handleDisplayPriceModal() {
+    this.props.displayPriceModal(['STEEM', 'SBD']);
   }
 
   handleNavigateToSavedTags() {
@@ -46,7 +55,14 @@ class CurrentUserScreen extends Component {
     return (
       <Container>
         <Header>
-          <HeaderEmptyView />
+          <Touchable onPress={this.handleDisplayPriceModal}>
+            <MaterialCommunityIcons
+              name={MATERIAL_COMMUNITY_ICONS.lineChart}
+              size={ICON_SIZES.menuIcon}
+              color={COLORS.PRIMARY_COLOR}
+              style={{ padding: 5 }}
+            />
+          </Touchable>
           <HeaderText>bSteem</HeaderText>
           <Touchable onPress={this.handleNavigateToSavedTags}>
             <MaterialCommunityIcons
@@ -63,4 +79,4 @@ class CurrentUserScreen extends Component {
   }
 }
 
-export default CurrentUserScreen;
+export default connect(mapStateToProps, mapDispatchToProps)(CurrentUserScreen);

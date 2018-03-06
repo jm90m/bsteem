@@ -19,8 +19,8 @@ import FeedSort from 'components/feed-sort/FeedSort';
 import LargeLoading from 'components/common/LargeLoading';
 import * as navigationConstants from 'constants/navigation';
 import Header from 'components/common/Header';
-import HeaderEmptyView from 'components/common/HeaderEmptyView';
 import BSteemModal from 'components/common/BSteemModal';
+import { displayPriceModal } from '../state/actions/appActions';
 
 const StyledFlatList = styled.FlatList`
   background-color: ${COLORS.WHITE.WHITE_SMOKE};
@@ -57,9 +57,8 @@ const mapDispatchToProps = dispatch => ({
   fetchDiscussions: filter => dispatch(fetchDiscussions(filter)),
   fetchMoreDiscussions: (startAuthor, startPermlink, filter) =>
     dispatch(fetchMoreDiscussions(startAuthor, startPermlink, filter)),
+  displayPriceModal: symbols => dispatch(displayPriceModal(symbols)),
 });
-
-const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
 
 class HomeScreen extends Component {
   static propTypes = {
@@ -68,6 +67,7 @@ class HomeScreen extends Component {
     loadingFetchMoreDiscussions: PropTypes.bool.isRequired,
     fetchDiscussions: PropTypes.func.isRequired,
     fetchMoreDiscussions: PropTypes.func.isRequired,
+    displayPriceModal: PropTypes.func.isRequired,
     navigation: PropTypes.shape().isRequired,
   };
 
@@ -90,10 +90,7 @@ class HomeScreen extends Component {
     this.renderRow = this.renderRow.bind(this);
     this.onRefreshCurrentFeed = this.onRefreshCurrentFeed.bind(this);
     this.handleNavigateToSavedTags = this.handleNavigateToSavedTags.bind(this);
-  }
-
-  componentDidMount() {
-    this.props.fetchDiscussions(this.state.currentFilter);
+    this.handleDisplayPriceModal = this.handleDisplayPriceModal.bind(this);
   }
 
   onEndReached() {
@@ -123,6 +120,10 @@ class HomeScreen extends Component {
     );
   }
 
+  handleDisplayPriceModal() {
+    this.props.displayPriceModal(['STEEM', 'SBD']);
+  }
+
   handleHideMenu() {
     this.setMenuVisibile(false);
   }
@@ -142,7 +143,14 @@ class HomeScreen extends Component {
     return (
       <View>
         <Header>
-          <HeaderEmptyView />
+          <TouchableOpacity onPress={this.handleDisplayPriceModal}>
+            <MaterialCommunityIcons
+              name={MATERIAL_COMMUNITY_ICONS.lineChart}
+              size={ICON_SIZES.menuIcon}
+              color={COLORS.PRIMARY_COLOR}
+              style={{ padding: 5 }}
+            />
+          </TouchableOpacity>
           <TouchableMenu onPress={() => this.setMenuVisibile(!menuVisible)}>
             <MaterialIcons
               name={currentFilter.icon}

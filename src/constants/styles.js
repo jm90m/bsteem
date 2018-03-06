@@ -160,6 +160,11 @@ export const MATERIAL_COMMUNITY_ICONS = {
   tag: 'tag',
   posts: 'file-document-box',
   shareVariant: 'share-variant',
+
+  caretUp: 'menu-up',
+  caretDown: 'menu-down',
+
+  lineChart: 'chart-line',
 };
 
 export const FEATHER_ICONS = {

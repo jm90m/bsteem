@@ -1,3 +1,5 @@
+import _ from 'lodash';
+import { getCryptoPriceIncreaseDetails } from 'util/cryptoUtils';
 import {
   FETCH_STEEM_RATE,
   FETCH_STEEM_GLOBAL_PROPERTIES,
@@ -6,6 +8,9 @@ import {
   DISPLAY_NOTIFY_MODAL,
   HIDE_NOTIFY_MODAL,
   APP_ONBOARDING,
+  FETCH_CRYPTO_PRICE_HISTORY,
+  DISPLAY_PRICE_MODAL,
+  HIDE_PRICE_MODAL,
 } from '../actions/actionTypes';
 
 const INITIAL_STATE = {
@@ -19,6 +24,9 @@ const INITIAL_STATE = {
   notifyTitle: '',
   notifyDescription: '',
   appLoading: false,
+  cryptosPriceHistory: {},
+  displayPriceModal: false,
+  displayedCryptos: [],
 };
 
 export default (state = INITIAL_STATE, action) => {
@@ -87,6 +95,44 @@ export default (state = INITIAL_STATE, action) => {
         ...state,
         appLoading: false,
       };
+
+    case FETCH_CRYPTO_PRICE_HISTORY.SUCCESS: {
+      const { symbol, usdPriceHistory, btcPriceHistory } = action.payload;
+      const usdPriceHistoryByClose = _.map(usdPriceHistory.Data, data => data.close);
+      const btcPriceHistoryByClose = _.map(btcPriceHistory.Data, data => data.close);
+      const priceDetails = getCryptoPriceIncreaseDetails(
+        usdPriceHistoryByClose,
+        btcPriceHistoryByClose,
+      );
+      const btcAPIError = btcPriceHistory.Response === 'Error';
+      const usdAPIError = usdPriceHistory.Response === 'Error';
+
+      return {
+        ...state,
+        cryptosPriceHistory: {
+          ...state.cryptosPriceHistory,
+          [symbol]: {
+            usdPriceHistory: usdPriceHistoryByClose,
+            priceDetails,
+            btcAPIError,
+            usdAPIError,
+          },
+        },
+      };
+    }
+
+    case DISPLAY_PRICE_MODAL:
+      return {
+        ...state,
+        displayPriceModal: true,
+        displayedCryptos: action.payload,
+      };
+
+    case HIDE_PRICE_MODAL:
+      return {
+        ...state,
+        displayPriceModal: false,
+      };
     default:
       return state;
   }
@@ -102,3 +148,6 @@ export const getDisplayNotifyModal = state => state.displayNotifyModal;
 export const getNotifyTitle = state => state.notifyTitle;
 export const getNotifyDescription = state => state.notifyDescription;
 export const getIsAppLoading = state => state.appLoading;
+export const getCryptosPriceHistory = state => state.cryptosPriceHistory;
+export const getDisplayPriceModal = state => state.displayPriceModal;
+export const getDisplayedCryptos = state => state.displayedCryptos;

@@ -93,6 +93,10 @@ export const getDisplayNotifyModal = state => fromApp.getDisplayNotifyModal(stat
 export const getNotifyTitle = state => fromApp.getNotifyTitle(state.app);
 export const getNotifyDescription = state => fromApp.getNotifyDescription(state.app);
 export const getIsAppLoading = state => fromApp.getIsAppLoading(state.app);
+export const getCryptosPriceHistory = state => fromApp.getCryptosPriceHistory(state.app);
+export const getDisplayPriceModal = state => fromApp.getDisplayPriceModal(state.app);
+export const getDisplayedCryptos = state => fromApp.getDisplayedCryptos(state.app);
+
 // Comments Selectors
 export const getCommentsByPostId = state => fromComments.getCommentsByPostId(state.comments);
 export const getLoadingComments = state => fromComments.getLoadingComments(state.comments);

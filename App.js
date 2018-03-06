@@ -8,6 +8,7 @@ import AppNavigation from 'screens/navigation/AppNavigation';
 import SteemConnectErrorModal from 'components/common/steem-connect/SteemConnectErrorModalContainer';
 import NotifyModal from 'components/common/notify/NotifyModal';
 import SplashScreen from 'components/common/SplashScreen';
+import CryptoPriceModal from 'components/common/crypto-price-modal/CryptoPriceModal';
 
 const store = configureStore();
 
@@ -53,6 +54,7 @@ export default class App extends React.Component {
           <AppNavigation />
           <SteemConnectErrorModal />
           <NotifyModal />
+          <CryptoPriceModal />
           <SplashScreen assetsAreLoaded={assetsAreLoaded} />
         </View>
       </Provider>

@@ -1,5 +1,5 @@
 import { AsyncStorage, NetInfo } from 'react-native';
-import { takeLatest, call, put } from 'redux-saga/effects';
+import { takeLatest, call, put, takeEvery } from 'redux-saga/effects';
 import _ from 'lodash';
 import API from 'api/api';
 import { i18nInit } from 'i18n/i18n';
@@ -22,6 +22,7 @@ import {
   STEEM_ACCESS_TOKEN,
 } from 'constants/asyncStorageKeys';
 import sc2 from 'api/sc2';
+import { FETCH_CRYPTO_PRICE_HISTORY } from '../actions/actionTypes';
 
 const fetchGlobalSteemProperties = function*() {
   try {
@@ -103,6 +104,24 @@ const appOnboarding = function*() {
   }
 };
 
+const fetchCryptoPriceHistory = function*(action) {
+  try {
+    const { symbol } = action.payload;
+    const usdPriceHistory = yield call(API.getCryptoPriceHistory, symbol, 'USD', 6);
+    const btcPriceHistory = yield call(API.getCryptoPriceHistory, symbol, 'BTC', 6);
+    const payload = {
+      usdPriceHistory,
+      btcPriceHistory,
+      symbol,
+    };
+    yield put(appActions.fetchCryptoPriceHistory.success(payload));
+  } catch (error) {
+    yield put(appActions.fetchCryptoPriceHistory.fail(error));
+  } finally {
+    yield put(appActions.fetchCryptoPriceHistory.loadingEnd());
+  }
+};
+
 export const watchFetchSteemGlobalProperties = function*() {
   yield takeLatest(FETCH_STEEM_GLOBAL_PROPERTIES.ACTION, fetchGlobalSteemProperties);
 };
@@ -121,4 +140,8 @@ export const watchSetTranslations = function*() {
 
 export const watchAppOnboarding = function*() {
   yield takeLatest(APP_ONBOARDING.ACTION, appOnboarding);
+};
+
+export const watchFetchCryptoPriceHistory = function*() {
+  yield takeEvery(FETCH_CRYPTO_PRICE_HISTORY.ACTION, fetchCryptoPriceHistory);
 };

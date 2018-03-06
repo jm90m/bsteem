@@ -76,6 +76,9 @@ export const SET_STEEMCONNECT_ERROR_MODAL_DISPLAY = '@app/set-steemconnect-error
 export const DISPLAY_NOTIFY_MODAL = '@app/display-notify-modal';
 export const HIDE_NOTIFY_MODAL = '@app/hide-notify-modal';
 export const APP_ONBOARDING = createAsyncActionType('@app/app-onboardig');
+export const FETCH_CRYPTO_PRICE_HISTORY = createAsyncActionType('@app/fetch-crypto-price-history');
+export const DISPLAY_PRICE_MODAL = '@app/display-price-modal';
+export const HIDE_PRICE_MODAL = '@app/hide-price-modal';
 
 // Editor Actions
 export const CREATE_POST = createAsyncActionType('@editor/create-post');

@@ -76,7 +76,9 @@ class CurrentUserFeed extends Component {
   }
 
   componentDidMount() {
-    this.props.currentUserFeedFetch();
+    if (_.isEmpty(this.props.currentUserFeed)) {
+      this.props.currentUserFeedFetch();
+    }
   }
 
   componentWillReceiveProps() {

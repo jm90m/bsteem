@@ -54,6 +54,7 @@ const rootSaga = function*() {
     spawn(appSaga.watchFetchNetworkConnection),
     spawn(appSaga.watchSetTranslations),
     spawn(appSaga.watchAppOnboarding),
+    spawn(appSaga.watchFetchCryptoPriceHistory),
 
     // Editor Sagas
     spawn(editorSaga.watchCreatePost),

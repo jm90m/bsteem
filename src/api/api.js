@@ -204,6 +204,12 @@ class API {
     const requestQuery = API.createRequestQuery('get_content', [author, slug]);
     return sendPostRequest(API.BASE_URL, requestQuery);
   }
+
+  static async getCryptoPriceHistory(symbol, toSymbol = 'USD', limit = 6) {
+    return sendRequest(
+      `https://min-api.cryptocompare.com/data/histoday?fsym=${symbol}&tsym=${toSymbol}&limit=${limit}`,
+    );
+  }
 }
 
 export const getAPIByFilter = filterId => {

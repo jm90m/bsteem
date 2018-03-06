@@ -9,8 +9,6 @@ import SmallLoading from '../common/SmallLoading';
 
 const { width: deviceWidth } = Dimensions.get('screen');
 
-const StyledImage = styled.Image``;
-
 class PostImage extends Component {
   static propTypes = {
     images: PropTypes.arrayOf(PropTypes.string),

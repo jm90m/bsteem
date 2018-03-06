@@ -8,6 +8,9 @@ import {
   HIDE_NOTIFY_MODAL,
   DISPLAY_NOTIFY_MODAL,
   APP_ONBOARDING,
+  FETCH_CRYPTO_PRICE_HISTORY,
+  DISPLAY_PRICE_MODAL,
+  HIDE_PRICE_MODAL,
 } from './actionTypes';
 
 export const fetchSteemRate = createAsyncSagaAction(FETCH_STEEM_RATE);
@@ -33,3 +36,13 @@ export const displayNotifyModal = (notifyTitle, notifyDescription) => ({
 });
 
 export const appOnboarding = createAsyncSagaAction(APP_ONBOARDING);
+export const fetchCryptoPriceHistory = createAsyncSagaAction(FETCH_CRYPTO_PRICE_HISTORY);
+
+export const hidePriceModal = () => ({
+  type: HIDE_PRICE_MODAL,
+});
+
+export const displayPriceModal = symbols => ({
+  type: DISPLAY_PRICE_MODAL,
+  payload: symbols,
+});

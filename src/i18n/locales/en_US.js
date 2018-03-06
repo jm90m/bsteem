@@ -25,6 +25,7 @@ export default {
     replyTo: 'Reply to',
     editComment: 'Edit Comment',
     postPreview: 'Post Preview',
+    market: 'Current Market Prices',
   },
   editor: {
     title: 'Title',
@@ -102,6 +103,7 @@ export default {
   feed: {
     emptyFeed: 'Feed is currently empty',
     userFeedEmpty: 'User currently has no blog posts.',
-    currentUserFeedEmpty: 'Your feed is empty, follow users and their latest post will show up on your feed.'
+    currentUserFeedEmpty:
+      'Your feed is empty, follow users and their latest post will show up on your feed.',
   },
 };
