@@ -98,7 +98,7 @@ class UserHeader extends Component {
   }
 
   renderActionButtons() {
-    const { hideFollowButton, username, authenticated, authUsername } = this.props;
+    const { hideFollowButton, username, authUsername } = this.props;
     const isAuthUser = authUsername === username;
     const hideActions = hideFollowButton || isAuthUser;
 
@@ -135,7 +135,10 @@ class UserHeader extends Component {
       10000,
     );
     const votingPower = calculateVotingPower(userDetails);
-    const formattedVotingPower = parseFloat(votingPower * 100).toFixed(0);
+    const votingPowerPercent = votingPower * 100;
+    const formattedVotingPower = _.isNaN(votingPowerPercent)
+      ? 0
+      : parseFloat(votingPowerPercent).toFixed(0);
     const voteWorthText = `${i18n.user.voteValue}: $${
       _.isNaN(voteWorth) ? 0 : parseFloat(voteWorth).toFixed(2)
     }`;
@@ -147,7 +150,7 @@ class UserHeader extends Component {
         {this.renderActionButtons()}
         <UserProfile userProfile={userProfile} userDetails={userDetails} />
         <VoteContainer>
-          <VoteContentContainer>
+          <VoteContentContainer style={{ paddingTop: 5 }}>
             <MaterialIcons name={MATERIAL_ICONS.money} size={20} color={COLORS.GREY.CHARCOAL} />
             <VoteText>{voteWorthText}</VoteText>
           </VoteContentContainer>
