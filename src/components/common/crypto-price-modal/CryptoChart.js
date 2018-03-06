@@ -5,7 +5,7 @@ import { Dimensions } from 'react-native';
 import { connect } from 'react-redux';
 import { getCryptosPriceHistory } from 'state/rootReducer';
 import { getCryptoDetails, getCurrentDaysOfTheWeek } from 'util/cryptoUtils';
-import { VictoryChart, VictoryLine, VictoryAxis } from 'victory-native';
+import { VictoryChart, VictoryLine, VictoryAxis, VictoryLabel } from 'victory-native';
 import _ from 'lodash';
 import { COLORS, MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -171,23 +171,21 @@ class CryptoChart extends Component {
         fill: COLORS.PRIMARY_COLOR,
       };
     });
-    console.log('CHARTSZ', chartData, daysOfTheWeek);
     return (
       <VictoryChart
         height={250}
-        padding={{ top: 20, bottom: 60, left: 0, right: 0 }}
+        padding={{ top: 100, bottom: 100, left: 40, right: 40 }}
         width={deviceWidth - 40}
-        domainPadding={60}
       >
         <VictoryLine
           data={formattedChartData}
-          padding={{ top: 100, bottom: 100 }}
           style={{
-            data: { stroke: COLORS.PRIMARY_COLOR, strokeWidth: 3 },
+            data: { stroke: COLORS.PRIMARY_COLOR, strokeWidth: 3, opacity: 0.5 },
             labels: {
               fontSize: 18,
             },
           }}
+          labelComponent={<VictoryLabel renderInPortal dy={-20} />}
         />
         <VictoryAxis style={{ axis: { stroke: 'none' } }} />
       </VictoryChart>
