@@ -15,5 +15,5 @@ export default {
   steemjs: 'Steem.js',
   strimi: 'Strimi',
   bsteem: 'bSteem',
-  'bsteem-beta': 'bSteem beta',
+  'bsteem-beta': 'bSteem',
 };
