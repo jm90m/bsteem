@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
-import { ListView, View, RefreshControl, TouchableOpacity } from 'react-native';
+import { View, RefreshControl, TouchableOpacity } from 'react-native';
 import { connect } from 'react-redux';
 import styled from 'styled-components/native';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
@@ -185,9 +185,15 @@ class HomeScreen extends Component {
           renderItem={this.renderRow}
           enableEmptySections
           onEndReached={this.onEndReached}
-          refreshing={loadingFetchDiscussions}
-          onRefresh={this.onRefreshCurrentFeed}
           keyExtractor={(item, index) => `${_.get(item, 'item.id', '')}${index}`}
+          refreshControl={
+            <RefreshControl
+              refreshing={loadingFetchDiscussions}
+              onRefresh={this.onRefreshCurrentFeed}
+              tintColor={COLORS.PRIMARY_COLOR}
+              colors={[COLORS.PRIMARY_COLOR]}
+            />
+          }
         />
         {(loadingFetchMoreDiscussions || loadingFetchDiscussions) && (
           <LoadingMoreContainer>

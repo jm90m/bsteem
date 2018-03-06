@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
+import { RefreshControl } from 'react-native';
 import styled from 'styled-components/native';
 import { COLORS } from 'constants/styles';
 import PostPreview from 'components/post-preview/PostPreview';
@@ -103,8 +104,14 @@ class UserBlog extends Component {
         }
         keyExtractor={(item, index) => `${_.get(item, 'item.id', '')}${index}`}
         ListEmptyComponent={this.renderEmptyComponent}
-        refreshing={refreshUserBlogLoading}
-        onRefresh={refreshUserBlog}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshUserBlogLoading}
+            onRefresh={refreshUserBlog}
+            tintColor={COLORS.PRIMARY_COLOR}
+            colors={[COLORS.PRIMARY_COLOR]}
+          />
+        }
       />
     );
   }

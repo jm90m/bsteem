@@ -137,9 +137,15 @@ class CurrentUserFeed extends Component {
           enableEmptySections
           onEndReached={this.onEndReached}
           keyExtractor={(item, index) => `${_.get(item, 'id', '')}${index}`}
-          onRefresh={this.onRefreshCurrentFeed}
-          refreshing={loadingFetchCurrentUserFeed}
           ListEmptyComponent={this.renderEmptyComponent}
+          refreshControl={
+            <RefreshControl
+              refreshing={loadingFetchCurrentUserFeed}
+              onRefresh={this.onRefreshCurrentFeed}
+              tintColor={COLORS.PRIMARY_COLOR}
+              colors={[COLORS.PRIMARY_COLOR]}
+            />
+          }
         />
       </Container>
     );

@@ -169,6 +169,7 @@ class FollowingScreen extends Component {
               refreshing={isRefreshing}
               onRefresh={this.onRefreshCurrentFeed}
               colors={[COLORS.PRIMARY_COLOR]}
+              tintColor={COLORS.PRIMARY_COLOR}
             />
           }
         />
