@@ -106,4 +106,8 @@ export default {
     currentUserFeedEmpty:
       'Your feed is empty, follow users and their latest post will show up on your feed.',
   },
+  user: {
+    votingPower: 'Voting Power',
+    voteValue: 'Vote Value',
+  },
 };

@@ -12,7 +12,7 @@ const Container = styled.View`
   background-color: ${COLORS.WHITE.WHITE};
 `;
 
-const UserProfile = ({ userProfile }) => {
+const UserProfile = ({ userProfile, userDetails }) => {
   const about = _.get(userProfile, 'about', '');
   const location = _.get(userProfile, 'location', '');
   const website = _.get(userProfile, 'website', '');
@@ -29,6 +29,7 @@ const UserProfile = ({ userProfile }) => {
 
 UserProfile.propTypes = {
   userProfile: PropTypes.shape(),
+  userDetails: PropTypes.shape(),
 };
 
 UserProfile.defaultProps = {

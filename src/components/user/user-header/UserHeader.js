@@ -4,16 +4,21 @@ import styled from 'styled-components/native';
 import _ from 'lodash';
 import { View } from 'react-native';
 import { connect } from 'react-redux';
+import { getVoteValue } from 'util/userUtils';
+import { calculateVotingPower } from 'util/steemitUtils';
 import { getReputation } from 'util/steemitFormatters';
 import {
   getUsersDetails,
   getUsersFollowCount,
   getIsAuthenticated,
   getAuthUsername,
+  getRewardFund,
+  getSteemRate,
 } from 'state/rootReducer';
 import UserProfile from 'components/user/user-profile/UserProfile';
 import * as navigationConstants from 'constants/navigation';
 import { COLORS } from 'constants/styles';
+import i18n from 'i18n/i18n';
 import SaveUserButton from 'components/common/SaveUserButton';
 import UserStats from './UserStats';
 import UserCover from './UserCover';
@@ -36,7 +41,18 @@ const mapStateToProps = state => ({
   usersFollowCount: getUsersFollowCount(state),
   authenticated: getIsAuthenticated(state),
   authUsername: getAuthUsername(state),
+  rewardFund: getRewardFund(state),
+  steemRate: getSteemRate(state),
 });
+
+const VoteText = styled.Text`
+  color: ${COLORS.GREY.CHARCOAL};
+`;
+
+const VoteContainer = styled.View`
+  padding: 5px 10px;
+  background-color: ${COLORS.WHITE.WHITE};
+`;
 
 @connect(mapStateToProps)
 class UserHeader extends Component {
@@ -48,6 +64,7 @@ class UserHeader extends Component {
     hideFollowButton: PropTypes.bool,
     authenticated: PropTypes.bool,
     navigation: PropTypes.shape().isRequired,
+    rewardFund: PropTypes.shape().isRequired,
   };
 
   static defaultProps = {
@@ -90,7 +107,7 @@ class UserHeader extends Component {
   }
 
   render() {
-    const { usersDetails, username, usersFollowCount } = this.props;
+    const { usersDetails, username, usersFollowCount, rewardFund, steemRate } = this.props;
     const userDetails = usersDetails[username] || {};
     const userJsonMetaData = _.attempt(JSON.parse, userDetails.json_metadata);
     const userProfile = _.isError(userJsonMetaData) ? {} : userJsonMetaData.profile;
@@ -102,12 +119,29 @@ class UserHeader extends Component {
     const followerCount = _.get(userFollowCount, 'follower_count', 0);
     const followingCount = _.get(userFollowCount, 'following_count', 0);
     const postCount = _.get(userDetails, 'post_count', 0);
+    const voteWorth = getVoteValue(
+      userDetails,
+      _.get(rewardFund, 'recent_claims'),
+      _.get(rewardFund, 'reward_balance'),
+      steemRate,
+      10000,
+    );
+    const votingPower = calculateVotingPower(userDetails);
+    const formattedVotingPower = parseFloat(votingPower * 100).toFixed(0);
+    const voteWorthText = `${i18n.user.voteValue}: $${
+      _.isNaN(voteWorth) ? 0 : parseFloat(voteWorth).toFixed(2)
+    }`;
+    const votePowerText = `${i18n.user.votingPower}: ${formattedVotingPower}%`;
 
     return (
       <View>
         <UserCover username={username} hasCover={hasCover} userReputation={userReputation} />
         {this.renderActionButtons()}
-        <UserProfile userProfile={userProfile} />
+        <UserProfile userProfile={userProfile} userDetails={userDetails} />
+        <VoteContainer>
+          <VoteText>{voteWorthText}</VoteText>
+          <VoteText>{votePowerText}</VoteText>
+        </VoteContainer>
         <UserStats
           postCount={postCount}
           followerCount={followerCount}

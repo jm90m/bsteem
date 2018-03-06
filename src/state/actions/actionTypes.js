@@ -79,6 +79,7 @@ export const APP_ONBOARDING = createAsyncActionType('@app/app-onboardig');
 export const FETCH_CRYPTO_PRICE_HISTORY = createAsyncActionType('@app/fetch-crypto-price-history');
 export const DISPLAY_PRICE_MODAL = '@app/display-price-modal';
 export const HIDE_PRICE_MODAL = '@app/hide-price-modal';
+export const FETCH_REWARD_FUND = createAsyncActionType('@app/fetch-reward-fund');
 
 // Editor Actions
 export const CREATE_POST = createAsyncActionType('@editor/create-post');

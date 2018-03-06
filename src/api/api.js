@@ -210,6 +210,11 @@ class API {
       `https://min-api.cryptocompare.com/data/histoday?fsym=${symbol}&tsym=${toSymbol}&limit=${limit}`,
     );
   }
+
+  static async getRewardFund() {
+    const requestQuery = API.createRequestQuery('get_reward_fund', ['post']);
+    return sendPostRequest(API.BASE_URL, requestQuery);
+  }
 }
 
 export const getAPIByFilter = filterId => {

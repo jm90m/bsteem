@@ -11,6 +11,7 @@ import {
   FETCH_CRYPTO_PRICE_HISTORY,
   DISPLAY_PRICE_MODAL,
   HIDE_PRICE_MODAL,
+  FETCH_REWARD_FUND,
 } from '../actions/actionTypes';
 
 const INITIAL_STATE = {
@@ -27,6 +28,7 @@ const INITIAL_STATE = {
   cryptosPriceHistory: {},
   displayPriceModal: false,
   displayedCryptos: [],
+  rewardFund: {},
 };
 
 export default (state = INITIAL_STATE, action) => {
@@ -133,6 +135,15 @@ export default (state = INITIAL_STATE, action) => {
         ...state,
         displayPriceModal: false,
       };
+
+    case FETCH_REWARD_FUND.SUCCESS:
+      return {
+        ...state,
+        rewardFund: {
+          ...state.rewardFund,
+          ...action.payload,
+        },
+      };
     default:
       return state;
   }
@@ -151,3 +162,4 @@ export const getIsAppLoading = state => state.appLoading;
 export const getCryptosPriceHistory = state => state.cryptosPriceHistory;
 export const getDisplayPriceModal = state => state.displayPriceModal;
 export const getDisplayedCryptos = state => state.displayedCryptos;
+export const getRewardFund = state => state.rewardFund;

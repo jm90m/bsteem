@@ -11,6 +11,7 @@ import {
   FETCH_CRYPTO_PRICE_HISTORY,
   DISPLAY_PRICE_MODAL,
   HIDE_PRICE_MODAL,
+  FETCH_REWARD_FUND,
 } from './actionTypes';
 
 export const fetchSteemRate = createAsyncSagaAction(FETCH_STEEM_RATE);
@@ -46,3 +47,5 @@ export const displayPriceModal = symbols => ({
   type: DISPLAY_PRICE_MODAL,
   payload: symbols,
 });
+
+export const fetchRewardFund = createAsyncSagaAction(FETCH_REWARD_FUND);

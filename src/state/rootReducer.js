@@ -96,6 +96,7 @@ export const getIsAppLoading = state => fromApp.getIsAppLoading(state.app);
 export const getCryptosPriceHistory = state => fromApp.getCryptosPriceHistory(state.app);
 export const getDisplayPriceModal = state => fromApp.getDisplayPriceModal(state.app);
 export const getDisplayedCryptos = state => fromApp.getDisplayedCryptos(state.app);
+export const getRewardFund = state => fromApp.getRewardFund(state.app);
 
 // Comments Selectors
 export const getCommentsByPostId = state => fromComments.getCommentsByPostId(state.comments);

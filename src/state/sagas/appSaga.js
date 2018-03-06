@@ -22,7 +22,7 @@ import {
   STEEM_ACCESS_TOKEN,
 } from 'constants/asyncStorageKeys';
 import sc2 from 'api/sc2';
-import { FETCH_CRYPTO_PRICE_HISTORY } from '../actions/actionTypes';
+import { FETCH_CRYPTO_PRICE_HISTORY, FETCH_REWARD_FUND } from '../actions/actionTypes';
 
 const fetchGlobalSteemProperties = function*() {
   try {
@@ -86,6 +86,21 @@ const authenticateUser = function*() {
   }
 };
 
+const fetchRewardFund = function*() {
+  try {
+    const response = yield call(API.getRewardFund);
+    if (response.error) {
+      yield put(appActions.fetchRewardFund.fail(response.error));
+    } else {
+      yield put(appActions.fetchRewardFund.success(response.result));
+    }
+  } catch (error) {
+    yield put(appActions.fetchRewardFund.fail(error));
+  } finally {
+    yield put(appActions.fetchRewardFund.loadingEnd());
+  }
+};
+
 const appOnboarding = function*() {
   try {
     // home screen onboarding
@@ -94,6 +109,7 @@ const appOnboarding = function*() {
 
     // authenticate
     yield call(authenticateUser);
+    yield call(fetchRewardFund);
     yield put(currentUserActions.currentUserFeedFetch());
 
     yield put(appActions.appOnboarding.success());
@@ -144,4 +160,8 @@ export const watchAppOnboarding = function*() {
 
 export const watchFetchCryptoPriceHistory = function*() {
   yield takeEvery(FETCH_CRYPTO_PRICE_HISTORY.ACTION, fetchCryptoPriceHistory);
+};
+
+export const watchFetchRewardFund = function*() {
+  yield takeLatest(FETCH_REWARD_FUND.ACTION, fetchRewardFund);
 };
