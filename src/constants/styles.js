@@ -112,6 +112,7 @@ export const MATERIAL_ICONS = {
   star: 'star',
   flashOn: 'flash-on',
   modeComment: 'mode-comment',
+  money: 'attach-money',
 
   // video
   playCircle: 'play-circle-outline',

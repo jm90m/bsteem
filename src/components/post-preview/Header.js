@@ -118,7 +118,7 @@ class Header extends Component {
           <Touchable onPress={this.handleReblogUserNavigation}>
             <RebloggedUsername>{postData.first_reblogged_by}</RebloggedUsername>
           </Touchable>
-          <RebloggedText>{' reblogged'}</RebloggedText>
+          <RebloggedText>{` ${i18n.post.reblogged}`}</RebloggedText>
         </Reblogged>
       );
     } else if (firstRebloggedOn) {
@@ -159,7 +159,7 @@ class Header extends Component {
       const app = _.isError(jsonMetadata) ? [] : _.split(jsonMetadata.app, '/');
       const from = _.get(APPS, app[0], '');
 
-      return <PostedFrom>{`Posted from: ${from}`}</PostedFrom>;
+      return <PostedFrom>{`${i18n.post.postedFrom}: ${from}`}</PostedFrom>;
     } catch (e) {
       return <View />;
     }

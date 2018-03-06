@@ -74,6 +74,7 @@ export default {
     viewComments: 'View Comments',
     reblogged: 'Reblogged',
     noPostFound: 'No post was found.',
+    postedFrom: 'Posted from',
   },
   comments: {
     noCommentsToShow: 'No comments to show.',

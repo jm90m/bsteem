@@ -22,6 +22,7 @@ import {
 import PostPreview from '../components/saved-content/PostPreview';
 import SaveTagButton from '../components/common/SaveTagButton';
 import Avatar from '../components/common/Avatar';
+import SaveUserButton from '../components/common/SaveUserButton';
 
 const MenuContent = styled.View`
   flex-direction: row;
@@ -72,6 +73,9 @@ const UserContainer = styled.View`
   padding: 5px 10px;
   margin: 5px 0;
   background-color: ${COLORS.WHITE.WHITE};
+  justify-content: space-between;
+  flex-direction: row;
+  align-items: center;
 `;
 
 const Username = styled.Text`
@@ -235,6 +239,7 @@ class SavedContentScreen extends Component {
             <Avatar username={username} size={40} />
             <Username>{`@${username}`}</Username>
           </UserTouchable>
+          <SaveUserButton username={username} />
         </UserContainer>
       ));
 

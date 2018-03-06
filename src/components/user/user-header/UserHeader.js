@@ -20,9 +20,11 @@ import * as navigationConstants from 'constants/navigation';
 import { COLORS } from 'constants/styles';
 import i18n from 'i18n/i18n';
 import SaveUserButton from 'components/common/SaveUserButton';
+import { MaterialIcons } from '@expo/vector-icons';
 import UserStats from './UserStats';
 import UserCover from './UserCover';
 import UserFollowButton from './UserFollowButton';
+import { MATERIAL_ICONS } from '../../../constants/styles';
 
 const SaveUserButtonContainer = styled.View`
   padding-right: 10px;
@@ -47,10 +49,16 @@ const mapStateToProps = state => ({
 
 const VoteText = styled.Text`
   color: ${COLORS.GREY.CHARCOAL};
+  margin-left: 5px;
+`;
+
+const VoteContentContainer = styled.View`
+  flex-direction: row;
+  padding-bottom: 5px;
 `;
 
 const VoteContainer = styled.View`
-  padding: 5px 10px;
+  padding: 0 10px;
   background-color: ${COLORS.WHITE.WHITE};
 `;
 
@@ -139,8 +147,14 @@ class UserHeader extends Component {
         {this.renderActionButtons()}
         <UserProfile userProfile={userProfile} userDetails={userDetails} />
         <VoteContainer>
-          <VoteText>{voteWorthText}</VoteText>
-          <VoteText>{votePowerText}</VoteText>
+          <VoteContentContainer>
+            <MaterialIcons name={MATERIAL_ICONS.money} size={20} color={COLORS.GREY.CHARCOAL} />
+            <VoteText>{voteWorthText}</VoteText>
+          </VoteContentContainer>
+          <VoteContentContainer>
+            <MaterialIcons name={MATERIAL_ICONS.flashOn} size={20} color={COLORS.GREY.CHARCOAL} />
+            <VoteText>{votePowerText}</VoteText>
+          </VoteContentContainer>
         </VoteContainer>
         <UserStats
           postCount={postCount}
