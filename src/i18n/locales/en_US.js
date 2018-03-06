@@ -109,5 +109,6 @@ export default {
   user: {
     votingPower: 'Voting Power',
     voteValue: 'Vote Value',
+    wallet: 'wallet',
   },
 };

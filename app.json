@@ -10,7 +10,7 @@
     "primaryColor": "#ffffff",
     "icon": "./assets/bsteem-icon.png",
     "splash": {
-      "image": "./assets/bsteem-logo-splash.png",
+      "image": "./assets/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#FCFCFC"
     },

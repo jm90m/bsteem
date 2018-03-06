@@ -159,7 +159,7 @@ class Header extends Component {
       const app = _.isError(jsonMetadata) ? [] : _.split(jsonMetadata.app, '/');
       const from = _.get(APPS, app[0], '');
 
-      return <PostedFrom>{from}</PostedFrom>;
+      return <PostedFrom>{`Posted from: ${from}`}</PostedFrom>;
     } catch (e) {
       return <View />;
     }

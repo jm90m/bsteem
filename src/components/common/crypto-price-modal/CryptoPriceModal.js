@@ -9,12 +9,22 @@ import {
   getCryptosPriceHistory,
   getDisplayPriceModal,
   getDisplayedCryptos,
+  getLoadingSteemGlobalProperties,
+  getTotalVestingFundSteem,
+  getTotalVestingShares,
+  getUsersDetails,
+  getAuthUsername,
+  getIsAuthenticated,
+  getSteemRate,
+  getLoadingUsersDetails,
 } from 'state/rootReducer';
 import { MaterialIcons } from '@expo/vector-icons';
 import HeaderEmptyView from 'components/common/HeaderEmptyView';
 import { COLORS, MATERIAL_ICONS } from 'constants/styles';
 import { hidePriceModal } from 'state/actions/appActions';
 import i18n from 'i18n/i18n';
+import { fetchUser } from 'state/actions/usersActions';
+import UserWalletSummary from 'components/wallet/UserWalletSummary';
 import Header from '../Header';
 import CryptoChart from './CryptoChart';
 
@@ -35,14 +45,29 @@ const EmptyView = styled.View`
   width: 100;
 `;
 
+const UserWalletContainer = styled.View``;
+
+const UserWalletTitleText = styled(TitleText)`
+  padding: 10px 15px;
+`;
+
 const mapStateToProps = state => ({
   cryptosPriceHistory: getCryptosPriceHistory(state),
   displayPriceModal: getDisplayPriceModal(state),
   displayedCryptos: getDisplayedCryptos(state),
+  usersDetails: getUsersDetails(state),
+  loadingSteemGlobalProperties: getLoadingSteemGlobalProperties(state),
+  totalVestingFundSteem: getTotalVestingFundSteem(state),
+  totalVestingShares: getTotalVestingShares(state),
+  currentAuthUsername: getAuthUsername(state),
+  authenticated: getIsAuthenticated(state),
+  loadingUsersDetails: getLoadingUsersDetails(state),
+  steemRate: getSteemRate(state),
 });
 
 const mapDispatchToProps = dispatch => ({
   hidePriceModal: () => dispatch(hidePriceModal()),
+  fetchUser: username => dispatch(fetchUser.action({ username })),
 });
 
 class CryptoPriceModal extends Component {
@@ -50,7 +75,16 @@ class CryptoPriceModal extends Component {
     displayedCryptos: PropTypes.arrayOf(PropTypes.string),
     cryptosPriceHistory: PropTypes.shape().isRequired,
     displayPriceModal: PropTypes.bool.isRequired,
+    authenticated: PropTypes.bool.isRequired,
     hidePriceModal: PropTypes.func.isRequired,
+    totalVestingFundSteem: PropTypes.string.isRequired,
+    totalVestingShares: PropTypes.string.isRequired,
+    loadingSteemGlobalProperties: PropTypes.bool.isRequired,
+    loadingUsersDetails: PropTypes.bool.isRequired,
+    currentAuthUsername: PropTypes.string.isRequired,
+    steemRate: PropTypes.string.isRequired,
+    usersDetails: PropTypes.shape().isRequired,
+    fetchUser: PropTypes.func.isRequired,
   };
 
   static defaultProps = {
@@ -99,6 +133,7 @@ class CryptoPriceModal extends Component {
         });
       },
     );
+    this.props.fetchUser(this.props.currentAuthUsername);
   }
 
   renderCryptoCharts() {
@@ -111,6 +146,37 @@ class CryptoPriceModal extends Component {
     return _.map(displayedCryptos, crypto => (
       <CryptoChart key={crypto} crypto={crypto} refreshCharts={refreshCharts} />
     ));
+  }
+
+  renderUserWallet() {
+    const {
+      loadingUsersDetails,
+      steemRate,
+      loadingSteemGlobalProperties,
+      totalVestingFundSteem,
+      totalVestingShares,
+      currentAuthUsername,
+      authenticated,
+      usersDetails,
+    } = this.props;
+
+    if (!authenticated) return null;
+
+    const user = _.get(usersDetails, currentAuthUsername, {});
+
+    return (
+      <UserWalletContainer>
+        <UserWalletTitleText>{`${currentAuthUsername} ${i18n.user.wallet}`}</UserWalletTitleText>
+        <UserWalletSummary
+          user={user}
+          loading={loadingUsersDetails}
+          steemRate={steemRate}
+          loadingSteemGlobalProperties={loadingSteemGlobalProperties}
+          totalVestingFundSteem={totalVestingFundSteem}
+          totalVestingShares={totalVestingShares}
+        />
+      </UserWalletContainer>
+    );
   }
 
   render() {
@@ -145,6 +211,7 @@ class CryptoPriceModal extends Component {
               />
             }
           >
+            {this.renderUserWallet()}
             {this.renderCryptoCharts()}
             <EmptyView />
           </ScrollView>
