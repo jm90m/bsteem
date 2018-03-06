@@ -34,7 +34,7 @@ export default class App extends React.Component {
         Asset.loadAsync([
           require('./src/images/steem.png'),
           require('./assets/bsteem-icon.png'),
-          require('./assets/bsteem-logo-splash.png'),
+          require('./assets/splash.png'),
         ]),
       ]);
     } catch (e) {
