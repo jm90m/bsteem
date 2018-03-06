@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components/native';
-import { Dimensions } from 'react-native';
+import { Dimensions, Platform } from 'react-native';
 import { connect } from 'react-redux';
 import { getCryptosPriceHistory } from 'state/rootReducer';
 import { getCryptoDetails, getCurrentDaysOfTheWeek } from 'util/cryptoUtils';
@@ -200,6 +200,7 @@ class CryptoChart extends Component {
     const cryptoUSDPriceHistoryKey = `${currentCrypto.symbol}.usdPriceHistory`;
     const usdPriceHistory = _.get(cryptosPriceHistory, cryptoUSDPriceHistoryKey, null);
     const loading = _.isNull(usdPriceHistory);
+    const renderChart = Platform.OS === 'ios';
 
     if (loading) {
       return (
@@ -216,7 +217,7 @@ class CryptoChart extends Component {
         <CryptoName>{currentCrypto.name}</CryptoName>
         {this.renderUSDPrice()}
         {this.renderBTCPrice()}
-        {this.renderChart()}
+        {renderChart && this.renderChart()}
       </Container>
     );
   }
