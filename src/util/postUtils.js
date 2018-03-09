@@ -54,3 +54,13 @@ export function getHtml(body, parsedJsonMetadata, returnType = 'Object') {
   }
   return sections.join('');
 }
+
+export const isPostTaggedNSFW = post => {
+  if (_.get(post, 'parent_permlink') === 'nsfw') return true;
+
+  const postJSONMetaData = _.attempt(JSON.parse, post.json_metadata);
+
+  if (_.isError(postJSONMetaData)) return false;
+
+  return _.includes(postJSONMetaData.tags, 'nsfw');
+};

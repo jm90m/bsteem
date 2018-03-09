@@ -42,5 +42,20 @@ export const LOGOUT = {
   label: 'Logout',
 };
 
+export const SETTINGS = {
+  icon: MATERIAL_ICONS.settings,
+  id: 'settings',
+  label: 'Settings',
+};
+
 export const USER_MENU = [BLOG, COMMENTS, FOLLOWERS, FOLLOWING, WALLET, ACTIVITY];
-export const CURRENT_USER_MENU = [BLOG, COMMENTS, FOLLOWERS, FOLLOWING, WALLET, ACTIVITY, LOGOUT];
+export const CURRENT_USER_MENU = [
+  BLOG,
+  COMMENTS,
+  FOLLOWERS,
+  FOLLOWING,
+  WALLET,
+  ACTIVITY,
+  SETTINGS,
+  LOGOUT,
+];

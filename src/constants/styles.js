@@ -117,6 +117,7 @@ export const MATERIAL_ICONS = {
   // video
   playCircle: 'play-circle-outline',
   edit: 'edit',
+  settings: 'settings',
 };
 
 export const MATERIAL_COMMUNITY_ICONS = {

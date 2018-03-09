@@ -228,6 +228,14 @@ class CurrentUserProfileScreen extends Component {
       case userMenuConstants.LOGOUT.id:
         this.showLogoutScreen();
         break;
+      case userMenuConstants.SETTINGS.id:
+        this.setState(
+          {
+            menuVisible: false,
+          },
+          () => this.props.navigation.navigate(navigationConstants.SETTINGS),
+        );
+        break;
       default:
         this.setState({
           currentMenuOption: option,

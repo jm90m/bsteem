@@ -26,6 +26,8 @@ export default {
     editComment: 'Edit Comment',
     postPreview: 'Post Preview',
     market: 'Current Market Prices',
+    settings: 'Settings',
+    login: 'Login & Settings',
   },
   editor: {
     title: 'Title',
@@ -75,6 +77,10 @@ export default {
     reblogged: 'Reblogged',
     noPostFound: 'No post was found.',
     postedFrom: 'Posted from',
+    nsfwPostHidden: 'The contents of this post is currently hidden because it is tagged NSFW.',
+    displayHiddenContent: 'Display hidden content.',
+    lowAuthorReputationPostPreview:
+      'The contents of this post is currently hidden because the author has a low reputation or the post has a low rating.',
   },
   comments: {
     noCommentsToShow: 'No comments to show.',
@@ -111,5 +117,8 @@ export default {
     votingPower: 'Voting Power',
     voteValue: 'Vote Value',
     wallet: 'wallet',
+  },
+  settings: {
+    enableNSFW: 'Enable NSFW Posts',
   },
 };

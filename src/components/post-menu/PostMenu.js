@@ -116,7 +116,6 @@ class PostMenu extends Component {
     const displayMenuButton = authUsername !== author && !_.isEmpty(authUsername);
     const isReblogged = _.includes(rebloggedList, `${id}`);
     const hideReblog = !(displayMenuButton && !isReblogged) || hideReblogMenu;
-    const renderReportPost = false;
 
     return (
       <TouchableWithoutFeedback onPress={hideMenu}>
@@ -178,19 +177,18 @@ class PostMenu extends Component {
                 </MenuModalContents>
               </MenuModalButton>
             )}
-            {displayMenuButton &&
-              renderReportPost && (
-                <MenuModalButton onPress={handleReportPost}>
-                  <MenuModalContents>
-                    <MaterialIcons
-                      size={ICON_SIZES.menuModalOptionIcon}
-                      color={COLORS.PRIMARY_COLOR}
-                      name={MATERIAL_ICONS.report}
-                    />
-                    <MenuText>{i18n.postMenu.reportPost}</MenuText>
-                  </MenuModalContents>
-                </MenuModalButton>
-              )}
+            {displayMenuButton && (
+              <MenuModalButton onPress={handleReportPost}>
+                <MenuModalContents>
+                  <MaterialIcons
+                    size={ICON_SIZES.menuModalOptionIcon}
+                    color={COLORS.PRIMARY_COLOR}
+                    name={MATERIAL_ICONS.report}
+                  />
+                  <MenuText>{i18n.postMenu.reportPost}</MenuText>
+                </MenuModalContents>
+              </MenuModalButton>
+            )}
             <MenuModalButton onPress={this.handleShare}>
               <MenuModalContents>
                 <MaterialCommunityIcons

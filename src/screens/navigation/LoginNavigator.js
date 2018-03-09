@@ -17,6 +17,7 @@ import VotesScreen from '../stack-screens/VotesScreen';
 import FetchPostScreen from '../stack-screens/FetchPostScreen';
 import ReplyScreen from '../stack-screens/ReplyScreen';
 import EditReplyScreen from '../stack-screens/EditReplyScreen';
+import SettingsScreen from '../stack-screens/SettingsScreen';
 
 const screenNavigationOptions = {
   tabBarIcon: ({ tintColor }) => (
@@ -79,6 +80,10 @@ const LoginNavigator = StackNavigator(
     },
     [navigationConstants.EDIT_REPLY]: {
       screen: EditReplyScreen,
+      navigationOptions: screenNavigationOptions,
+    },
+    [navigationConstants.SETTINGS]: {
+      screen: SettingsScreen,
       navigationOptions: screenNavigationOptions,
     },
   },

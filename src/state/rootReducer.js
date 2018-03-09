@@ -10,6 +10,7 @@ import appReducer, * as fromApp from './reducers/appReducer';
 import editorReducer, * as fromEditor from './reducers/editorReducer';
 import firebaseReducer, * as fromFirebase from './reducers/firebaseReducer';
 import postsReducer, * as fromPosts from './reducers/postsReducer';
+import settingsReducer, * as fromSettings from './reducers/settingsReducer';
 
 export default combineReducers({
   app: appReducer,
@@ -23,6 +24,7 @@ export default combineReducers({
   editor: editorReducer,
   firebase: firebaseReducer,
   posts: postsReducer,
+  settings: settingsReducer,
 });
 
 // Home Selectors
@@ -119,3 +121,6 @@ export const getPendingSavingUsers = state => fromFirebase.getPendingSavingUsers
 // Posts Selectors
 export const getPostsDetails = state => fromPosts.getPostsDetails(state.posts);
 export const getPostLoading = state => fromPosts.getPostLoading(state.posts);
+
+// Settings Selectors
+export const getDisplayNSFWContent = state => fromSettings.getDisplayNSFWContent(state.settings);

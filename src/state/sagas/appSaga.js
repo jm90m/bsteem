@@ -8,6 +8,7 @@ import * as homeActions from 'state/actions/homeActions';
 import * as authActions from 'state/actions/authActions';
 import * as currentUserActions from 'state/actions/currentUserActions';
 import * as feedFilters from 'constants/feedFilters';
+import * as settingsSaga from './settingsSaga';
 import {
   FETCH_STEEM_GLOBAL_PROPERTIES,
   FETCH_STEEM_RATE,
@@ -110,6 +111,7 @@ const appOnboarding = function*() {
     // authenticate
     yield call(authenticateUser);
     yield call(fetchRewardFund);
+    yield call(settingsSaga.fetchUserSettings);
     yield put(currentUserActions.currentUserFeedFetch());
 
     yield put(appActions.appOnboarding.success());

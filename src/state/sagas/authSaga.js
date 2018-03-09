@@ -2,6 +2,7 @@ import { takeLatest, call, put } from 'redux-saga/effects';
 import { AUTHENTICATE_USER } from '../actions/actionTypes';
 import * as authActions from 'state/actions/authActions';
 import * as currentUserActions from 'state/actions/currentUserActions';
+import * as settingsActions from 'state/actions/settingsActions';
 
 const authenticateUser = function*(action) {
   try {
@@ -14,6 +15,7 @@ const authenticateUser = function*(action) {
     };
     yield put(authActions.authenticateUser.success(payload));
     yield put(currentUserActions.currentUserFollowListFetch.action());
+    yield put(settingsActions.getCurrentUserSettings.action());
   } catch (error) {
     yield put(authActions.authenticateUser.fail(error));
   }

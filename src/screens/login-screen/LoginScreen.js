@@ -36,9 +36,9 @@ class LoginScreen extends Component {
   };
 
   renderLoginButton() {
-    const { accessToken } = this.props;
+    const { accessToken, navigation } = this.props;
     if (_.isEmpty(accessToken)) {
-      return <SteemConnectLogin />;
+      return <SteemConnectLogin navigation={navigation} />;
     }
     return null;
   }

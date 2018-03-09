@@ -5,8 +5,9 @@ import Expo, { AuthSession } from 'expo';
 import { connect } from 'react-redux';
 import sc2 from 'api/sc2';
 import styled from 'styled-components/native';
-import { COLORS } from 'constants/styles';
+import { COLORS, MATERIAL_ICONS } from 'constants/styles';
 import PrimaryButton from 'components/common/PrimaryButton';
+import { MaterialIcons } from '@expo/vector-icons';
 import SecondaryButton from 'components/common/SecondaryButton';
 import DEBUG from 'constants/debug';
 import {
@@ -17,7 +18,10 @@ import {
 } from 'constants/asyncStorageKeys';
 import * as authActions from 'state/actions/authActions';
 import i18n from 'i18n/i18n';
+import * as navigationConstants from 'constants/navigation';
 import BsteemIcon from '../../../assets/bsteem-icon.png';
+import Header from 'components/common/Header';
+import HeaderEmptyView from 'components/common/HeaderEmptyView';
 import { redirectAuthURL } from 'constants/bsteem';
 
 const mapDispatchToProps = dispatch => ({
@@ -25,11 +29,13 @@ const mapDispatchToProps = dispatch => ({
   authenticateUserError: error => dispatch(authActions.authenticateUser.fail(error)),
 });
 
-const Container = styled.View`
-  flex: 1;
+const Container = styled.View``;
+
+const ContentContainer = styled.View`
   background-color: ${COLORS.SPLASH_SCREEN_BACKGROUND};
   align-items: center;
   justify-content: center;
+  height: 100%;
 `;
 
 const DebugText = styled.Text`
@@ -49,6 +55,15 @@ const ButtonContainer = styled.View`
 
 const Logo = styled.Image``;
 
+const TouchableSettings = styled.TouchableOpacity``;
+
+const SettingsIconContainer = styled.View``;
+
+const Title = styled.Text`
+  font-weight: bold;
+  color: ${COLORS.PRIMARY_COLOR};
+`;
+
 class SteemConnectLogin extends Component {
   static propTypes = {
     authenticateUserSuccess: PropTypes.func.isRequired,
@@ -64,6 +79,7 @@ class SteemConnectLogin extends Component {
     this.handleSteemConnectLogin = this.handleSteemConnectLogin.bind(this);
     this.handleSignUp = this.handleSignUp.bind(this);
     this.displayDebugText = this.displayDebugText.bind(this);
+    this.navigateToSettings = this.navigateToSettings.bind(this);
   }
 
   async handleSteemConnectLogin() {
@@ -110,6 +126,10 @@ class SteemConnectLogin extends Component {
     }
   }
 
+  navigateToSettings() {
+    this.props.navigation.navigate(navigationConstants.SETTINGS);
+  }
+
   displayDebugText() {
     this.setState({
       displayDebug: true,
@@ -129,26 +149,42 @@ class SteemConnectLogin extends Component {
   render() {
     return (
       <Container>
-        <TouchableWithoutFeedback onLongPress={this.displayDebugText}>
-          <Logo source={BsteemIcon} style={{ width: 200, height: 200 }} resizeMode="contain" />
-        </TouchableWithoutFeedback>
-        <Description>{i18n.login.description}</Description>
-        <ButtonContainer>
-          <PrimaryButton
-            onPress={this.handleSteemConnectLogin}
-            title={i18n.login.loginWithSC}
-            fontWeight="bold"
-            backgroundColor={COLORS.PRIMARY_COLOR}
-          />
-        </ButtonContainer>
-        <ButtonContainer>
-          <SecondaryButton
-            onPress={this.handleSignUp}
-            fontWeight="bold"
-            title={i18n.login.signUp}
-          />
-        </ButtonContainer>
-        {this.renderDebugText()}
+        <Header>
+          <HeaderEmptyView />
+          <Title>{i18n.titles.login}</Title>
+          <TouchableSettings onPress={this.navigateToSettings}>
+            <SettingsIconContainer>
+              <MaterialIcons
+                name={MATERIAL_ICONS.settings}
+                size={24}
+                color={COLORS.PRIMARY_COLOR}
+                style={{ padding: 5 }}
+              />
+            </SettingsIconContainer>
+          </TouchableSettings>
+        </Header>
+        <ContentContainer>
+          <TouchableWithoutFeedback onLongPress={this.displayDebugText}>
+            <Logo source={BsteemIcon} style={{ width: 200, height: 200 }} resizeMode="contain" />
+          </TouchableWithoutFeedback>
+          <Description>{i18n.login.description}</Description>
+          <ButtonContainer>
+            <PrimaryButton
+              onPress={this.handleSteemConnectLogin}
+              title={i18n.login.loginWithSC}
+              fontWeight="bold"
+              backgroundColor={COLORS.PRIMARY_COLOR}
+            />
+          </ButtonContainer>
+          <ButtonContainer>
+            <SecondaryButton
+              onPress={this.handleSignUp}
+              fontWeight="bold"
+              title={i18n.login.signUp}
+            />
+          </ButtonContainer>
+          {this.renderDebugText()}
+        </ContentContainer>
       </Container>
     );
   }

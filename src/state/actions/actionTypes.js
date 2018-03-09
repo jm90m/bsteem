@@ -99,3 +99,11 @@ export const UNSAVE_USER = createAsyncActionType('@firebase/unsave-user');
 
 // Posts Actions
 export const FETCH_POST_DETAILS = createAsyncActionType('@posts/fetch-post-details');
+
+// Settings Actions
+export const UPDATE_NSFW_DISPLAY_SETTING = createAsyncActionType(
+  '@settings/update-nsfw-display-settings',
+);
+export const FETCH_CURRENT_USER_SETTINGS = createAsyncActionType(
+  '@settings/fetch-current-user-settings',
+);

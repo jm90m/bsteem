@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Modal, Share } from 'react-native';
+import { Share, View } from 'react-native';
 import styled from 'styled-components/native';
 import { connect } from 'react-redux';
 import _ from 'lodash';
@@ -9,6 +9,7 @@ import {
   getIsAuthenticated,
   getAuthUsername,
   getCurrentUserRebloggedList,
+  getDisplayNSFWContent,
 } from 'state/rootReducer';
 import { currentUserVotePost, currentUserReblogPost } from 'state/actions/currentUserActions';
 import { isPostVoted } from 'util/voteUtils';
@@ -19,6 +20,9 @@ import PostPhotoBrowser from 'components/post/PostPhotoBrowser';
 import ReblogModal from 'components/post/ReblogModal';
 import PostMenu from 'components/post-menu/PostMenu';
 import EmbedContent from 'components/post-preview/EmbedContent';
+import { isPostTaggedNSFW } from 'util/postUtils';
+import { getReputation } from 'util/steemitFormatters';
+import i18n from 'i18n/i18n';
 import Footer from './Footer';
 import Header from './Header';
 import BodyShort from './BodyShort';
@@ -47,10 +51,22 @@ const Title = styled.Text`
 
 const Touchable = styled.TouchableOpacity``;
 
+const HiddenPreviewText = styled.Text`
+  padding: 0 5px;
+`;
+
+const HiddenContentLink = styled.Text`
+  color: ${COLORS.PRIMARY_COLOR};
+  padding: 0 5px;
+`;
+
+const TextTouchable = styled.TouchableWithoutFeedback``;
+
 const mapStateToProps = state => ({
   authenticated: getIsAuthenticated(state),
   authUsername: getAuthUsername(state),
   rebloggedList: getCurrentUserRebloggedList(state),
+  displayNSFWContent: getDisplayNSFWContent(state),
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -99,11 +115,13 @@ class PostPreview extends Component {
     postData: PropTypes.shape(),
     rebloggedList: PropTypes.arrayOf(PropTypes.string),
     currentUsername: PropTypes.string,
+    displayNSFWContent: PropTypes.bool.isRequired,
   };
 
   static defaultProps = {
     postData: {},
     authenticated: false,
+    displayNSFWContent: false,
     authUsername: '',
     rebloggedList: [],
     currentUsername: '',
@@ -112,6 +130,14 @@ class PostPreview extends Component {
   constructor(props) {
     super(props);
     const { postData } = props;
+    const postAuthorReputation = getReputation(postData.author_reputation);
+    let displayPostPreview = true;
+
+    if (postAuthorReputation >= 0 && isPostTaggedNSFW(postData)) {
+      displayPostPreview = props.displayNSFWContent;
+    } else if (postAuthorReputation < 0) {
+      displayPostPreview = false;
+    }
 
     this.state = {
       likedPost: isPostVoted(postData, props.authUsername),
@@ -120,6 +146,7 @@ class PostPreview extends Component {
       loadingReblog: false,
       displayPhotoBrowser: false,
       displayMenu: false,
+      displayPostPreview,
     };
 
     this.handleOnPressVote = this.handleOnPressVote.bind(this);
@@ -141,6 +168,7 @@ class PostPreview extends Component {
     this.handlePhotoBrowserShare = this.handlePhotoBrowserShare.bind(this);
     this.handleAuthVote = this.handleAuthVote.bind(this);
     this.handleReblogIconPress = this.handleReblogIconPress.bind(this);
+    this.displayHiddenContent = this.displayHiddenContent.bind(this);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -204,6 +232,12 @@ class PostPreview extends Component {
         voteFailCallback,
       );
     }
+  }
+
+  displayHiddenContent() {
+    this.setState({
+      displayPostPreview: true,
+    });
   }
 
   handleOnPressVote() {
@@ -323,6 +357,22 @@ class PostPreview extends Component {
     });
   }
 
+  getDisplayPostPreview() {
+    const { postData } = this.props;
+    const { displayPostPreview } = this.state;
+    const postAuthorReputation = getReputation(postData.author_reputation);
+
+    if (displayPostPreview) return true;
+
+    if (postAuthorReputation >= 0 && isPostTaggedNSFW(postData)) {
+      return displayPostPreview;
+    } else if (postAuthorReputation < 0) {
+      return false;
+    }
+
+    return true;
+  }
+
   renderPreview() {
     const { postData } = this.props;
     const { id } = postData;
@@ -368,6 +418,22 @@ class PostPreview extends Component {
     const parsedJsonMetadata = JSON.parse(json_metadata);
     const images = parsedJsonMetadata.image || [];
     const formattedImages = _.map(images, image => ({ photo: image }));
+    const showPostPreview = this.getDisplayPostPreview();
+    const hiddenStoryPreviewMessage = isPostTaggedNSFW(postData) ? (
+      <View>
+        <HiddenPreviewText> {`${i18n.post.nsfwPostHidden} `}</HiddenPreviewText>
+        <TextTouchable onPress={this.displayHiddenContent}>
+          <HiddenContentLink>{i18n.post.displayHiddenContent}</HiddenContentLink>
+        </TextTouchable>
+      </View>
+    ) : (
+      <View>
+        <HiddenPreviewText>{`${i18n.post.lowAuthorReputationPostPreview} `}</HiddenPreviewText>
+        <TextTouchable onPress={this.displayHiddenContent}>
+          <HiddenContentLink>{i18n.post.displayHiddenContent}</HiddenContentLink>
+        </TextTouchable>
+      </View>
+    );
 
     return (
       <Container>
@@ -381,7 +447,7 @@ class PostPreview extends Component {
           <Touchable onPress={this.handleNavigateToPost}>
             <Title>{title}</Title>
           </Touchable>
-          {this.renderPreview()}
+          {showPostPreview ? this.renderPreview() : hiddenStoryPreviewMessage}
         </Content>
         <Footer
           authUsername={authUsername}

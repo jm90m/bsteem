@@ -9,6 +9,7 @@ import * as appSaga from './sagas/appSaga';
 import * as editorSaga from './sagas/editorSaga';
 import * as firebaseSaga from './sagas/firebaseSaga';
 import * as authSaga from './sagas/authSaga';
+import * as settingsSaga from './sagas/settingsSaga';
 
 const rootSaga = function*() {
   yield all([
@@ -74,6 +75,10 @@ const rootSaga = function*() {
 
     // Auth Sagas
     spawn(authSaga.watchAuthenticateUser),
+
+    // Settings Sagas
+    spawn(settingsSaga.watchFetchUserSettings),
+    spawn(settingsSaga.watchSaveNSFWDisplaySetting),
   ]);
 };
 
