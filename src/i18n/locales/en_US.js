@@ -28,6 +28,7 @@ export default {
     market: 'Current Market Prices',
     settings: 'Settings',
     login: 'Login & Settings',
+    reportedPosts: 'Reported Posts'
   },
   editor: {
     title: 'Title',
@@ -120,5 +121,7 @@ export default {
   },
   settings: {
     enableNSFW: 'Enable NSFW Posts',
+    ViewReportedPosts: 'View Reported Posts',
+    noReportedPosts: 'No reported posts',
   },
 };

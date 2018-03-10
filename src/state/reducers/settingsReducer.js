@@ -3,6 +3,7 @@ import { FETCH_CURRENT_USER_SETTINGS, UPDATE_NSFW_DISPLAY_SETTING } from '../act
 
 const INITIAL_STATE = {
   displayNSFWContent: false,
+  reportedPosts: [],
 };
 
 export default (state = INITIAL_STATE, action) => {
@@ -25,3 +26,4 @@ export default (state = INITIAL_STATE, action) => {
 };
 
 export const getDisplayNSFWContent = state => state.displayNSFWContent;
+export const getReportedPosts = state => state.reportedPosts;

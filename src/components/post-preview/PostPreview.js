@@ -358,14 +358,14 @@ class PostPreview extends Component {
   }
 
   getDisplayPostPreview() {
-    const { postData } = this.props;
+    const { postData, displayNSFWContent } = this.props;
     const { displayPostPreview } = this.state;
     const postAuthorReputation = getReputation(postData.author_reputation);
 
     if (displayPostPreview) return true;
 
     if (postAuthorReputation >= 0 && isPostTaggedNSFW(postData)) {
-      return displayPostPreview;
+      return displayNSFWContent;
     } else if (postAuthorReputation < 0) {
       return false;
     }

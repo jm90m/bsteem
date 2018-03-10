@@ -35,7 +35,7 @@ export default class App extends React.Component {
           require('./src/images/steem.png'),
           require('./assets/bsteem-icon.png'),
           require('./assets/splash.png'),
-          require('./assets/bsteem-name-logo.png.png'),
+          require('./assets/bsteem-name-logo.png'),
         ]),
       ]);
     } catch (e) {

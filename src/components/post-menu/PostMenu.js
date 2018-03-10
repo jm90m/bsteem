@@ -116,6 +116,7 @@ class PostMenu extends Component {
     const displayMenuButton = authUsername !== author && !_.isEmpty(authUsername);
     const isReblogged = _.includes(rebloggedList, `${id}`);
     const hideReblog = !(displayMenuButton && !isReblogged) || hideReblogMenu;
+    const displayReportButton = authUsername !== author;
 
     return (
       <TouchableWithoutFeedback onPress={hideMenu}>
@@ -177,7 +178,7 @@ class PostMenu extends Component {
                 </MenuModalContents>
               </MenuModalButton>
             )}
-            {displayMenuButton && (
+            {displayReportButton && (
               <MenuModalButton onPress={handleReportPost}>
                 <MenuModalContents>
                   <MaterialIcons

@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components/native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { COLORS, MATERIAL_ICONS } from 'constants/styles';
+import { Modal, View } from 'react-native';
 import { connect } from 'react-redux';
 import Header from 'components/common/Header';
 import HeaderEmptyView from 'components/common/HeaderEmptyView';
@@ -10,6 +11,19 @@ import i18n from 'i18n/i18n';
 import { CheckBox } from 'react-native-elements';
 import { getDisplayNSFWContent } from 'state/rootReducer';
 import * as settingsActions from 'state/actions/settingsActions';
+import PrimaryButton from 'components/common/PrimaryButton';
+import PostPreview from 'components/saved-content/PostPreview';
+import * as navigationConstants from '../../constants/navigation';
+import _ from 'lodash';
+
+const EmptyContent = styled.View`
+  padding: 20px;
+  background-color: ${COLORS.WHITE.WHITE};
+`;
+
+const EmptyText = styled.Text`
+  font-size: 18px;
+`;
 
 const Container = styled.View`
   flex: 1;
@@ -24,6 +38,12 @@ const TitleText = styled.Text`
   font-weight: bold;
   color: ${COLORS.PRIMARY_COLOR};
 `;
+
+const ButtonContainer = styled.View`
+  margin: 10px 0;
+`;
+
+const ScrollView = styled.ScrollView``;
 
 const mapStateToProps = state => ({
   displayNSFWContent: getDisplayNSFWContent(state),
@@ -41,13 +61,26 @@ class SettingsScreen extends Component {
     displayNSFWContent: PropTypes.bool.isRequired,
     getCurrentUserSettings: PropTypes.func.isRequired,
     updateNSFWDisplaySettings: PropTypes.func.isRequired,
+    reportedPosts: PropTypes.arrayOf(PropTypes.shape()),
+  };
+
+  static defaultProps = {
+    reportedPosts: [],
   };
 
   constructor(props) {
     super(props);
 
+    this.state = {
+      displayReportedPostsModal: false,
+    };
+
     this.navigateBack = this.navigateBack.bind(this);
     this.handleUpdateNSFWDisplay = this.handleUpdateNSFWDisplay.bind(this);
+    this.handleNavigatePost = this.handleNavigatePost.bind(this);
+    this.handleNavigateUser = this.handleNavigateUser.bind(this);
+    this.hideReportedPostsModal = this.hideReportedPostsModal.bind(this);
+    this.showReportedPostsModal = this.showReportedPostsModal.bind(this);
   }
 
   componentDidMount() {
@@ -58,13 +91,58 @@ class SettingsScreen extends Component {
     this.props.navigation.goBack();
   }
 
+  handleNavigatePost(author, permlink) {
+    this.props.navigation.navigate(navigationConstants.FETCH_POST, {
+      author,
+      permlink,
+    });
+  }
+
+  hideReportedPostsModal() {
+    this.setState({
+      displayReportedPostsModal: false,
+    });
+  }
+
+  showReportedPostsModal() {
+    this.setState({
+      displayReportedPostsModal: true,
+    });
+  }
+
+  handleNavigateUser(username) {
+    this.props.navigation.navigate(navigationConstants.USER, { username });
+  }
+
   handleUpdateNSFWDisplay() {
     const { displayNSFWContent } = this.props;
     this.props.updateNSFWDisplaySettings(!displayNSFWContent);
   }
 
+  renderReportedPosts() {
+    const { reportedPosts } = this.props;
+    const reportedPostsPreview = _.map(reportedPosts, post => (
+      <PostPreview
+        key={post.id}
+        handleNavigatePost={() => this.handleNavigatePost(post.author, post.permlink)}
+        handleNavigateUser={() => this.handleNavigateUser(post.author)}
+        author={post.author}
+        created={post.created}
+        title={post.title}
+      />
+    ));
+    return _.isEmpty(reportedPostsPreview) ? (
+      <EmptyContent>
+        <EmptyText>{i18n.saved.noReportedPosts}</EmptyText>
+      </EmptyContent>
+    ) : (
+      reportedPostsPreview
+    );
+  }
+
   render() {
     const { displayNSFWContent } = this.props;
+    const { displayReportedPostsModal } = this.state;
     return (
       <Container>
         <Header>
@@ -79,6 +157,31 @@ class SettingsScreen extends Component {
           checked={displayNSFWContent}
           onPress={this.handleUpdateNSFWDisplay}
         />
+        <ButtonContainer>
+          <PrimaryButton
+            title={i18n.settings.ViewReportedPosts}
+            onPress={this.showReportedPostsModal}
+          />
+        </ButtonContainer>
+        {displayReportedPostsModal && (
+          <Modal
+            animationType="slide"
+            visible={displayReportedPostsModal}
+            onRequestClose={this.hideReportedPostsModal}
+          >
+            <Header>
+              <HeaderEmptyView />
+              <TitleText>{i18n.titles.reportedPosts}</TitleText>
+              <BackTouchable onPress={this.hideReportedPostsModal()}>
+                <MaterialIcons size={24} name={MATERIAL_ICONS.close} />
+              </BackTouchable>
+            </Header>
+            <ScrollView>
+              {this.renderReportedPosts()}
+              <View style={{ height: 100 }} />
+            </ScrollView>
+          </Modal>
+        )}
       </Container>
     );
   }

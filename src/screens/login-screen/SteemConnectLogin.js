@@ -34,7 +34,6 @@ const Container = styled.View``;
 const ContentContainer = styled.View`
   background-color: ${COLORS.SPLASH_SCREEN_BACKGROUND};
   align-items: center;
-  justify-content: center;
   height: 100%;
 `;
 
