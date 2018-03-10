@@ -7,11 +7,13 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { MATERIAL_COMMUNITY_ICONS, COLORS, ICON_SIZES } from '../../constants/styles';
 import * as settingsActions from 'state/actions/settingsActions';
 import {
-  getPendingSavingPosts, getPendingSavingTags, getSavedPosts,
-  getSavedTags
+  getPendingSavingPosts,
+  getPendingSavingTags,
+  getSavedPosts,
+  getSavedTags,
 } from '../../state/rootReducer';
 import SmallLoading from './SmallLoading';
-import { savePost, unsavePost } from "../../state/actions/firebaseActions";
+import { savePost, unsavePost } from '../../state/actions/firebaseActions';
 
 const Touchable = styled.TouchableOpacity``;
 
@@ -39,10 +41,8 @@ class ReportPostButton extends Component {
     savedPosts: PropTypes.arrayOf(PropTypes.shape()),
   };
 
-
   constructor(props) {
     super(props);
-
 
     this.handleReportPost = this.handleReportPost.bind(this);
     this.handleUnreportPost = this.handleUnreportPost.bind(this);
@@ -64,20 +64,14 @@ class ReportPostButton extends Component {
     const isLoading = _.includes(pendingSavingPosts, id);
     const isReported = _.findIndex(reportedPosts, post => post.id === id) > -1;
 
-    return isReported ? (
-      <Touchable onPress={this.handleUnsaveTag}>
+    return isLoading ? (
+      <SmallLoading />
+    ) : (
+      <Touchable onPress={this.handleReportPost}>
         <MaterialCommunityIcons
-          name={MATERIAL_ICONS.report}
+          name={MATERIAL_COMMUNITY_ICONS.report}
           size={ICON_SIZES.menuIcon}
           color={isReported ? COLORS.PRIMARY_COLOR : COLORS.TERTIARY_COLOR}
-        />
-      </Touchable>
-    ) : (
-      <Touchable onPress={this.handleSaveTag}>
-        <MaterialCommunityIcons
-          name={MATERIAL_COMMUNITY_ICONS.saveTag}
-          size={ICON_SIZES.menuIcon}
-          color={COLORS.PRIMARY_COLOR}
         />
       </Touchable>
     );
