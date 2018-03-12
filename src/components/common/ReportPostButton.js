@@ -4,16 +4,10 @@ import _ from 'lodash';
 import { connect } from 'react-redux';
 import styled from 'styled-components/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { MATERIAL_COMMUNITY_ICONS, COLORS, ICON_SIZES } from '../../constants/styles';
 import * as settingsActions from 'state/actions/settingsActions';
-import {
-  getPendingSavingPosts,
-  getPendingSavingTags,
-  getSavedPosts,
-  getSavedTags,
-} from '../../state/rootReducer';
+import { MATERIAL_COMMUNITY_ICONS, COLORS, ICON_SIZES } from 'constants/styles';
 import SmallLoading from './SmallLoading';
-import { savePost, unsavePost } from '../../state/actions/firebaseActions';
+import { getPendingReportingPosts, getReportedPosts } from 'state/rootReducer';
 
 const Touchable = styled.TouchableOpacity``;
 
@@ -69,7 +63,8 @@ class ReportPostButton extends Component {
     ) : (
       <Touchable onPress={this.handleReportPost}>
         <MaterialCommunityIcons
-          name={MATERIAL_COMMUNITY_ICONS.report}
+          n
+          Game={MATERIAL_COMMUNITY_ICONS.report}
           size={ICON_SIZES.menuIcon}
           color={isReported ? COLORS.PRIMARY_COLOR : COLORS.TERTIARY_COLOR}
         />
