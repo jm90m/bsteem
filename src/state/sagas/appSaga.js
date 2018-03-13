@@ -104,12 +104,13 @@ const fetchRewardFund = function*() {
 
 const appOnboarding = function*() {
   try {
+    yield call(authenticateUser);
+
     // home screen onboarding
     yield put(homeActions.fetchDiscussions(feedFilters.TRENDING));
     yield put(homeActions.fetchTags());
 
     // authenticate
-    yield call(authenticateUser);
     yield call(fetchRewardFund);
     yield call(settingsSaga.fetchUserSettings);
     yield put(currentUserActions.currentUserFeedFetch());

@@ -2,7 +2,7 @@ import React from 'react';
 import { View } from 'react-native';
 import sc2 from 'api/sc2';
 import { Provider } from 'react-redux';
-import { Constants, AppLoading, Asset } from 'expo';
+import { Constants, Asset } from 'expo';
 import configureStore from 'state/configureStore';
 import AppNavigation from 'screens/navigation/AppNavigation';
 import SteemConnectErrorModal from 'components/common/steem-connect/SteemConnectErrorModalContainer';

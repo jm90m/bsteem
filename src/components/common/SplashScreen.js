@@ -29,7 +29,7 @@ class SplashScreen extends Component {
   }
   render() {
     const { appLoading, assetsAreLoaded } = this.props;
-    const displaySplashScreen = !assetsAreLoaded || appLoading;
+    const displaySplashScreen = !assetsAreLoaded;
     return displaySplashScreen && <AppLoading />;
   }
 }
