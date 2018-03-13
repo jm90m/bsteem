@@ -19,10 +19,9 @@ import {
 import * as authActions from 'state/actions/authActions';
 import i18n from 'i18n/i18n';
 import * as navigationConstants from 'constants/navigation';
-import BsteemIcon from '../../../assets/bsteem-icon.png';
 import Header from 'components/common/Header';
 import HeaderEmptyView from 'components/common/HeaderEmptyView';
-import { redirectAuthURL } from 'constants/bsteem';
+import BsteemIcon from '../../../assets/bsteem-name-logo.png';
 
 const mapDispatchToProps = dispatch => ({
   authenticateUserSuccess: payload => dispatch(authActions.authenticateUser.success(payload)),

@@ -33,8 +33,6 @@ export default class App extends React.Component {
       await Promise.all([
         Asset.loadAsync([
           require('./src/images/steem.png'),
-          require('./assets/bsteem-icon.png'),
-          require('./assets/splash.png'),
           require('./assets/bsteem-name-logo.png'),
         ]),
       ]);

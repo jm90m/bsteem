@@ -15,7 +15,7 @@ import {
   AUTH_USERNAME,
   STEEM_ACCESS_TOKEN,
 } from '../../../constants/asyncStorageKeys';
-import BsteemIcon from '../../../../assets/bsteem-icon.png';
+import BsteemIcon from '../../../../assets/bsteem-name-logo.png';
 
 const Container = styled.View`
   justify-content: center;
