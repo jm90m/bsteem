@@ -11,7 +11,7 @@ const { width: deviceWidth } = Dimensions.get('screen');
 
 class PostImage extends Component {
   static propTypes = {
-    images: PropTypes.arrayOf(PropTypes.string),
+    images: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]),
     height: PropTypes.number,
     width: PropTypes.number,
     widthOffset: PropTypes.number,
@@ -28,9 +28,8 @@ class PostImage extends Component {
 
   constructor(props) {
     super(props);
-
     this.state = {
-      imageUrl: _.head(props.images),
+      imageUrl: Array.isArray(props.images) ? _.head(props.images) : props.images,
       noImage: false,
       width: props.width,
       height: props.height,
@@ -64,11 +63,17 @@ class PostImage extends Component {
 
   handlePreviewImageError() {
     const { images } = this.props;
-    const newImageUrl = getValidImageUrl(images);
-    if (!_.isNull(newImageUrl)) {
-      this.setState({
-        imageUrl: newImageUrl,
-      });
+    if (Array.isArray(images)) {
+      const newImageUrl = getValidImageUrl(images);
+      if (!_.isNull(newImageUrl)) {
+        this.setState({
+          imageUrl: newImageUrl,
+        });
+      } else {
+        this.setState({
+          noImage: true,
+        });
+      }
     } else {
       this.setState({
         noImage: true,
