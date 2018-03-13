@@ -1,4 +1,10 @@
-import { FETCH_TAGS, FETCH_DISCUSSIONS, FETCH_MORE_DISCUSSIONS } from './actionTypes';
+import {
+  FETCH_TAGS,
+  FETCH_DISCUSSIONS,
+  FETCH_MORE_DISCUSSIONS,
+  ENABLE_FILTER_HOME_FEED_BY_FOLLOWERS,
+  DISABLE_FILTER_HOME_FEED_BY_FOLLOWERS,
+} from './actionTypes';
 
 export const fetchTags = () => ({
   type: FETCH_TAGS.PENDING,
@@ -48,4 +54,12 @@ export const fetchMoreDiscussionsSuccess = payload => ({
 export const fetchMoreDiscussionsFail = error => ({
   type: FETCH_MORE_DISCUSSIONS.ERROR,
   error,
+});
+
+export const enableFilterHomeFeedByFollowers = () => ({
+  type: ENABLE_FILTER_HOME_FEED_BY_FOLLOWERS,
+});
+
+export const disableFilterHomeFeedByFollowers = () => ({
+  type: DISABLE_FILTER_HOME_FEED_BY_FOLLOWERS,
 });

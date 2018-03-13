@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 import { TouchableWithoutFeedback } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import _ from 'lodash';
@@ -8,6 +9,9 @@ import { COLORS } from 'constants/styles';
 import { FEED_FILTERS } from 'constants/feedFilters';
 import MenuModalButton from 'components/common/menu/MenuModalButton';
 import MenuWrapper from 'components/common/menu/MenuWrapper';
+import { CheckBox } from 'react-native-elements';
+import { getIsAuthenticated } from 'state/rootReducer';
+import i18n from '../../i18n/i18n';
 
 const Container = styled.View`
   flex: 1;
@@ -27,13 +31,21 @@ const MenuText = styled.Text`
   font-weight: bold;
 `;
 
+const mapStateToProps = state => ({
+  authenticated: getIsAuthenticated(state),
+});
+
 class FeedSort extends Component {
   static propTypes = {
     handleSortPost: PropTypes.func.isRequired,
     hideMenu: PropTypes.func.isRequired,
+    authenticated: PropTypes.bool.isRequired,
+    handleFilterFeedByFollowers: PropTypes.func,
+    filterFeedByFollowers: PropTypes.bool,
   };
 
   render() {
+    const { authenticated, filterFeedByFollowers, handleFilterFeedByFollowers } = this.props;
     return (
       <TouchableWithoutFeedback onPress={this.props.hideMenu}>
         <Container>
@@ -46,6 +58,17 @@ class FeedSort extends Component {
                 </MenuModalContents>
               </MenuModalButton>
             ))}
+            {authenticated && (
+              <MenuModalButton>
+                <MenuModalContents>
+                  <CheckBox
+                    title={i18n.feed.filterCurrentFeedByFollowers}
+                    checked={filterFeedByFollowers}
+                    onPress={handleFilterFeedByFollowers}
+                  />
+                </MenuModalContents>
+              </MenuModalButton>
+            )}
           </MenuWrapper>
         </Container>
       </TouchableWithoutFeedback>
@@ -53,4 +76,4 @@ class FeedSort extends Component {
   }
 }
 
-export default FeedSort;
+export default connect(mapStateToProps)(FeedSort);

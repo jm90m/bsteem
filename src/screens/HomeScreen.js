@@ -10,8 +10,15 @@ import {
   getLoadingFetchMoreDiscussions,
   getHomeFeedPosts,
   getHasNetworkConnection,
+  getFilterFeedByFollowers,
+  getCurrentUserFollowList,
 } from 'state/rootReducer';
-import { fetchDiscussions, fetchMoreDiscussions } from 'state/actions/homeActions';
+import {
+  fetchDiscussions,
+  fetchMoreDiscussions,
+  enableFilterHomeFeedByFollowers,
+  disableFilterHomeFeedByFollowers,
+} from 'state/actions/homeActions';
 import { MATERIAL_COMMUNITY_ICONS, COLORS, ICON_SIZES } from 'constants/styles';
 import { TRENDING } from 'constants/feedFilters';
 import PostPreview from 'components/post-preview/PostPreview';
@@ -20,6 +27,7 @@ import LargeLoading from 'components/common/LargeLoading';
 import * as navigationConstants from 'constants/navigation';
 import Header from 'components/common/Header';
 import BSteemModal from 'components/common/BSteemModal';
+import i18n from 'i18n/i18n';
 import { displayPriceModal } from '../state/actions/appActions';
 
 const StyledFlatList = styled.FlatList`
@@ -46,11 +54,21 @@ const LoadingMoreContainer = styled.View`
   margin-top: 20px;
 `;
 
+const EmptyContainer = styled.View`
+  margin: 5px 0;
+  padding: 20px;
+  background-color: ${COLORS.WHITE.WHITE};
+`;
+
+const EmptyText = styled.Text``;
+
 const mapStateToProps = state => ({
   posts: getHomeFeedPosts(state),
   loadingFetchDiscussions: getLoadingFetchDiscussions(state),
   loadingFetchMoreDiscussions: getLoadingFetchMoreDiscussions(state),
   networkConnection: getHasNetworkConnection(state),
+  filterFeedByFollowers: getFilterFeedByFollowers(state),
+  currentUserFollowList: getCurrentUserFollowList(state),
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -58,6 +76,8 @@ const mapDispatchToProps = dispatch => ({
   fetchMoreDiscussions: (startAuthor, startPermlink, filter) =>
     dispatch(fetchMoreDiscussions(startAuthor, startPermlink, filter)),
   displayPriceModal: symbols => dispatch(displayPriceModal(symbols)),
+  enableFilterHomeFeedByFollowers: () => dispatch(enableFilterHomeFeedByFollowers()),
+  disableFilterHomeFeedByFollowers: () => dispatch(disableFilterHomeFeedByFollowers()),
 });
 
 class HomeScreen extends Component {
@@ -65,10 +85,18 @@ class HomeScreen extends Component {
     posts: PropTypes.arrayOf(PropTypes.shape()).isRequired,
     loadingFetchDiscussions: PropTypes.bool.isRequired,
     loadingFetchMoreDiscussions: PropTypes.bool.isRequired,
+    filterFeedByFollowers: PropTypes.bool.isRequired,
     fetchDiscussions: PropTypes.func.isRequired,
     fetchMoreDiscussions: PropTypes.func.isRequired,
     displayPriceModal: PropTypes.func.isRequired,
+    enableFilterHomeFeedByFollowers: PropTypes.func.isRequired,
+    disableFilterHomeFeedByFollowers: PropTypes.func.isRequired,
     navigation: PropTypes.shape().isRequired,
+    currentUserFollowList: PropTypes.shape(),
+  };
+
+  static defaultProps = {
+    currentUserFollowList: {},
   };
 
   static navigationOptions = {
@@ -90,6 +118,7 @@ class HomeScreen extends Component {
     this.renderRow = this.renderRow.bind(this);
     this.onRefreshCurrentFeed = this.onRefreshCurrentFeed.bind(this);
     this.handleNavigateToSavedTags = this.handleNavigateToSavedTags.bind(this);
+    this.handleFilterFeedByFollowers = this.handleFilterFeedByFollowers.bind(this);
     this.handleDisplayPriceModal = this.handleDisplayPriceModal.bind(this);
   }
 
@@ -120,6 +149,16 @@ class HomeScreen extends Component {
     );
   }
 
+  handleFilterFeedByFollowers() {
+    const { filterFeedByFollowers } = this.props;
+
+    if (filterFeedByFollowers) {
+      this.props.disableFilterHomeFeedByFollowers();
+    } else {
+      this.props.enableFilterHomeFeedByFollowers();
+    }
+  }
+
   handleDisplayPriceModal() {
     this.props.displayPriceModal(['STEEM', 'SBD']);
   }
@@ -137,9 +176,26 @@ class HomeScreen extends Component {
     return <PostPreview postData={postData} navigation={this.props.navigation} />;
   }
 
+  renderEmptyText() {
+    return (
+      <EmptyContainer>
+        <EmptyText>{i18n.feed.emptyFeedCheckFilters}</EmptyText>
+      </EmptyContainer>
+    );
+  }
+
   render() {
-    const { loadingFetchDiscussions, loadingFetchMoreDiscussions, posts } = this.props;
+    const {
+      loadingFetchDiscussions,
+      loadingFetchMoreDiscussions,
+      posts,
+      filterFeedByFollowers,
+      currentUserFollowList,
+    } = this.props;
     const { menuVisible, currentFilter } = this.state;
+    const displayedPosts = filterFeedByFollowers
+      ? _.filter(posts, post => _.get(currentUserFollowList, post.author, false))
+      : posts;
     return (
       <View>
         <Header>
@@ -177,11 +233,16 @@ class HomeScreen extends Component {
         </Header>
         {menuVisible && (
           <BSteemModal visible={menuVisible} handleOnClose={this.handleHideMenu}>
-            <FeedSort hideMenu={this.handleHideMenu} handleSortPost={this.handleSortPost} />
+            <FeedSort
+              hideMenu={this.handleHideMenu}
+              handleSortPost={this.handleSortPost}
+              handleFilterFeedByFollowers={this.handleFilterFeedByFollowers}
+              filterFeedByFollowers={filterFeedByFollowers}
+            />
           </BSteemModal>
         )}
         <StyledFlatList
-          data={posts}
+          data={displayedPosts}
           renderItem={this.renderRow}
           enableEmptySections
           onEndReached={this.onEndReached}
@@ -195,6 +256,7 @@ class HomeScreen extends Component {
             />
           }
         />
+        {_.isEmpty(displayedPosts) && this.renderEmptyText()}
         {(loadingFetchMoreDiscussions || loadingFetchDiscussions) && (
           <LoadingMoreContainer>
             <LargeLoading />

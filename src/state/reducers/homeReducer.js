@@ -1,9 +1,16 @@
 import _ from 'lodash';
-import { FETCH_TAGS, FETCH_DISCUSSIONS, FETCH_MORE_DISCUSSIONS } from '../actions/actionTypes';
+import {
+  FETCH_TAGS,
+  FETCH_DISCUSSIONS,
+  FETCH_MORE_DISCUSSIONS,
+  ENABLE_FILTER_HOME_FEED_BY_FOLLOWERS,
+  DISABLE_FILTER_HOME_FEED_BY_FOLLOWERS,
+} from '../actions/actionTypes';
 
 const INITIAL_STATE = {
   posts: [],
   tags: [],
+  filterFeedByFollowers: false,
   loadingFetchDiscussions: false,
   loadingFetchMoreDiscussions: false,
   tagsLoading: false,
@@ -56,6 +63,16 @@ export default (state = INITIAL_STATE, action) => {
         ...state,
         loadingFetchMoreDiscussions: false,
       };
+    case ENABLE_FILTER_HOME_FEED_BY_FOLLOWERS:
+      return {
+        ...state,
+        filterFeedByFollowers: true,
+      };
+    case DISABLE_FILTER_HOME_FEED_BY_FOLLOWERS:
+      return {
+        ...state,
+        filterFeedByFollowers: false,
+      };
     default:
       return state;
   }
@@ -65,3 +82,4 @@ export const getLoadingFetchDiscussions = state => state.loadingFetchDiscussions
 export const getLoadingFetchMoreDiscussions = state => state.loadingFetchMoreDiscussions;
 export const getHomeFeedPosts = state => state.posts;
 export const getHomeTags = state => state.tags;
+export const getFilterFeedByFollowers = state => state.filterFeedByFollowers;

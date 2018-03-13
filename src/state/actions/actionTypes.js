@@ -5,6 +5,8 @@ export const FETCH_DISCUSSIONS = createAsyncActionType('@home/fetch-discussions'
 export const FETCH_MORE_DISCUSSIONS = createAsyncActionType('@home/fetch-more-discussions');
 export const FETCH_TAGS = createAsyncActionType('@fetch-tags');
 export const FETCH_COMMENTS = createAsyncActionType('@fetch-comments');
+export const ENABLE_FILTER_HOME_FEED_BY_FOLLOWERS = '@home/enable-filter-home-feed-by-followers';
+export const DISABLE_FILTER_HOME_FEED_BY_FOLLOWERS = '@home/disable-filter-home-feed-by-followers';
 
 // User Actions
 export const FETCH_USER = createAsyncActionType('@user/fetch-user');

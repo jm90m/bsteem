@@ -118,6 +118,8 @@ export default {
     userFeedEmpty: 'User currently has no blog posts.',
     currentUserFeedEmpty:
       'Your feed is empty, follow users and their latest post will show up on your feed.',
+    emptyFeedCheckFilters: 'Feed is currently empty, check your applied filters',
+    filterCurrentFeedByFollowers: 'Filter current feed by followers',
   },
   user: {
     votingPower: 'Voting Power',

@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import _ from 'lodash';
 import styled from 'styled-components/native';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
@@ -10,6 +11,8 @@ import PostPreview from 'components/post-preview/PostPreview';
 import FeedSort from 'components/feed-sort/FeedSort';
 import Header from 'components/common/Header';
 import SaveTagButton from 'components/common/SaveTagButton';
+import { connect } from 'react-redux';
+import { getCurrentUserFollowList } from 'state/rootReducer';
 import i18n from 'i18n/i18n';
 import BSteemModal from '../../components/common/BSteemModal';
 
@@ -47,9 +50,21 @@ const EmptyFeedText = styled.Text`
   font-size: 18px;
 `;
 
+const mapStateToProps = state => ({
+  currentUserFollowList: getCurrentUserFollowList(state),
+});
+
 class FeedScreen extends Component {
   static navigationOptions = {
     headerMode: 'none',
+  };
+
+  static propTypes = {
+    currentUserFollowList: PropTypes.shape(),
+  };
+
+  static defaultProps = {
+    currentUserFollowList: {},
   };
 
   constructor(props) {
@@ -60,6 +75,7 @@ class FeedScreen extends Component {
       menuVisible: false,
       currentFilter: TRENDING,
       posts: [],
+      filterFeedByFollowers: false,
     };
 
     this.fetchInitialPostsForFilter = this.fetchInitialPostsForFilter.bind(this);
@@ -70,6 +86,9 @@ class FeedScreen extends Component {
     this.renderRow = this.renderRow.bind(this);
     this.handleSortPost = this.handleSortPost.bind(this);
     this.renderLoadingOrEmptyText = this.renderLoadingOrEmptyText.bind(this);
+    this.enableFilterFeedByFollowers = this.enableFilterFeedByFollowers.bind(this);
+    this.disableFilterFeedByFollowers = this.disableFilterFeedByFollowers.bind(this);
+    this.toggleFilterFeedByFollowers = this.toggleFilterFeedByFollowers.bind(this);
   }
 
   fetchInitialPostsForFilter() {
@@ -143,14 +162,41 @@ class FeedScreen extends Component {
     );
   }
 
-  renderLoadingOrEmptyText() {
+  enableFilterFeedByFollowers() {
+    this.setState({
+      filterFeedByFollowers: true,
+    });
+  }
+
+  disableFilterFeedByFollowers() {
+    this.setState({
+      filterFeedByFollowers: false,
+    });
+  }
+
+  toggleFilterFeedByFollowers() {
+    const { filterFeedByFollowers } = this.state;
+    if (filterFeedByFollowers) {
+      this.disableFilterFeedByFollowers();
+    } else {
+      this.enableFilterFeedByFollowers();
+    }
+  }
+
+  renderLoadingOrEmptyText(displayedPosts) {
     const { posts, loading } = this.state;
     if (loading) {
       return <Loading color={COLORS.PRIMARY_COLOR} size="large" />;
-    } else if (_.size(posts) === 0) {
+    } else if (_.isEmpty(posts)) {
       return (
         <EmptyFeedView>
           <EmptyFeedText>{i18n.feed.emptyFeed}</EmptyFeedText>
+        </EmptyFeedView>
+      );
+    } else if (_.isEmpty(displayedPosts)) {
+      return (
+        <EmptyFeedView>
+          <EmptyFeedText>{i18n.feed.emptyFeedCheckFilters}</EmptyFeedText>
         </EmptyFeedView>
       );
     }
@@ -158,9 +204,13 @@ class FeedScreen extends Component {
   }
 
   render() {
+    const { currentUserFollowList } = this.props;
     const { tag } = this.props.navigation.state.params;
-    const { currentFilter, menuVisible, posts } = this.state;
+    const { currentFilter, menuVisible, posts, filterFeedByFollowers } = this.state;
     const displayListView = _.size(posts) > 0;
+    const displayedPosts = filterFeedByFollowers
+      ? _.filter(posts, post => _.get(currentUserFollowList, post.author, false))
+      : posts;
 
     return (
       <Container>
@@ -179,22 +229,27 @@ class FeedScreen extends Component {
         </Header>
         {menuVisible && (
           <BSteemModal visible={menuVisible} handleOnClose={this.handleHideMenu}>
-            <FeedSort hideMenu={this.handleHideMenu} handleSortPost={this.handleSortPost} />
+            <FeedSort
+              hideMenu={this.handleHideMenu}
+              handleSortPost={this.handleSortPost}
+              handleFilterFeedByFollowers={this.toggleFilterFeedByFollowers}
+              filterFeedByFollowers={filterFeedByFollowers}
+            />
           </BSteemModal>
         )}
+        {this.renderLoadingOrEmptyText(displayedPosts)}
         {displayListView && (
           <StyledFlatList
-            data={posts}
+            data={displayedPosts}
             renderItem={this.renderRow}
             enableEmptySections
             onEndReached={this.fetchMorePosts}
             keyExtractor={(item, index) => `${_.get(item, 'item.id', '')}${index}`}
           />
         )}
-        {this.renderLoadingOrEmptyText()}
       </Container>
     );
   }
 }
 
-export default FeedScreen;
+export default connect(mapStateToProps)(FeedScreen);
