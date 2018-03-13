@@ -22,6 +22,7 @@ import HeaderEmptyView from 'components/common/HeaderEmptyView';
 import { MATERIAL_COMMUNITY_ICONS } from '../../constants/styles';
 import * as postConstants from 'constants/postConstants';
 import PostCreationPreviewModal from './PostCreationPreviewModal';
+import DisclaimerText from './DisclaimerText';
 
 const { width: deviceWidth } = Dimensions.get('screen');
 
@@ -487,6 +488,7 @@ class PostCreationScreen extends Component {
             <Picker.Item label={i18n.editor.allRewards} value={postConstants.REWARDS.ALL} />
             <Picker.Item label={i18n.editor.noRewards} value={postConstants.REWARDS.NONE} />
           </Picker>
+          <DisclaimerText/>
           <ActionButtonsContainer>
             <PrimaryButton
               onPress={this.handleSubmit}

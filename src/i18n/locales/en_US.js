@@ -48,6 +48,9 @@ export default {
     allRewards: '100% Steem Power',
     halfRewards: '50% SBD and 50% SP',
     noRewards: 'Declined',
+    disclaimerText:
+      "By creating this post you agree to the steem's terms and conditions, which is hosted on steemit's website.",
+    tos: 'Terms and Conditions',
   },
   postMenu: {
     follow: 'Follow',
