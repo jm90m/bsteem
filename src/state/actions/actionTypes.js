@@ -107,3 +107,7 @@ export const UPDATE_NSFW_DISPLAY_SETTING = createAsyncActionType(
 export const FETCH_CURRENT_USER_SETTINGS = createAsyncActionType(
   '@settings/fetch-current-user-settings',
 );
+export const CURRENT_USER_REPORT_POST = createAsyncActionType('@settings/current-user-report-post');
+export const CURRENT_USER_UNREPORT_POST = createAsyncActionType(
+  '@settings/current-user-unreport-post',
+);

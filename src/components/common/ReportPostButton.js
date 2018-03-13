@@ -31,8 +31,18 @@ class ReportPostButton extends Component {
     author: PropTypes.string,
     id: PropTypes.number,
     created: PropTypes.string,
-    pendingSavingPosts: PropTypes.arrayOf(PropTypes.number),
-    savedPosts: PropTypes.arrayOf(PropTypes.shape()),
+    pendingReportingPosts: PropTypes.arrayOf(PropTypes.number),
+    reportedPosts: PropTypes.arrayOf(PropTypes.shape()),
+  };
+
+  static defaultProps = {
+    title: '',
+    permlink: '',
+    author: '',
+    id: 0,
+    created: '',
+    pendingReportingPosts: [],
+    reportedPosts: [],
   };
 
   constructor(props) {
@@ -53,9 +63,9 @@ class ReportPostButton extends Component {
   }
 
   render() {
-    const { id, pendingSavingPosts, reportedPosts } = this.props;
+    const { id, pendingReportingPosts, reportedPosts } = this.props;
 
-    const isLoading = _.includes(pendingSavingPosts, id);
+    const isLoading = _.includes(pendingReportingPosts, id);
     const isReported = _.findIndex(reportedPosts, post => post.id === id) > -1;
 
     return isLoading ? (
@@ -63,8 +73,7 @@ class ReportPostButton extends Component {
     ) : (
       <Touchable onPress={this.handleReportPost}>
         <MaterialCommunityIcons
-          n
-          Game={MATERIAL_COMMUNITY_ICONS.report}
+          name={MATERIAL_COMMUNITY_ICONS.report}
           size={ICON_SIZES.menuIcon}
           color={isReported ? COLORS.PRIMARY_COLOR : COLORS.TERTIARY_COLOR}
         />

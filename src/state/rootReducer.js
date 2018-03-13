@@ -124,3 +124,6 @@ export const getPostLoading = state => fromPosts.getPostLoading(state.posts);
 
 // Settings Selectors
 export const getDisplayNSFWContent = state => fromSettings.getDisplayNSFWContent(state.settings);
+export const getReportedPosts = state => fromSettings.getReportedPosts(state.settings);
+export const getPendingReportingPosts = state =>
+  fromSettings.getPendingReportingPosts(state.settings);
