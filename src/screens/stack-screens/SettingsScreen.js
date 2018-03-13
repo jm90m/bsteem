@@ -9,12 +9,13 @@ import Header from 'components/common/Header';
 import HeaderEmptyView from 'components/common/HeaderEmptyView';
 import i18n from 'i18n/i18n';
 import { CheckBox } from 'react-native-elements';
-import { getDisplayNSFWContent } from 'state/rootReducer';
+import { getDisplayNSFWContent, getReportedPosts } from 'state/rootReducer';
 import * as settingsActions from 'state/actions/settingsActions';
 import PrimaryButton from 'components/common/PrimaryButton';
 import PostPreview from 'components/saved-content/PostPreview';
 import * as navigationConstants from '../../constants/navigation';
 import _ from 'lodash';
+import ReportPostButton from '../../components/common/ReportPostButton';
 
 const EmptyContent = styled.View`
   padding: 20px;
@@ -47,12 +48,14 @@ const ScrollView = styled.ScrollView``;
 
 const mapStateToProps = state => ({
   displayNSFWContent: getDisplayNSFWContent(state),
+  reportedPosts: getReportedPosts(state),
 });
 
 const mapDispatchToProps = dispatch => ({
   updateNSFWDisplaySettings: displayNSFWContent =>
     dispatch(settingsActions.updateNSFWDisplaySettings.action(displayNSFWContent)),
   getCurrentUserSettings: () => dispatch(settingsActions.getCurrentUserSettings.action()),
+  fetchReportedPosts: () => dispatch(settingsActions.fetchReportedPosts.action()),
 });
 
 class SettingsScreen extends Component {
@@ -61,6 +64,7 @@ class SettingsScreen extends Component {
     displayNSFWContent: PropTypes.bool.isRequired,
     getCurrentUserSettings: PropTypes.func.isRequired,
     updateNSFWDisplaySettings: PropTypes.func.isRequired,
+    fetchReportedPosts: PropTypes.func.isRequired,
     reportedPosts: PropTypes.arrayOf(PropTypes.shape()),
   };
 
@@ -85,6 +89,7 @@ class SettingsScreen extends Component {
 
   componentDidMount() {
     this.props.getCurrentUserSettings();
+    this.props.fetchReportedPosts();
   }
 
   navigateBack() {
@@ -92,6 +97,7 @@ class SettingsScreen extends Component {
   }
 
   handleNavigatePost(author, permlink) {
+    this.hideReportedPostsModal();
     this.props.navigation.navigate(navigationConstants.FETCH_POST, {
       author,
       permlink,
@@ -111,6 +117,7 @@ class SettingsScreen extends Component {
   }
 
   handleNavigateUser(username) {
+    this.hideReportedPostsModal();
     this.props.navigation.navigate(navigationConstants.USER, { username });
   }
 
@@ -129,6 +136,15 @@ class SettingsScreen extends Component {
         author={post.author}
         created={post.created}
         title={post.title}
+        actionComponent={
+          <ReportPostButton
+            title={post.title}
+            permlink={post.permlink}
+            author={post.author}
+            id={post.id}
+            created={post.created}
+          />
+        }
       />
     ));
     return _.isEmpty(reportedPostsPreview) ? (
@@ -172,7 +188,7 @@ class SettingsScreen extends Component {
             <Header>
               <HeaderEmptyView />
               <TitleText>{i18n.titles.reportedPosts}</TitleText>
-              <BackTouchable onPress={this.hideReportedPostsModal()}>
+              <BackTouchable onPress={this.hideReportedPostsModal}>
                 <MaterialIcons size={24} name={MATERIAL_ICONS.close} />
               </BackTouchable>
             </Header>

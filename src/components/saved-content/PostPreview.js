@@ -35,6 +35,10 @@ const PostTitle = styled.Text`
   font-size: 20px;
 `;
 
+const ActionComponent = styled.View`
+  margin-left: auto;
+`;
+
 class PostPreview extends Component {
   static propTypes = {
     author: PropTypes.string,
@@ -42,6 +46,7 @@ class PostPreview extends Component {
     created: PropTypes.string,
     handleNavigatePost: PropTypes.func,
     handleNavigateUser: PropTypes.func,
+    actionComponent: PropTypes.element,
   };
 
   static defaultProps = {
@@ -50,10 +55,18 @@ class PostPreview extends Component {
     created: '',
     handleNavigatePost: () => {},
     handleNavigateUser: () => {},
+    actionComponent: null,
   };
 
   render() {
-    const { author, title, created, handleNavigatePost, handleNavigateUser } = this.props;
+    const {
+      author,
+      title,
+      created,
+      handleNavigatePost,
+      handleNavigateUser,
+      actionComponent,
+    } = this.props;
 
     return (
       <Container>
@@ -67,6 +80,7 @@ class PostPreview extends Component {
             </TouchableOpacity>
             <TimeAgo created={created} />
           </AuthorContents>
+          <ActionComponent>{actionComponent}</ActionComponent>
         </AuthorContainer>
         <TouchableOpacity onPress={handleNavigatePost}>
           <PostTitle>{title}</PostTitle>

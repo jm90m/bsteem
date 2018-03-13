@@ -28,7 +28,7 @@ export default {
     market: 'Current Market Prices',
     settings: 'Settings',
     login: 'Login & Settings',
-    reportedPosts: 'Reported Posts'
+    reportedPosts: 'Reported Posts',
   },
   editor: {
     title: 'Title',
@@ -79,6 +79,8 @@ export default {
     noPostFound: 'No post was found.',
     postedFrom: 'Posted from',
     nsfwPostHidden: 'The contents of this post is currently hidden because it is tagged NSFW.',
+    reportedPostHidden:
+      'The contents of this post is currently hidden because you have reported it',
     displayHiddenContent: 'Display hidden content.',
     lowAuthorReputationPostPreview:
       'The contents of this post is currently hidden because the author has a low reputation or the post has a low rating.',
@@ -123,5 +125,8 @@ export default {
     enableNSFW: 'Enable NSFW Posts',
     ViewReportedPosts: 'View Reported Posts',
     noReportedPosts: 'No reported posts',
+    reportPost: 'Report Post',
+    reportedPost: 'Reported Post',
+    unreportPost: 'Unreport Post',
   },
 };

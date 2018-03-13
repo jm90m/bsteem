@@ -7,6 +7,7 @@ import { connect } from 'react-redux';
 import _ from 'lodash';
 import i18n from 'i18n/i18n';
 import { bsteemShareText, getBusyUrl } from 'util/bsteemUtils';
+import ReportPostMenuButton from './ReportPostMenuButton';
 import {
   COLORS,
   MATERIAL_ICONS,
@@ -43,7 +44,6 @@ class PostMenu extends Component {
     handleLikePost: PropTypes.func,
     handleNavigateToComments: PropTypes.func,
     handleReblog: PropTypes.func,
-    handleReportPost: PropTypes.func,
     hideMenu: PropTypes.func,
     postData: PropTypes.shape({
       author: PropTypes.string,
@@ -71,7 +71,6 @@ class PostMenu extends Component {
     handleLikePost: () => {},
     handleNavigateToComments: () => {},
     handleReblog: () => {},
-    handleReportPost: () => {},
     handleDisplayPhotoBrowser: () => {},
   };
 
@@ -102,7 +101,6 @@ class PostMenu extends Component {
       handleLikePost,
       handleNavigateToComments,
       handleReblog,
-      handleReportPost,
       postData,
       authUsername,
       rebloggedList,
@@ -179,16 +177,13 @@ class PostMenu extends Component {
               </MenuModalButton>
             )}
             {displayReportButton && (
-              <MenuModalButton onPress={handleReportPost}>
-                <MenuModalContents>
-                  <MaterialIcons
-                    size={ICON_SIZES.menuModalOptionIcon}
-                    color={COLORS.PRIMARY_COLOR}
-                    name={MATERIAL_ICONS.report}
-                  />
-                  <MenuText>{i18n.postMenu.reportPost}</MenuText>
-                </MenuModalContents>
-              </MenuModalButton>
+              <ReportPostMenuButton
+                title={title}
+                permlink={permlink}
+                author={author}
+                id={id}
+                created={created}
+              />
             )}
             <MenuModalButton onPress={this.handleShare}>
               <MenuModalContents>

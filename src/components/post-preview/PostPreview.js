@@ -10,6 +10,7 @@ import {
   getAuthUsername,
   getCurrentUserRebloggedList,
   getDisplayNSFWContent,
+  getReportedPosts,
 } from 'state/rootReducer';
 import { currentUserVotePost, currentUserReblogPost } from 'state/actions/currentUserActions';
 import { isPostVoted } from 'util/voteUtils';
@@ -67,6 +68,7 @@ const mapStateToProps = state => ({
   authUsername: getAuthUsername(state),
   rebloggedList: getCurrentUserRebloggedList(state),
   displayNSFWContent: getDisplayNSFWContent(state),
+  reportedPosts: getReportedPosts(state),
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -114,6 +116,7 @@ class PostPreview extends Component {
     navigation: PropTypes.shape().isRequired,
     postData: PropTypes.shape(),
     rebloggedList: PropTypes.arrayOf(PropTypes.string),
+    reportedPosts: PropTypes.arrayOf(PropTypes.shape()),
     currentUsername: PropTypes.string,
     displayNSFWContent: PropTypes.bool.isRequired,
   };
@@ -124,18 +127,22 @@ class PostPreview extends Component {
     displayNSFWContent: false,
     authUsername: '',
     rebloggedList: [],
+    reportedPosts: [],
     currentUsername: '',
   };
 
   constructor(props) {
     super(props);
-    const { postData } = props;
+    const { postData, reportedPosts } = props;
     const postAuthorReputation = getReputation(postData.author_reputation);
+    const isReported = _.findIndex(reportedPosts, post => post.id === postData.id) > -1;
     let displayPostPreview = true;
 
     if (postAuthorReputation >= 0 && isPostTaggedNSFW(postData)) {
       displayPostPreview = props.displayNSFWContent;
     } else if (postAuthorReputation < 0) {
+      displayPostPreview = false;
+    } else if (isReported) {
       displayPostPreview = false;
     }
 
@@ -181,6 +188,21 @@ class PostPreview extends Component {
         likedPost: isPostVoted(postData, authUsername),
         loadingVote: false,
       });
+    }
+
+    const isDifferentReportedPosts = !_.isEqual(
+      JSON.stringify(this.props.reportedPosts),
+      JSON.stringify(nextProps.reportedPosts),
+    );
+
+    if (isDifferentReportedPosts) {
+      const { postData } = this.props;
+      const isReported = _.findIndex(nextProps.reportedPosts, post => post.id === postData.id) > -1;
+      if (isReported) {
+        this.setState({
+          displayPostPreview: false,
+        });
+      }
     }
   }
 
@@ -358,8 +380,9 @@ class PostPreview extends Component {
   }
 
   getDisplayPostPreview() {
-    const { postData, displayNSFWContent } = this.props;
+    const { postData, displayNSFWContent, reportedPosts } = this.props;
     const { displayPostPreview } = this.state;
+    const isReported = _.findIndex(reportedPosts, post => post.id === postData.id) > -1;
     const postAuthorReputation = getReputation(postData.author_reputation);
 
     if (displayPostPreview) return true;
@@ -368,9 +391,32 @@ class PostPreview extends Component {
       return displayNSFWContent;
     } else if (postAuthorReputation < 0) {
       return false;
+    } else if (isReported) {
+      return false;
     }
 
     return true;
+  }
+
+  renderHiddenPreviewText() {
+    const { postData, reportedPosts } = this.props;
+    const isReported = _.findIndex(reportedPosts, post => post.id === postData.id) > -1;
+    let hiddenPreviewText = i18n.post.lowAuthorReputationPostPreview;
+
+    if (isPostTaggedNSFW(postData)) {
+      hiddenPreviewText = i18n.post.nsfwPostHidden;
+    } else if (isReported) {
+      hiddenPreviewText = i18n.post.reportedPostHidden;
+    }
+
+    return (
+      <View>
+        <HiddenPreviewText>{`${hiddenPreviewText} `}</HiddenPreviewText>
+        <TextTouchable onPress={this.displayHiddenContent}>
+          <HiddenContentLink>{i18n.post.displayHiddenContent}</HiddenContentLink>
+        </TextTouchable>
+      </View>
+    );
   }
 
   renderPreview() {
@@ -419,21 +465,7 @@ class PostPreview extends Component {
     const images = parsedJsonMetadata.image || [];
     const formattedImages = _.map(images, image => ({ photo: image }));
     const showPostPreview = this.getDisplayPostPreview();
-    const hiddenStoryPreviewMessage = isPostTaggedNSFW(postData) ? (
-      <View>
-        <HiddenPreviewText> {`${i18n.post.nsfwPostHidden} `}</HiddenPreviewText>
-        <TextTouchable onPress={this.displayHiddenContent}>
-          <HiddenContentLink>{i18n.post.displayHiddenContent}</HiddenContentLink>
-        </TextTouchable>
-      </View>
-    ) : (
-      <View>
-        <HiddenPreviewText>{`${i18n.post.lowAuthorReputationPostPreview} `}</HiddenPreviewText>
-        <TextTouchable onPress={this.displayHiddenContent}>
-          <HiddenContentLink>{i18n.post.displayHiddenContent}</HiddenContentLink>
-        </TextTouchable>
-      </View>
-    );
+    const hiddenStoryPreviewMessage = this.renderHiddenPreviewText();
 
     return (
       <Container>

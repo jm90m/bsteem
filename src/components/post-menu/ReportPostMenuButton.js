@@ -6,15 +6,21 @@ import styled from 'styled-components/native';
 import { MaterialIcons } from '@expo/vector-icons';
 import * as settingsActions from 'state/actions/settingsActions';
 import { MATERIAL_ICONS, COLORS, ICON_SIZES } from 'constants/styles';
+import SmallLoading from 'components/common/SmallLoading';
 import { getPendingReportingPosts, getReportedPosts } from 'state/rootReducer';
+import MenuModalButton from '../common/menu/MenuModalButton';
 import i18n from 'i18n/i18n';
-import SmallLoading from './SmallLoading';
 
-const Touchable = styled.TouchableOpacity``;
-
-const ActionLink = styled.Text`
+const MenuText = styled.Text`
+  margin-left: 5px;
   color: ${COLORS.PRIMARY_COLOR};
   font-weight: bold;
+`;
+
+const MenuModalContents = styled.View`
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
 `;
 
 @connect(
@@ -28,7 +34,7 @@ const ActionLink = styled.Text`
     unreportPost: id => dispatch(settingsActions.unreportPost.action({ id })),
   }),
 )
-class ReportPostButton extends Component {
+class ReportPostMenuButton extends Component {
   static propTypes = {
     reportPost: PropTypes.func.isRequired,
     unreportPost: PropTypes.func.isRequired,
@@ -73,33 +79,27 @@ class ReportPostButton extends Component {
 
     const isLoading = _.includes(pendingReportingPosts, id);
     const isReported = _.findIndex(reportedPosts, post => post.id === id) > -1;
+    const menuText = isReported ? i18n.settings.reportedPost : i18n.settings.reportPost;
+    const menuIconColor = isReported ? COLORS.TERTIARY_COLOR : COLORS.PRIMARY_COLOR;
     const onPress = isReported ? this.handleUnreportPost : this.handleReportPost;
-    const menuIconColor = isReported ? COLORS.PRIMARY_COLOR : COLORS.TERTIARY_COLOR;
 
-    if (isLoading) {
-      return <SmallLoading />;
-    }
-
-    if (isReported) {
-      return (
-        <Touchable onPress={this.handleUnreportPost}>
-          <ActionLink>{i18n.settings.unreportPost}</ActionLink>
-        </Touchable>
-      );
-    }
-
-    return isLoading ? (
-      <SmallLoading />
-    ) : (
-      <Touchable onPress={onPress}>
-        <MaterialIcons
-          name={MATERIAL_ICONS.report}
-          size={ICON_SIZES.menuIcon}
-          color={menuIconColor}
-        />
-      </Touchable>
+    return (
+      <MenuModalButton onPress={onPress}>
+        <MenuModalContents>
+          {isLoading ? (
+            <SmallLoading style={{ marginRight: 5 }} />
+          ) : (
+            <MaterialIcons
+              size={ICON_SIZES.menuModalOptionIcon}
+              color={menuIconColor}
+              name={MATERIAL_ICONS.report}
+            />
+          )}
+          <MenuText>{menuText}</MenuText>
+        </MenuModalContents>
+      </MenuModalButton>
     );
   }
 }
 
-export default ReportPostButton;
+export default ReportPostMenuButton;
