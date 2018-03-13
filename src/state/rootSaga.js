@@ -79,6 +79,9 @@ const rootSaga = function*() {
     // Settings Sagas
     spawn(settingsSaga.watchFetchUserSettings),
     spawn(settingsSaga.watchSaveNSFWDisplaySetting),
+    spawn(settingsSaga.watchReportPost),
+    spawn(settingsSaga.watchUnreportPost),
+    spawn(settingsSaga.watchFetchReportedPosts),
   ]);
 };
 

@@ -111,3 +111,4 @@ export const CURRENT_USER_REPORT_POST = createAsyncActionType('@settings/current
 export const CURRENT_USER_UNREPORT_POST = createAsyncActionType(
   '@settings/current-user-unreport-post',
 );
+export const FETCH_REPORTED_POSTS = createAsyncActionType('@settings/fetch-reported-posts');
