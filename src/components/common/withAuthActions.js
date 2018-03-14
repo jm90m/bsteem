@@ -16,14 +16,22 @@ export default function withAuthActions(WrappedComponent) {
   });
 
   const mapDispatchToProps = dispatch => ({
-    authenticateUser: payload => dispatch(authActions.authenticateUser.action(payload)),
+    authenticateUserSuccess: (accessToken, expiresIn, username, maxAge) =>
+      dispatch(
+        authActions.authenticateUser.success({
+          accessToken,
+          expiresIn,
+          username,
+          maxAge,
+        }),
+      ),
     authenticateUserError: error => dispatch(authActions.authenticateUser.fail(error)),
   });
 
   class Wrapper extends React.Component {
     static propTypes = {
       authenticated: PropTypes.bool,
-      authenticateUser: PropTypes.func.isRequired,
+      authenticateUserSuccess: PropTypes.func.isRequired,
       authenticateUserError: PropTypes.func.isRequired,
     };
 
@@ -70,7 +78,7 @@ export default function withAuthActions(WrappedComponent) {
             <LoginModal
               visible={this.state.displayLoginModal}
               handleLoginModalCancel={this.hideLoginModal}
-              authenticateUser={this.props.authenticateUser}
+              authenticateUserSuccess={this.props.authenticateUserSuccess}
               authenticateUserError={this.props.authenticateUserError}
             />
           )}

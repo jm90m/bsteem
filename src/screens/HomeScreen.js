@@ -256,7 +256,7 @@ class HomeScreen extends Component {
             />
           }
         />
-        {_.isEmpty(displayedPosts) && this.renderEmptyText()}
+        {_.isEmpty(displayedPosts) && !loadingFetchDiscussions && this.renderEmptyText()}
         {(loadingFetchMoreDiscussions || loadingFetchDiscussions) && (
           <LoadingMoreContainer>
             <LargeLoading />

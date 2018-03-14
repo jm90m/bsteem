@@ -11,15 +11,15 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  authenticateUser: (accessToken, expiresIn, username, maxAge) =>
-    dispatch(authActions.authenticateUser.action(accessToken, expiresIn, username, maxAge)),
+  authenticateUserSuccess: (accessToken, expiresIn, username, maxAge) =>
+    dispatch(authActions.authenticateUser.success({ accessToken, expiresIn, username, maxAge })),
   authenticateUserError: error => dispatch(authActions.authenticateUser.fail(error)),
   closeSteemConnectErrorModal: () => dispatch(setSteemConnectErrorModalDisplay(false)),
 });
 
 const SteemConnectErrorModalContainer = ({
   steemConnectDisplayErrorModal,
-  authenticateUser,
+  authenticateUserSuccess,
   authenticateUserError,
   closeSteemConnectErrorModal,
 }) => {
@@ -28,7 +28,7 @@ const SteemConnectErrorModalContainer = ({
   return (
     <SteemConnectErrorModal
       visible={steemConnectDisplayErrorModal}
-      authenticateUser={authenticateUser}
+      authenticateUserSuccess={authenticateUserSuccess}
       authenticateUserError={authenticateUserError}
       closeSteemConnectErrorModal={closeSteemConnectErrorModal}
     />
@@ -37,7 +37,7 @@ const SteemConnectErrorModalContainer = ({
 
 SteemConnectErrorModalContainer.propTypes = {
   steemConnectDisplayErrorModal: PropTypes.bool.isRequired,
-  authenticateUser: PropTypes.func.isRequired,
+  authenticateUserSuccess: PropTypes.func.isRequired,
   authenticateUserError: PropTypes.func.isRequired,
   closeSteemConnectErrorModal: PropTypes.func.isRequired,
 };

@@ -44,7 +44,7 @@ class SteemConnectErrorModal extends Component {
   static propTypes = {
     visible: PropTypes.bool.isRequired,
     closeSteemConnectErrorModal: PropTypes.func.isRequired,
-    authenticateUser: PropTypes.func.isRequired,
+    authenticateUserSuccess: PropTypes.func.isRequired,
     authenticateUserError: PropTypes.func.isRequired,
   };
 
@@ -77,7 +77,7 @@ class SteemConnectErrorModal extends Component {
         AsyncStorage.setItem(AUTH_EXPIRATION, expiresIn);
         AsyncStorage.setItem(AUTH_USERNAME, username);
         AsyncStorage.setItem(AUTH_MAX_EXPIRATION_AGE, `${maxAge}`);
-        this.props.authenticateUser(accessToken, expiresIn, username, maxAge);
+        this.props.authenticateUserSuccess(accessToken, expiresIn, username, maxAge);
       } else {
         this.props.authenticateUserError();
       }
