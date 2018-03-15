@@ -74,6 +74,10 @@ const TouchableMenuContainer = styled.View`
   padding: 5px;
 `;
 
+const LoadingContainer = styled.View`
+  margin-top: 20px;
+`;
+
 const mapStateToProps = state => ({
   postsDetails: getPostsDetails(state),
   postLoading: getPostLoading(state),
@@ -511,7 +515,9 @@ class EditPostScreen extends Component {
           </TouchableMenu>
         </Header>
         {postLoading ? (
-          <LargeLoading style={{ marginTop: 20 }} />
+          <LoadingContainer>
+            <LargeLoading />
+          </LoadingContainer>
         ) : (
           <StyledScrollView>
             <FormLabel>{i18n.editor.title}</FormLabel>
