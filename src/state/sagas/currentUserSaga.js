@@ -1,7 +1,14 @@
+import Expo from 'expo';
 import _ from 'lodash';
 import { takeLatest, all, call, put, select, takeEvery } from 'redux-saga/effects';
 import API from 'api/api';
 import sc2 from 'api/sc2';
+import {
+  getFirebaseValueOnce,
+  getUserRebloggedPostsRef,
+  getRebloggedPostRef,
+  setFirebaseData,
+} from 'util/firebaseUtils';
 import { getAuthUsername, getCurrentUserFeed, getCommentsByPostId } from '../rootReducer';
 import {
   FETCH_CURRENT_USER_FEED,
@@ -13,8 +20,10 @@ import {
   FETCH_CURRENT_USER_FOLLOW_LIST,
   CURRENT_USER_FOLLOW_USER,
   CURRENT_USER_UNFOLLOW_USER,
+  FETCH_CURRENT_USER_REBLOG_LIST,
 } from '../actions/actionTypes';
 import * as currentUserActions from '../actions/currentUserActions';
+import { refreshUserBlog } from '../actions/usersActions';
 
 const fetchCurrentUserFeed = function*() {
   try {
@@ -93,6 +102,21 @@ const voteComment = function*(action) {
   }
 };
 
+const addRebloggedPostToFirebase = function*(postId) {
+  try {
+    const authUsername = yield select(getAuthUsername);
+    let userID;
+    if (_.isEmpty(authUsername)) {
+      userID = Expo.Constants.deviceId;
+    } else {
+      userID = authUsername;
+    }
+    yield call(setFirebaseData, getRebloggedPostRef(userID, postId), postId);
+  } catch (error) {
+    console.log('failed to add reblog post on firebase');
+  }
+};
+
 const reblogPost = function*(action) {
   try {
     const { postId, postAuthor, postPermlink, reblogSuccessCallback } = action.payload;
@@ -103,7 +127,9 @@ const reblogPost = function*(action) {
       postId,
     };
     console.log('REBLOG SUCCESS', result, payload);
+    yield call(addRebloggedPostToFirebase, postId);
     yield put(currentUserActions.currentUserReblogPost.success(payload));
+    yield put(refreshUserBlog.action({ username: currentUsername }));
   } catch (error) {
     const { reblogFailCallback } = action.payload;
     console.log('REBLOG FAIL', error);
@@ -114,7 +140,18 @@ const reblogPost = function*(action) {
 
 const fetchCurrentUserRebloggedList = function*() {
   try {
-    const currentUsername = yield select(getAuthUsername);
+    const authUsername = yield select(getAuthUsername);
+    let userID;
+
+    if (_.isEmpty(authUsername)) {
+      userID = Expo.Constants.deviceId;
+    } else {
+      userID = authUsername;
+    }
+    const snapshot = yield call(getFirebaseValueOnce, getUserRebloggedPostsRef(userID), 'value');
+    const result = snapshot.val() || {};
+    const rebloggedPosts = _.map(result, (val, id) => id);
+    yield put(currentUserActions.currentUserReblogListFetch.success(rebloggedPosts));
   } catch (error) {
     yield put(currentUserActions.currentUserReblogListFetch.fail(error));
   }
@@ -213,4 +250,8 @@ export const watchCurrentUserFollowUser = function*() {
 
 export const watchCurrentUserUnfollowUser = function*() {
   yield takeEvery(CURRENT_USER_UNFOLLOW_USER.ACTION, unfollowUser);
+};
+
+export const watchFetchCurrentUserRebloggedList = function*() {
+  yield takeLatest(FETCH_CURRENT_USER_REBLOG_LIST.ACTION, fetchCurrentUserRebloggedList);
 };

@@ -113,7 +113,8 @@ const appOnboarding = function*() {
     // authenticate
     yield call(fetchRewardFund);
     yield call(settingsSaga.fetchUserSettings);
-    yield put(currentUserActions.currentUserFeedFetch());
+    yield put(currentUserActions.currentUserFeedFetch.action());
+    yield put(currentUserActions.currentUserReblogListFetch.action());
 
     yield put(appActions.appOnboarding.success());
   } catch (error) {
