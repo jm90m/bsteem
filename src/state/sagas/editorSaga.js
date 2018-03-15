@@ -3,6 +3,7 @@ import { takeLatest, call, all, put, select } from 'redux-saga/effects';
 import _ from 'lodash';
 import { createPermlink, createCommentPermlink } from 'util/steemitUtils';
 import ERRORS from 'constants/errors';
+import { imgurConfig } from 'constants/config';
 import { CREATE_COMMENT, CREATE_POST, UPLOAD_IMAGE } from '../actions/actionTypes';
 import { getAuthUsername, getUsersDetails } from '../rootReducer';
 import * as editorActions from '../actions/editorActions';
@@ -248,16 +249,6 @@ const createComment = function*(action) {
 
 async function uploadToBusy(uri, authUsername, callback, errorCallback) {
   let apiUrl = `https://img.busy.org/@${authUsername}/uploads`;
-
-  // Note:
-  // Uncomment this if you want to experiment with local server
-  //
-  // if (Constants.isDevice) {
-  //   apiUrl = `https://your-ngrok-subdomain.ngrok.io/upload`;
-  // } else {
-  //   apiUrl = `http://localhost:3000/upload`
-  // }
-
   let uriParts = uri.split('.');
   let fileType = uri[uri.length - 1];
 
@@ -286,11 +277,47 @@ async function uploadToBusy(uri, authUsername, callback, errorCallback) {
     });
 }
 
+async function uploadToImgur(imageData) {
+  const { uri } = imageData;
+  const auth = `Client-ID ${imgurConfig.clientId}`;
+  const apiUrl = 'https://imgur-apiv3.p.mashape.com/3/image';
+  const fileType = uri[uri.length - 1];
+  const formData = new FormData();
+  formData.append('image', {
+    uri,
+    name: `photo.${fileType}`,
+    type: `image/${fileType}`,
+  });
+
+  const options = {
+    method: 'POST',
+    body: formData,
+    headers: {
+      Authorization: auth,
+      'X-Mashape-Key': imgurConfig.mashapeKey,
+      Accept: 'application/json',
+      'Content-Type': 'multipart/form-data',
+    },
+  };
+
+  return fetch(apiUrl, options).then(res => res.json());
+}
+
 const uploadImage = function*(action) {
   try {
-    const { uri, callback, errorCallback } = action.payload;
+    const { imageData, callback, errorCallback } = action.payload;
     const authUsername = select(getAuthUsername);
-    const result = yield call(uploadToBusy, uri, authUsername, callback, errorCallback);
+    const result = yield call(uploadToImgur, imageData);
+
+    if (_.get(result, 'success', false)) {
+      const imageData = _.get(result, 'data', {});
+      const imageURL = _.get(imageData, 'link');
+      const imageID = _.get(imageData, 'id');
+      callback(imageURL, imageID);
+    } else {
+      errorCallback();
+    }
+    console.log('IMGUR RESULT', result);
   } catch (error) {
     console.log(error);
   }

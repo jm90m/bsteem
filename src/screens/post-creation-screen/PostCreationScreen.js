@@ -72,8 +72,8 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
   createPost: (postData, callback) => dispatch(createPost.action({ postData, callback })),
-  uploadImage: (uri, callback, errorCallback) =>
-    dispatch(uploadImage.action({ uri, callback, errorCallback })),
+  uploadImage: (imageData, callback, errorCallback) =>
+    dispatch(uploadImage.action({ imageData, callback, errorCallback })),
 });
 
 @connect(mapStateToProps, mapDispatchToProps)
@@ -100,6 +100,8 @@ class PostCreationScreen extends Component {
     additionalPostContents: [],
     additionalInputCounter: 0,
     previewVisible: false,
+    errorImageUploading: false,
+    imageLoading: false,
     currentPostData: { body: '' },
     rewards: postConstants.REWARDS.HALF,
   };
@@ -120,6 +122,7 @@ class PostCreationScreen extends Component {
     this.removeTag = this.removeTag.bind(this);
     this.handleCreatePostSuccess = this.handleCreatePostSuccess.bind(this);
     this.handleSuccessImageUpload = this.handleSuccessImageUpload.bind(this);
+    this.handleErrorImageUpload = this.handleErrorImageUpload.bind(this);
     this.insertImage = this.insertImage.bind(this);
     this.addTextInput = this.addTextInput.bind(this);
     this.renderAdditionalContents = this.renderAdditionalContents.bind(this);
@@ -183,21 +186,26 @@ class PostCreationScreen extends Component {
 
   async pickImage() {
     const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: 'Images',
       allowsEditing: true,
     });
-
     console.log('IMAGE PICKER', result);
 
     if (!result.cancelled) {
       this.setState({ imageLoading: true });
-      this.props.uploadImage(result.uri, this.handleSuccessImageUpload, () => {
-        console.log('ERROR');
-      });
+      this.props.uploadImage(result, this.handleSuccessImageUpload, this.handleErrorImageUpload);
     }
   }
 
   handleSuccessImageUpload(url, name) {
     this.insertImage(url, name);
+  }
+
+  handleErrorImageUpload() {
+    this.setState({
+      imageLoading: false,
+      errorImageUploading: true,
+    });
   }
 
   insertImage(image, imageName = 'image') {

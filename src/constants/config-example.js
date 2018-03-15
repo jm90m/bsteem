@@ -6,3 +6,8 @@ export const firebaseConfig = {
   storageBucket: '',
   messagingSenderId: '',
 };
+
+export const imgurConfig = {
+  clientId: '',
+  mashapeKey: '',
+};

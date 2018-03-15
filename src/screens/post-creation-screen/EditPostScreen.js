@@ -27,7 +27,6 @@ import uuidv4 from 'uuid/v4';
 import { createPost, uploadImage } from 'state/actions/editorActions';
 import PostCreationPreviewModal from './PostCreationPreviewModal';
 import * as navigationConstants from '../../constants/navigation';
-import PostCreationScreen from './PostCreationScreen';
 
 const { width: deviceWidth } = Dimensions.get('screen');
 
@@ -86,8 +85,8 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
   fetchPostDetails: (author, permlink) => dispatch(fetchPostDetails.action({ author, permlink })),
   createPost: (postData, callback) => dispatch(createPost.action({ postData, callback })),
-  uploadImage: (uri, callback, errorCallback) =>
-    dispatch(uploadImage.action({ uri, callback, errorCallback })),
+  uploadImage: (imageData, callback, errorCallback) =>
+    dispatch(uploadImage.action({ imageData, callback, errorCallback })),
 });
 
 class EditPostScreen extends Component {
@@ -119,6 +118,7 @@ class EditPostScreen extends Component {
       previewVisible: false,
       currentPostData: { body: '' },
       imageLoading: false,
+      errorImageUploading: false,
       additionalPostContents: [],
       additionalInputCounter: 0,
     };
@@ -138,6 +138,7 @@ class EditPostScreen extends Component {
     this.pickImage = this.pickImage.bind(this);
 
     this.insertImage = this.insertImage.bind(this);
+    this.handleErrorImageUpload = this.handleErrorImageUpload.bind(this);
     this.addTextInput = this.addTextInput.bind(this);
     this.renderAdditionalContents = this.renderAdditionalContents.bind(this);
     this.removeAdditionalContent = this.removeAdditionalContent.bind(this);
@@ -435,8 +436,16 @@ class EditPostScreen extends Component {
     });
   }
 
+  handleErrorImageUpload() {
+    this.setState({
+      imageLoading: false,
+      errorImageUploading: true,
+    });
+  }
+
   async pickImage() {
     const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: 'Images',
       allowsEditing: true,
     });
 
@@ -444,9 +453,7 @@ class EditPostScreen extends Component {
 
     if (!result.cancelled) {
       this.setState({ imageLoading: true });
-      this.props.uploadImage(result.uri, this.insertImage, () => {
-        console.log('ERROR');
-      });
+      this.props.uploadImage(result, this.insertImage, this.handleErrorImageUpload);
     }
   }
 
