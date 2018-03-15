@@ -65,6 +65,10 @@ const ActionButtons = styled.View`
   flex-direction: row;
 `;
 
+const PickerContainer = styled.View`
+  padding: 0 10px;
+`;
+
 const mapStateToProps = state => ({
   authUsername: getAuthUsername(state),
   createPostLoading: getCreatePostLoading(state),
@@ -476,11 +480,13 @@ class PostCreationScreen extends Component {
           {this.renderAdditionalContents()}
           {imageLoading && <SmallLoading style={{ marginTop: 20, alignSelf: 'center' }} />}
           <FormLabel>{i18n.editor.rewards}</FormLabel>
-          <Picker selectedValue={rewards} onValueChange={this.onChangeRewards}>
-            <Picker.Item label={i18n.editor.halfRewards} value={postConstants.REWARDS.HALF} />
-            <Picker.Item label={i18n.editor.allRewards} value={postConstants.REWARDS.ALL} />
-            <Picker.Item label={i18n.editor.noRewards} value={postConstants.REWARDS.NONE} />
-          </Picker>
+          <PickerContainer>
+            <Picker selectedValue={rewards} onValueChange={this.onChangeRewards}>
+              <Picker.Item label={i18n.editor.halfRewards} value={postConstants.REWARDS.HALF} />
+              <Picker.Item label={i18n.editor.allRewards} value={postConstants.REWARDS.ALL} />
+              <Picker.Item label={i18n.editor.noRewards} value={postConstants.REWARDS.NONE} />
+            </Picker>
+          </PickerContainer>
           <DisclaimerText />
           <ActionButtonsContainer>
             <PrimaryButton

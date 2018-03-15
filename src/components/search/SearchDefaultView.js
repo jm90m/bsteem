@@ -10,6 +10,7 @@ const Container = styled.View`
   flex: 1;
   flex-wrap: wrap;
   flex-direction: row;
+  padding-bottom: 100px;
 `;
 
 const TouchableTag = styled.TouchableOpacity`
