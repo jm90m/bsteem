@@ -176,6 +176,7 @@ class PostPreview extends Component {
     this.handleAuthVote = this.handleAuthVote.bind(this);
     this.handleReblogIconPress = this.handleReblogIconPress.bind(this);
     this.displayHiddenContent = this.displayHiddenContent.bind(this);
+    this.handleEditPost = this.handleEditPost.bind(this);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -419,6 +420,14 @@ class PostPreview extends Component {
     );
   }
 
+  handleEditPost() {
+    const { postData } = this.props;
+    this.handleHideMenu();
+    this.props.navigation.navigate(navigationConstants.EDIT_POST, {
+      postData,
+    });
+  }
+
   renderPreview() {
     const { postData } = this.props;
     const { id } = postData;
@@ -520,6 +529,7 @@ class PostPreview extends Component {
               handleLikePost={this.handleOnPressVote}
               rebloggedList={rebloggedList}
               likedPost={likedPost}
+              handleEditPost={this.handleEditPost}
             />
           </BSteemModal>
         )}

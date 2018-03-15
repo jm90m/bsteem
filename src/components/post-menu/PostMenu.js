@@ -58,6 +58,7 @@ class PostMenu extends Component {
     hideReblogMenu: PropTypes.bool,
     displayPhotoBrowserMenu: PropTypes.bool,
     handleDisplayPhotoBrowser: PropTypes.func,
+    handleEditPost: PropTypes.func,
   };
 
   static defaultProps = {
@@ -72,6 +73,7 @@ class PostMenu extends Component {
     handleNavigateToComments: () => {},
     handleReblog: () => {},
     handleDisplayPhotoBrowser: () => {},
+    handleEditPost: () => {},
   };
 
   constructor(props) {
@@ -101,6 +103,7 @@ class PostMenu extends Component {
       handleLikePost,
       handleNavigateToComments,
       handleReblog,
+      handleEditPost,
       postData,
       authUsername,
       rebloggedList,
@@ -110,11 +113,12 @@ class PostMenu extends Component {
       displayPhotoBrowserMenu,
       handleDisplayPhotoBrowser,
     } = this.props;
-    const { title, permlink, author, id, created } = postData;
+    const { title, permlink, author, id, created, cashout_time } = postData;
     const displayMenuButton = authUsername !== author && !_.isEmpty(authUsername);
     const isReblogged = _.includes(rebloggedList, `${id}`);
     const hideReblog = !(displayMenuButton && !isReblogged) || hideReblogMenu;
     const displayReportButton = authUsername !== author;
+    const displayEditPostButton = authUsername === author && cashout_time !== '1969-12-31T23:59:59';
 
     return (
       <TouchableWithoutFeedback onPress={hideMenu}>
@@ -195,6 +199,18 @@ class PostMenu extends Component {
                 <MenuText>{i18n.postMenu.sharePost}</MenuText>
               </MenuModalContents>
             </MenuModalButton>
+            {displayEditPostButton && (
+              <MenuModalButton onPress={handleEditPost}>
+                <MenuModalContents>
+                  <MaterialCommunityIcons
+                    size={ICON_SIZES.menuModalOptionIcon}
+                    color={COLORS.PRIMARY_COLOR}
+                    name={MATERIAL_COMMUNITY_ICONS.pencil}
+                  />
+                  <MenuText>{i18n.postMenu.editPost}</MenuText>
+                </MenuModalContents>
+              </MenuModalButton>
+            )}
           </MenuWrapper>
         </Container>
       </TouchableWithoutFeedback>

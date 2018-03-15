@@ -51,6 +51,7 @@ export default {
     disclaimerText:
       "By creating this post you agree to the steem's terms and conditions, which is hosted on steemit's website.",
     tos: 'Terms and Conditions',
+    createPost: 'Create Post'
   },
   postMenu: {
     follow: 'Follow',
@@ -62,6 +63,7 @@ export default {
     reportPost: 'Report Post',
     postImages: 'Post Images',
     sharePost: 'Share Post',
+    editPost: 'Edit Post',
   },
   login: {
     description: 'Sign in with SteemConnect so that you can vote, like, comment, and create posts.',

@@ -135,6 +135,7 @@ class PostScreen extends Component {
 
     this.handleLikePost = this.handleLikePost.bind(this);
     this.handlePostLinkPress = this.handlePostLinkPress.bind(this);
+    this.handleEditPost = this.handleEditPost.bind(this);
 
     this.loadingVote = this.loadingVote.bind(this);
     this.likedVoteSuccess = this.likedVoteSuccess.bind(this);
@@ -281,6 +282,14 @@ class PostScreen extends Component {
     Share.share(content);
   }
 
+  handleEditPost() {
+    const postData = this.getCurrentPostDetails();
+    this.handleHideMenu();
+    this.props.navigation.navigate(navigationConstants.EDIT_POST, {
+      postData,
+    });
+  }
+
   handlePostLinkPress(e, url) {
     console.log('clicked link: ', url);
     const isTag = _.includes(url, POST_HTML_BODY_TAG);
@@ -394,6 +403,7 @@ class PostScreen extends Component {
               postData={postDetails}
               displayPhotoBrowserMenu={displayPhotoBrowserMenu}
               handleDisplayPhotoBrowser={this.handleDisplayPhotoBrowser}
+              handleEditPost={this.handleEditPost}
               hideReblogMenu
             />
           </BSteemModal>

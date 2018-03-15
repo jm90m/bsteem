@@ -17,6 +17,7 @@ import PostScreen from '../stack-screens/PostScreen';
 import SavedContentScreen from '../SavedContentScreen';
 import ReplyScreen from '../stack-screens/ReplyScreen';
 import EditReplyScreen from '../stack-screens/EditReplyScreen';
+import EditPostScreen from '../post-creation-screen/EditPostScreen';
 
 const screenNavigationOptions = {
   tabBarIcon: ({ tintColor }) => (
@@ -79,6 +80,10 @@ const SearchNavigator = StackNavigator(
     },
     [navigationConstants.EDIT_REPLY]: {
       screen: EditReplyScreen,
+      navigationOptions: screenNavigationOptions,
+    },
+    [navigationConstants.EDIT_POST]: {
+      screen: EditPostScreen,
       navigationOptions: screenNavigationOptions,
     },
   },

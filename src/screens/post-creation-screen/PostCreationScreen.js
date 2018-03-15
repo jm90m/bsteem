@@ -10,16 +10,14 @@ import * as navigationConstants from 'constants/navigation';
 import i18n from 'i18n/i18n';
 import { FormLabel, FormInput, Icon, FormValidationMessage } from 'react-native-elements';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS, MATERIAL_ICONS, ICON_SIZES } from 'constants/styles';
+import { COLORS, MATERIAL_ICONS, ICON_SIZES, MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
 import { getAuthUsername, getCreatePostLoading } from 'state/rootReducer';
 import { createPost, uploadImage } from 'state/actions/editorActions';
-import defaultPostData from 'constants/defaultPostData';
 import Header from 'components/common/Header';
 import TagsInput from 'components/editor/TagsInput';
 import SmallLoading from 'components/common/SmallLoading';
 import PrimaryButton from 'components/common/PrimaryButton';
 import HeaderEmptyView from 'components/common/HeaderEmptyView';
-import { MATERIAL_COMMUNITY_ICONS } from '../../constants/styles';
 import * as postConstants from 'constants/postConstants';
 import PostCreationPreviewModal from './PostCreationPreviewModal';
 import DisclaimerText from './DisclaimerText';
@@ -300,27 +298,14 @@ class PostCreationScreen extends Component {
     });
   }
 
-  handleCreatePostSuccess(postData) {
-    const { title, category, author, json_metadata, body, permlink, id } = postData;
-    const postDataWithDefaults = {
-      ...defaultPostData,
-      ...postData,
-    };
-    const parsedJsonMetadata = _.attempt(JSON.parse, json_metadata);
-
+  handleCreatePostSuccess(author, permlink) {
     // reset form state
     this.setState(PostCreationScreen.INITIAL_STATE);
     this.additionalContents = {};
 
-    this.props.navigation.navigate(navigationConstants.POST, {
-      title,
-      body,
+    this.props.navigation.navigate(navigationConstants.FETCH_POST, {
       permlink,
       author,
-      parsedJsonMetadata: _.isError(parsedJsonMetadata) ? {} : parsedJsonMetadata,
-      category,
-      postId: id,
-      postData: postDataWithDefaults,
     });
   }
 
@@ -488,7 +473,7 @@ class PostCreationScreen extends Component {
             <Picker.Item label={i18n.editor.allRewards} value={postConstants.REWARDS.ALL} />
             <Picker.Item label={i18n.editor.noRewards} value={postConstants.REWARDS.NONE} />
           </Picker>
-          <DisclaimerText/>
+          <DisclaimerText />
           <ActionButtonsContainer>
             <PrimaryButton
               onPress={this.handleSubmit}

@@ -145,6 +145,7 @@ class FetchPostScreen extends Component {
     this.handleDisplayPhotoBrowser = this.handleDisplayPhotoBrowser.bind(this);
     this.handleHidePhotoBrowser = this.handleHidePhotoBrowser.bind(this);
     this.handlePhotoBrowserShare = this.handlePhotoBrowserShare.bind(this);
+    this.handleEditPost = this.handleEditPost.bind(this);
 
     this.getCurrentPostDetails = this.getCurrentPostDetails.bind(this);
     this.fetchCurrentPostDetails = this.fetchCurrentPostDetails.bind(this);
@@ -316,6 +317,14 @@ class FetchPostScreen extends Component {
     });
   }
 
+  handleEditPost() {
+    const postData = this.getCurrentPostDetails();
+    this.handleHideMenu();
+    this.props.navigation.navigate(navigationConstants.EDIT_POST, {
+      postData,
+    });
+  }
+
   renderNoPostFound() {
     return (
       <Container>
@@ -396,6 +405,7 @@ class FetchPostScreen extends Component {
               postData={currentPostDetails}
               displayPhotoBrowserMenu={displayPhotoBrowserMenu}
               handleDisplayPhotoBrowser={this.handleDisplayPhotoBrowser}
+              handleEditPost={this.handleEditPost}
               hideReblogMenu
             />
           </BSteemModal>

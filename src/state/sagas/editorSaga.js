@@ -108,7 +108,7 @@ function broadcastComment(
         author,
         permlink,
         allow_votes: true,
-        allow_curation_rewards: false,
+        allow_curation_rewards: true,
         max_accepted_payout: '1000000.000 SBD',
         percent_steem_dollars: 10000,
       },
@@ -133,7 +133,8 @@ const createPost = function*(action) {
       draftId,
       isUpdating,
     } = postData;
-    let { permlink } = postData.permlink;
+    let { permlink } = postData;
+    const noUpvote = false;
 
     if (!isUpdating) {
       const generatedPermlink = yield call(
@@ -147,7 +148,8 @@ const createPost = function*(action) {
     }
 
     // use getBodyPatchIfSmall func in steemitUtils
-    const newBody = isUpdating ? postData.originalBody : body;
+    const newBody = isUpdating ? getBodyPatchIfSmaller(postData.originalBody, body) : body;
+    console.log('POST CREATION START', newBody, author, permlink);
     const result = yield call(
       broadcastPost,
       parentAuthor,
@@ -156,14 +158,14 @@ const createPost = function*(action) {
       title,
       newBody,
       jsonMetadata,
-      reward,
-      upvote,
+      !isUpdating && reward,
+      noUpvote,
       permlink,
     );
-    console.log('POST CREATION RESULTS', result);
     const payload = result.result;
+    console.log('POST CREATION RESULTS', result);
 
-    if (callback) callback(postData);
+    if (callback) callback(author, permlink);
 
     yield put(editorActions.createPost.success(payload));
   } catch (error) {
