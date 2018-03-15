@@ -2,13 +2,14 @@ import sc2 from 'api/sc2';
 import { takeLatest, call, all, put, select } from 'redux-saga/effects';
 import _ from 'lodash';
 import { createPermlink, createCommentPermlink } from 'util/steemitUtils';
+import ERRORS from 'constants/errors';
 import { CREATE_COMMENT, CREATE_POST, UPLOAD_IMAGE } from '../actions/actionTypes';
 import { getAuthUsername, getUsersDetails } from '../rootReducer';
 import * as editorActions from '../actions/editorActions';
 import * as appActions from '../actions/appActions';
 import { getBodyPatchIfSmaller } from '../../util/steemitUtils';
-import ERRORS from 'constants/errors';
 import API from '../../api/api';
+import { refreshUserBlog } from '../actions/usersActions';
 
 export const rewardsValues = {
   all: '100',
@@ -168,6 +169,7 @@ const createPost = function*(action) {
     if (callback) callback(author, permlink);
 
     yield put(editorActions.createPost.success(payload));
+    yield put(refreshUserBlog.action({ username: author }));
   } catch (error) {
     console.log(error);
     const postCreationError = ERRORS.POST_INTERVAL;
