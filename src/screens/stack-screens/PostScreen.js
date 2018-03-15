@@ -283,7 +283,7 @@ class PostScreen extends Component {
   }
 
   handleEditPost() {
-    const postData = this.getCurrentPostDetails();
+    const { postData } = this.props.navigation.state.params;
     this.handleHideMenu();
     this.props.navigation.navigate(navigationConstants.EDIT_POST, {
       postData,
@@ -346,7 +346,7 @@ class PostScreen extends Component {
       photo: image,
       caption: image.caption || '',
     }));
-    const tags = _.compact(_.get(parsedJsonMetadata, 'tags', []));
+    const tags = _.uniq(_.compact(_.get(parsedJsonMetadata, 'tags', [])));
     const widthOffset = 20;
     const displayPhotoBrowserMenu = !_.isEmpty(formattedImages);
 

@@ -235,7 +235,7 @@ class PostCreationScreen extends Component {
 
   getPostData() {
     const bsteemTag = 'bsteem';
-    const tags = _.compact([...this.state.tags, bsteemTag]);
+    const tags = _.uniq([...this.state.tags, bsteemTag]);
     const images = _.map(this.state.currentImages, image => image.src);
     const postBody = this.getPostBody();
     const body = _.isEmpty(postBody) ? ' ' : postBody;

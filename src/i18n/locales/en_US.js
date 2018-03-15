@@ -51,7 +51,8 @@ export default {
     disclaimerText:
       "By creating this post you agree to the steem's terms and conditions, which is hosted on steemit's website.",
     tos: 'Terms and Conditions',
-    createPost: 'Create Post'
+    createPost: 'Create Post',
+    editPost: 'Edit Post',
   },
   postMenu: {
     follow: 'Follow',

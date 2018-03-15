@@ -155,9 +155,7 @@ class FetchPostScreen extends Component {
     const { author, permlink } = this.props.navigation.state.params;
     const currentPostDetails = this.getCurrentPostDetails();
 
-    if (_.isEmpty(currentPostDetails)) {
-      this.props.fetchPostDetails(author, permlink);
-    }
+    this.props.fetchPostDetails(author, permlink);
   }
 
   getCurrentPostDetails() {
@@ -377,7 +375,7 @@ class FetchPostScreen extends Component {
     const images = _.get(parsedJsonMetadata, 'image', []);
     const widthOffset = 20;
     const formattedImages = _.map(images, image => ({ photo: image }));
-    const tags = _.compact(_.get(parsedJsonMetadata, 'tags', []));
+    const tags = _.uniq(_.compact(_.get(parsedJsonMetadata, 'tags', [])));
     const displayPhotoBrowserMenu = !_.isEmpty(formattedImages);
 
     return (

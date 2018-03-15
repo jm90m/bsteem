@@ -166,7 +166,7 @@ class EditPostScreen extends Component {
     if (diffPostData || diffPostLoading) {
       const postJSONMetaData = _.attempt(JSON.parse, currentPostData.json_metadata);
       const jsonMetaData = _.isError(postJSONMetaData) ? {} : postJSONMetaData;
-      const tags = _.get(jsonMetaData, 'tags', []);
+      const tags = _.uniq(_.get(jsonMetaData, 'tags', []));
 
       this.setState({
         bodyInput: currentPostData.body,
@@ -335,13 +335,13 @@ class EditPostScreen extends Component {
 
   getPostData() {
     const bsteemTag = 'bsteem';
-    const tags = _.compact([...this.state.tags, bsteemTag]);
+    const tags = _.uniq([...this.state.tags, bsteemTag]);
     const oldPostData = this.getCurrentPostDetails();
     const postJSONMetaData = _.attempt(JSON.parse, oldPostData.json_metadata);
     const jsonMetaData = _.isError(postJSONMetaData) ? {} : postJSONMetaData;
     const oldImages = _.get(jsonMetaData, 'images', []);
-    const images = _.compact(
-      _.concat(oldImages, _.map(this.state.currentImages, image => image.src)),
+    const images = _.uniq(
+      _.compact(_.concat(oldImages, _.map(this.state.currentImages, image => image.src))),
     );
     const postBody = this.getPostBody();
     const body = _.isEmpty(postBody) ? ' ' : postBody;
@@ -356,6 +356,8 @@ class EditPostScreen extends Component {
       lastUpdated: Date.now(),
       upvote: true,
       isUpdating: true,
+      parentPermlink: oldPostData.parent_permlink,
+      parentAuthor: oldPostData.parent_author,
     };
 
     const metaData = {
@@ -372,7 +374,7 @@ class EditPostScreen extends Component {
 
     data.jsonMetadata = {
       ...jsonMetaData,
-      metaData,
+      ...metaData,
     };
 
     return data;
@@ -532,7 +534,7 @@ class EditPostScreen extends Component {
             <ActionButtonsContainer>
               <PrimaryButton
                 onPress={this.handleSubmit}
-                title={i18n.editor.createPost}
+                title={i18n.editor.editPost}
                 disabled={createPostLoading}
                 loading={createPostLoading}
               />
