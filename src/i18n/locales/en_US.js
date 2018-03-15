@@ -128,6 +128,7 @@ export default {
     votingPower: 'Voting Power',
     voteValue: 'Vote Value',
     wallet: 'wallet',
+    joinedDate: 'Joined Date'
   },
   settings: {
     enableNSFW: 'Enable NSFW Posts',

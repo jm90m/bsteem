@@ -7,6 +7,7 @@ import { COLORS, MATERIAL_ICONS } from 'constants/styles';
 const Container = styled.View`
   flex-direction: row;
   align-items: center;
+  padding-bottom: 5px;
 `;
 
 const Location = styled.Text`

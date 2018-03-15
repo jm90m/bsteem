@@ -98,6 +98,7 @@ export const MATERIAL_ICONS = {
   // user profile
   location: 'location-on',
   reply: 'reply',
+  timer: 'timer',
 
   close: 'close',
   create: 'create',
@@ -187,6 +188,7 @@ export const ICON_SIZES = {
   actionIcon: 22,
   menuModalOptionIcon: 20,
   editorCloseIcon: 30,
+  userHeaderIcon: 20,
 };
 
 export const ICON_COLORS = {

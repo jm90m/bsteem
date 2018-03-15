@@ -54,6 +54,7 @@ const VoteText = styled.Text`
 
 const VoteContentContainer = styled.View`
   flex-direction: row;
+  align-items: center;
   padding-bottom: 5px;
 `;
 
@@ -150,7 +151,7 @@ class UserHeader extends Component {
         {this.renderActionButtons()}
         <UserProfile userProfile={userProfile} userDetails={userDetails} />
         <VoteContainer>
-          <VoteContentContainer style={{ paddingTop: 5 }}>
+          <VoteContentContainer>
             <MaterialIcons name={MATERIAL_ICONS.money} size={20} color={COLORS.GREY.CHARCOAL} />
             <VoteText>{voteWorthText}</VoteText>
           </VoteContentContainer>
