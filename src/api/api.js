@@ -77,6 +77,11 @@ class API {
     return sendPostRequest(API.BASE_URL, requestQuery);
   }
 
+  static async getTransferHistory(username) {
+    const requestQuery = API.createRequestQuery('get_state', [`@${username}/transfers`]);
+    return sendPostRequest(API.BASE_URL, requestQuery);
+  }
+
   static async getAccount(username) {
     const requestQuery = API.createRequestQuery('get_accounts', [[username]]);
     return sendPostRequest(API.BASE_URL, requestQuery);

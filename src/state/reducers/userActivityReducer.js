@@ -2,7 +2,9 @@ import _ from 'lodash';
 import {
   FETCH_USER_ACCOUNT_HISTORY,
   FETCH_MORE_USER_ACCOUNT_HISTORY,
+  FETCH_USER_TRANSFER_HISTORY,
 } from 'state/actions/actionTypes';
+import { FETCH_USER } from '../actions/actionTypes';
 
 const initialState = {
   usersTransactions: {},
@@ -10,6 +12,8 @@ const initialState = {
   loadingFetchUserAccountHistory: false,
   loadingFetchMoreUserAccountHistory: false,
 
+  loadingFetchUserTransferHistory: false,
+  userTransferHistory: {},
   // loadingEstAccountValue: true,
   // loadingGlobalProperties: true,
   // accountHistoryFilter: [],
@@ -77,6 +81,29 @@ export default function(state = initialState, action) {
         ...state,
         loadingFetchMoreUserAccountHistory: false,
       };
+
+    case FETCH_USER_TRANSFER_HISTORY.ACTION:
+      return {
+        ...state,
+        loadingFetchUserTransferHistory: true,
+      };
+    case FETCH_USER_TRANSFER_HISTORY.SUCCESS: {
+      const { username, userTransferHistory } = action.payload;
+      return {
+        ...state,
+        loadingFetchUserTransferHistory: false,
+        userTransferHistory: {
+          ...state.userTransferHistory,
+          [username]: userTransferHistory,
+        },
+      };
+    }
+    case FETCH_USER_TRANSFER_HISTORY.LOADING_END:
+    case FETCH_USER_TRANSFER_HISTORY.ERROR:
+      return {
+        ...state,
+        loadingFetchUserTransferHistory: false,
+      };
     default:
       return state;
   }
@@ -87,3 +114,5 @@ export const getUsersAccountHistory = state => state.usersAccountHistory;
 export const getLoadingFetchUserAccountHistory = state => state.loadingFetchUserAccountHistory;
 export const getLoadingFetchMoreUserAccountHistory = state =>
   state.loadingFetchMoreUserAccountHistory;
+export const getUserTransferHistory = state => state.userTransferHistory;
+export const getLoadingFetchUserTransferHistory = state => state.loadingFetchUserTransferHistory;

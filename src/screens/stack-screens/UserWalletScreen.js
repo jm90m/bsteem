@@ -5,34 +5,31 @@ import { ListView, RefreshControl } from 'react-native';
 import _ from 'lodash';
 import { connect } from 'react-redux';
 import {
-  getUsersTransactions,
   getUsersDetails,
   getLoadingUsersDetails,
-  getLoadingFetchUserAccountHistory,
-  getLoadingFetchMoreUserAccountHistory,
   getSteemRate,
   getLoadingSteemGlobalProperties,
   getTotalVestingFundSteem,
   getTotalVestingShares,
+  getUserTransferHistory,
+  getLoadingFetchUserTransferHistory,
 } from 'state/rootReducer';
 import { MaterialIcons } from '@expo/vector-icons';
 import { COLORS, MATERIAL_ICONS } from 'constants/styles';
-import {
-  fetchMoreUserAccountHistory,
-  fetchUserAccountHistory,
-} from 'state/actions/userActivityActions';
+import { fetchUserTransferHistory } from 'state/actions/userActivityActions';
 import { fetchUser } from 'state/actions/usersActions';
 import Header from 'components/common/Header';
 import HeaderEmptyView from 'components/common/HeaderEmptyView';
 import WalletTransaction from 'components/wallet/WalletTransaction';
 import UserWalletSummary from 'components/wallet/UserWalletSummary';
-import LargeLoading from 'components/common/LargeLoading';
 
 const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
 
 const Container = styled.View``;
 
-const StyledListView = styled.ListView``;
+const StyledListView = styled.ListView`
+  padding-bottom: 200px;
+`;
 
 const BackTouchable = styled.TouchableOpacity`
   justify-content: center;
@@ -45,21 +42,18 @@ const TitleText = styled.Text`
 `;
 
 const mapStateToProps = state => ({
-  usersTransactions: getUsersTransactions(state),
   usersDetails: getUsersDetails(state),
   loadingUsersDetails: getLoadingUsersDetails(state),
-  loadingFetchUserAccountHistory: getLoadingFetchUserAccountHistory(state),
-  loadingFetchMoreUserAccountHistory: getLoadingFetchMoreUserAccountHistory(state),
   steemRate: getSteemRate(state),
   loadingSteemGlobalProperties: getLoadingSteemGlobalProperties(state),
   totalVestingFundSteem: getTotalVestingFundSteem(state),
   totalVestingShares: getTotalVestingShares(state),
+  userTransferHistory: getUserTransferHistory(state),
+  loadingFetchUserTransferHistory: getLoadingFetchUserTransferHistory(state),
 });
 
 const mapDispatchToProps = dispatch => ({
-  fetchUserAccountHistory: username => dispatch(fetchUserAccountHistory.action({ username })),
-  fetchMoreUserAccountHistory: username =>
-    dispatch(fetchMoreUserAccountHistory.action({ username })),
+  fetchUserTransferHistory: username => dispatch(fetchUserTransferHistory.action({ username })),
   fetchUser: username => dispatch(fetchUser.action({ username })),
 });
 
@@ -67,18 +61,16 @@ const mapDispatchToProps = dispatch => ({
 class UserWalletScreen extends Component {
   static propTypes = {
     navigation: PropTypes.shape().isRequired,
-    usersTransactions: PropTypes.shape().isRequired,
     usersDetails: PropTypes.shape().isRequired,
     loadingUsersDetails: PropTypes.bool.isRequired,
-    loadingFetchUserAccountHistory: PropTypes.bool.isRequired,
-    loadingFetchMoreUserAccountHistory: PropTypes.bool.isRequired,
-    fetchUserAccountHistory: PropTypes.func.isRequired,
-    fetchMoreUserAccountHistory: PropTypes.func.isRequired,
     fetchUser: PropTypes.func.isRequired,
     steemRate: PropTypes.string.isRequired,
+    userTransferHistory: PropTypes.shape().isRequired,
     loadingSteemGlobalProperties: PropTypes.bool.isRequired,
+    loadingFetchUserTransferHistory: PropTypes.bool.isRequired,
     totalVestingFundSteem: PropTypes.string.isRequired,
     totalVestingShares: PropTypes.string.isRequired,
+    fetchUserTransferHistory: PropTypes.func.isRequired,
   };
 
   constructor(props) {
@@ -87,17 +79,16 @@ class UserWalletScreen extends Component {
     this.renderUserWalletRow = this.renderUserWalletRow.bind(this);
     this.navigateBack = this.navigateBack.bind(this);
     this.onRefreshUserWallet = this.onRefreshUserWallet.bind(this);
-    this.handleFetchMoreUserAccountHistory = this.handleFetchMoreUserAccountHistory.bind(this);
   }
 
   componentDidMount() {
-    const { usersTransactions, usersDetails } = this.props;
+    const { userTransferHistory, usersDetails } = this.props;
     const { username } = this.props.navigation.state.params;
-    const userAccountHistory = _.get(usersTransactions, username, []);
+    const currentUserTransferHistory = _.get(userTransferHistory, username, []);
     const userDetails = _.get(usersDetails, username, {});
 
-    if (_.isEmpty(userAccountHistory)) {
-      this.props.fetchUserAccountHistory(username);
+    if (_.isEmpty(currentUserTransferHistory)) {
+      this.props.fetchUserTransferHistory(username);
     }
 
     if (_.isEmpty(userDetails)) {
@@ -108,16 +99,11 @@ class UserWalletScreen extends Component {
   onRefreshUserWallet() {
     const { username } = this.props.navigation.state.params;
     this.props.fetchUser(username);
-    this.props.fetchUserAccountHistory(username);
+    this.props.fetchUserTransferHistory(username);
   }
 
   navigateBack() {
     this.props.navigation.goBack();
-  }
-
-  handleFetchMoreUserAccountHistory() {
-    const { username } = this.props.navigation.state.params;
-    this.props.fetchMoreUserAccountHistory(username);
   }
 
   renderUserWalletRow(rowData) {
@@ -155,16 +141,15 @@ class UserWalletScreen extends Component {
 
   render() {
     const {
-      usersTransactions,
-      loadingFetchUserAccountHistory,
+      userTransferHistory,
       loadingUsersDetails,
-      loadingFetchMoreUserAccountHistory,
+      loadingFetchUserTransferHistory,
     } = this.props;
     const { username } = this.props.navigation.state.params;
     const userWalletSummary = [{ isUserWalletSummary: true }];
     const userTransactionsDataSource = _.concat(
       userWalletSummary,
-      _.get(usersTransactions, username, []),
+      _.get(userTransferHistory, username, []),
     );
 
     return (
@@ -180,16 +165,14 @@ class UserWalletScreen extends Component {
           dataSource={ds.cloneWithRows(userTransactionsDataSource)}
           renderRow={this.renderUserWalletRow}
           enableEmptySections
-          onEndReached={this.handleFetchMoreUserAccountHistory}
           refreshControl={
             <RefreshControl
-              refreshing={loadingFetchUserAccountHistory || loadingUsersDetails}
+              refreshing={loadingFetchUserTransferHistory || loadingUsersDetails}
               onRefresh={this.onRefreshUserWallet}
               colors={[COLORS.PRIMARY_COLOR]}
             />
           }
         />
-        {loadingFetchMoreUserAccountHistory && <LargeLoading />}
       </Container>
     );
   }

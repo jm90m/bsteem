@@ -49,6 +49,7 @@ const rootSaga = function*() {
     // User Activity Sagas
     spawn(userActivitySaga.watchFetchUserAccountHistory),
     spawn(userActivitySaga.watchFetchMoreUserAccountHistory),
+    spawn(userActivitySaga.watchFetchUserTransferHistory),
 
     // App Sagas
     spawn(appSaga.watchFetchSteemGlobalProperties),

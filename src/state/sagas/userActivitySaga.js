@@ -4,7 +4,7 @@ import API from 'api/api';
 import {
   FETCH_USER_ACCOUNT_HISTORY,
   FETCH_MORE_USER_ACCOUNT_HISTORY,
-  LOAD_MORE_USER_ACTION,
+  FETCH_USER_TRANSFER_HISTORY,
 } from 'state/actions/actionTypes';
 import { isWalletTransaction } from 'util/apiUtils';
 import { getUsersAccountHistory } from 'state/rootReducer';
@@ -35,13 +35,23 @@ const getParsedUserActions = userActions => {
   };
 };
 
+const parseUserTransferActions = userTransferActions =>
+  _.map(userTransferActions, action => {
+    const actionCount = action[0];
+    const actionDetails = {
+      ...action[1],
+      actionCount,
+    };
+    return actionDetails;
+  }).reverse();
+
 const fetchUserAccountHistory = function*(action) {
   try {
     const { username } = action.payload;
     const result = yield call(API.getAccountHistory, username);
 
     if (result.error) {
-      yield put(userActivityActions.fetchUserAccountHistory.fail(error));
+      yield put(userActivityActions.fetchUserAccountHistory.fail(result.error));
     } else {
       const parsedUserActions = getParsedUserActions(result.result);
 
@@ -99,10 +109,36 @@ const fetchMoreUserAccountHistory = function*(action) {
   }
 };
 
+const fetchUserTransferHistory = function*(action) {
+  try {
+    const { username } = action.payload;
+    const result = yield call(API.getTransferHistory, username);
+    if (result.error) {
+      yield put(userActivityActions.fetchUserTransferHistory.fail(result.error));
+    } else {
+      const transferHistoryKey = `result.accounts.${username}.transfer_history`;
+      const userTransferHistory = parseUserTransferActions(_.get(result, transferHistoryKey, []));
+      const payload = {
+        username,
+        userTransferHistory,
+      };
+      yield put(userActivityActions.fetchUserTransferHistory.success(payload));
+    }
+  } catch (error) {
+    yield put(userActivityActions.fetchUserTransferHistory.fail(error));
+  } finally {
+    yield put(userActivityActions.fetchUserTransferHistory.loadingEnd());
+  }
+};
+
 export const watchFetchUserAccountHistory = function*() {
   yield takeLatest(FETCH_USER_ACCOUNT_HISTORY.ACTION, fetchUserAccountHistory);
 };
 
 export const watchFetchMoreUserAccountHistory = function*() {
   yield takeLatest(FETCH_MORE_USER_ACCOUNT_HISTORY.ACTION, fetchMoreUserAccountHistory);
+};
+
+export const watchFetchUserTransferHistory = function*() {
+  yield takeLatest(FETCH_USER_TRANSFER_HISTORY.ACTION, fetchUserTransferHistory);
 };
