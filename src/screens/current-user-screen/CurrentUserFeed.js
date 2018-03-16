@@ -59,6 +59,7 @@ class CurrentUserFeed extends Component {
     currentUserFeedFetch: PropTypes.func.isRequired,
     currentUserFeedFetchMore: PropTypes.func.isRequired,
     navigation: PropTypes.shape().isRequired,
+    hideFeed: PropTypes.bool.isRequired,
   };
 
   static defaultProps = {
@@ -128,9 +129,10 @@ class CurrentUserFeed extends Component {
   }
 
   render() {
-    const { currentUserFeed, loadingFetchCurrentUserFeed } = this.props;
+    const { currentUserFeed, loadingFetchCurrentUserFeed, hideFeed } = this.props;
+    const containerStyles = hideFeed ? { width: 0, height: 0 } : {};
     return (
-      <Container>
+      <Container style={containerStyles}>
         <StyledFlatList
           data={currentUserFeed}
           renderItem={this.renderRow}

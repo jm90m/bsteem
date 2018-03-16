@@ -124,6 +124,8 @@ export default {
       'Your feed is empty, follow users and their latest post will show up on your feed.',
     emptyFeedCheckFilters: 'Feed is currently empty, check your applied filters',
     filterCurrentFeedByFollowers: 'Filter current feed by following',
+    currentUserBSteemFeedEmpty:
+      'Your bSteem feed is empty, favorite some tags and posts from those tags will show up on your feed.',
   },
   user: {
     votingPower: 'Voting Power',

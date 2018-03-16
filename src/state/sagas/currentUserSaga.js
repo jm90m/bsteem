@@ -1,7 +1,7 @@
 import Expo from 'expo';
 import _ from 'lodash';
 import { takeLatest, all, call, put, select, takeEvery } from 'redux-saga/effects';
-import API from 'api/api';
+import API, { getAPIByFilter } from 'api/api';
 import sc2 from 'api/sc2';
 import {
   getFirebaseValueOnce,
@@ -9,7 +9,12 @@ import {
   getRebloggedPostRef,
   setFirebaseData,
 } from 'util/firebaseUtils';
-import { getAuthUsername, getCurrentUserFeed, getCommentsByPostId } from '../rootReducer';
+import {
+  getAuthUsername,
+  getCurrentUserFeed,
+  getCommentsByPostId,
+  getSavedTags,
+} from '../rootReducer';
 import {
   FETCH_CURRENT_USER_FEED,
   FETCH_MORE_CURRENT_USER_FEED,
@@ -21,6 +26,8 @@ import {
   CURRENT_USER_FOLLOW_USER,
   CURRENT_USER_UNFOLLOW_USER,
   FETCH_CURRENT_USER_REBLOG_LIST,
+  FETCH_CURRENT_USER_BSTEEM_FEED,
+  FETCH_MORE_CURRENT_USER_BSTEEM_FEED,
 } from '../actions/actionTypes';
 import * as currentUserActions from '../actions/currentUserActions';
 import { refreshUserBlog } from '../actions/usersActions';
@@ -65,6 +72,48 @@ const fetchMoreCurrentUserFeed = function*() {
   } catch (error) {
     yield put(currentUserActions.currentUserFeedFetchMore.fail(error));
   }
+};
+
+const fetchFeedforBSteem = function*(tag, limit, filter) {
+  try {
+    const api = getAPIByFilter(filter);
+    const query = {
+      tag,
+      limit,
+    };
+    const result = yield call(api, query);
+    if (result.error) {
+      return [];
+    }
+    return result.result;
+  } catch (e) {
+    return [];
+  }
+};
+
+const fetchCurrentUserBSteemFeed = function*(action) {
+  try {
+    const { filter } = action.payload;
+    const savedTags = yield select(getSavedTags);
+    const maxTags = _.size(savedTags) >= 5 ? 5 : savedTags.length;
+    let bsteemFeed = [];
+
+    for (const i in savedTags) {
+      const tag = savedTags[i];
+      const tagFeed = yield call(fetchFeedforBSteem, tag, 10, filter);
+      bsteemFeed = _.unionBy(bsteemFeed, tagFeed, 'id');
+    }
+
+    yield put(currentUserActions.currentUserBSteemFeedFetch.success(bsteemFeed));
+  } catch (error) {
+    console.log(error);
+    yield put(currentUserActions.currentUserBSteemFeedFetch.fail(error));
+  }
+};
+
+const fetchMoreCurrentUserBSteemFeed = function*() {
+  try {
+  } catch (error) {}
 };
 
 const votePost = function*(action) {
@@ -254,4 +303,12 @@ export const watchCurrentUserUnfollowUser = function*() {
 
 export const watchFetchCurrentUserRebloggedList = function*() {
   yield takeLatest(FETCH_CURRENT_USER_REBLOG_LIST.ACTION, fetchCurrentUserRebloggedList);
+};
+
+export const watchFetchCurrentUserBSteemFeed = function*() {
+  yield takeLatest(FETCH_CURRENT_USER_BSTEEM_FEED.ACTION, fetchCurrentUserBSteemFeed);
+};
+
+export const watchFetchMoreCurrentUserBsteemFeed = function*() {
+  yield takeLatest(FETCH_MORE_CURRENT_USER_BSTEEM_FEED.ACTION, fetchMoreCurrentUserBSteemFeed);
 };
