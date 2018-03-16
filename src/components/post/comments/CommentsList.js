@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { ListView, RefreshControl, FlatList } from 'react-native';
+import { RefreshControl, FlatList } from 'react-native';
 import styled from 'styled-components/native';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
@@ -9,10 +9,8 @@ import LargeLoading from 'components/common/LargeLoading';
 import { SORT_COMMENTS } from 'constants/comments';
 import Comment from './Comment';
 
-const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
-
 const EmptyView = styled.View`
-  height: 150px;
+  height: 200px;
   width: 50px;
 `;
 
@@ -136,9 +134,6 @@ class CommentsList extends Component {
   render() {
     const { comments, loadingComments } = this.props;
     const { displayedComments } = this.state;
-
-    console.log('COMMENTS', comments, comments.length);
-    console.log('~~~~~~ END ---- COMMENTS DATA ~~~~~~');
 
     const displayComments = _.concat(displayedComments, { bsteemEmptyView: true });
 
