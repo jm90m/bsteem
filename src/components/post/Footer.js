@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { TouchableOpacity, Modal } from 'react-native';
+import { TouchableOpacity } from 'react-native';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import _ from 'lodash';
@@ -12,6 +12,7 @@ import { calculatePayout } from 'util/steemitUtils';
 import { getAuthUsername, getCurrentUserRebloggedList } from 'state/rootReducer';
 import { currentUserReblogPost } from 'state/actions/currentUserActions';
 import * as navigationConstants from 'constants/navigation';
+import BSteemModal from 'components/common/BSteemModal';
 import ReblogModal from './ReblogModal';
 
 const Container = styled.View`
@@ -234,17 +235,12 @@ class Footer extends Component {
           <Payout payoutIsDeclined={payoutIsDeclined}>${formattedDisplayedPayout}</Payout>
         </TouchableOpacity>
         {displayReblogModal && (
-          <Modal
-            animationType="slide"
-            transparent
-            visible={displayReblogModal}
-            onRequestClose={this.hideReblogModal}
-          >
+          <BSteemModal visible={displayReblogModal} handleOnClose={this.hideReblogModal}>
             <ReblogModal
               closeModal={this.hideReblogModal}
               confirmReblog={this.handleReblogConfirm}
             />
-          </Modal>
+          </BSteemModal>
         )}
       </Container>
     );

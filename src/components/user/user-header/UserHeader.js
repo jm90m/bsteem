@@ -17,15 +17,19 @@ import {
 } from 'state/rootReducer';
 import UserProfile from 'components/user/user-profile/UserProfile';
 import * as navigationConstants from 'constants/navigation';
-import { COLORS } from 'constants/styles';
+import { COLORS, MATERIAL_ICONS } from 'constants/styles';
 import i18n from 'i18n/i18n';
 import SaveUserButton from 'components/common/SaveUserButton';
 import { MaterialIcons } from '@expo/vector-icons';
 import UserStats from './UserStats';
 import UserCover from './UserCover';
 import UserFollowButton from './UserFollowButton';
-import { MATERIAL_ICONS } from '../../../constants/styles';
 
+const Container = styled.View`
+  margin-bottom: 5px;
+  border-width: 1px;
+  border-color: ${COLORS.PRIMARY_BORDER_COLOR};
+`;
 const SaveUserButtonContainer = styled.View`
   padding-right: 10px;
 `;
@@ -71,7 +75,6 @@ class UserHeader extends Component {
     usersDetails: PropTypes.shape().isRequired,
     usersFollowCount: PropTypes.shape().isRequired,
     hideFollowButton: PropTypes.bool,
-    authenticated: PropTypes.bool,
     navigation: PropTypes.shape().isRequired,
     rewardFund: PropTypes.shape().isRequired,
   };
@@ -146,7 +149,7 @@ class UserHeader extends Component {
     const votePowerText = `${i18n.user.votingPower}: ${formattedVotingPower}%`;
 
     return (
-      <View>
+      <Container>
         <UserCover username={username} hasCover={hasCover} userReputation={userReputation} />
         {this.renderActionButtons()}
         <UserProfile userProfile={userProfile} userDetails={userDetails} />
@@ -167,7 +170,7 @@ class UserHeader extends Component {
           onPressFollowers={this.handleOnPressFollowers}
           onPressFollowing={this.handleOnPressFollowing}
         />
-      </View>
+      </Container>
     );
   }
 }

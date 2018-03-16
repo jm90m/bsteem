@@ -10,8 +10,8 @@ const Container = styled.View`
   background-color: ${COLORS.WHITE.WHITE};
   margin-top: 5px;
   margin-bottom: 5px;
-  border-color: ${COLORS.WHITE.WHITE_SMOKE};
-  border-width: 2px;
+  border-color: ${COLORS.PRIMARY_BORDER_COLOR};
+  border-width: 1px;
   padding: 10px;
 `;
 

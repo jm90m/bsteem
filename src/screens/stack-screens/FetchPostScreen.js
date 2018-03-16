@@ -443,7 +443,7 @@ class FetchPostScreen extends Component {
           <PrimaryButton
             onPress={this.navigateToComments}
             title={i18n.post.viewComments}
-            style={{ marginTop: 20, marginBottom: 40 }}
+            style={{ marginTop: 20, marginBottom: 100 }}
           />
         </ScrollView>
       </Container>
