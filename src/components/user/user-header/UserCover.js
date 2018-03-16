@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { View, Dimensions } from 'react-native';
 import styled from 'styled-components/native';
-import { MaterialIcons } from '@expo/vector-icons';
+import _ from 'lodash';
 import Avatar from 'components/common/Avatar';
 import { getUserBackgroundCoverUrl } from 'util/busyImageUtils';
 import { COLORS } from 'constants/styles';
@@ -51,20 +51,22 @@ const Handle = styled.Text`
   font-size: 14px;
   background-color: transparent;
   color: ${props => (props.hasCover ? COLORS.WHITE.WHITE : COLORS.BLUE.BOTICELLI)};
-  font-weight: 500; 
- `;
+  font-weight: 500;
+`;
 
 class UserCover extends Component {
   static propTypes = {
     username: PropTypes.string,
     userReputation: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     hasCover: PropTypes.bool,
+    userProfile: PropTypes.shape(),
   };
 
   static defaultProps = {
     username: '',
     userReputation: '0',
     hasCover: false,
+    userProfile: {},
   };
 
   constructor(props) {
@@ -90,9 +92,10 @@ class UserCover extends Component {
   }
 
   render() {
-    const { username, userReputation } = this.props;
+    const { username, userReputation, userProfile } = this.props;
     const { hasCover } = this.state;
-
+    const name = _.get(userProfile, 'name', username);
+    const displayName = _.isEmpty(_.trim(name)) ? username : name;
     return (
       <Container hasCover={hasCover}>
         <BackgroundImage
@@ -105,13 +108,11 @@ class UserCover extends Component {
           <Avatar username={username} size={50} />
           <View>
             <UsernameContainer>
-              <UsernameText hasCover={hasCover}>{username}</UsernameText>
+              <UsernameText hasCover={hasCover}>{displayName}</UsernameText>
               <ReputationScore reputation={userReputation} />
             </UsernameContainer>
             <HandleContainer>
-              <Handle hasCover={hasCover}>
-                {`@${username}`}
-              </Handle>
+              <Handle hasCover={hasCover}>{`@${username}`}</Handle>
             </HandleContainer>
           </View>
         </UserHeaderContents>

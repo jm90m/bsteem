@@ -29,6 +29,7 @@ export default {
     settings: 'Settings',
     login: 'Login & Settings',
     reportedPosts: 'Reported Posts',
+    editProfile: 'Edit Profile',
   },
   editor: {
     title: 'Title',
@@ -137,5 +138,14 @@ export default {
     reportPost: 'Report Post',
     reportedPost: 'Reported Post',
     unreportPost: 'Unreport Post',
+  },
+  editProfile: {
+    name: 'Name',
+    about: 'About',
+    location: 'Location',
+    website: 'Website',
+    profilePicture: 'Profile Picture',
+    coverPicture: 'Cover Picture',
+    submit: 'Submit',
   },
 };

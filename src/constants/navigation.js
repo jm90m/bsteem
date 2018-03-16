@@ -15,6 +15,7 @@ export const REPLY = 'REPLY';
 export const EDIT_REPLY = 'EDIT_REPLY';
 export const SETTINGS = 'SETTINGS';
 export const EDIT_POST = 'EDIT_POST';
+export const EDIT_PROFILE = 'EDIT_PROFILE';
 
 // user navigations
 export const USER_BLOG = 'USER_BLOG';

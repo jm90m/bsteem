@@ -150,7 +150,12 @@ class UserHeader extends Component {
 
     return (
       <Container>
-        <UserCover username={username} hasCover={hasCover} userReputation={userReputation} />
+        <UserCover
+          username={username}
+          hasCover={hasCover}
+          userReputation={userReputation}
+          userProfile={userProfile}
+        />
         {this.renderActionButtons()}
         <UserProfile userProfile={userProfile} userDetails={userDetails} />
         <VoteContainer>

@@ -111,6 +111,7 @@ class CurrentUserProfileScreen extends Component {
     this.fetchMoreUserPosts = this.fetchMoreUserPosts.bind(this);
     this.handleRefreshUserBlog = this.handleRefreshUserBlog.bind(this);
     this.showLogoutScreen = this.showLogoutScreen.bind(this);
+    this.handleNavigateToEditProfile = this.handleNavigateToEditProfile.bind(this);
     this.hideLogoutScreen = this.hideLogoutScreen.bind(this);
   }
 
@@ -278,6 +279,10 @@ class CurrentUserProfileScreen extends Component {
     }
   }
 
+  handleNavigateToEditProfile() {
+    this.props.navigation.navigate(navigationConstants.EDIT_PROFILE);
+  }
+
   renderUserContent() {
     const { currentMenuOption } = this.state;
     const { username, usersComments, usersBlog, refreshUserBlogLoading } = this.props;
@@ -331,6 +336,7 @@ class CurrentUserProfileScreen extends Component {
         <CurrentUserHeader
           currentMenuOption={currentMenuOption}
           toggleCurrentUserMenu={this.toggleCurrentUserMenu}
+          handleNavigateToEditProfile={this.handleNavigateToEditProfile}
         />
         {this.renderUserContent()}
         {this.renderLoader()}

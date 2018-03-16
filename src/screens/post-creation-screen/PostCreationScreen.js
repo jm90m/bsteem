@@ -450,6 +450,7 @@ class PostCreationScreen extends Component {
               <MaterialCommunityIcons
                 size={ICON_SIZES.menuIcon}
                 name={MATERIAL_COMMUNITY_ICONS.magnify}
+                color={COLORS.PRIMARY_COLOR}
               />
             </TouchableMenuContainer>
           </TouchableMenu>

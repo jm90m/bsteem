@@ -5,7 +5,6 @@ import styled from 'styled-components/native';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS, ICON_SIZES, MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
 import Header from 'components/common/Header';
-import HeaderEmptyView from 'components/common/HeaderEmptyView';
 
 const CurrentMenuDisplay = styled.View`
   flex-direction: row;
@@ -17,29 +16,33 @@ const CurrentMenuText = styled.Text`
   color: ${COLORS.PRIMARY_COLOR};
 `;
 
-const TouchableContainer = styled.TouchableOpacity`
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-`;
-
 const MenuIconContainer = styled.View`
   padding: 5px;
 `;
+
+const Touchable = styled.TouchableOpacity``;
 
 class CurrentUserHeader extends Component {
   static propTypes = {
     currentMenuOption: PropTypes.shape().isRequired,
     toggleCurrentUserMenu: PropTypes.func.isRequired,
+    handleNavigateToEditProfile: PropTypes.func.isRequired,
   };
 
   render() {
     const { currentMenuOption } = this.props;
     return (
-      <TouchableContainer onPress={this.props.toggleCurrentUserMenu}>
-        <Header>
-          <HeaderEmptyView />
+      <Header>
+        <Touchable onPress={this.props.handleNavigateToEditProfile}>
+          <MenuIconContainer>
+            <MaterialCommunityIcons
+              size={ICON_SIZES.menuIcon}
+              name={MATERIAL_COMMUNITY_ICONS.accountEdit}
+              color={COLORS.PRIMARY_COLOR}
+            />
+          </MenuIconContainer>
+        </Touchable>
+        <Touchable onPress={this.props.toggleCurrentUserMenu}>
           <CurrentMenuDisplay>
             <MaterialIcons
               size={ICON_SIZES.menuIcon}
@@ -48,14 +51,17 @@ class CurrentUserHeader extends Component {
             />
             <CurrentMenuText>{currentMenuOption.label}</CurrentMenuText>
           </CurrentMenuDisplay>
+        </Touchable>
+        <Touchable onPress={this.props.toggleCurrentUserMenu}>
           <MenuIconContainer>
             <MaterialCommunityIcons
               size={ICON_SIZES.menuIcon}
               name={MATERIAL_COMMUNITY_ICONS.menuVertical}
+              color={COLORS.PRIMARY_COLOR}
             />
           </MenuIconContainer>
-        </Header>
-      </TouchableContainer>
+        </Touchable>
+      </Header>
     );
   }
 }

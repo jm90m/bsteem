@@ -134,6 +134,7 @@ export const MATERIAL_COMMUNITY_ICONS = {
   clock: 'clock',
   magnify: 'magnify',
   filter: 'filter',
+  accountEdit: 'account-edit',
 
   // activity
   voteFill: 'thumb-up',
