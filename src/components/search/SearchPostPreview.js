@@ -123,7 +123,7 @@ class SearchPostPreview extends Component {
           <BodyShort content={summary} />
         </TouchableOpacity>
         <TagsContainer>
-          {_.map(tags, tag => (
+          {_.map(_.uniq(tags), tag => (
             <TagContainer onPress={() => this.handleNavigateToFeedScreen(tag)} key={tag}>
               <Tag tag={tag} />
             </TagContainer>

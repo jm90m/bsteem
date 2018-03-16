@@ -40,8 +40,8 @@ class FeedSort extends Component {
     handleSortPost: PropTypes.func.isRequired,
     hideMenu: PropTypes.func.isRequired,
     authenticated: PropTypes.bool.isRequired,
-    handleFilterFeedByFollowers: PropTypes.func,
-    filterFeedByFollowers: PropTypes.bool,
+    handleFilterFeedByFollowers: PropTypes.func.isRequired,
+    filterFeedByFollowers: PropTypes.bool.isRequired,
   };
 
   render() {
