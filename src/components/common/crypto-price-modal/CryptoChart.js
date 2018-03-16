@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components/native';
 import { connect } from 'react-redux';
+import { Platform } from 'react-native';
 import { getCryptosPriceHistory } from 'state/rootReducer';
 import { getCryptoDetails, getCurrentDaysOfTheWeek } from 'util/cryptoUtils';
 import _ from 'lodash';
@@ -10,7 +11,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as appActions from 'state/actions/appActions';
 import LargeLoading from 'components/common/LargeLoading';
 import { LineChart, XAxis } from 'react-native-svg-charts';
-import { Text, G, Rect } from 'react-native-svg';
+import { Text } from 'react-native-svg';
 
 const Container = styled.View`
   padding: 20px;
@@ -180,40 +181,42 @@ class CryptoChart extends Component {
         <CryptoName>{currentCrypto.name}</CryptoName>
         {this.renderUSDPrice()}
         {this.renderBTCPrice()}
-        <Container style={{ height: 200, marginBottom: 20 }}>
-          <LineChart
-            style={{ height: 200 }}
-            data={chartData}
-            svg={{ stroke: COLORS.PRIMARY_COLOR, strokeWidth: 2 }}
-            contentInset={{ top: 40, bottom: 20, left: 20, right: 20 }}
-            showGrid={false}
-            animate={false}
-            renderDecorator={data => {
-              const dx = data.x(data.index);
-              const dy = data.y(data.value);
-              const key = `${data.value}${data.index}`;
-              return (
-                <Text
-                  key={key}
-                  dx={dx}
-                  dy={dy - 30}
-                  alignmentBaseline="hanging"
-                  textAnchor="middle"
-                  stroke={COLORS.PRIMARY_COLOR}
-                >
-                  {`$${data.value}`}
-                </Text>
-              );
-            }}
-          />
-          <XAxis
-            style={{ marginHorizontal: -10 }}
-            data={[0, 1, 2, 3, 4, 5, 6]}
-            formatLabel={value => daysOfTheWeek[value]}
-            contentInset={{ left: 10, right: 10 }}
-            svg={{ fontSize: 14 }}
-          />
-        </Container>
+        {Platform.OS === 'ios' && (
+          <Container style={{ height: 200, marginBottom: 20 }}>
+            <LineChart
+              style={{ height: 200 }}
+              data={chartData}
+              svg={{ stroke: COLORS.PRIMARY_COLOR, strokeWidth: 2 }}
+              contentInset={{ top: 40, bottom: 20, left: 20, right: 20 }}
+              showGrid={false}
+              animate={false}
+              renderDecorator={data => {
+                const dx = data.x(data.index);
+                const dy = data.y(data.value);
+                const key = `${data.value}${data.index}`;
+                return (
+                  <Text
+                    key={key}
+                    dx={dx}
+                    dy={dy - 30}
+                    alignmentBaseline="hanging"
+                    textAnchor="middle"
+                    stroke={COLORS.PRIMARY_COLOR}
+                  >
+                    {`$${data.value}`}
+                  </Text>
+                );
+              }}
+            />
+            <XAxis
+              style={{ marginHorizontal: -10 }}
+              data={[0, 1, 2, 3, 4, 5, 6]}
+              formatLabel={value => daysOfTheWeek[value]}
+              contentInset={{ left: 10, right: 10 }}
+              svg={{ fontSize: 14 }}
+            />
+          </Container>
+        )}
       </Container>
     );
   }
