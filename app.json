@@ -25,7 +25,7 @@
     },
     "android": {
       "package": "com.bsteem.bsteemapp",
-      "versionCode": 25,
+      "versionCode": 26,
       "permissions": ["READ_PHONE_STATE", "READ_CONTACTS", "CAMERA", "RECORD_AUDIO"]
     }
   }
