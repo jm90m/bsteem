@@ -24,6 +24,8 @@ const TouchableIcon = styled.TouchableOpacity`
 
 const Title = styled.Text`
   margin-left: 3px;
+  color: ${COLORS.PRIMARY_COLOR};
+  font-weight: bold;
 `;
 
 const LoadingContainer = styled.View`
@@ -134,7 +136,11 @@ class CommentScreen extends Component {
             <Title>{i18n.titles.comments}</Title>
           </TitleContainer>
           <TouchableIcon onPress={this.handleReplyToPost}>
-            <MaterialIcons size={ICON_SIZES.menuIcon} name={MATERIAL_ICONS.reply} />
+            <MaterialIcons
+              size={ICON_SIZES.menuIcon}
+              name={MATERIAL_ICONS.reply}
+              color={COLORS.PRIMARY_COLOR}
+            />
           </TouchableIcon>
         </Header>
         {loadingComments ? (

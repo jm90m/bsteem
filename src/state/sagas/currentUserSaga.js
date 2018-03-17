@@ -75,12 +75,13 @@ const fetchMoreCurrentUserFeed = function*() {
   }
 };
 
-const fetchFeedforBSteem = function*(tag, limit, filter) {
+const fetchFeedforBSteem = function*(tag, limit, filter, extraQueryParams = {}) {
   try {
     const api = getAPIByFilter(filter);
     const query = {
       tag,
       limit,
+      ...extraQueryParams,
     };
     const result = yield call(api, query);
     if (result.error) {
@@ -120,9 +121,15 @@ const fetchMoreCurrentUserBSteemFeed = function*(action) {
     const randomIndex = Math.floor(Math.random() * _.size(currentUserBSteemFeed));
     const randomPost = _.get(currentUserBSteemFeed, randomIndex, _.last(currentUserBSteemFeed));
     const tag = _.get(randomPost, 'category');
+    const author = _.get(randomPost, 'author', '');
+    const permlink = _.get(randomPost, 'permlink', '');
     const limit = 20;
+    const extraQueryParams = {
+      start_author: author,
+      start_permlink: permlink,
+    };
 
-    const tagResults = yield call(fetchFeedforBSteem, tag, limit, filter);
+    const tagResults = yield call(fetchFeedforBSteem, tag, limit, filter, extraQueryParams);
 
     yield put(currentUserActions.currentUserBSteemFeedFetchMore.success(tagResults));
   } catch (error) {
