@@ -60,6 +60,7 @@ const rootSaga = function*() {
     spawn(appSaga.watchSetTranslations),
     spawn(appSaga.watchAppOnboarding),
     spawn(appSaga.watchFetchCryptoPriceHistory),
+    spawn(appSaga.watchFetchRewardFund),
 
     // Editor Sagas
     spawn(editorSaga.watchCreatePost),

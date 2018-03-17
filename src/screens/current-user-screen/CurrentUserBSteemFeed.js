@@ -77,11 +77,13 @@ class CurrentUserBSteemFeed extends Component {
     navigation: PropTypes.shape().isRequired,
     currentUserBSteemFeed: PropTypes.arrayOf(PropTypes.shape()),
     currentUserFollowList: PropTypes.shape(),
+    hideFeed: PropTypes.bool,
   };
 
   static defaultProps = {
     currentUserBSteemFeed: [],
     currentUserFollowList: {},
+    hideFeed: false,
   };
 
   constructor(props) {
@@ -214,6 +216,7 @@ class CurrentUserBSteemFeed extends Component {
       currentUserBSteemFeed,
       loadingFetchCurrentUserBSteemFeed,
       currentUserFollowList,
+      hideFeed,
     } = this.props;
     const { menuVisible, filterFeedByFollowers } = this.state;
     const displayedPosts = filterFeedByFollowers
@@ -221,7 +224,7 @@ class CurrentUserBSteemFeed extends Component {
       : currentUserBSteemFeed;
 
     return (
-      <Container>
+      <Container style={hideFeed && { height: 0, width: 0, display: 'none' }}>
         <StyledFlatList
           data={displayedPosts}
           renderItem={this.renderRow}

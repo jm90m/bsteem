@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components/native';
 import { connect } from 'react-redux';
-import { getAuthUsername } from 'state/rootReducer';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Header from 'components/common/Header';
 import { ICON_SIZES, COLORS, MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
@@ -33,9 +32,7 @@ const MiddleMenuContent = styled.View`
   padding: 10px 20px;
 `;
 
-const mapStateToProps = state => ({
-  username: getAuthUsername(state),
-});
+const mapStateToProps = state => ({});
 
 const mapDispatchToProps = dispatch => ({
   displayPriceModal: symbols => dispatch(displayPriceModal(symbols)),
@@ -114,11 +111,8 @@ class CurrentUserScreen extends Component {
             />
           </Touchable>
         </Header>
-        {selectedHome ? (
-          <CurrentUserFeed navigation={navigation} />
-        ) : (
-          <CurrentUserBSteemFeed navigation={navigation} />
-        )}
+        <CurrentUserFeed navigation={navigation} hideFeed={!selectedHome} />
+        <CurrentUserBSteemFeed navigation={navigation} hideFeed={selectedHome} />
       </Container>
     );
   }

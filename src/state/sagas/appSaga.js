@@ -6,7 +6,7 @@ import { i18nInit } from 'i18n/i18n';
 import * as appActions from 'state/actions/appActions';
 import * as homeActions from 'state/actions/homeActions';
 import * as authActions from 'state/actions/authActions';
-import * as firebaseActions from 'state/actions/firebaseActions';
+import * as firebaseSaga from 'state/sagas/firebaseSaga';
 import * as currentUserActions from 'state/actions/currentUserActions';
 import * as feedFilters from 'constants/feedFilters';
 import * as settingsSaga from './settingsSaga';
@@ -25,6 +25,7 @@ import {
 } from 'constants/asyncStorageKeys';
 import sc2 from 'api/sc2';
 import { FETCH_CRYPTO_PRICE_HISTORY, FETCH_REWARD_FUND } from '../actions/actionTypes';
+import { TRENDING } from '../../constants/feedFilters';
 
 const fetchGlobalSteemProperties = function*() {
   try {
@@ -116,8 +117,14 @@ const appOnboarding = function*() {
       put(currentUserActions.currentUserFeedFetch.action()),
       put(currentUserActions.currentUserReblogListFetch.action()),
       put(homeActions.fetchTags()),
-      put(firebaseActions.fetchSavedTags.action()),
     ]);
+
+    yield call(firebaseSaga.fetchSavedTags);
+    yield put(
+      currentUserActions.currentUserBSteemFeedFetch.action({
+        filter: feedFilters.TRENDING,
+      }),
+    );
 
     yield put(appActions.appOnboarding.success());
   } catch (error) {

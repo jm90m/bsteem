@@ -39,7 +39,7 @@ const setFirebaseData = (ref, values = {}) => {
     .set(values);
 };
 
-const fetchSavedTags = function*() {
+export const fetchSavedTags = function*() {
   try {
     const authUsername = yield select(getAuthUsername);
     let userID;
