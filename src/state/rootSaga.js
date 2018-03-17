@@ -45,6 +45,8 @@ const rootSaga = function*() {
     spawn(currentUserSaga.watchCurrentUserFollowUser),
     spawn(currentUserSaga.watchCurrentUserUnfollowUser),
     spawn(currentUserSaga.watchFetchCurrentUserRebloggedList),
+    spawn(currentUserSaga.watchFetchCurrentUserBSteemFeed),
+    spawn(currentUserSaga.watchFetchMoreCurrentUserBsteemFeed),
 
     // User Activity Sagas
     spawn(userActivitySaga.watchFetchUserAccountHistory),

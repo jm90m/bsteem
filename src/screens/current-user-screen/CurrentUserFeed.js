@@ -135,6 +135,7 @@ class CurrentUserFeed extends Component {
           data={currentUserFeed}
           renderItem={this.renderRow}
           enableEmptySections
+          initialNumToRender={4}
           onEndReached={this.onEndReached}
           keyExtractor={(item, index) => `${_.get(item, 'id', '')}${index}`}
           ListEmptyComponent={this.renderEmptyComponent}

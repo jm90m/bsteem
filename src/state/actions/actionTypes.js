@@ -55,6 +55,12 @@ export const CURRENT_USER_FOLLOW_USER = createAsyncActionType(
 export const CURRENT_USER_UNFOLLOW_USER = createAsyncActionType(
   '@current-user/current-user-unfollow-user',
 );
+export const FETCH_CURRENT_USER_BSTEEM_FEED = createAsyncActionType(
+  '@current-user/fetch-current-user-bsteem-feed',
+);
+export const FETCH_MORE_CURRENT_USER_BSTEEM_FEED = createAsyncActionType(
+  '@current-user/fetch-more-current-user-bsteem-feed',
+);
 
 // User Activity Actions
 export const FETCH_USER_ACCOUNT_HISTORY = createAsyncActionType(

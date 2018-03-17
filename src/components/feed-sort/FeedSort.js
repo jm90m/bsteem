@@ -44,6 +44,8 @@ class FeedSort extends Component {
     filterFeedByFollowers: PropTypes.bool.isRequired,
   };
 
+  handleSortPost = filter => () => this.props.handleSortPost(filter);
+
   render() {
     const { authenticated, filterFeedByFollowers, handleFilterFeedByFollowers } = this.props;
     return (
@@ -51,7 +53,7 @@ class FeedSort extends Component {
         <Container>
           <MenuWrapper>
             {_.map(FEED_FILTERS, filter => (
-              <MenuModalButton onPress={() => this.props.handleSortPost(filter)} key={filter.label}>
+              <MenuModalButton onPress={this.handleSortPost(filter)} key={filter.label}>
                 <MenuModalContents>
                   <MaterialIcons size={20} color={COLORS.PRIMARY_COLOR} name={filter.icon} />
                   <MenuText>{filter.label}</MenuText>

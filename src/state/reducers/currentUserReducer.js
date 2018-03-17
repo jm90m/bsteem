@@ -5,6 +5,8 @@ import {
   FETCH_CURRENT_USER_REBLOG_LIST,
   CURRENT_USER_REBLOG_POST,
   FETCH_CURRENT_USER_FOLLOW_LIST,
+  FETCH_CURRENT_USER_BSTEEM_FEED,
+  FETCH_MORE_CURRENT_USER_BSTEEM_FEED,
 } from '../actions/actionTypes';
 
 const INITIAL_STATE = {
@@ -13,6 +15,10 @@ const INITIAL_STATE = {
   loadingFetchMoreCurrentUserFeed: false,
   rebloggedList: [],
   followList: {},
+
+  currentUserBSteemFeed: [],
+  loadingFetchCurrentUserBSteemFeed: false,
+  loadingFetchMoreCurrentBSteemUserFeed: false,
 };
 
 export default (state = INITIAL_STATE, action) => {
@@ -75,6 +81,40 @@ export default (state = INITIAL_STATE, action) => {
         followList: formattedFollowList,
       };
     }
+
+    case FETCH_CURRENT_USER_BSTEEM_FEED.ACTION:
+      return {
+        ...state,
+        loadingFetchCurrentUserBSteemFeed: true,
+      };
+
+    case FETCH_CURRENT_USER_BSTEEM_FEED.SUCCESS:
+      return {
+        ...state,
+        currentUserBSteemFeed: action.payload,
+        loadingFetchCurrentUserBSteemFeed: false,
+      };
+    case FETCH_CURRENT_USER_BSTEEM_FEED.ERROR:
+      return {
+        ...state,
+        loadingFetchCurrentUserBSteemFeed: false,
+      };
+    case FETCH_MORE_CURRENT_USER_BSTEEM_FEED.ACTION:
+      return {
+        ...state,
+        loadingFetchMoreCurrentBSteemUserFeed: true,
+      };
+    case FETCH_MORE_CURRENT_USER_BSTEEM_FEED.SUCCESS:
+      return {
+        ...state,
+        currentUserBSteemFeed: _.unionBy(state.currentUserBSteemFeed, action.payload, 'id'),
+        loadingFetchMoreCurrentBSteemUserFeed: false,
+      };
+    case FETCH_MORE_CURRENT_USER_BSTEEM_FEED.ERROR:
+      return {
+        ...state,
+        loadingFetchMoreCurrentBSteemUserFeed: false,
+      };
     default:
       return state;
   }
@@ -85,3 +125,8 @@ export const getLoadingFetchCurrentUserFeed = state => state.loadingFetchCurrent
 export const getLoadingFetchMoreCurrentUserFeed = state => state.loadingFetchMoreCurrentUserFeed;
 export const getCurrentUserRebloggedList = state => state.rebloggedList;
 export const getCurrentUserFollowList = state => state.followList;
+export const getCurrentUserBSteemFeed = state => state.currentUserBSteemFeed;
+export const getLoadingFetchCurrentUserBSteemFeed = state =>
+  state.loadingFetchCurrentUserBSteemFeed;
+export const getLoadingFetchMoreCurrentBSteemUserFeed = state =>
+  state.loadingFetchMoreCurrentBSteemUserFeed;

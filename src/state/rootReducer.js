@@ -72,6 +72,12 @@ export const getCurrentUserRebloggedList = state =>
   fromCurrentUser.getCurrentUserRebloggedList(state.currentUser);
 export const getCurrentUserFollowList = state =>
   fromCurrentUser.getCurrentUserFollowList(state.currentUser);
+export const getCurrentUserBSteemFeed = state =>
+  fromCurrentUser.getCurrentUserBSteemFeed(state.currentUser);
+export const getLoadingFetchCurrentUserBSteemFeed = state =>
+  fromCurrentUser.getLoadingFetchCurrentUserBSteemFeed(state.currentUser);
+export const getLoadingFetchMoreCurrentBSteemUserFeed = state =>
+  fromCurrentUser.getLoadingFetchMoreCurrentBSteemUserFeed(state.currentUser);
 
 // User Activity Selectors
 export const getUsersTransactions = state =>

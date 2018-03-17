@@ -9,6 +9,7 @@ import { ICON_SIZES, COLORS, MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
 import { displayPriceModal } from 'state/actions/appActions';
 import * as navigationConstants from 'constants/navigation';
 import CurrentUserFeed from './CurrentUserFeed';
+import CurrentUserBSteemFeed from './CurrentUserBSteemFeed';
 
 const Container = styled.View`
   flex: 1;
@@ -17,9 +18,19 @@ const Container = styled.View`
 const Touchable = styled.TouchableOpacity``;
 
 const HeaderText = styled.Text`
-  color: ${COLORS.PRIMARY_COLOR};
+  color: ${props => (props.selected ? COLORS.PRIMARY_COLOR : COLORS.SECONDARY_COLOR)};
   align-self: center;
   font-weight: bold;
+`;
+
+const MiddleMenu = styled.View`
+  flex-direction: row;
+`;
+
+const MiddleMenuContent = styled.View`
+  border-bottom-width: 2;
+  border-bottom-color: ${props => (props.selected ? COLORS.PRIMARY_COLOR : 'transparent')};
+  padding: 10px 20px;
 `;
 
 const mapStateToProps = state => ({
@@ -36,10 +47,26 @@ class CurrentUserScreen extends Component {
     displayPriceModal: PropTypes.func.isRequired,
   };
 
+  static MENU = {
+    home: 'Home',
+    bSteem: 'bSteem',
+  };
   constructor(props) {
     super(props);
+
+    this.state = {
+      selectedMenu: CurrentUserScreen.MENU.home,
+    };
+
+    this.setSelectedMenu = this.setSelectedMenu.bind(this);
     this.handleNavigateToSavedTags = this.handleNavigateToSavedTags.bind(this);
     this.handleDisplayPriceModal = this.handleDisplayPriceModal.bind(this);
+  }
+
+  setSelectedMenu(selectedMenu) {
+    this.setState({
+      selectedMenu,
+    });
   }
 
   handleDisplayPriceModal() {
@@ -52,6 +79,9 @@ class CurrentUserScreen extends Component {
 
   render() {
     const { navigation } = this.props;
+    const { selectedMenu } = this.state;
+    const selectedHome = CurrentUserScreen.MENU.home === selectedMenu;
+
     return (
       <Container>
         <Header>
@@ -63,7 +93,18 @@ class CurrentUserScreen extends Component {
               style={{ padding: 5 }}
             />
           </Touchable>
-          <HeaderText>bSteem</HeaderText>
+          <MiddleMenu>
+            <Touchable onPress={() => this.setSelectedMenu(CurrentUserScreen.MENU.home)}>
+              <MiddleMenuContent selected={selectedHome}>
+                <HeaderText selected={selectedHome}>{CurrentUserScreen.MENU.home}</HeaderText>
+              </MiddleMenuContent>
+            </Touchable>
+            <Touchable onPress={() => this.setSelectedMenu(CurrentUserScreen.MENU.bSteem)}>
+              <MiddleMenuContent style={{ marginLeft: 15 }} selected={!selectedHome}>
+                <HeaderText selected={!selectedHome}>{CurrentUserScreen.MENU.bSteem}</HeaderText>
+              </MiddleMenuContent>
+            </Touchable>
+          </MiddleMenu>
           <Touchable onPress={this.handleNavigateToSavedTags}>
             <MaterialCommunityIcons
               name="star"
@@ -73,7 +114,11 @@ class CurrentUserScreen extends Component {
             />
           </Touchable>
         </Header>
-        <CurrentUserFeed navigation={navigation} />
+        {selectedHome ? (
+          <CurrentUserFeed navigation={navigation} />
+        ) : (
+          <CurrentUserBSteemFeed navigation={navigation} />
+        )}
       </Container>
     );
   }
