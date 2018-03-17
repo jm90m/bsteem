@@ -82,7 +82,7 @@ export default (state = INITIAL_STATE, action) => {
       };
     }
 
-    case FETCH_CURRENT_USER_BSTEEM_FEED.Action:
+    case FETCH_CURRENT_USER_BSTEEM_FEED.ACTION:
       return {
         ...state,
         loadingFetchCurrentUserBSteemFeed: true,
@@ -98,6 +98,22 @@ export default (state = INITIAL_STATE, action) => {
       return {
         ...state,
         loadingFetchCurrentUserBSteemFeed: false,
+      };
+    case FETCH_MORE_CURRENT_USER_BSTEEM_FEED.ACTION:
+      return {
+        ...state,
+        loadingFetchMoreCurrentBSteemUserFeed: true,
+      };
+    case FETCH_MORE_CURRENT_USER_BSTEEM_FEED.SUCCESS:
+      return {
+        ...state,
+        currentUserBSteemFeed: _.unionBy(state.currentUserBSteemFeed, action.payload, 'id'),
+        loadingFetchMoreCurrentBSteemUserFeed: false,
+      };
+    case FETCH_MORE_CURRENT_USER_BSTEEM_FEED.ERROR:
+      return {
+        ...state,
+        loadingFetchMoreCurrentBSteemUserFeed: false,
       };
     default:
       return state;

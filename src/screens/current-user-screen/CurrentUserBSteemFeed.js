@@ -14,9 +14,14 @@ import {
   currentUserBSteemFeedFetch,
   currentUserBSteemFeedFetchMore,
 } from 'state/actions/currentUserActions';
+import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import PostPreview from 'components/post-preview/PostPreview';
 import { TRENDING } from 'constants/feedFilters';
+import FeedSort from 'components/feed-sort/FeedSort';
+import BSteemModal from 'components/common/BSteemModal';
 import i18n from '../../i18n/i18n';
+import { ICON_SIZES, MATERIAL_COMMUNITY_ICONS } from '../../constants/styles';
+import { getCurrentUserFollowList } from '../../state/rootReducer';
 
 const Container = styled.View`
   flex: 1;
@@ -33,12 +38,28 @@ const EmptyContainer = styled.View`
   background-color: ${COLORS.WHITE.WHITE};
 `;
 
+const TouchableFilter = styled.TouchableOpacity`
+  flex-direction: row;
+  align-items: center;
+  padding-top: 5px;
+`;
+
+const FilterMenuIcon = styled.View`
+  margin-top: 3px;
+`;
+
+const FilterText = styled.Text`
+  color: ${COLORS.PRIMARY_COLOR};
+  margin-left: 3px;
+`;
+
 const EmptyText = styled.Text``;
 
 const mapStateToProps = state => ({
   currentUserBSteemFeed: getCurrentUserBSteemFeed(state),
   loadingFetchCurrentUserBSteemFeed: getLoadingFetchCurrentUserBSteemFeed(state),
   loadingFetchMoreCurrentBSteemUserFeed: getLoadingFetchMoreCurrentBSteemUserFeed(state),
+  currentUserFollowList: getCurrentUserFollowList(state),
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -49,75 +70,167 @@ const mapDispatchToProps = dispatch => ({
 
 class CurrentUserBSteemFeed extends Component {
   static propTypes = {
-    currentUserBSteemFeed: PropTypes.arrayOf(PropTypes.shape()),
     loadingFetchCurrentUserBSteemFeed: PropTypes.bool.isRequired,
     loadingFetchMoreCurrentBSteemUserFeed: PropTypes.bool.isRequired,
     currentUserBSteemFeedFetch: PropTypes.func.isRequired,
     currentUserBSteemFeedFetchMore: PropTypes.func.isRequired,
     navigation: PropTypes.shape().isRequired,
-    hideFeed: PropTypes.bool.isRequired,
+    currentUserBSteemFeed: PropTypes.arrayOf(PropTypes.shape()),
+    currentUserFollowList: PropTypes.shape(),
   };
 
   static defaultProps = {
     currentUserBSteemFeed: [],
+    currentUserFollowList: {},
   };
 
   constructor(props) {
     super(props);
 
     this.state = {
-      currentFilter: TRENDING.id,
+      currentFilter: TRENDING,
+      menuVisible: false,
+      filterFeedByFollowers: false,
     };
 
     this.onRefreshCurrentFeed = this.onRefreshCurrentFeed.bind(this);
-    this.renderRow = this.renderRow.bind(this);
     this.onEndReached = this.onEndReached.bind(this);
+
+    this.renderRow = this.renderRow.bind(this);
     this.renderEmptyComponent = this.renderEmptyComponent.bind(this);
+    this.renderHeaderComponent = this.renderHeaderComponent.bind(this);
+
+    this.handleHideMenu = this.handleHideMenu.bind(this);
+    this.handleDisplayMenu = this.handleDisplayMenu.bind(this);
+    this.handleSortPost = this.handleSortPost.bind(this);
+    this.toggleFilterFeedByFollowers = this.toggleFilterFeedByFollowers.bind(this);
   }
 
   componentDidMount() {
     if (_.isEmpty(this.props.currentUserBSteemFeed)) {
-      this.props.currentUserBSteemFeedFetch(this.state.currentFilter);
+      this.props.currentUserBSteemFeedFetch(this.state.currentFilter.id);
     }
   }
 
   onRefreshCurrentFeed() {
-    this.props.currentUserBSteemFeedFetch(this.state.currentFilter);
+    this.props.currentUserBSteemFeedFetch(this.state.currentFilter.id);
   }
 
   onEndReached() {
-    this.props.currentUserBSteemFeedFetchMore(this.state.currentFilter);
+    this.props.currentUserBSteemFeedFetchMore(this.state.currentFilter.id);
   }
 
+  handleHideMenu() {
+    this.setState({
+      menuVisible: false,
+    });
+  }
+
+  handleDisplayMenu() {
+    this.setState({
+      menuVisible: true,
+    });
+  }
+
+  handleSortPost(currentFilter) {
+    this.setState(
+      {
+        currentFilter,
+        menuVisible: false,
+      },
+      () => this.props.currentUserBSteemFeedFetch(currentFilter.id),
+    );
+  }
+
+  enableFilterFeedByFollowers() {
+    this.setState({
+      filterFeedByFollowers: true,
+      menuVisible: false,
+    });
+  }
+
+  disableFilterFeedByFollowers() {
+    this.setState({
+      filterFeedByFollowers: false,
+      menuVisible: false,
+    });
+  }
+
+  toggleFilterFeedByFollowers() {
+    const { filterFeedByFollowers } = this.state;
+    if (filterFeedByFollowers) {
+      this.disableFilterFeedByFollowers();
+    } else {
+      this.enableFilterFeedByFollowers();
+    }
+  }
+
+  renderHeaderComponent() {
+    const { currentFilter } = this.state;
+    return (
+      <TouchableFilter onPress={this.handleDisplayMenu}>
+        <MaterialIcons
+          name={currentFilter.icon}
+          size={ICON_SIZES.menuIcon}
+          color={COLORS.PRIMARY_COLOR}
+        />
+        <FilterText>{currentFilter.label}</FilterText>
+        <FilterMenuIcon>
+          <MaterialCommunityIcons
+            name={MATERIAL_COMMUNITY_ICONS.chevronDown}
+            size={ICON_SIZES.menuIcon}
+            color={COLORS.PRIMARY_COLOR}
+          />
+        </FilterMenuIcon>
+      </TouchableFilter>
+    );
+  }
   renderRow(rowData) {
     return <PostPreview postData={rowData.item} navigation={this.props.navigation} />;
   }
 
-  renderEmptyComponent() {
-    const { currentUserBSteemFeed, loadingFetchMoreCurrentBSteemUserFeed } = this.props;
+  renderEmptyComponent = displayedPosts => () => {
+    const { currentUserBSteemFeed, loadingFetchCurrentUserBSteemFeed } = this.props;
 
-    if (_.isEmpty(currentUserBSteemFeed) && !loadingFetchMoreCurrentBSteemUserFeed) {
+    if (_.isEmpty(currentUserBSteemFeed) && !loadingFetchCurrentUserBSteemFeed) {
       return (
         <EmptyContainer>
           <EmptyText>{i18n.feed.currentUserBSteemFeedEmpty}</EmptyText>
         </EmptyContainer>
       );
+    } else if (_.isEmpty(displayedPosts) && !loadingFetchCurrentUserBSteemFeed) {
+      return (
+        <EmptyContainer>
+          <EmptyText>{i18n.feed.emptyFeedCheckFilters}</EmptyText>
+        </EmptyContainer>
+      );
     }
 
     return null;
-  }
+  };
 
   render() {
-    const { currentUserBSteemFeed, loadingFetchCurrentUserBSteemFeed, hideFeed } = this.props;
-    const containerStyles = hideFeed ? { width: 0, height: 0 } : {};
+    const {
+      currentUserBSteemFeed,
+      loadingFetchCurrentUserBSteemFeed,
+      currentUserFollowList,
+    } = this.props;
+    const { menuVisible, filterFeedByFollowers } = this.state;
+    const displayedPosts = filterFeedByFollowers
+      ? _.filter(currentUserBSteemFeed, post => _.get(currentUserFollowList, post.author, false))
+      : currentUserBSteemFeed;
+
     return (
-      <Container style={containerStyles}>
+      <Container>
         <StyledFlatList
-          data={currentUserBSteemFeed}
+          data={displayedPosts}
           renderItem={this.renderRow}
           enableEmptySections
           keyExtractor={(item, index) => `${_.get(item, 'id', '')}${index}`}
-          ListEmptyComponent={this.renderEmptyComponent}
+          ListHeaderComponent={this.renderHeaderComponent}
+          ListEmptyComponent={this.renderEmptyComponent(displayedPosts)}
+          onEndReached={this.onEndReached}
+          initialNumToRender={4}
           refreshControl={
             <RefreshControl
               refreshing={loadingFetchCurrentUserBSteemFeed}
@@ -127,6 +240,16 @@ class CurrentUserBSteemFeed extends Component {
             />
           }
         />
+        {menuVisible && (
+          <BSteemModal visible={menuVisible} handleOnClose={this.handleHideMenu}>
+            <FeedSort
+              hideMenu={this.handleHideMenu}
+              handleSortPost={this.handleSortPost}
+              handleFilterFeedByFollowers={this.toggleFilterFeedByFollowers}
+              filterFeedByFollowers={filterFeedByFollowers}
+            />
+          </BSteemModal>
+        )}
       </Container>
     );
   }

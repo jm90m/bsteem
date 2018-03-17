@@ -14,6 +14,7 @@ import {
   getCurrentUserFeed,
   getCommentsByPostId,
   getSavedTags,
+  getCurrentUserBSteemFeed,
 } from '../rootReducer';
 import {
   FETCH_CURRENT_USER_FEED,
@@ -95,14 +96,15 @@ const fetchCurrentUserBSteemFeed = function*(action) {
   try {
     const { filter } = action.payload;
     const savedTags = yield select(getSavedTags);
-    const maxTags = _.size(savedTags) >= 5 ? 5 : savedTags.length;
+    const limit = _.size(savedTags) >= 10 ? 1 : 3;
+
     let bsteemFeed = [];
 
-    for (const i in savedTags) {
-      const tag = savedTags[i];
-      const tagFeed = yield call(fetchFeedforBSteem, tag, 10, filter);
-      bsteemFeed = _.unionBy(bsteemFeed, tagFeed, 'id');
-    }
+    const tagResults = yield all(
+      savedTags.map(tag => call(fetchFeedforBSteem, tag, limit, filter)),
+    );
+
+    bsteemFeed = _.unionBy(bsteemFeed, _.flatten(tagResults), 'id');
 
     yield put(currentUserActions.currentUserBSteemFeedFetch.success(bsteemFeed));
   } catch (error) {
@@ -111,9 +113,21 @@ const fetchCurrentUserBSteemFeed = function*(action) {
   }
 };
 
-const fetchMoreCurrentUserBSteemFeed = function*() {
+const fetchMoreCurrentUserBSteemFeed = function*(action) {
   try {
-  } catch (error) {}
+    const { filter } = action.payload;
+    const currentUserBSteemFeed = yield select(getCurrentUserBSteemFeed);
+    const randomIndex = Math.floor(Math.random() * _.size(currentUserBSteemFeed));
+    const randomPost = _.get(currentUserBSteemFeed, randomIndex, _.last(currentUserBSteemFeed));
+    const tag = _.get(randomPost, 'category');
+    const limit = 20;
+
+    const tagResults = yield call(fetchFeedforBSteem, tag, limit, filter);
+
+    yield put(currentUserActions.currentUserBSteemFeedFetchMore.success(tagResults));
+  } catch (error) {
+    yield put(currentUserActions.currentUserBSteemFeedFetchMore.fail(error));
+  }
 };
 
 const votePost = function*(action) {

@@ -51,7 +51,7 @@ class CommentsFooter extends Component {
 
   renderVoteButton() {
     const { likedPost, onPressVote, loadingVote } = this.props;
-    console.log('LOADING VOTE', loadingVote);
+
     if (loadingVote) {
       return <Loading color={COLORS.PRIMARY_COLOR} size="small" />;
     }

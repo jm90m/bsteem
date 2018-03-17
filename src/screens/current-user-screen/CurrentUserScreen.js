@@ -114,7 +114,11 @@ class CurrentUserScreen extends Component {
             />
           </Touchable>
         </Header>
-        <CurrentUserFeed navigation={navigation} hideFeed={!selectedHome} />
+        {selectedHome ? (
+          <CurrentUserFeed navigation={navigation} />
+        ) : (
+          <CurrentUserBSteemFeed navigation={navigation} />
+        )}
       </Container>
     );
   }

@@ -234,6 +234,7 @@ class FeedScreen extends Component {
               handleSortPost={this.handleSortPost}
               handleFilterFeedByFollowers={this.toggleFilterFeedByFollowers}
               filterFeedByFollowers={filterFeedByFollowers}
+              initialNumToRender={4}
             />
           </BSteemModal>
         )}

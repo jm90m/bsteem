@@ -59,7 +59,6 @@ class CurrentUserFeed extends Component {
     currentUserFeedFetch: PropTypes.func.isRequired,
     currentUserFeedFetchMore: PropTypes.func.isRequired,
     navigation: PropTypes.shape().isRequired,
-    hideFeed: PropTypes.bool.isRequired,
   };
 
   static defaultProps = {
@@ -129,14 +128,14 @@ class CurrentUserFeed extends Component {
   }
 
   render() {
-    const { currentUserFeed, loadingFetchCurrentUserFeed, hideFeed } = this.props;
-    const containerStyles = hideFeed ? { width: 0, height: 0 } : {};
+    const { currentUserFeed, loadingFetchCurrentUserFeed } = this.props;
     return (
-      <Container style={containerStyles}>
+      <Container>
         <StyledFlatList
           data={currentUserFeed}
           renderItem={this.renderRow}
           enableEmptySections
+          initialNumToRender={4}
           onEndReached={this.onEndReached}
           keyExtractor={(item, index) => `${_.get(item, 'id', '')}${index}`}
           ListEmptyComponent={this.renderEmptyComponent}

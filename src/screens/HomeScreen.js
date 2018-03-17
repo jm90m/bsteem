@@ -245,6 +245,7 @@ class HomeScreen extends Component {
           data={displayedPosts}
           renderItem={this.renderRow}
           enableEmptySections
+          initialNumToRender={4}
           onEndReached={this.onEndReached}
           keyExtractor={(item, index) => `${_.get(item, 'item.id', '')}${index}`}
           refreshControl={
