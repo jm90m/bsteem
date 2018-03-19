@@ -170,6 +170,7 @@ export const MATERIAL_COMMUNITY_ICONS = {
   caretDown: 'menu-down',
 
   lineChart: 'chart-line',
+  noteMultipleOutline: 'note-multiple-outline',
 };
 
 export const FEATHER_ICONS = {

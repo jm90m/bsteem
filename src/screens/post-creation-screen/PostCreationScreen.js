@@ -108,6 +108,7 @@ class PostCreationScreen extends Component {
     imageLoading: false,
     currentPostData: { body: '' },
     rewards: postConstants.REWARDS.HALF,
+    draftsVisible: false,
   };
 
   constructor(props) {
@@ -295,6 +296,8 @@ class PostCreationScreen extends Component {
     });
   }
 
+  toggleDrafts = draftsVisible => () => this.setState({ draftsVisible });
+
   removeTag(tag) {
     const { tags } = this.state;
     const newTags = [...tags];
@@ -443,7 +446,15 @@ class PostCreationScreen extends Component {
     return (
       <Container>
         <Header>
-          <HeaderEmptyView />
+          <TouchableMenu onPress={this.showDrafts}>
+            <TouchableMenuContainer>
+              <MaterialCommunityIcons
+                size={ICON_SIZES.menuIcon}
+                name={MATERIAL_COMMUNITY_ICONS.noteMultipleOutline}
+                color={COLORS.PRIMARY_COLOR}
+              />
+            </TouchableMenuContainer>
+          </TouchableMenu>
           <CreatePostText>{i18n.titles.createPost}</CreatePostText>
           <TouchableMenu onPress={this.showPreview}>
             <TouchableMenuContainer>
