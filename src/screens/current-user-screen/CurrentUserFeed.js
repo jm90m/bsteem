@@ -22,7 +22,7 @@ const Container = styled.View`
 
 const StyledFlatList = styled.FlatList`
   flex: 1;
-  background-color: ${COLORS.WHITE.WHITE_SMOKE};
+  background-color: ${COLORS.PRIMARY_BORDER_COLOR};
 `;
 
 const LoadingContainer = styled.View`
