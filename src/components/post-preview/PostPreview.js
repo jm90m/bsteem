@@ -5,6 +5,7 @@ import styled from 'styled-components/native';
 import { connect } from 'react-redux';
 import _ from 'lodash';
 import { COLORS } from 'constants/styles';
+import { jsonParse } from 'util/bsteemUtils';
 import {
   getIsAuthenticated,
   getAuthUsername,
@@ -347,7 +348,7 @@ class PostPreview extends Component {
   handleNavigateToPost() {
     const { postData } = this.props;
     const { title, category, author, json_metadata, body, permlink, id } = postData;
-    const parsedJsonMetadata = JSON.parse(json_metadata);
+    const parsedJsonMetadata = jsonParse(json_metadata);
     this.props.navigation.navigate(navigationConstants.POST, {
       title,
       body,
@@ -470,7 +471,7 @@ class PostPreview extends Component {
       displayMenu,
     } = this.state;
     const { title, json_metadata } = postData;
-    const parsedJsonMetadata = JSON.parse(json_metadata);
+    const parsedJsonMetadata = jsonParse(json_metadata);
     const images = parsedJsonMetadata.image || [];
     const formattedImages = _.map(images, image => ({ photo: image }));
     const showPostPreview = this.getDisplayPostPreview();

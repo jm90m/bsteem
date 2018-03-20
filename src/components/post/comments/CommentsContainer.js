@@ -111,14 +111,6 @@ class CommentsContainer extends Component {
 
     let fetchedCommentsList = [];
 
-    if (_.isNull(postComments)) {
-      return (
-        <EmptyCommentsTextContainer>
-          <EmptyCommentsText>{i18n.comments.noCommentsToShow}</EmptyCommentsText>
-        </EmptyCommentsTextContainer>
-      );
-    }
-
     if (Array.isArray(rootNode)) {
       fetchedCommentsList = _.map(rootNode, id => comments[id]);
     }
@@ -127,14 +119,6 @@ class CommentsContainer extends Component {
 
     if (fetchedCommentsList && fetchedCommentsList.length) {
       commentsChildren = this.getNestedComments(postComments, rootNode, {});
-    }
-
-    if (_.isEmpty(fetchedCommentsList) && !loadingComments) {
-      return (
-        <EmptyCommentsTextContainer>
-          <EmptyCommentsText>{i18n.comments.noCommentsToShow}</EmptyCommentsText>
-        </EmptyCommentsTextContainer>
-      );
     }
 
     return (

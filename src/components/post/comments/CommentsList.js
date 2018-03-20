@@ -8,6 +8,7 @@ import { COLORS } from 'constants/styles';
 import LargeLoading from 'components/common/LargeLoading';
 import { SORT_COMMENTS } from 'constants/comments';
 import Comment from './Comment';
+import i18n from '../../../i18n/i18n';
 
 const EmptyView = styled.View`
   height: 200px;
@@ -22,7 +23,11 @@ const LoadingContainer = styled.View`
   align-items: center;
 `;
 
-const DISPLAY_LIMIT = 10;
+const EmptyCommentsTextContainer = styled.View`
+  padding: 20px;
+  background-color: ${COLORS.WHITE.WHITE};
+`;
+const EmptyCommentsText = styled.Text``;
 
 class CommentsList extends Component {
   static propTypes = {
@@ -52,42 +57,24 @@ class CommentsList extends Component {
     this.state = {
       sort,
       sortedComments,
-      displayedComments: _.slice(sortedComments, 0, DISPLAY_LIMIT),
     };
 
     this.renderComment = this.renderComment.bind(this);
-    this.renderLoader = this.renderLoader.bind(this);
-    this.displayMoreComments = this.displayMoreComments.bind(this);
     this.refreshCommentsList = this.refreshCommentsList.bind(this);
+    this.renderEmptyComponent = this.renderEmptyComponent.bind(this);
   }
 
   refreshCommentsList() {
     const { postData } = this.props;
-    const { author, permlink, postId, category } = postData;
-    this.props.fetchComments(category, author, permlink, postId);
-  }
-
-  componentWillReceiveProps(nextProps) {}
-
-  displayMoreComments() {
-    const { displayedComments, sortedComments } = this.state;
-
-    if (_.size(sortedComments) === _.size(displayedComments)) return;
-
-    const lastDisplayedCommentIndex = _.size(displayedComments);
-    const moreCommentsLastIndex = lastDisplayedCommentIndex + DISPLAY_LIMIT;
-    const moreComments = _.slice(sortedComments, lastDisplayedCommentIndex, moreCommentsLastIndex);
-
-    this.setState({
-      displayedComments: _.concat(displayedComments, moreComments),
-    });
+    const { author, permlink, id, category } = postData;
+    this.props.fetchComments(category, author, permlink, id);
   }
 
   renderComment(rowData) {
     const commentData = _.get(rowData, 'item', {});
 
     if (_.get(commentData, 'bsteemEmptyView', false)) {
-      return this.renderLoader();
+      return <EmptyView />;
     }
 
     const {
@@ -118,37 +105,49 @@ class CommentsList extends Component {
     );
   }
 
-  renderLoader() {
-    const { displayedComments, sortedComments } = this.state;
+  renderEmptyComponent() {
+    const { comments, loadingComments } = this.props;
 
-    if (_.size(sortedComments) !== _.size(displayedComments)) {
+    if (loadingComments) {
       return (
         <LoadingContainer>
           <LargeLoading />
         </LoadingContainer>
       );
+    } else if (_.isNull(comments) || _.isEmpty(comments)) {
+      return (
+        <EmptyCommentsTextContainer>
+          <EmptyCommentsText>{i18n.comments.noCommentsToShow}</EmptyCommentsText>
+        </EmptyCommentsTextContainer>
+      );
     }
-    return <EmptyView />;
+    return null;
   }
 
   render() {
     const { comments, loadingComments } = this.props;
-    const { displayedComments } = this.state;
-
-    const displayComments = _.concat(displayedComments, { bsteemEmptyView: true });
+    const { sort } = this.state;
+    const sortedComments = sortComments(comments, sort);
+    const displayComments = _.concat(sortedComments, { bsteemEmptyView: true });
 
     return (
       <FlatList
         style={{ marginBottom: 30 }}
-        initialListSize={_.size(comments)}
         data={displayComments}
         enableEmptySections
         renderItem={this.renderComment}
-        onEndReached={this.displayMoreComments}
         onEndReachedThreshold={100}
-        refreshing={loadingComments}
-        onRefresh={this.refreshCommentsList}
+        ListEmptyComponent={this.renderEmptyComponent}
+        initialNumToRender={4}
         keyExtractor={(item, index) => `${_.get(item, 'item.id', '')}${index}`}
+        refreshControl={
+          <RefreshControl
+            refreshing={loadingComments}
+            onRefresh={this.refreshCommentsList}
+            tintColor={COLORS.PRIMARY_COLOR}
+            colors={[COLORS.PRIMARY_COLOR]}
+          />
+        }
       />
     );
   }

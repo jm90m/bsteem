@@ -46,6 +46,7 @@ export default (state = INITIAL_STATE, action) => {
       return {
         ...state,
         commentsByPostId: {
+          ...state.commentsByPostId,
           [postId]: {
             ...oldPostCommentsDetails,
             comments,

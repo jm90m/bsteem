@@ -16,7 +16,7 @@ import { calculatePayout } from '../../../util/steemitUtils';
 
 const { width: deviceWidth } = Dimensions.get('screen');
 
-const COMMENT_PADDING = 30;
+const COMMENT_PADDING = 10;
 
 const Container = styled.View`
   background-color: ${COLORS.WHITE.WHITE};

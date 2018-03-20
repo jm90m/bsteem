@@ -143,13 +143,7 @@ class CommentScreen extends Component {
             />
           </TouchableIcon>
         </Header>
-        {loadingComments ? (
-          <LoadingContainer>
-            <LargeLoading />
-          </LoadingContainer>
-        ) : (
           <CommentsContainer postId={postId} postData={postData} navigation={navigation} />
-        )}
       </Container>
     );
   }

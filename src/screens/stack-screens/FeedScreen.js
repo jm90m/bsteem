@@ -234,7 +234,6 @@ class FeedScreen extends Component {
               handleSortPost={this.handleSortPost}
               handleFilterFeedByFollowers={this.toggleFilterFeedByFollowers}
               filterFeedByFollowers={filterFeedByFollowers}
-              initialNumToRender={4}
             />
           </BSteemModal>
         )}
@@ -245,6 +244,7 @@ class FeedScreen extends Component {
             renderItem={this.renderRow}
             enableEmptySections
             onEndReached={this.fetchMorePosts}
+            initialNumToRender={4}
             keyExtractor={(item, index) => `${_.get(item, 'item.id', '')}${index}`}
           />
         )}
