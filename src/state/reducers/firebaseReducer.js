@@ -6,6 +6,8 @@ import {
   FETCH_SAVED_POSTS,
   FETCH_SAVED_USERS,
   SAVE_USER,
+  SAVE_DRAFT,
+  FETCH_DRAFTS,
 } from '../actions/actionTypes';
 
 const INITIAL_STATE = {
@@ -18,6 +20,10 @@ const INITIAL_STATE = {
   loadingSavedTags: false,
   loadingSavedPosts: false,
   loadingSavedUsers: false,
+
+  drafts: [],
+  loadingDrafts: false,
+  loadingSavingDraft: false,
 };
 
 export default (state = INITIAL_STATE, action) => {
@@ -116,6 +122,39 @@ export default (state = INITIAL_STATE, action) => {
           user => user.username !== action.payload,
         ),
       };
+
+    case FETCH_DRAFTS.ACTION:
+      return {
+        ...state,
+        loadingDrafts: true,
+      };
+
+    case FETCH_DRAFTS.SUCCESS: {
+      const drafts = _.map(action.payload, (post, draftID) => ({ ...post, draftID }));
+      return {
+        ...state,
+        drafts,
+        loadingDrafts: false,
+      };
+    }
+    case FETCH_DRAFTS.ERROR:
+      return {
+        ...state,
+        loadingDrafts: false,
+      };
+
+    case SAVE_DRAFT.ACTION:
+      return {
+        ...state,
+        loadingSavingDraft: true,
+      };
+    case SAVE_DRAFT.SUCCESS:
+    case SAVE_DRAFT.ERROR:
+    case SAVE_DRAFT.LOADING_END:
+      return {
+        ...state,
+        loadingSavingDraft: false,
+      };
     default:
       return state;
   }
@@ -130,3 +169,6 @@ export const getPendingSavingUsers = state => state.pendingSavingUsers;
 export const getSavedTags = state => state.savedTags;
 export const getSavedPosts = state => state.savedPosts;
 export const getSavedUsers = state => state.savedUsers;
+export const getDrafts = state => state.drafts;
+export const getLoadingDrafts = state => state.loadingDrafts;
+export const getLoadingSavingDraft = state => state.loadingSavingDraft;

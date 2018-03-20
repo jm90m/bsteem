@@ -7,10 +7,6 @@ class SplashScreen extends Component {
     assetsAreLoaded: PropTypes.bool.isRequired,
   };
 
-  static defaultProps = {
-    assetsAreLoaded: false,
-  };
-
   render() {
     const { assetsAreLoaded } = this.props;
     const displaySplashScreen = !assetsAreLoaded;

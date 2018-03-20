@@ -13,7 +13,7 @@ export const setFirebaseData = (ref, values = {}) => {
     .set(values);
 };
 
-const baseUserSettingsRef = 'user-settings';
+export const baseUserSettingsRef = 'user-settings';
 export const getUserSavedTagsRef = username => `${baseUserSettingsRef}/${username}/saved-tags`;
 export const getSaveTagRef = (username, tag) => `${getUserSavedTagsRef(username)}/${tag}`;
 
@@ -28,3 +28,7 @@ export const getUserRebloggedPostsRef = username =>
   `${baseUserSettingsRef}/${username}/reblogged-posts`;
 export const getRebloggedPostRef = (username, postID) =>
   `${getUserRebloggedPostsRef(username)}/${postID}`;
+
+export const getUserPostDraftsRef = username => `${baseUserSettingsRef}/${username}/post-drafts`;
+export const getSavedDraftRef = (username, draftID) =>
+  `${getUserPostDraftsRef(username)}/${draftID}`;

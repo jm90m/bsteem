@@ -77,6 +77,9 @@ const rootSaga = function*() {
     spawn(firebaseSaga.watchFetchSavedUsers),
     spawn(firebaseSaga.watchSaveUser),
     spawn(firebaseSaga.watchUnsaveUser),
+    spawn(firebaseSaga.watchSaveDraft),
+    spawn(firebaseSaga.watchDeleteDraft),
+    spawn(firebaseSaga.watchFetchDrafts),
 
     // Auth Sagas
     spawn(authSaga.watchAuthenticateUser),

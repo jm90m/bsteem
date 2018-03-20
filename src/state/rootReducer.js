@@ -127,6 +127,9 @@ export const getSavedUsers = state => fromFirebase.getSavedUsers(state.firebase)
 export const getPendingSavingTags = state => fromFirebase.getPendingSavingTags(state.firebase);
 export const getPendingSavingPosts = state => fromFirebase.getPendingSavingPosts(state.firebase);
 export const getPendingSavingUsers = state => fromFirebase.getPendingSavingUsers(state.firebase);
+export const getDrafts = state => fromFirebase.getDrafts(state.firebase);
+export const getLoadingDrafts = state => fromFirebase.getLoadingDrafts(state.firebase);
+export const getLoadingSavingDraft = state => fromFirebase.getLoadingSavingDraft(state.firebase);
 
 // Posts Selectors
 export const getPostsDetails = state => fromPosts.getPostsDetails(state.posts);

@@ -30,6 +30,7 @@ export default {
     login: 'Login & Settings',
     reportedPosts: 'Reported Posts',
     editProfile: 'Edit Profile',
+    drafts: 'Drafts',
   },
   editor: {
     title: 'Title',
@@ -54,6 +55,11 @@ export default {
     tos: 'Terms and Conditions',
     createPost: 'Create Post',
     editPost: 'Edit Post',
+    postPreview: 'Post Preview',
+    savePost: 'Save Post',
+    savingPost: 'Saving...',
+    errorSavingEmptyTitleOrBody: 'Post must contain a title and body before being saved',
+    postSavedToDrafts: 'Post has been saved to drafts',
   },
   postMenu: {
     follow: 'Follow',

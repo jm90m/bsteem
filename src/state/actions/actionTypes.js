@@ -107,6 +107,9 @@ export const UNSAVE_POST = createAsyncActionType('@firebase/unsave-post');
 export const FETCH_SAVED_USERS = createAsyncActionType('@firebase/fetch-saved-users');
 export const SAVE_USER = createAsyncActionType('@firebase/save-user');
 export const UNSAVE_USER = createAsyncActionType('@firebase/unsave-user');
+export const SAVE_DRAFT = createAsyncActionType('@firebase/save-draft');
+export const DELETE_DRAFT = createAsyncActionType('@firebase/delete-draft');
+export const FETCH_DRAFTS = createAsyncActionType('@firebase/fetch-drafts');
 
 // Posts Actions
 export const FETCH_POST_DETAILS = createAsyncActionType('@posts/fetch-post-details');

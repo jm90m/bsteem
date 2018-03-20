@@ -1,6 +1,5 @@
 import { takeLatest, takeEvery, call, put, select } from 'redux-saga/effects';
 import _ from 'lodash';
-import firebase from 'firebase';
 import Expo from 'expo';
 import {
   FETCH_SAVED_TAGS,
@@ -12,32 +11,24 @@ import {
   FETCH_SAVED_USERS,
   SAVE_USER,
   UNSAVE_USER,
+  SAVE_DRAFT,
+  DELETE_DRAFT,
+  FETCH_DRAFTS,
 } from 'state/actions/actionTypes';
+import {
+  getUserSavedTagsRef,
+  getSaveTagRef,
+  getUserSavedPostsRef,
+  getSavePostRef,
+  getUserSavedUsersRef,
+  getSaveUserRef,
+  getFirebaseValueOnce,
+  setFirebaseData,
+  getUserPostDraftsRef,
+  getSavedDraftRef,
+} from 'util/firebaseUtils';
 import * as firebaseActions from '../actions/firebaseActions';
 import { getAuthUsername } from '../rootReducer';
-
-const baseUserSettingsRef = 'user-settings';
-const getUserSavedTagsRef = username => `${baseUserSettingsRef}/${username}/saved-tags`;
-const getSaveTagRef = (username, tag) => `${getUserSavedTagsRef(username)}/${tag}`;
-
-const getUserSavedPostsRef = username => `${baseUserSettingsRef}/${username}/saved-posts`;
-const getSavePostRef = (username, postID) => `${getUserSavedPostsRef(username)}/${postID}`;
-
-const getUserSavedUsersRef = username => `${baseUserSettingsRef}/${username}/saved-users`;
-const getSaveUserRef = (username, saveUser) => `${getUserSavedUsersRef(username)}/${saveUser}`;
-
-const getFirebaseValueOnce = (ref, key) =>
-  firebase
-    .database()
-    .ref(ref)
-    .once(key);
-
-const setFirebaseData = (ref, values = {}) => {
-  firebase
-    .database()
-    .ref(ref)
-    .set(values);
-};
 
 export const fetchSavedTags = function*() {
   try {
@@ -240,6 +231,78 @@ const unsaveUser = function*(action) {
   }
 };
 
+const fetchDrafts = function*() {
+  try {
+    const authUsername = yield select(getAuthUsername);
+    let userID;
+    if (_.isEmpty(authUsername)) {
+      userID = Expo.Constants.deviceId;
+    } else {
+      userID = authUsername;
+    }
+    const snapshot = yield call(getFirebaseValueOnce, getUserPostDraftsRef(userID), 'value');
+    const drafts = snapshot.val() || {};
+    yield put(firebaseActions.fetchDrafts.success(drafts));
+  } catch (error) {
+    console.log(error);
+    yield put(firebaseActions.fetchDrafts.fail({ error }));
+  } finally {
+    yield put(firebaseActions.fetchDrafts.loadingEnd());
+  }
+};
+
+const saveDraft = function*(action) {
+  try {
+    const { postData, draftID, successCallback } = action.payload;
+    const authUsername = yield select(getAuthUsername);
+
+    let userID;
+
+    if (_.isEmpty(authUsername)) {
+      userID = Expo.Constants.deviceId;
+    } else {
+      userID = authUsername;
+    }
+
+    yield call(setFirebaseData, getSavedDraftRef(userID, draftID), postData);
+    yield call(fetchDrafts);
+    successCallback();
+    yield put(firebaseActions.saveDraft.success());
+  } catch (error) {
+    console.log(error);
+    const { draftID } = action.payload;
+    yield put(firebaseActions.saveDraft.fail({ error }, draftID));
+  } finally {
+    const { id } = action.payload;
+    yield put(firebaseActions.saveDraft.loadingEnd(id));
+  }
+};
+
+const deleteDraft = function*(action) {
+  try {
+    const { draftID } = action.payload;
+    const authUsername = yield select(getAuthUsername);
+
+    let userID;
+
+    if (_.isEmpty(authUsername)) {
+      userID = Expo.Constants.deviceId;
+    } else {
+      userID = authUsername;
+    }
+    yield call(setFirebaseData, getSavedDraftRef(userID, draftID), null);
+    yield put(firebaseActions.deleteDraft.success(draftID));
+    yield call(fetchDrafts);
+  } catch (error) {
+    console.log(error);
+    const { draftID } = action.payload;
+    yield put(firebaseActions.deleteDraft.fail({ error }, draftID));
+  } finally {
+    const { id } = action.payload;
+    yield put(firebaseActions.deleteDraft.loadingEnd(id));
+  }
+};
+
 export const watchFetchSavedTags = function*() {
   yield takeLatest(FETCH_SAVED_TAGS.ACTION, fetchSavedTags);
 };
@@ -274,4 +337,14 @@ export const watchSaveUser = function*() {
 
 export const watchUnsaveUser = function*() {
   yield takeEvery(UNSAVE_USER.ACTION, unsaveUser);
+};
+
+export const watchSaveDraft = function*() {
+  yield takeEvery(SAVE_DRAFT.ACTION, saveDraft);
+};
+export const watchDeleteDraft = function*() {
+  yield takeEvery(DELETE_DRAFT.ACTION, deleteDraft);
+};
+export const watchFetchDrafts = function*() {
+  yield takeLatest(FETCH_DRAFTS.ACTION, fetchDrafts);
 };

@@ -11,16 +11,18 @@ import i18n from 'i18n/i18n';
 import { FormLabel, FormInput, Icon, FormValidationMessage } from 'react-native-elements';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS, MATERIAL_ICONS, ICON_SIZES, MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
-import { getAuthUsername, getCreatePostLoading } from 'state/rootReducer';
+import { getAuthUsername, getCreatePostLoading, getLoadingSavingDraft } from 'state/rootReducer';
 import { createPost, uploadImage } from 'state/actions/editorActions';
+import { saveDraft } from 'state/actions/firebaseActions';
 import Header from 'components/common/Header';
 import TagsInput from 'components/editor/TagsInput';
 import SmallLoading from 'components/common/SmallLoading';
 import PrimaryButton from 'components/common/PrimaryButton';
-import HeaderEmptyView from 'components/common/HeaderEmptyView';
 import * as postConstants from 'constants/postConstants';
 import PostCreationPreviewModal from './PostCreationPreviewModal';
 import DisclaimerText from './DisclaimerText';
+import DraftsModal from './DraftsModal';
+import PostCreationMenu from './PostCreationMenu';
 
 const { width: deviceWidth } = Dimensions.get('screen');
 
@@ -69,15 +71,30 @@ const PickerContainer = styled.View`
   padding: 0 10px;
 `;
 
+const StatusContent = styled.View`
+  padding: 10px;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+`;
+
+const StatusText = styled.Text`
+  margin-left: 5px;
+  color: ${COLORS.PRIMARY_COLOR};
+`;
+
 const mapStateToProps = state => ({
   authUsername: getAuthUsername(state),
   createPostLoading: getCreatePostLoading(state),
+  loadingSavingDraft: getLoadingSavingDraft(state),
 });
 
 const mapDispatchToProps = dispatch => ({
   createPost: (postData, callback) => dispatch(createPost.action({ postData, callback })),
   uploadImage: (imageData, callback, errorCallback) =>
     dispatch(uploadImage.action({ imageData, callback, errorCallback })),
+  saveDraft: (postData, draftID, successCallback) =>
+    dispatch(saveDraft.action({ postData, draftID, successCallback })),
 });
 
 @connect(mapStateToProps, mapDispatchToProps)
@@ -90,6 +107,11 @@ class PostCreationScreen extends Component {
 
   static propTypes = {
     authUsername: PropTypes.string.isRequired,
+    createPostLoading: PropTypes.bool.isRequired,
+    loadingSavingDraft: PropTypes.bool.isRequired,
+    saveDraft: PropTypes.func.isRequired,
+    uploadImage: PropTypes.func.isRequired,
+    createPost: PropTypes.func.isRequired,
   };
 
   static INITIAL_STATE = {
@@ -109,6 +131,10 @@ class PostCreationScreen extends Component {
     currentPostData: { body: '' },
     rewards: postConstants.REWARDS.HALF,
     draftsVisible: false,
+    menuVisible: false,
+    savePostError: false,
+    savePostSuccess: false,
+    draftID: null,
   };
 
   constructor(props) {
@@ -135,6 +161,9 @@ class PostCreationScreen extends Component {
 
     this.hidePreview = this.hidePreview.bind(this);
     this.showPreview = this.showPreview.bind(this);
+
+    this.handleSavePost = this.handleSavePost.bind(this);
+    this.handleSuccessSaveDraft = this.handleSuccessSaveDraft.bind(this);
   }
 
   onChangeRewards(rewards) {
@@ -142,6 +171,7 @@ class PostCreationScreen extends Component {
       rewards,
     });
   }
+
   onChangeTitle(value) {
     if (!_.isEmpty(value)) {
       this.setState({
@@ -293,8 +323,11 @@ class PostCreationScreen extends Component {
     this.setState({
       previewVisible: true,
       currentPostData: this.getPostData(),
+      menuVisible: false,
     });
   }
+
+  toggleMenu = menuVisible => () => this.setState({ menuVisible });
 
   toggleDrafts = draftsVisible => () => this.setState({ draftsVisible });
 
@@ -324,6 +357,45 @@ class PostCreationScreen extends Component {
     });
   }
 
+  handleSuccessSaveDraft() {
+    this.setState({
+      savePostError: false,
+      savePostSuccess: true,
+    });
+  }
+
+  handleSavePost() {
+    this.setState({
+      savePostError: false,
+      savePostSuccess: false,
+    });
+
+    const postData = this.getPostData();
+    let { draftID } = this.state;
+
+    if (_.isNull(draftID)) {
+      draftID = new Date().getTime();
+    }
+
+    const title = _.get(postData, 'title');
+    const body = _.get(postData, 'body');
+
+    if (_.isEmpty(title) || _.isEmpty(body)) {
+      this.setState({
+        savePostError: true,
+        savePostSuccess: false,
+      });
+    } else {
+      this.setState(
+        {
+          savePostError: false,
+          draftID,
+        },
+        () => this.props.saveDraft(postData, draftID, this.handleSuccessSaveDraft),
+      );
+    }
+  }
+
   handleSubmit() {
     // validate form
     const { tags, titleInput } = this.state;
@@ -341,6 +413,21 @@ class PostCreationScreen extends Component {
       this.setState(errorState);
     }
   }
+
+  handleSelectDraft = postData => () => {
+    const titleInput = _.get(postData, 'title', '');
+    const bodyInput = _.get(postData, 'body', '');
+    const draftID = _.get(postData, 'draftID', null);
+    const tags = _.filter(_.get(postData, 'jsonMetadata.tags', []), tag => tag !== 'bsteem');
+
+    this.setState({
+      titleInput,
+      bodyInput,
+      tags,
+      draftsVisible: false,
+      draftID,
+    });
+  };
 
   removeAdditionalContent(index, type, imgID) {
     const additionalPostContents = [...this.state.additionalPostContents];
@@ -427,8 +514,49 @@ class PostCreationScreen extends Component {
     });
   }
 
+  renderPostStatusMessages() {
+    const { loadingSavingDraft } = this.props;
+    const { savePostError, savePostSuccess } = this.state;
+
+    if (loadingSavingDraft) {
+      return (
+        <StatusContent>
+          <SmallLoading />
+          <StatusText style={{ color: COLORS.PRIMARY_COLOR }}>{i18n.editor.savingPost}</StatusText>
+        </StatusContent>
+      );
+    } else if (savePostError) {
+      return (
+        <StatusContent>
+          <MaterialIcons
+            size={ICON_SIZES.menuModalOptionIcon}
+            color={COLORS.RED.VALENCIA}
+            name={MATERIAL_ICONS.warning}
+          />
+          <StatusText style={{ color: COLORS.RED.VALENCIA }}>
+            {i18n.editor.errorSavingEmptyTitleOrBody}
+          </StatusText>
+        </StatusContent>
+      );
+    } else if (savePostSuccess) {
+      return (
+        <StatusContent>
+          <MaterialIcons
+            size={ICON_SIZES.menuModalOptionIcon}
+            color={COLORS.BLUE.MEDIUM_AQUAMARINE}
+            name={MATERIAL_ICONS.checkCircle}
+          />
+          <StatusText style={{ color: COLORS.BLUE.MEDIUM_AQUAMARINE }}>
+            {i18n.editor.postSavedToDrafts}
+          </StatusText>
+        </StatusContent>
+      );
+    }
+    return null;
+  }
+
   render() {
-    const { createPostLoading } = this.props;
+    const { createPostLoading, loadingSavingDraft } = this.props;
     const {
       titleInput,
       tagsInput,
@@ -440,13 +568,17 @@ class PostCreationScreen extends Component {
       previewVisible,
       currentPostData,
       rewards,
+      draftsVisible,
+      menuVisible,
+      savePostError,
+      savePostSuccess,
     } = this.state;
     const displayTitleError = !_.isEmpty(titleError);
 
     return (
       <Container>
         <Header>
-          <TouchableMenu onPress={this.showDrafts}>
+          <TouchableMenu onPress={this.toggleDrafts(true)}>
             <TouchableMenuContainer>
               <MaterialCommunityIcons
                 size={ICON_SIZES.menuIcon}
@@ -456,11 +588,11 @@ class PostCreationScreen extends Component {
             </TouchableMenuContainer>
           </TouchableMenu>
           <CreatePostText>{i18n.titles.createPost}</CreatePostText>
-          <TouchableMenu onPress={this.showPreview}>
+          <TouchableMenu onPress={this.toggleMenu(true)}>
             <TouchableMenuContainer>
               <MaterialCommunityIcons
                 size={ICON_SIZES.menuIcon}
-                name={MATERIAL_COMMUNITY_ICONS.magnify}
+                name={MATERIAL_COMMUNITY_ICONS.menuVertical}
                 color={COLORS.PRIMARY_COLOR}
               />
             </TouchableMenuContainer>
@@ -500,6 +632,7 @@ class PostCreationScreen extends Component {
             </Picker>
           </PickerContainer>
           <DisclaimerText />
+          {this.renderPostStatusMessages()}
           <ActionButtonsContainer>
             <PrimaryButton
               onPress={this.handleSubmit}
@@ -508,6 +641,14 @@ class PostCreationScreen extends Component {
               loading={createPostLoading}
             />
             <ActionButtons>
+              <ActionButtonTouchable onPress={this.handleSavePost} disabled={createPostLoading}>
+                <Icon
+                  name={MATERIAL_ICONS.save}
+                  backgroundColor={COLORS.GREY.NERO}
+                  size={ICON_SIZES.actionIcon}
+                  color={COLORS.WHITE.WHITE}
+                />
+              </ActionButtonTouchable>
               <ActionButtonTouchable onPress={this.addTextInput} disabled={createPostLoading}>
                 <Icon
                   name="note-add"
@@ -532,6 +673,22 @@ class PostCreationScreen extends Component {
           previewVisible={previewVisible}
           postData={currentPostData}
         />
+        <DraftsModal
+          handleHideDrafts={this.toggleDrafts(false)}
+          draftsVisible={draftsVisible}
+          handleSelectDraft={this.handleSelectDraft}
+        />
+        {menuVisible && (
+          <PostCreationMenu
+            hideMenu={this.toggleMenu(false)}
+            menuVisible={menuVisible}
+            handleShowPreview={this.showPreview}
+            handleSavePost={this.handleSavePost}
+            loadingSavingDraft={loadingSavingDraft}
+            savePostError={savePostError}
+            savePostSuccess={savePostSuccess}
+          />
+        )}
       </Container>
     );
   }

@@ -120,6 +120,10 @@ export const MATERIAL_ICONS = {
   playCircle: 'play-circle-outline',
   edit: 'edit',
   settings: 'settings',
+
+  save: 'save',
+  warning: 'warning',
+  checkCircle: 'check-circle',
 };
 
 export const MATERIAL_COMMUNITY_ICONS = {
