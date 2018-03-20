@@ -9,13 +9,14 @@ import * as authActions from 'state/actions/authActions';
 import * as firebaseSaga from 'state/sagas/firebaseSaga';
 import * as currentUserActions from 'state/actions/currentUserActions';
 import * as feedFilters from 'constants/feedFilters';
-import * as settingsSaga from './settingsSaga';
 import {
   FETCH_STEEM_GLOBAL_PROPERTIES,
   FETCH_STEEM_RATE,
   FETCH_NETWORK_CONNECTION,
   SET_TRANSLATIONS,
   APP_ONBOARDING,
+  FETCH_CRYPTO_PRICE_HISTORY,
+  FETCH_REWARD_FUND,
 } from 'state/actions/actionTypes';
 import {
   AUTH_EXPIRATION,
@@ -24,7 +25,7 @@ import {
   STEEM_ACCESS_TOKEN,
 } from 'constants/asyncStorageKeys';
 import sc2 from 'api/sc2';
-import { FETCH_CRYPTO_PRICE_HISTORY, FETCH_REWARD_FUND } from '../actions/actionTypes';
+import * as settingsSaga from './settingsSaga';
 import { TRENDING } from '../../constants/feedFilters';
 
 const fetchGlobalSteemProperties = function*() {
@@ -111,9 +112,11 @@ const appOnboarding = function*() {
 
     // home screen onboarding
     yield all([
-      put(homeActions.fetchDiscussions(feedFilters.TRENDING)),
       call(fetchRewardFund),
       call(settingsSaga.fetchUserSettings),
+      call(fetchSteemRate),
+      call(fetchGlobalSteemProperties),
+      put(homeActions.fetchDiscussions(feedFilters.TRENDING)),
       put(currentUserActions.currentUserFeedFetch.action()),
       put(currentUserActions.currentUserReblogListFetch.action()),
       put(homeActions.fetchTags()),
