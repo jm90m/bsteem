@@ -212,7 +212,7 @@ class CryptoChart extends Component {
               style={{ marginHorizontal: -10 }}
               data={[0, 1, 2, 3, 4, 5, 6]}
               formatLabel={value => daysOfTheWeek[value]}
-              contentInset={{ left: 10, right: 10 }}
+              contentInset={{ left: 20, right: 20 }}
               svg={{ fontSize: 14 }}
             />
           </Container>
