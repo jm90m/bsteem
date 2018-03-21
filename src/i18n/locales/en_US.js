@@ -100,6 +100,12 @@ export default {
   },
   comments: {
     noCommentsToShow: 'No comments to show.',
+    best: 'Best',
+    oldest: 'Oldest',
+    newest: 'Newest',
+    reputation: 'Author Reputation',
+    comments: 'Comments',
+    sortBy: 'Sort by',
   },
   votes: {
     noUpvoted: 'No one has upvoted this content.',

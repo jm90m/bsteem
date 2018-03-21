@@ -243,16 +243,14 @@ class CurrentUserBSteemFeed extends Component {
             />
           }
         />
-        {menuVisible && (
-          <BSteemModal visible={menuVisible} handleOnClose={this.handleHideMenu}>
-            <FeedSort
-              hideMenu={this.handleHideMenu}
-              handleSortPost={this.handleSortPost}
-              handleFilterFeedByFollowers={this.toggleFilterFeedByFollowers}
-              filterFeedByFollowers={filterFeedByFollowers}
-            />
-          </BSteemModal>
-        )}
+        <BSteemModal visible={menuVisible} handleOnClose={this.handleHideMenu}>
+          <FeedSort
+            hideMenu={this.handleHideMenu}
+            handleSortPost={this.handleSortPost}
+            handleFilterFeedByFollowers={this.toggleFilterFeedByFollowers}
+            filterFeedByFollowers={filterFeedByFollowers}
+          />
+        </BSteemModal>
       </Container>
     );
   }

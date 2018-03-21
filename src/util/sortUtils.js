@@ -1,6 +1,7 @@
 import { SORT_COMMENTS } from 'constants/comments';
+import { getReputation } from 'util/steemitFormatters';
 
-export const sortComments = (comments, sortType = SORT_COMMENTS.BEST) => {
+export const sortComments = (comments, sortType = SORT_COMMENTS.BEST.id) => {
   const sortedComments = [...comments];
 
   const netNegative = a => a.net_rshares < 0;
@@ -11,7 +12,7 @@ export const sortComments = (comments, sortType = SORT_COMMENTS.BEST) => {
   const netRshares = a => a.net_rshares;
 
   switch (sortType) {
-    case SORT_COMMENTS.BEST:
+    case SORT_COMMENTS.BEST.id:
       return sortedComments.sort((a, b) => {
         if (netNegative(a)) {
           return 1;
@@ -28,10 +29,14 @@ export const sortComments = (comments, sortType = SORT_COMMENTS.BEST) => {
 
         return netRshares(b) - netRshares(a);
       });
-    case SORT_COMMENTS.NEWEST:
+    case SORT_COMMENTS.NEWEST.id:
       return sortedComments.sort((a, b) => Date.parse(a.created) - Date.parse(b.created)).reverse();
-    case SORT_COMMENTS.OLDEST:
+    case SORT_COMMENTS.OLDEST.id:
       return sortedComments.sort((a, b) => Date.parse(a.created) - Date.parse(b.created));
+    case SORT_COMMENTS.REPUTATION.id:
+      return sortedComments.sort(
+        (a, b) => getReputation(b.author_reputation) - getReputation(a.author_reputation),
+      );
     default:
       return sortedComments;
   }

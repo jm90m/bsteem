@@ -4,11 +4,11 @@ import styled from 'styled-components/native';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { sortComments } from 'util/sortUtils';
-import { COLORS } from 'constants/styles';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { COLORS, ICON_SIZES, MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
 import LargeLoading from 'components/common/LargeLoading';
-import { SORT_COMMENTS } from 'constants/comments';
+import i18n from 'i18n/i18n';
 import Comment from './Comment';
-import i18n from '../../../i18n/i18n';
 
 const EmptyView = styled.View`
   height: 200px;
@@ -29,6 +29,25 @@ const EmptyCommentsTextContainer = styled.View`
 `;
 const EmptyCommentsText = styled.Text``;
 
+const TouchableFilter = styled.TouchableOpacity`
+  flex-direction: row;
+  align-items: center;
+  padding: 5px;
+`;
+
+const FilterMenuIcon = styled.View`
+  margin-top: 3px;
+`;
+
+const FilterText = styled.Text`
+  color: ${COLORS.PRIMARY_COLOR};
+  margin-left: 3px;
+`;
+
+const BoldText = styled.Text`
+  font-weight: bold;
+`;
+
 class CommentsList extends Component {
   static propTypes = {
     postData: PropTypes.shape().isRequired,
@@ -41,6 +60,8 @@ class CommentsList extends Component {
     loadingComments: PropTypes.bool.isRequired,
     authUsername: PropTypes.string,
     authenticated: PropTypes.bool,
+    sort: PropTypes.shape().isRequired,
+    handleDisplayMenu: PropTypes.func.isRequired,
   };
 
   static defaultProps = {
@@ -52,16 +73,11 @@ class CommentsList extends Component {
 
   constructor(props) {
     super(props);
-    const sort = SORT_COMMENTS.BEST;
-    const sortedComments = sortComments(props.comments, sort);
-    this.state = {
-      sort,
-      sortedComments,
-    };
 
     this.renderComment = this.renderComment.bind(this);
     this.refreshCommentsList = this.refreshCommentsList.bind(this);
     this.renderEmptyComponent = this.renderEmptyComponent.bind(this);
+    this.renderHeaderComponent = this.renderHeaderComponent.bind(this);
   }
 
   refreshCommentsList() {
@@ -85,6 +101,7 @@ class CommentsList extends Component {
       navigation,
       currentUserVoteComment,
       postId,
+      sort,
     } = this.props;
     const postAuthor = postData.author;
 
@@ -101,7 +118,35 @@ class CommentsList extends Component {
         commentsChildren={commentsChildren}
         navigation={navigation}
         currentUserVoteComment={currentUserVoteComment}
+        sort={sort}
       />
+    );
+  }
+
+  renderHeaderComponent() {
+    const { handleDisplayMenu, sort, loadingComments } = this.props;
+
+    if (loadingComments) return null;
+
+    return (
+      <TouchableFilter onPress={handleDisplayMenu}>
+        <MaterialCommunityIcons
+          name={sort.icon}
+          size={ICON_SIZES.menuIcon}
+          color={COLORS.PRIMARY_COLOR}
+        />
+        <FilterText>
+          {`${i18n.comments.sortBy} `}
+          <BoldText>{sort.label}</BoldText>
+        </FilterText>
+        <FilterMenuIcon>
+          <MaterialCommunityIcons
+            name={MATERIAL_COMMUNITY_ICONS.chevronDown}
+            size={ICON_SIZES.menuIcon}
+            color={COLORS.PRIMARY_COLOR}
+          />
+        </FilterMenuIcon>
+      </TouchableFilter>
     );
   }
 
@@ -125,9 +170,8 @@ class CommentsList extends Component {
   }
 
   render() {
-    const { comments, loadingComments } = this.props;
-    const { sort } = this.state;
-    const sortedComments = sortComments(comments, sort);
+    const { comments, loadingComments, sort } = this.props;
+    const sortedComments = sortComments(comments, sort.id);
     const displayComments = _.concat(sortedComments, { bsteemEmptyView: true });
 
     return (
@@ -138,6 +182,7 @@ class CommentsList extends Component {
         renderItem={this.renderComment}
         onEndReachedThreshold={100}
         ListEmptyComponent={this.renderEmptyComponent}
+        ListHeaderComponent={this.renderHeaderComponent}
         initialNumToRender={4}
         keyExtractor={(item, index) => `${_.get(item, 'item.id', '')}${index}`}
         refreshControl={

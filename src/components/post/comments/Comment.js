@@ -47,7 +47,12 @@ class Comment extends Component {
     navigation: PropTypes.shape().isRequired,
     currentUserVoteComment: PropTypes.func.isRequired,
     onActionInitiated: PropTypes.func,
-    sort: PropTypes.oneOf([SORT_COMMENTS.BEST, SORT_COMMENTS.NEWEST, SORT_COMMENTS.OLDEST]),
+    sort: PropTypes.oneOf([
+      SORT_COMMENTS.BEST,
+      SORT_COMMENTS.NEWEST,
+      SORT_COMMENTS.OLDEST,
+      SORT_COMMENTS.REPUTATION,
+    ]).isRequired,
     //rewardFund: PropTypes.shape().isRequired,
     rootPostAuthor: PropTypes.string,
     rootPostId: PropTypes.number,
@@ -66,7 +71,6 @@ class Comment extends Component {
   };
 
   static defaultProps = {
-    sort: SORT_COMMENTS.BEST,
     rootPostAuthor: undefined,
     commentsChildren: undefined,
     pendingVotes: [],
@@ -277,6 +281,7 @@ class Comment extends Component {
       navigation,
       currentUserVoteComment,
       rootPostId,
+      sort,
     } = this.props;
 
     if (!_.isEmpty(newReplyComment)) {
@@ -297,6 +302,7 @@ class Comment extends Component {
           authenticated={authenticated}
           currentUserVoteComment={currentUserVoteComment}
           rootPostId={rootPostId}
+          sort={sort}
         />
       );
     }
@@ -323,7 +329,7 @@ class Comment extends Component {
     } = this.props;
 
     if (!_.isEmpty(commentsChildren[comment.id])) {
-      return sortComments(commentsChildren[comment.id], sort).map(child => (
+      return sortComments(commentsChildren[comment.id], sort.id).map(child => (
         <Comment
           key={child.id}
           authUsername={authUsername}
@@ -340,6 +346,7 @@ class Comment extends Component {
           authenticated={authenticated}
           currentUserVoteComment={currentUserVoteComment}
           rootPostId={rootPostId}
+          sort={sort}
         />
       ));
     }

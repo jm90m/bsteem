@@ -10,19 +10,16 @@ import {
   getLoadingComments,
 } from 'state/rootReducer';
 import { currentUserVoteComment } from 'state/actions/currentUserActions';
+import { SORT_COMMENTS } from 'constants/comments';
 import { COLORS } from 'constants/styles';
 import i18n from 'i18n/i18n';
-import { fetchComments } from '/state/actions/postsActions';
+import { fetchComments } from 'state/actions/postsActions';
 import * as editorActions from 'state/actions/editorActions';
 import CommentsList from './CommentsList';
+import BSteemModal from '../../common/BSteemModal';
+import CommentsMenu from './CommentsMenu';
 
 const Container = styled.View``;
-
-const EmptyCommentsTextContainer = styled.View`
-  padding: 20px;
-  background-color: ${COLORS.WHITE.WHITE};
-`;
-const EmptyCommentsText = styled.Text``;
 
 const mapStateToProps = state => ({
   authUsername: getAuthUsername(state),
@@ -83,6 +80,11 @@ class CommentsContainer extends Component {
     commentsByPostId: {},
   };
 
+  state = {
+    displayMenu: false,
+    sort: SORT_COMMENTS.BEST,
+  };
+
   getNestedComments(postComments, commentsIdArray, nestedComments) {
     const newNestedComments = nestedComments;
     _.forEach(commentsIdArray, commentId => {
@@ -95,6 +97,14 @@ class CommentsContainer extends Component {
     return newNestedComments;
   }
 
+  handleSetDisplayMenu = displayMenu => () => this.setState({ displayMenu });
+
+  handleSortComments = sort => () =>
+    this.setState({
+      sort,
+      displayMenu: false,
+    });
+
   render() {
     const {
       authUsername,
@@ -105,6 +115,7 @@ class CommentsContainer extends Component {
       authenticated,
       loadingComments,
     } = this.props;
+    const { displayMenu, sort } = this.state;
     const postComments = _.get(commentsByPostId, postId, null);
     const comments = _.get(postComments, 'comments', {});
     const rootNode = _.get(postComments, `childrenById.${postId}`, null);
@@ -134,7 +145,17 @@ class CommentsContainer extends Component {
           authenticated={authenticated}
           fetchComments={this.props.fetchComments}
           loadingComments={loadingComments}
+          handleDisplayMenu={this.handleSetDisplayMenu(true)}
+          sort={sort}
         />
+        {displayMenu && (
+          <BSteemModal visible={displayMenu} handleOnClose={this.handleSetDisplayMenu(false)}>
+            <CommentsMenu
+              handleSortComments={this.handleSortComments}
+              hideMenu={this.handleSetDisplayMenu(false)}
+            />
+          </BSteemModal>
+        )}
       </Container>
     );
   }

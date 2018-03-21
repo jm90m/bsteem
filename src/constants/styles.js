@@ -175,6 +175,12 @@ export const MATERIAL_COMMUNITY_ICONS = {
 
   lineChart: 'chart-line',
   noteMultipleOutline: 'note-multiple-outline',
+
+  // comments
+  newest: 'creation',
+  best: 'fire',
+  oldest: 'ghost',
+  reputation: 'heart',
 };
 
 export const FEATHER_ICONS = {

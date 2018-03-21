@@ -8,10 +8,9 @@ import { fetchComments } from 'state/actions/postsActions';
 import i18n from 'i18n/i18n';
 import CommentsContainer from 'components/post/comments/CommentsContainer';
 import { ICON_SIZES, MATERIAL_ICONS, COLORS } from 'constants/styles';
-import { getCommentsByPostId, getLoadingComments, getIsAuthenticated } from 'state/rootReducer';
+import { getCommentsByPostId } from 'state/rootReducer';
 import Header from 'components/common/Header';
 import withAuthActions from 'components/common/withAuthActions';
-import LargeLoading from 'components/common/LargeLoading';
 import * as editorActions from '../../state/actions/editorActions';
 import * as navigationConstants from '../../constants/navigation';
 
@@ -28,10 +27,6 @@ const Title = styled.Text`
   font-weight: bold;
 `;
 
-const LoadingContainer = styled.View`
-  margin-top: 50px;
-`;
-
 const TitleContainer = styled.View`
   flex-direction: row;
   align-items: center;
@@ -39,8 +34,6 @@ const TitleContainer = styled.View`
 
 const mapStateToProps = state => ({
   commentsByPostId: getCommentsByPostId(state),
-  loadingComments: getLoadingComments(state),
-  authenticated: getIsAuthenticated(state),
 });
 const mapDispatchToProps = dispatch => ({
   fetchComments: (category, author, permlink, postId) =>
@@ -64,14 +57,11 @@ class CommentScreen extends Component {
     fetchComments: PropTypes.func.isRequired,
     onActionInitiated: PropTypes.func.isRequired,
     commentsByPostId: PropTypes.shape(),
-    loadingComments: PropTypes.bool,
-    authenticated: PropTypes.bool.isRequired,
   };
 
   static defaultProps = {
     navigation: {},
     commentsByPostId: {},
-    loadingComments: false,
   };
 
   static navigationOptions = {
@@ -119,7 +109,7 @@ class CommentScreen extends Component {
   }
 
   render() {
-    const { loadingComments, navigation } = this.props;
+    const { navigation } = this.props;
     const { postId, postData } = navigation.state.params;
     return (
       <Container>
@@ -143,7 +133,7 @@ class CommentScreen extends Component {
             />
           </TouchableIcon>
         </Header>
-          <CommentsContainer postId={postId} postData={postData} navigation={navigation} />
+        <CommentsContainer postId={postId} postData={postData} navigation={navigation} />
       </Container>
     );
   }
