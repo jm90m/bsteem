@@ -10,14 +10,9 @@ import {
   getLoadingComments,
 } from 'state/rootReducer';
 import { currentUserVoteComment } from 'state/actions/currentUserActions';
-import { SORT_COMMENTS } from 'constants/comments';
-import { COLORS } from 'constants/styles';
-import i18n from 'i18n/i18n';
 import { fetchComments } from 'state/actions/postsActions';
 import * as editorActions from 'state/actions/editorActions';
 import CommentsList from './CommentsList';
-import BSteemModal from '../../common/BSteemModal';
-import CommentsMenu from './CommentsMenu';
 
 const Container = styled.View``;
 
@@ -69,6 +64,8 @@ class CommentsContainer extends Component {
     currentUserVoteComment: PropTypes.func.isRequired,
     fetchComments: PropTypes.func.isRequired,
     loadingComments: PropTypes.bool.isRequired,
+    handleDisplayMenu: PropTypes.func.isRequired,
+    sort: PropTypes.shape().isRequired,
     authUsername: PropTypes.string,
     authenticated: PropTypes.bool,
     commentsByPostId: PropTypes.shape(),
@@ -78,11 +75,6 @@ class CommentsContainer extends Component {
     authUsername: '',
     authenticated: false,
     commentsByPostId: {},
-  };
-
-  state = {
-    displayMenu: false,
-    sort: SORT_COMMENTS.BEST,
   };
 
   getNestedComments(postComments, commentsIdArray, nestedComments) {
@@ -97,14 +89,6 @@ class CommentsContainer extends Component {
     return newNestedComments;
   }
 
-  handleSetDisplayMenu = displayMenu => () => this.setState({ displayMenu });
-
-  handleSortComments = sort => () =>
-    this.setState({
-      sort,
-      displayMenu: false,
-    });
-
   render() {
     const {
       authUsername,
@@ -114,8 +98,9 @@ class CommentsContainer extends Component {
       navigation,
       authenticated,
       loadingComments,
+      handleDisplayMenu,
+      sort,
     } = this.props;
-    const { displayMenu, sort } = this.state;
     const postComments = _.get(commentsByPostId, postId, null);
     const comments = _.get(postComments, 'comments', {});
     const rootNode = _.get(postComments, `childrenById.${postId}`, null);
@@ -145,17 +130,9 @@ class CommentsContainer extends Component {
           authenticated={authenticated}
           fetchComments={this.props.fetchComments}
           loadingComments={loadingComments}
-          handleDisplayMenu={this.handleSetDisplayMenu(true)}
+          handleDisplayMenu={handleDisplayMenu}
           sort={sort}
         />
-        {displayMenu && (
-          <BSteemModal visible={displayMenu} handleOnClose={this.handleSetDisplayMenu(false)}>
-            <CommentsMenu
-              handleSortComments={this.handleSortComments}
-              hideMenu={this.handleSetDisplayMenu(false)}
-            />
-          </BSteemModal>
-        )}
       </Container>
     );
   }

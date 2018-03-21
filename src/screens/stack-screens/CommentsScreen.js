@@ -9,10 +9,13 @@ import i18n from 'i18n/i18n';
 import CommentsContainer from 'components/post/comments/CommentsContainer';
 import { ICON_SIZES, MATERIAL_ICONS, COLORS } from 'constants/styles';
 import { getCommentsByPostId } from 'state/rootReducer';
-import Header from 'components/common/Header';
 import withAuthActions from 'components/common/withAuthActions';
-import * as editorActions from '../../state/actions/editorActions';
-import * as navigationConstants from '../../constants/navigation';
+import Header from 'components/common/Header';
+import * as editorActions from 'state/actions/editorActions';
+import * as navigationConstants from 'constants/navigation';
+import { SORT_COMMENTS } from 'constants/comments';
+import BSteemModal from 'components/common/BSteemModal';
+import CommentsMenu from 'components/post/comments/CommentsMenu';
 
 const Container = styled.View``;
 
@@ -72,6 +75,11 @@ class CommentScreen extends Component {
   constructor(props) {
     super(props);
 
+    this.state = {
+      displayMenu: false,
+      sort: SORT_COMMENTS.BEST,
+    };
+
     this.navigateBack = this.navigateBack.bind(this);
     this.navigateToReplyScreen = this.navigateToReplyScreen.bind(this);
     this.handleReplyToPost = this.handleReplyToPost.bind(this);
@@ -104,12 +112,21 @@ class CommentScreen extends Component {
     });
   }
 
+  handleSetDisplayMenu = displayMenu => () => this.setState({ displayMenu });
+
+  handleSortComments = sort => () =>
+    this.setState({
+      sort,
+      displayMenu: false,
+    });
+
   handleReplyToPost() {
     this.props.onActionInitiated(this.navigateToReplyScreen);
   }
 
   render() {
     const { navigation } = this.props;
+    const { displayMenu, sort } = this.state;
     const { postId, postData } = navigation.state.params;
     return (
       <Container>
@@ -133,7 +150,21 @@ class CommentScreen extends Component {
             />
           </TouchableIcon>
         </Header>
-        <CommentsContainer postId={postId} postData={postData} navigation={navigation} />
+        <CommentsContainer
+          postId={postId}
+          postData={postData}
+          navigation={navigation}
+          sort={sort}
+          handleDisplayMenu={this.handleSetDisplayMenu(true)}
+        />
+        {displayMenu && (
+          <BSteemModal visible={displayMenu} handleOnClose={this.handleSetDisplayMenu(false)}>
+            <CommentsMenu
+              handleSortComments={this.handleSortComments}
+              hideMenu={this.handleSetDisplayMenu(false)}
+            />
+          </BSteemModal>
+        )}
       </Container>
     );
   }
