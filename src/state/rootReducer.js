@@ -92,6 +92,7 @@ export const getUserTransferHistory = state =>
   fromUserActivity.getUserTransferHistory(state.userActivity);
 export const getLoadingFetchUserTransferHistory = state =>
   fromUserActivity.getLoadingFetchUserTransferHistory(state.userActivity);
+
 // App Selectors
 export const getSteemRate = state => fromApp.getSteemRate(state.app);
 export const getLoadingSteemGlobalProperties = state =>
@@ -109,6 +110,7 @@ export const getCryptosPriceHistory = state => fromApp.getCryptosPriceHistory(st
 export const getDisplayPriceModal = state => fromApp.getDisplayPriceModal(state.app);
 export const getDisplayedCryptos = state => fromApp.getDisplayedCryptos(state.app);
 export const getRewardFund = state => fromApp.getRewardFund(state.app);
+export const getDisplayMessagesModal = state => fromApp.getDisplayMessagesModal(state.app);
 
 // Comments Selectors
 export const getCommentsByPostId = state => fromComments.getCommentsByPostId(state.comments);

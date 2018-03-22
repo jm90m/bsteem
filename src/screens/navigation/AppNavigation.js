@@ -8,12 +8,12 @@ import { COLORS } from 'constants/styles';
 import { getAuthAccessToken } from 'state/rootReducer';
 import * as navigationConstants from 'constants/navigation';
 import * as appActions from 'state/actions/appActions';
+import { firebaseConfig } from 'constants/config';
 import HomeNavigator from './HomeNavigator';
 import SearchNavigator from './SearchNavigator';
 import LoginNavigator from './LoginNavigator';
 import CurrentUserNavigator from './CurrentUserNavigator';
 import PostCreationScreen from '../post-creation-screen/PostCreationScreen';
-import { firebaseConfig } from 'constants/config';
 
 const tabNavigatorOptions = {
   tabBarPosition: 'bottom',

@@ -91,6 +91,8 @@ export const FETCH_CRYPTO_PRICE_HISTORY = createAsyncActionType('@app/fetch-cryp
 export const DISPLAY_PRICE_MODAL = '@app/display-price-modal';
 export const HIDE_PRICE_MODAL = '@app/hide-price-modal';
 export const FETCH_REWARD_FUND = createAsyncActionType('@app/fetch-reward-fund');
+export const HIDE_MESSAGES_MODAL = '@app/hide-messages-modal';
+export const DISPLAY_MESSAGES_MODAL = '@app/display-messages-modal';
 
 // Editor Actions
 export const CREATE_POST = createAsyncActionType('@editor/create-post');

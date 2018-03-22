@@ -32,3 +32,8 @@ export const getRebloggedPostRef = (username, postID) =>
 export const getUserPostDraftsRef = username => `${baseUserSettingsRef}/${username}/post-drafts`;
 export const getSavedDraftRef = (username, draftID) =>
   `${getUserPostDraftsRef(username)}/${draftID}`;
+
+export const getUserAllPrivateMessagesRef = username =>
+  `${baseUserSettingsRef}/${username}/private-messages`;
+export const getUserPrivateMessagesRef = (username, toUser) =>
+  `${baseUserSettingsRef}/${username}/private-messages/${toUser}`;

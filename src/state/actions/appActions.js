@@ -12,6 +12,8 @@ import {
   DISPLAY_PRICE_MODAL,
   HIDE_PRICE_MODAL,
   FETCH_REWARD_FUND,
+  HIDE_MESSAGES_MODAL,
+  DISPLAY_MESSAGES_MODAL,
 } from './actionTypes';
 
 export const fetchSteemRate = createAsyncSagaAction(FETCH_STEEM_RATE);
@@ -49,3 +51,11 @@ export const displayPriceModal = symbols => ({
 });
 
 export const fetchRewardFund = createAsyncSagaAction(FETCH_REWARD_FUND);
+
+export const hideMessagesModal = () => ({
+  type: HIDE_MESSAGES_MODAL,
+});
+
+export const displayMessagesModal = () => ({
+  type: DISPLAY_MESSAGES_MODAL,
+});

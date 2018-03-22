@@ -181,6 +181,8 @@ export const MATERIAL_COMMUNITY_ICONS = {
   best: 'fire',
   oldest: 'ghost',
   reputation: 'heart',
+
+  messageText: 'message-text',
 };
 
 export const FEATHER_ICONS = {
