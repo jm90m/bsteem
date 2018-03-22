@@ -7,6 +7,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS, MATERIAL_COMMUNITY_ICONS, ICON_COLORS, ICON_SIZES } from 'constants/styles';
 import WalletTransactionContainer from './WalletTransactionContainer';
 import IconContainer from './IconContainer';
+import TimeAgo from 'components/common/TimeAgo';
 
 const RewardsPayoutContainer = styled.Text`
   flex-direction: row;
@@ -76,7 +77,7 @@ const ClaimReward = ({
     </IconContainer>
     <ClaimRewardContent>
       <ClaimRewardsText>{'Claim Rewards '}</ClaimRewardsText>
-      <TimeStamp>{moment(timestamp).fromNow()}</TimeStamp>
+      <TimeAgo created={timestamp} />
     </ClaimRewardContent>
     <RewardsPayoutContainer>
       {getFormattedPayout(

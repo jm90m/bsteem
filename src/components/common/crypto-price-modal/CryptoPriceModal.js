@@ -26,6 +26,7 @@ import i18n from 'i18n/i18n';
 import { fetchUser } from 'state/actions/usersActions';
 import UserWalletSummary from 'components/wallet/UserWalletSummary';
 import Header from '../Header';
+import ClaimRewardsBlock from '../ClaimRewardsBlock';
 import CryptoChart from './CryptoChart';
 
 const Container = styled.View``;
@@ -185,7 +186,7 @@ class CryptoPriceModal extends Component {
   }
 
   render() {
-    const { displayPriceModal } = this.props;
+    const { displayPriceModal, authenticated } = this.props;
 
     if (!displayPriceModal) return null;
 
@@ -217,6 +218,7 @@ class CryptoPriceModal extends Component {
             }
           >
             {this.renderUserWallet()}
+            {authenticated && <ClaimRewardsBlock />}
             {this.renderCryptoCharts()}
             <DisclaimerText>{i18n.general.transferDisclaimer}</DisclaimerText>
             <EmptyView />

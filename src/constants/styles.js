@@ -201,6 +201,7 @@ export const ICON_SIZES = {
   menuModalOptionIcon: 20,
   editorCloseIcon: 30,
   userHeaderIcon: 20,
+  contentTitleBlockIcon: 20,
 };
 
 export const ICON_COLORS = {

@@ -33,6 +33,7 @@ export default {
     reportedPosts: 'Reported Posts',
     editProfile: 'Edit Profile',
     drafts: 'Drafts',
+    rewards: 'Rewards',
   },
   editor: {
     title: 'Title',
@@ -146,6 +147,8 @@ export default {
     voteValue: 'Vote Value',
     wallet: 'wallet',
     joinedDate: 'Joined Date',
+    rewardClaimed: 'Reward Claimed',
+    claimRewards: 'Claim Rewards',
   },
   settings: {
     enableNSFW: 'Enable NSFW Posts',
