@@ -139,7 +139,10 @@ class CryptoPriceModal extends Component {
         });
       },
     );
-    this.props.fetchUser(this.props.currentAuthUsername);
+
+    if (this.props.authenticated) {
+      this.props.fetchUser(this.props.currentAuthUsername);
+    }
   }
 
   renderCryptoCharts() {
