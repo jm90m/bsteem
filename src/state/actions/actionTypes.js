@@ -128,3 +128,7 @@ export const CURRENT_USER_UNREPORT_POST = createAsyncActionType(
   '@settings/current-user-unreport-post',
 );
 export const FETCH_REPORTED_POSTS = createAsyncActionType('@settings/fetch-reported-posts');
+
+// Messages
+export const FETCH_MESSAGES = createAsyncActionType('@messages/fetch-messages');
+export const SEARCH_USER_MESSAGES = createAsyncActionType('@messages/search-user-messages');

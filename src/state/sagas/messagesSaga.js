@@ -1,36 +1,52 @@
-import Expo from 'expo';
 import _ from 'lodash';
 import { takeLatest, all, call, put, select, takeEvery } from 'redux-saga/effects';
-import API, { getAPIByFilter } from 'api/api';
-import sc2 from 'api/sc2';
-import {
-  getFirebaseValueOnce,
-  getUserRebloggedPostsRef,
-  getRebloggedPostRef,
-  setFirebaseData,
-} from 'util/firebaseUtils';
-import {
-  getAuthUsername,
-  getCurrentUserFeed,
-  getCommentsByPostId,
-  getSavedTags,
-  getCurrentUserBSteemFeed,
-} from '../rootReducer';
-import {
-  FETCH_CURRENT_USER_FEED,
-  FETCH_MORE_CURRENT_USER_FEED,
-  CURRENT_USER_VOTE_POST,
-  CURRENT_USER_VOTE_COMMENT,
-  CURRENT_USER_REBLOG_POST,
-  CURRENT_USER_ONBOARDING,
-  FETCH_CURRENT_USER_FOLLOW_LIST,
-  CURRENT_USER_FOLLOW_USER,
-  CURRENT_USER_UNFOLLOW_USER,
-  FETCH_CURRENT_USER_REBLOG_LIST,
-  FETCH_CURRENT_USER_BSTEEM_FEED,
-  FETCH_MORE_CURRENT_USER_BSTEEM_FEED,
-} from '../actions/actionTypes';
-import * as currentUserActions from '../actions/currentUserActions';
-import { refreshUserBlog } from '../actions/usersActions';
+import API from 'api/api';
+import { getFirebaseValueOnce, getUserAllPrivateMessagesRef } from 'util/firebaseUtils';
+import { FETCH_MESSAGES, SEARCH_USER_MESSAGES } from '../actions/actionTypes';
+import * as firebaseActions from '../actions/firebaseActions';
+import { getAuthUsername } from '../rootReducer';
 
-const fetchMessages = function*() {};
+const fetchMessages = function*() {
+  try {
+    const authUsername = yield select(getAuthUsername);
+    const snapshot = yield call(
+      getFirebaseValueOnce,
+      getUserAllPrivateMessagesRef(authUsername),
+      'value',
+    );
+    const messages = snapshot.val() || {};
+    yield put(firebaseActions.fetchMessages.success(messages));
+  } catch (error) {
+    console.log(error);
+    yield put(firebaseActions.fetchMessages.fail({ error }));
+  } finally {
+    yield put(firebaseActions.fetchMessages.loadingEnd());
+  }
+};
+
+const searchUserMessages = function*(action) {
+  try {
+    const search = action.payload;
+    const response = yield call(API.getAccountReputation, search);
+    const usersResult = _.map(response.result, user => ({
+      ...user,
+      type: 'user',
+      name: user.account,
+    }));
+    console.log(usersResult, response);
+    yield put(firebaseActions.searchUserMessages.success(usersResult));
+  } catch (error) {
+    console.log(error);
+    yield put(firebaseActions.searchUserMessages.fail(error));
+  } finally {
+    yield put(firebaseActions.searchUserMessages.loadingEnd());
+  }
+};
+
+export const watchFetchMessages = function*() {
+  yield takeEvery(FETCH_MESSAGES.ACTION, fetchMessages);
+};
+
+export const watchSearchUserMessages = function*() {
+  yield takeLatest(SEARCH_USER_MESSAGES.ACTION, searchUserMessages);
+};
