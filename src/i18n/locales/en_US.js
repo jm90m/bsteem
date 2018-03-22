@@ -1,6 +1,8 @@
 export default {
   general: {
     cancel: 'Cancel',
+    transferDisclaimer:
+      'This app currently does not support transfer transactions such as buying or selling STEEM or SBD.',
   },
   errors: {
     postInterval: 'You may only post once every 5 minutes',

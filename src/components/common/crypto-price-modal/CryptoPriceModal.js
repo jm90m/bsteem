@@ -51,6 +51,11 @@ const UserWalletTitleText = styled(TitleText)`
   padding: 10px 15px;
 `;
 
+const DisclaimerText = styled.Text`
+  color: ${COLORS.TERTIARY_COLOR};
+  padding: 10px;
+`;
+
 const mapStateToProps = state => ({
   cryptosPriceHistory: getCryptosPriceHistory(state),
   displayPriceModal: getDisplayPriceModal(state),
@@ -213,6 +218,7 @@ class CryptoPriceModal extends Component {
           >
             {this.renderUserWallet()}
             {this.renderCryptoCharts()}
+            <DisclaimerText>{i18n.general.transferDisclaimer}</DisclaimerText>
             <EmptyView />
           </ScrollView>
         </Container>
