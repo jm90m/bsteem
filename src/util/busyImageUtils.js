@@ -1,3 +1,7 @@
-export const getAvatarImageUrl = (username, size) => `https://img.busy.org/@${username}?s=${size}`;
+export const getAvatarImageUrl = (username, size) =>
+  size > 64
+    ? `https://steemitimages.com/u/${username}/avatar`
+    : `https://steemitimages.com/u/${username}/avatar/small`;
 
-export const getUserBackgroundCoverUrl = username => `https://img.busy.org/@${username}/cover`;
+export const getUserBackgroundCoverUrl = coverImage =>
+  `https://steemitimages.com/2048x512/${coverImage}`;

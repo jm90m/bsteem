@@ -95,12 +95,13 @@ class UserCover extends Component {
     const { username, userReputation, userProfile } = this.props;
     const { hasCover } = this.state;
     const name = _.get(userProfile, 'name', username);
+    const coverImage = _.get(userProfile, 'cover_image', '');
     const displayName = _.isEmpty(_.trim(name)) ? username : name;
     return (
       <Container hasCover={hasCover}>
         <BackgroundImage
           resizeMode="cover"
-          source={{ uri: getUserBackgroundCoverUrl(username) }}
+          source={{ uri: getUserBackgroundCoverUrl(coverImage) }}
           onError={this.handleBackgroundCoverError}
           style={{ width, height: 75 }}
         />
