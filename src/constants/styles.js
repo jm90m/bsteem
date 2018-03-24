@@ -194,6 +194,7 @@ export const FONT_AWESOME_ICONS = {
   bolt: 'bolt',
   dollar: 'dollar',
   bank: 'bank',
+  sendMessage: 'send-o',
 };
 
 export const ICON_SIZES = {

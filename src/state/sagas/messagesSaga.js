@@ -27,7 +27,7 @@ const fetchMessages = function*() {
 const searchUserMessages = function*(action) {
   try {
     const search = action.payload;
-    const response = yield call(API.getAccountReputation, search);
+    const response = yield call(API.getAccountReputation, search, 5);
     const usersResult = _.map(response.result, user => ({
       ...user,
       type: 'user',
@@ -42,6 +42,8 @@ const searchUserMessages = function*(action) {
     yield put(firebaseActions.searchUserMessages.loadingEnd());
   }
 };
+
+
 
 export const watchFetchMessages = function*() {
   yield takeEvery(FETCH_MESSAGES.ACTION, fetchMessages);

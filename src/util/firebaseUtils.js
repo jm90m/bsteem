@@ -35,5 +35,11 @@ export const getSavedDraftRef = (username, draftID) =>
 
 export const getUserAllPrivateMessagesRef = username =>
   `${baseUserSettingsRef}/${username}/private-messages`;
-export const getUserPrivateMessagesRef = (username, toUser) =>
+export const getUserDisplayedPrivateMessagesRef = (username, toUser) =>
   `${baseUserSettingsRef}/${username}/private-messages/${toUser}`;
+
+export const baseMessagesRef = 'user-messages';
+export const getUsersMessages = (firstUser = '', secondUser = '') => {
+  const userMessageRef = _.join([firstUser, secondUser].sort(), '--');
+  return `${baseMessagesRef}/${userMessageRef}`;
+};

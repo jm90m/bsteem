@@ -51,11 +51,3 @@ export const displayPriceModal = symbols => ({
 });
 
 export const fetchRewardFund = createAsyncSagaAction(FETCH_REWARD_FUND);
-
-export const hideMessagesModal = () => ({
-  type: HIDE_MESSAGES_MODAL,
-});
-
-export const displayMessagesModal = () => ({
-  type: DISPLAY_MESSAGES_MODAL,
-});

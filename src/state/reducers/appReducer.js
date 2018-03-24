@@ -29,7 +29,6 @@ const INITIAL_STATE = {
   appLoading: false,
   cryptosPriceHistory: {},
   displayPriceModal: false,
-  displayMessagesModal: false,
   displayedCryptos: [],
   rewardFund: {},
 };
@@ -148,17 +147,6 @@ export default (state = INITIAL_STATE, action) => {
         },
       };
 
-    case DISPLAY_MESSAGES_MODAL:
-      return {
-        ...state,
-        displayMessagesModal: true,
-      };
-    case HIDE_MESSAGES_MODAL:
-      return {
-        ...state,
-        displayMessagesModal: false,
-      };
-
     default:
       return state;
   }
@@ -178,4 +166,3 @@ export const getCryptosPriceHistory = state => state.cryptosPriceHistory;
 export const getDisplayPriceModal = state => state.displayPriceModal;
 export const getDisplayedCryptos = state => state.displayedCryptos;
 export const getRewardFund = state => state.rewardFund;
-export const getDisplayMessagesModal = state => state.displayMessagesModal;

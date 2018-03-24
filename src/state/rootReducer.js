@@ -11,6 +11,7 @@ import editorReducer, * as fromEditor from './reducers/editorReducer';
 import firebaseReducer, * as fromFirebase from './reducers/firebaseReducer';
 import postsReducer, * as fromPosts from './reducers/postsReducer';
 import settingsReducer, * as fromSettings from './reducers/settingsReducer';
+import messagesReducer, * as fromMessages from './reducers/messagesReducer';
 
 export default combineReducers({
   app: appReducer,
@@ -25,6 +26,7 @@ export default combineReducers({
   firebase: firebaseReducer,
   posts: postsReducer,
   settings: settingsReducer,
+  messages: messagesReducer,
 });
 
 // Home Selectors
@@ -110,7 +112,6 @@ export const getCryptosPriceHistory = state => fromApp.getCryptosPriceHistory(st
 export const getDisplayPriceModal = state => fromApp.getDisplayPriceModal(state.app);
 export const getDisplayedCryptos = state => fromApp.getDisplayedCryptos(state.app);
 export const getRewardFund = state => fromApp.getRewardFund(state.app);
-export const getDisplayMessagesModal = state => fromApp.getDisplayMessagesModal(state.app);
 
 // Comments Selectors
 export const getCommentsByPostId = state => fromComments.getCommentsByPostId(state.comments);
@@ -142,3 +143,12 @@ export const getDisplayNSFWContent = state => fromSettings.getDisplayNSFWContent
 export const getReportedPosts = state => fromSettings.getReportedPosts(state.settings);
 export const getPendingReportingPosts = state =>
   fromSettings.getPendingReportingPosts(state.settings);
+
+// Messages Selectors
+export const getLoadingFetchMessages = state =>
+  fromMessages.getLoadingFetchMessages(state.messages);
+export const getMessages = state => fromMessages.getMessages(state.messages);
+export const getMessagesSearchUserResults = state =>
+  fromMessages.getMessagesSearchUserResults(state.messages);
+export const getLoadingMessagesSearchUserResults = state =>
+  fromMessages.getLoadingMessagesSearchUserResults(state.messages);

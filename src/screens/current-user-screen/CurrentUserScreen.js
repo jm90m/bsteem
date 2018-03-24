@@ -53,19 +53,17 @@ class CurrentUserScreen extends Component {
       selectedMenu: CurrentUserScreen.MENU.home,
     };
 
-    this.setSelectedMenu = this.setSelectedMenu.bind(this);
     this.handleNavigateToSavedTags = this.handleNavigateToSavedTags.bind(this);
-    this.handleDisplayMessagesModal = this.handleDisplayMessagesModal.bind(this);
+    this.handleNavigateToMessages = this.handleNavigateToMessages.bind(this);
   }
 
-  setSelectedMenu(selectedMenu) {
+  setSelectedMenu = selectedMenu => () =>
     this.setState({
       selectedMenu,
     });
-  }
 
-  handleDisplayMessagesModal() {
-    this.props.displayMessagesModal();
+  handleNavigateToMessages() {
+    this.props.navigation.navigate(navigationConstants.MESSAGES);
   }
 
   handleNavigateToSavedTags() {
@@ -80,7 +78,7 @@ class CurrentUserScreen extends Component {
     return (
       <Container>
         <Header>
-          <Touchable onPress={this.handleDisplayMessagesModal}>
+          <Touchable onPress={this.handleNavigateToMessages}>
             <MaterialCommunityIcons
               name={MATERIAL_COMMUNITY_ICONS.messageText}
               size={ICON_SIZES.menuIcon}
@@ -89,12 +87,12 @@ class CurrentUserScreen extends Component {
             />
           </Touchable>
           <MiddleMenu>
-            <Touchable onPress={() => this.setSelectedMenu(CurrentUserScreen.MENU.home)}>
+            <Touchable onPress={this.setSelectedMenu(CurrentUserScreen.MENU.home)}>
               <MiddleMenuContent selected={selectedHome}>
                 <HeaderText selected={selectedHome}>{CurrentUserScreen.MENU.home}</HeaderText>
               </MiddleMenuContent>
             </Touchable>
-            <Touchable onPress={() => this.setSelectedMenu(CurrentUserScreen.MENU.bSteem)}>
+            <Touchable onPress={this.setSelectedMenu(CurrentUserScreen.MENU.bSteem)}>
               <MiddleMenuContent style={{ marginLeft: 15 }} selected={!selectedHome}>
                 <HeaderText selected={!selectedHome}>{CurrentUserScreen.MENU.bSteem}</HeaderText>
               </MiddleMenuContent>

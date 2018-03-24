@@ -9,7 +9,6 @@ import SteemConnectErrorModal from 'components/common/steem-connect/SteemConnect
 import NotifyModal from 'components/common/notify/NotifyModal';
 import SplashScreen from 'components/common/SplashScreen';
 import CryptoPriceModal from 'components/common/crypto-price-modal/CryptoPriceModal';
-import MessagesModal from 'components/messages/MessagesModal';
 
 const store = configureStore();
 
@@ -55,7 +54,6 @@ export default class App extends React.Component {
           <SteemConnectErrorModal />
           <NotifyModal />
           <CryptoPriceModal />
-          <MessagesModal />
           <SplashScreen assetsAreLoaded={assetsAreLoaded} />
         </View>
       </Provider>
