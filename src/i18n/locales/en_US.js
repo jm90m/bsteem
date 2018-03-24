@@ -34,6 +34,7 @@ export default {
     editProfile: 'Edit Profile',
     drafts: 'Drafts',
     rewards: 'Rewards',
+    messages: 'Messages',
   },
   editor: {
     title: 'Title',

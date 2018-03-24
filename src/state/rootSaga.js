@@ -10,6 +10,7 @@ import * as editorSaga from './sagas/editorSaga';
 import * as firebaseSaga from './sagas/firebaseSaga';
 import * as authSaga from './sagas/authSaga';
 import * as settingsSaga from './sagas/settingsSaga';
+import * as messagesSaga from './sagas/messagesSaga';
 
 const rootSaga = function*() {
   yield all([
@@ -90,6 +91,10 @@ const rootSaga = function*() {
     spawn(settingsSaga.watchReportPost),
     spawn(settingsSaga.watchUnreportPost),
     spawn(settingsSaga.watchFetchReportedPosts),
+
+    // Messages Sagas
+    spawn(messagesSaga.watchFetchMessages),
+    spawn(messagesSaga.watchSearchUserMessages),
   ]);
 };
 

@@ -11,6 +11,7 @@ import editorReducer, * as fromEditor from './reducers/editorReducer';
 import firebaseReducer, * as fromFirebase from './reducers/firebaseReducer';
 import postsReducer, * as fromPosts from './reducers/postsReducer';
 import settingsReducer, * as fromSettings from './reducers/settingsReducer';
+import messagesReducer, * as fromMessages from './reducers/messagesReducer';
 
 export default combineReducers({
   app: appReducer,
@@ -25,6 +26,7 @@ export default combineReducers({
   firebase: firebaseReducer,
   posts: postsReducer,
   settings: settingsReducer,
+  messages: messagesReducer,
 });
 
 // Home Selectors
@@ -92,6 +94,7 @@ export const getUserTransferHistory = state =>
   fromUserActivity.getUserTransferHistory(state.userActivity);
 export const getLoadingFetchUserTransferHistory = state =>
   fromUserActivity.getLoadingFetchUserTransferHistory(state.userActivity);
+
 // App Selectors
 export const getSteemRate = state => fromApp.getSteemRate(state.app);
 export const getLoadingSteemGlobalProperties = state =>
@@ -140,3 +143,12 @@ export const getDisplayNSFWContent = state => fromSettings.getDisplayNSFWContent
 export const getReportedPosts = state => fromSettings.getReportedPosts(state.settings);
 export const getPendingReportingPosts = state =>
   fromSettings.getPendingReportingPosts(state.settings);
+
+// Messages Selectors
+export const getLoadingFetchMessages = state =>
+  fromMessages.getLoadingFetchMessages(state.messages);
+export const getMessages = state => fromMessages.getMessages(state.messages);
+export const getMessagesSearchUserResults = state =>
+  fromMessages.getMessagesSearchUserResults(state.messages);
+export const getLoadingMessagesSearchUserResults = state =>
+  fromMessages.getLoadingMessagesSearchUserResults(state.messages);

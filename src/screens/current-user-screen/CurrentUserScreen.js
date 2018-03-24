@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Header from 'components/common/Header';
 import { ICON_SIZES, COLORS, MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
-import { displayPriceModal } from 'state/actions/appActions';
+import { displayMessagesModal } from 'state/actions/appActions';
 import * as navigationConstants from 'constants/navigation';
 import CurrentUserFeed from './CurrentUserFeed';
 import CurrentUserBSteemFeed from './CurrentUserBSteemFeed';
@@ -32,16 +32,14 @@ const MiddleMenuContent = styled.View`
   padding: 10px 20px;
 `;
 
-const mapStateToProps = state => ({});
-
 const mapDispatchToProps = dispatch => ({
-  displayPriceModal: symbols => dispatch(displayPriceModal(symbols)),
+  displayMessagesModal: () => dispatch(displayMessagesModal()),
 });
 
 class CurrentUserScreen extends Component {
   static propTypes = {
     navigation: PropTypes.shape().isRequired,
-    displayPriceModal: PropTypes.func.isRequired,
+    displayMessagesModal: PropTypes.func.isRequired,
   };
 
   static MENU = {
@@ -55,19 +53,17 @@ class CurrentUserScreen extends Component {
       selectedMenu: CurrentUserScreen.MENU.home,
     };
 
-    this.setSelectedMenu = this.setSelectedMenu.bind(this);
     this.handleNavigateToSavedTags = this.handleNavigateToSavedTags.bind(this);
-    this.handleDisplayPriceModal = this.handleDisplayPriceModal.bind(this);
+    this.handleNavigateToMessages = this.handleNavigateToMessages.bind(this);
   }
 
-  setSelectedMenu(selectedMenu) {
+  setSelectedMenu = selectedMenu => () =>
     this.setState({
       selectedMenu,
     });
-  }
 
-  handleDisplayPriceModal() {
-    this.props.displayPriceModal(['STEEM', 'SBD']);
+  handleNavigateToMessages() {
+    this.props.navigation.navigate(navigationConstants.MESSAGES);
   }
 
   handleNavigateToSavedTags() {
@@ -82,21 +78,21 @@ class CurrentUserScreen extends Component {
     return (
       <Container>
         <Header>
-          <Touchable onPress={this.handleDisplayPriceModal}>
+          <Touchable onPress={this.handleNavigateToMessages}>
             <MaterialCommunityIcons
-              name={MATERIAL_COMMUNITY_ICONS.lineChart}
+              name={MATERIAL_COMMUNITY_ICONS.messageText}
               size={ICON_SIZES.menuIcon}
               color={COLORS.PRIMARY_COLOR}
               style={{ padding: 5 }}
             />
           </Touchable>
           <MiddleMenu>
-            <Touchable onPress={() => this.setSelectedMenu(CurrentUserScreen.MENU.home)}>
+            <Touchable onPress={this.setSelectedMenu(CurrentUserScreen.MENU.home)}>
               <MiddleMenuContent selected={selectedHome}>
                 <HeaderText selected={selectedHome}>{CurrentUserScreen.MENU.home}</HeaderText>
               </MiddleMenuContent>
             </Touchable>
-            <Touchable onPress={() => this.setSelectedMenu(CurrentUserScreen.MENU.bSteem)}>
+            <Touchable onPress={this.setSelectedMenu(CurrentUserScreen.MENU.bSteem)}>
               <MiddleMenuContent style={{ marginLeft: 15 }} selected={!selectedHome}>
                 <HeaderText selected={!selectedHome}>{CurrentUserScreen.MENU.bSteem}</HeaderText>
               </MiddleMenuContent>
@@ -118,4 +114,4 @@ class CurrentUserScreen extends Component {
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(CurrentUserScreen);
+export default connect(null, mapDispatchToProps)(CurrentUserScreen);

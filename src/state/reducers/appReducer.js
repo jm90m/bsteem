@@ -12,6 +12,8 @@ import {
   DISPLAY_PRICE_MODAL,
   HIDE_PRICE_MODAL,
   FETCH_REWARD_FUND,
+  DISPLAY_MESSAGES_MODAL,
+  HIDE_MESSAGES_MODAL,
 } from '../actions/actionTypes';
 
 const INITIAL_STATE = {
@@ -144,6 +146,7 @@ export default (state = INITIAL_STATE, action) => {
           ...action.payload,
         },
       };
+
     default:
       return state;
   }

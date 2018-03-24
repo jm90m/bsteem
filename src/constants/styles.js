@@ -181,6 +181,8 @@ export const MATERIAL_COMMUNITY_ICONS = {
   best: 'fire',
   oldest: 'ghost',
   reputation: 'heart',
+
+  messageText: 'message-text',
 };
 
 export const FEATHER_ICONS = {
@@ -192,6 +194,7 @@ export const FONT_AWESOME_ICONS = {
   bolt: 'bolt',
   dollar: 'dollar',
   bank: 'bank',
+  sendMessage: 'send-o',
 };
 
 export const ICON_SIZES = {

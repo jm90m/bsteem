@@ -26,7 +26,6 @@ import {
 } from 'constants/asyncStorageKeys';
 import sc2 from 'api/sc2';
 import * as settingsSaga from './settingsSaga';
-import { TRENDING } from '../../constants/feedFilters';
 
 const fetchGlobalSteemProperties = function*() {
   try {
