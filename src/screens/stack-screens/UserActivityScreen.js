@@ -53,6 +53,10 @@ const mapDispatchToProps = dispatch => ({
 
 @connect(mapStateToProps, mapDispatchToProps)
 class UserActivityScreen extends Component {
+  static navigationOptions = {
+    tabBarVisible: false,
+  };
+
   static propTypes = {
     navigation: PropTypes.shape().isRequired,
     usersAccountHistory: PropTypes.shape().isRequired,

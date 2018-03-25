@@ -57,6 +57,7 @@ const mapStateToProps = state => ({
 class FeedScreen extends Component {
   static navigationOptions = {
     headerMode: 'none',
+    tabBarVisible: false,
   };
 
   static propTypes = {

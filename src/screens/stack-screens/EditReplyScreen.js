@@ -63,6 +63,10 @@ const mapDispatchToProps = dispatch => ({
 });
 
 class EditReplyScreen extends Component {
+  static navigationOptions = {
+    tabBarVisible: false,
+  };
+
   static propTypes = {
     navigation: PropTypes.shape({
       goBack: PropTypes.func.isRequired,

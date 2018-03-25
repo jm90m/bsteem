@@ -55,6 +55,10 @@ const UserTouchable = styled.TouchableOpacity`
 const StyledListView = styled.ListView``;
 
 class FollowersScreen extends Component {
+  static navigationOptions = {
+    tabBarVisible: false,
+  };
+
   static propTypes = {
     navigation: PropTypes.shape().isRequired,
   };

@@ -51,9 +51,14 @@ const MENU = {
 };
 
 class VotesScreen extends Component {
+  static navigationOptions = {
+    tabBarVisible: false,
+  };
+
   static propTypes = {
     navigation: PropTypes.shape().isRequired,
   };
+
   constructor(props) {
     super(props);
     const { postData } = props.navigation.state.params;

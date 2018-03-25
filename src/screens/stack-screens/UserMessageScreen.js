@@ -112,7 +112,7 @@ class UserMessageScreen extends Component {
 
   componentDidMount() {
     const { username } = this.props.navigation.state.params;
-    this.props.fetchCurrentMessages(username, this.handleScrollToBottom);
+    this.props.fetchCurrentMessages(username);
   }
 
   componentWillUnmount() {
@@ -122,6 +122,12 @@ class UserMessageScreen extends Component {
       .database()
       .ref(getUsersMessagesRef(authUsername, username))
       .off('value', this.handleListenToNewMessages);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (_.isEmpty(this.props.messages) && !_.isEmpty(nextProps.messages)) {
+      this.handleScrollToBottom();
+    }
   }
 
   onChangeText(text) {

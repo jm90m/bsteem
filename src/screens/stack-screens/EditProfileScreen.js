@@ -51,6 +51,10 @@ const mapDispatchToProps = dispatch => ({
 });
 
 class EditProfileScreen extends Component {
+  static navigationOptions = {
+    tabBarVisible: false,
+  };
+
   static propTypes = {
     navigation: PropTypes.shape().isRequired,
     usersDetails: PropTypes.shape().isRequired,

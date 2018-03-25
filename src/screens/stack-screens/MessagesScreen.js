@@ -44,6 +44,10 @@ const mapDispatchToProps = dispatch => ({
 });
 
 class MessagesScreen extends Component {
+  static navigationOptions = {
+    tabBarVisible: false,
+  };
+
   static propTypes = {
     messagesSearchUserResults: PropTypes.arrayOf(PropTypes.shape()).isRequired,
     searchUserMessages: PropTypes.func.isRequired,

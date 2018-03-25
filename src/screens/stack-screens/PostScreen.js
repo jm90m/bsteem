@@ -92,6 +92,7 @@ const mapDispatchToProps = dispatch => ({
 class PostScreen extends Component {
   static navigationOptions = {
     headerMode: 'none',
+    tabBarVisible: false,
   };
 
   static propTypes = {

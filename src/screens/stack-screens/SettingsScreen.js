@@ -59,6 +59,10 @@ const mapDispatchToProps = dispatch => ({
 });
 
 class SettingsScreen extends Component {
+  static navigationOptions = {
+    tabBarVisible: false,
+  };
+
   static propTypes = {
     navigation: PropTypes.shape().isRequired,
     displayNSFWContent: PropTypes.bool.isRequired,
