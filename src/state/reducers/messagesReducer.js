@@ -4,6 +4,7 @@ import {
   SEARCH_USER_MESSAGES,
   SEND_MESSAGE,
   FETCH_CURRENT_MESSAGES,
+  FETCH_BLOCKED_USERS,
 } from '../actions/actionTypes';
 
 const INITIAL_STATE = {
@@ -12,6 +13,7 @@ const INITIAL_STATE = {
   messagesSearchUserResults: [],
   loadingMessagesSearchUserResults: false,
   displayedMessages: [],
+  blockedUsers: {},
 };
 
 export default function(state = INITIAL_STATE, action) {
@@ -75,6 +77,12 @@ export default function(state = INITIAL_STATE, action) {
         },
       };
     }
+
+    case FETCH_BLOCKED_USERS.SUCCESS:
+      return {
+        ...state,
+        blockedUsers: action.payload,
+      };
     default:
       return state;
   }
@@ -86,3 +94,4 @@ export const getMessagesSearchUserResults = state => state.messagesSearchUserRes
 export const getLoadingMessagesSearchUserResults = state => state.loadingMessagesSearchUserResults;
 export const getUserMessages = (state, username) => _.get(state.messages, username);
 export const getDisplayedMessages = state => state.displayedMessages;
+export const getBlockedUsers = state => state.blockedUsers;

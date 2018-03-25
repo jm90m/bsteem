@@ -97,6 +97,9 @@ const rootSaga = function*() {
     spawn(messagesSaga.watchSearchUserMessages),
     spawn(messagesSaga.watchSendMessage),
     spawn(messagesSaga.watchFetchCurrentMessage),
+    spawn(messagesSaga.watchFetchBlockedUsers),
+    spawn(messagesSaga.watchBlockUser),
+    spawn(messagesSaga.watchUnblockUser),
   ]);
 };
 

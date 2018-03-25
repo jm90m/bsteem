@@ -11,3 +11,5 @@ export const imgurConfig = {
   clientId: '',
   mashapeKey: '',
 };
+
+export const encryptionSecretKey = '';

@@ -124,6 +124,7 @@ const appOnboarding = function*() {
 
     yield call(firebaseSaga.fetchSavedTags);
     yield call(messagesSaga.fetchDisplayedMessages);
+    yield call(messagesSaga.fetchBlockedUsers);
     yield put(
       currentUserActions.currentUserBSteemFeedFetch.action({
         filter: feedFilters.TRENDING,

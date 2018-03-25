@@ -1,15 +1,18 @@
 import React, { Component } from 'react';
-import { TouchableWithoutFeedback } from 'react-native';
+import { TouchableWithoutFeedback, Dimensions } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import { COLORS, FONT_AWESOME_ICONS, ICON_SIZES } from 'constants/styles';
+import CryptoJS from 'crypto-js';
+import { encryptionSecretKey } from 'constants/config';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 import styled from 'styled-components/native';
 import Avatar from 'components/common/Avatar';
 
+const { width: deviceWidth } = Dimensions.get('screen');
+
 const Container = styled.View`
   flex-direction: row;
-  align-items: center;
   padding: 10px;
 `;
 
@@ -25,6 +28,7 @@ const Username = styled.Text`
 const PreviewText = styled.Text`
   margin: 0 5px;
   color: ${COLORS.TERTIARY_COLOR};
+  width: ${deviceWidth - 55};
 `;
 
 const SendMessageContainer = styled.View`
@@ -43,11 +47,25 @@ class UserMessagePreview extends Component {
     previewText: '',
   };
 
+  getDecryptedText() {
+    try {
+      const { previewText } = this.props;
+      const bytes = CryptoJS.AES.decrypt(previewText, encryptionSecretKey);
+      const plainText = bytes.toString(CryptoJS.enc.Utf8);
+      return _.trim(
+        _.truncate(plainText, {
+          length: 15,
+        }),
+      );
+    } catch (error) {
+      console.log(error);
+      return '';
+    }
+  }
+
   render() {
-    const { username, previewText } = this.props;
-    const truncatedPreviewText = _.truncate(previewText, {
-      length: 50,
-    });
+    const { username } = this.props;
+    const previewText = this.getDecryptedText();
 
     return (
       <TouchableWithoutFeedback onPress={this.props.navigateToUserMessage}>
@@ -55,7 +73,7 @@ class UserMessagePreview extends Component {
           <Avatar username={username} size={40} />
           <PreviewTextContainer>
             <Username>{`@${username}`}</Username>
-            <PreviewText>{truncatedPreviewText}</PreviewText>
+            <PreviewText>{previewText}</PreviewText>
           </PreviewTextContainer>
           <SendMessageContainer>
             <FontAwesome

@@ -155,3 +155,4 @@ export const getLoadingMessagesSearchUserResults = state =>
 export const getUserMessages = (state, username) =>
   fromMessages.getUserMessages(state.messages, username);
 export const getDisplayedMessages = state => fromMessages.getDisplayedMessages(state.messages);
+export const getBlockedUsers = state => fromMessages.getBlockedUsers(state.messages);

@@ -12,7 +12,6 @@ class EmbedContent extends Component {
       thumbnail: PropTypes.string,
       embed: PropTypes.string,
     }).isRequired,
-    inPost: PropTypes.bool,
     height: PropTypes.number,
     width: PropTypes.number,
   };

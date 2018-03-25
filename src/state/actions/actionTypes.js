@@ -134,3 +134,6 @@ export const FETCH_DISPLAYED_MESSAGES = createAsyncActionType('@messages/fetch-d
 export const SEARCH_USER_MESSAGES = createAsyncActionType('@messages/search-user-messages');
 export const SEND_MESSAGE = createAsyncActionType('@messages/send-message');
 export const FETCH_CURRENT_MESSAGES = createAsyncActionType('@messages/fetch-current-messages');
+export const FETCH_BLOCKED_USERS = createAsyncActionType('@messages/fetch-blocked-users');
+export const BLOCK_USER = createAsyncActionType('@messages/block-user');
+export const UNBLOCK_USER = createAsyncActionType('@messages/unblock-user');

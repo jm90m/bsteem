@@ -12,16 +12,23 @@ import {
 import styled from 'styled-components/native';
 import { connect } from 'react-redux';
 import BackButton from 'components/common/BackButton';
-import HeaderEmptyView from 'components/common/HeaderEmptyView';
 import Header from 'components/common/Header';
-import { FontAwesome } from '@expo/vector-icons';
-import { sendMessage, fetchCurrentMessages } from 'state/actions/firebaseActions';
+import { FontAwesome, MaterialCommunityIcons } from '@expo/vector-icons';
+import {
+  sendMessage,
+  fetchCurrentMessages,
+  blockUser,
+  unblockUser,
+} from 'state/actions/firebaseActions';
 import _ from 'lodash';
-import { getUserMessages, getAuthUsername } from 'state/rootReducer';
+import { getUserMessages, getAuthUsername, getBlockedUsers } from 'state/rootReducer';
 import firebase from 'firebase';
 import { getUsersMessagesRef } from 'util/firebaseUtils';
-import { COLORS, FONT_AWESOME_ICONS, ICON_SIZES } from 'constants/styles';
+import { COLORS, FONT_AWESOME_ICONS, ICON_SIZES, MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
+import * as navigationConstants from 'constants/navigation';
+import UserMessageMenuModal from 'components/messages/UserMessageMenuModal';
 import UserMessage from 'components/messages/UserMessage';
+import i18n from 'i18n/i18n';
 
 const { width: deviceWidth } = Dimensions.get('screen');
 
@@ -34,8 +41,6 @@ const Container = styled.View`
   background: ${COLORS.PRIMARY_BACKGROUND_COLOR};
   flex: 1;
 `;
-
-const ScrollViewContent = styled.ScrollView``;
 
 const InputContainer = styled.View`
   height: 50px;
@@ -53,9 +58,16 @@ const EmptyView = styled.View`
   width: ${Math.floor(deviceWidth / 2)};
 `;
 
+const MenuIconContainer = styled.View`
+  padding: 5px;
+`;
+
+const Touchable = styled.TouchableOpacity``;
+
 const mapStateToProps = (state, ownProps) => {
   const { username } = ownProps.navigation.state.params;
   return {
+    blockedUsers: getBlockedUsers(state),
     authUsername: getAuthUsername(state),
     messages: getUserMessages(state, username),
   };
@@ -68,6 +80,8 @@ const mapDispatchToProps = dispatch => ({
     dispatch(fetchCurrentMessages.action({ username, successCallback })),
   fetchCurrentMessagesSuccess: (username, messages) =>
     dispatch(fetchCurrentMessages.success({ username, messages })),
+  blockUser: username => dispatch(blockUser.action({ username })),
+  unblockUser: username => dispatch(unblockUser.action({ username })),
 });
 
 class UserMessageScreen extends Component {
@@ -82,6 +96,7 @@ class UserMessageScreen extends Component {
     fetchCurrentMessages: PropTypes.func.isRequired,
     fetchCurrentMessagesSuccess: PropTypes.func.isRequired,
     messages: PropTypes.shape(),
+    blockedUsers: PropTypes.shape().isRequired,
   };
 
   static defaultProps = {
@@ -94,6 +109,7 @@ class UserMessageScreen extends Component {
     this.state = {
       text: '',
       loading: false,
+      displayMenu: false,
     };
 
     this.handleNavigateBack = this.handleNavigateBack.bind(this);
@@ -103,6 +119,8 @@ class UserMessageScreen extends Component {
     this.handleRefreshMessages = this.handleRefreshMessages.bind(this);
     this.handleListenToNewMessages = this.handleListenToNewMessages.bind(this);
     this.handleScrollToBottom = this.handleScrollToBottom.bind(this);
+    this.handleBlockUser = this.handleBlockUser.bind(this);
+    this.handleNavigateToUser = this.handleNavigateToUser.bind(this);
   }
 
   componentWillMount() {
@@ -116,13 +134,7 @@ class UserMessageScreen extends Component {
 
   componentDidMount() {
     const { username } = this.props.navigation.state.params;
-    this.props.fetchCurrentMessages(username, this.handleScrollToBottom);
-  }
-
-  componentDidUpdate(prevProps) {
-    if (_.isEmpty(prevProps.messages) && !_.isEmpty(this.props.messages)) {
-      this.handleScrollToBottom();
-    }
+    this.props.fetchCurrentMessages(username);
   }
 
   componentWillUnmount() {
@@ -168,9 +180,37 @@ class UserMessageScreen extends Component {
     });
 
   handleSendMessage() {
+    const { blockedUsers } = this.props;
     const { username } = this.props.navigation.state.params;
+    const isBlocked = _.get(blockedUsers, username, false);
 
+    if (_.isEmpty(this.state.text) || isBlocked) return;
     this.props.sendMessage(username, this.state.text, this.successSendMessage);
+  }
+
+  handleSetDisplayMenu = displayMenu => () => this.setState({ displayMenu });
+
+  handleBlockUser() {
+    const { blockedUsers } = this.props;
+    const { username } = this.props.navigation.state.params;
+    const isBlocked = _.get(blockedUsers, username, false);
+
+    if (isBlocked) {
+      this.props.unblockUser(username);
+    } else {
+      this.props.blockUser(username);
+    }
+    this.setState({
+      displayMenu: false,
+    });
+  }
+
+  handleNavigateToUser() {
+    const { username } = this.props.navigation.state.params;
+    this.setState({
+      displayMenu: false,
+    });
+    this.props.navigation.navigate(navigationConstants.USER, { username });
   }
 
   handleNavigateBack() {
@@ -195,16 +235,25 @@ class UserMessageScreen extends Component {
   }
 
   render() {
+    const { blockedUsers } = this.props;
     const { username } = this.props.navigation.state.params;
-    const { text, loading } = this.state;
-    const behavior = Platform.OS === 'ios' ? 'position' : null;
+    const { text, loading, displayMenu } = this.state;
+    const isBlocked = _.get(blockedUsers, username, false);
 
     return (
       <Container>
         <Header>
           <BackButton navigateBack={this.handleNavigateBack} />
           <TitleText>{username}</TitleText>
-          <HeaderEmptyView />
+          <Touchable onPress={this.handleSetDisplayMenu(true)}>
+            <MenuIconContainer>
+              <MaterialCommunityIcons
+                size={ICON_SIZES.menuIcon}
+                name={MATERIAL_COMMUNITY_ICONS.menuVertical}
+                color={COLORS.PRIMARY_COLOR}
+              />
+            </MenuIconContainer>
+          </Touchable>
         </Header>
         <ScrollView
           ref={scrollView => {
@@ -218,17 +267,20 @@ class UserMessageScreen extends Component {
               colors={[COLORS.PRIMARY_COLOR]}
             />
           }
+          onContentSizeChange={this.handleScrollToBottom}
         >
           {this.renderMessages()}
           <EmptyView />
         </ScrollView>
-        <KeyboardAvoidingView behavior={behavior}>
+        <KeyboardAvoidingView behavior="position">
           <InputContainer>
             <TextInput
               style={{ height: 40, width: '90%' }}
               placeholderTextColor={COLORS.SECONDARY_COLOR}
               onChangeText={this.onChangeText}
-              value={text}
+              value={isBlocked ? i18n.messages.userIsBlocked : text}
+              multiline
+              editable={!isBlocked}
             />
             <TouchableOpacity onPress={this.handleSendMessage}>
               <FontAwesome
@@ -239,6 +291,13 @@ class UserMessageScreen extends Component {
             </TouchableOpacity>
           </InputContainer>
         </KeyboardAvoidingView>
+        <UserMessageMenuModal
+          visible={displayMenu}
+          hideMenu={this.handleSetDisplayMenu(false)}
+          handleNavigateToUser={this.handleNavigateToUser}
+          handleBlockUser={this.handleBlockUser}
+          isBlocked={isBlocked}
+        />
       </Container>
     );
   }

@@ -183,6 +183,8 @@ export const MATERIAL_COMMUNITY_ICONS = {
   reputation: 'heart',
 
   messageText: 'message-text',
+  block: 'block-helper',
+  hide: 'eye-off',
 };
 
 export const FEATHER_ICONS = {

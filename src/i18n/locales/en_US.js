@@ -168,4 +168,11 @@ export default {
     coverPicture: 'Cover Picture',
     submit: 'Submit',
   },
+  messages: {
+    viewProfile: 'View Profile',
+    blockUser: 'Block User',
+    unblockUser: 'Unblock User',
+    blockedUsers: 'Blocked Users',
+    userIsBlocked: 'You have blocked this user.',
+  },
 };

@@ -153,7 +153,6 @@ class FetchPostScreen extends Component {
 
   componentDidMount() {
     const { author, permlink } = this.props.navigation.state.params;
-    const currentPostDetails = this.getCurrentPostDetails();
 
     this.props.fetchPostDetails(author, permlink);
   }

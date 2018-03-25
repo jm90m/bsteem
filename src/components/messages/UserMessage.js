@@ -1,14 +1,18 @@
 import React, { Component } from 'react';
 import { COLORS } from 'constants/styles';
+import { Dimensions } from 'react-native';
 import PropTypes from 'prop-types';
+import { encryptionSecretKey } from 'constants/config';
+import CryptoJS from 'crypto-js';
 import _ from 'lodash';
 import styled from 'styled-components/native';
 import Avatar from 'components/common/Avatar';
 import moment from 'moment-timezone';
 
+const { width: deviceWidth } = Dimensions.get('screen');
+
 const Container = styled.View`
   flex-direction: row;
-  align-items: center;
   padding: 10px;
 `;
 
@@ -21,6 +25,9 @@ const Username = styled.Text`
 
 const Text = styled.Text`
   margin: 0 5px;
+  padding-right: 5px;
+  flex-wrap: wrap;
+  width: ${deviceWidth - 55};
 `;
 
 const TimeStampContainer = styled.View`
@@ -48,8 +55,21 @@ class UserMessage extends Component {
     timestamp: 0,
   };
 
+  getDecryptedText() {
+    try {
+      const { text } = this.props;
+      const bytes = CryptoJS.AES.decrypt(text, encryptionSecretKey);
+
+      return bytes.toString(CryptoJS.enc.Utf8);
+    } catch (error) {
+      console.log(error);
+      return '';
+    }
+  }
+
   render() {
-    const { username, text, timestamp } = this.props;
+    const { username, timestamp } = this.props;
+    const text = this.getDecryptedText();
 
     return (
       <Container>

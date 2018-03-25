@@ -49,3 +49,8 @@ export const getSendUserMessagesRef = (firstUser, secondUser, timestamp) => {
 
   return `${baseUserMessagesRef}/${timestamp}`;
 };
+
+export const getUserBlockedUsersRef = username =>
+  `${baseUserSettingsRef}/${username}/blocked-users`;
+export const getBlockedUserRef = (username, blockUsername) =>
+  `${getUserBlockedUsersRef(username)}/${blockUsername}`;

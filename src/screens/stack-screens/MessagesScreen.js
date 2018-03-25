@@ -13,6 +13,7 @@ import {
   getLoadingFetchMessages,
   getLoadingMessagesSearchUserResults,
   getDisplayedMessages,
+  getBlockedUsers,
 } from 'state/rootReducer';
 import { SearchBar } from 'react-native-elements';
 import * as navigationConstants from 'constants/navigation';
@@ -33,6 +34,7 @@ const ScrollView = styled.ScrollView`
 `;
 
 const mapStateToProps = state => ({
+  blockedUsers: getBlockedUsers(state),
   displayedMessages: getDisplayedMessages(state),
   messagesSearchUserResults: getMessagesSearchUserResults(state),
   loadingFetchMessages: getLoadingFetchMessages(state),
@@ -53,6 +55,7 @@ class MessagesScreen extends Component {
     searchUserMessages: PropTypes.func.isRequired,
     navigation: PropTypes.shape().isRequired,
     displayedMessages: PropTypes.arrayOf(PropTypes.shape()).isRequired,
+    blockedUsers: PropTypes.shape().isRequired,
   };
 
   constructor(props) {
@@ -86,7 +89,7 @@ class MessagesScreen extends Component {
   }
 
   renderSearchResults() {
-    const { messagesSearchUserResults, displayedMessages } = this.props;
+    const { messagesSearchUserResults, displayedMessages, blockedUsers } = this.props;
     const { currentSearchValue } = this.state;
 
     if (!_.isEmpty(currentSearchValue)) {
@@ -109,14 +112,20 @@ class MessagesScreen extends Component {
       ));
     }
 
-    return _.map(displayedMessages, (message, index) => (
-      <UserMessagePreview
-        key={`${message.toUser}-${index}`}
-        username={message.toUser}
-        navigateToUserMessage={this.navigateToUserMessage(message.toUser)}
-        previewText={message.text}
-      />
-    ));
+    return _.map(displayedMessages, (message, index) => {
+      const isBlocked = _.get(blockedUsers, message.toUser, false);
+
+      if (isBlocked) return null;
+
+      return (
+        <UserMessagePreview
+          key={`${message.toUser}-${index}`}
+          username={message.toUser}
+          navigateToUserMessage={this.navigateToUserMessage(message.toUser)}
+          previewText={message.text}
+        />
+      );
+    });
   }
 
   render() {
@@ -134,7 +143,11 @@ class MessagesScreen extends Component {
           onChangeText={this.handleSearchOnChangeText}
           placeholder=""
           value={currentSearchValue}
-          containerStyle={{ backgroundColor: COLORS.PRIMARY_BACKGROUND_COLOR, marginTop: 10 }}
+          containerStyle={{
+            backgroundColor: COLORS.PRIMARY_BACKGROUND_COLOR,
+            borderTopWidth: 0,
+            borderBottomColor: COLORS.PRIMARY_BORDER_COLOR,
+          }}
           inputStyle={{ backgroundColor: COLORS.PRIMARY_BACKGROUND_COLOR }}
           showLoadingIcon={false}
           autoCorrect={false}

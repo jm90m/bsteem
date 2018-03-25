@@ -5,8 +5,8 @@ const Header = styled.View`
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  background-color: ${COLORS.WHITE.WHITE};
-  border-bottom-color: ${COLORS.WHITE.GAINSBORO};
+  background-color: ${COLORS.PRIMARY_BACKGROUND_COLOR};
+  border-bottom-color: ${COLORS.PRIMARY_BORDER_COLOR};
   border-bottom-width: 1px;
   width: 100%;
   padding-top: 20px;
