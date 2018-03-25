@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   RefreshControl,
   Dimensions,
+  ScrollView,
 } from 'react-native';
 import styled from 'styled-components/native';
 import { connect } from 'react-redux';
@@ -138,7 +139,7 @@ class UserMessageScreen extends Component {
   handleScrollToBottom() {
     try {
       if (this.scrollView) {
-        _.attempt(this.scrollView.scrollToEnd);
+        _.attempt(this.scrollView.scrollToEnd, { animated: false });
       }
     } catch (error) {
       console.log(error);
@@ -195,7 +196,7 @@ class UserMessageScreen extends Component {
           <TitleText>{username}</TitleText>
           <HeaderEmptyView />
         </Header>
-        <ScrollViewContent
+        <ScrollView
           ref={scrollView => {
             this.scrollView = scrollView;
           }}
@@ -210,7 +211,7 @@ class UserMessageScreen extends Component {
         >
           {this.renderMessages()}
           <EmptyView />
-        </ScrollViewContent>
+        </ScrollView>
         <KeyboardAvoidingView behavior={behavior}>
           <InputContainer>
             <TextInput
