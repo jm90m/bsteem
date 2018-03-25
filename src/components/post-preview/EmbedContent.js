@@ -37,6 +37,7 @@ class EmbedContent extends Component {
         }}
         mediaPlaybackRequiresUserAction
         renderLoading={this.renderLoading}
+        scrollEnabled={false}
       />
     );
   }
