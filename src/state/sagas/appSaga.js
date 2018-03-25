@@ -7,6 +7,7 @@ import * as appActions from 'state/actions/appActions';
 import * as homeActions from 'state/actions/homeActions';
 import * as authActions from 'state/actions/authActions';
 import * as firebaseSaga from 'state/sagas/firebaseSaga';
+import * as messagesSaga from 'state/sagas/messagesSaga';
 import * as currentUserActions from 'state/actions/currentUserActions';
 import * as feedFilters from 'constants/feedFilters';
 import {
@@ -122,6 +123,7 @@ const appOnboarding = function*() {
     ]);
 
     yield call(firebaseSaga.fetchSavedTags);
+    yield call(messagesSaga.fetchDisplayedMessages);
     yield put(
       currentUserActions.currentUserBSteemFeedFetch.action({
         filter: feedFilters.TRENDING,

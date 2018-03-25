@@ -12,6 +12,7 @@ import {
   getMessagesSearchUserResults,
   getLoadingFetchMessages,
   getLoadingMessagesSearchUserResults,
+  getDisplayedMessages,
 } from 'state/rootReducer';
 import { SearchBar } from 'react-native-elements';
 import * as navigationConstants from 'constants/navigation';
@@ -32,6 +33,7 @@ const ScrollView = styled.ScrollView`
 `;
 
 const mapStateToProps = state => ({
+  displayedMessages: getDisplayedMessages(state),
   messagesSearchUserResults: getMessagesSearchUserResults(state),
   loadingFetchMessages: getLoadingFetchMessages(state),
   loadingMessagesSearchUserResults: getLoadingMessagesSearchUserResults(state),
@@ -46,6 +48,7 @@ class MessagesScreen extends Component {
     messagesSearchUserResults: PropTypes.arrayOf(PropTypes.shape()).isRequired,
     searchUserMessages: PropTypes.func.isRequired,
     navigation: PropTypes.shape().isRequired,
+    displayedMessages: PropTypes.arrayOf(PropTypes.shape()).isRequired,
   };
 
   constructor(props) {
@@ -83,19 +86,39 @@ class MessagesScreen extends Component {
   }
 
   renderSearchResults() {
-    const { messagesSearchUserResults } = this.props;
+    const { messagesSearchUserResults, displayedMessages } = this.props;
     const { currentSearchValue } = this.state;
+
     if (!_.isEmpty(currentSearchValue)) {
-      return _.map(messagesSearchUserResults, user => (
+      const filteredDisplayedMessages = _.filter(displayedMessages, message =>
+        _.includes(message.toUser, currentSearchValue),
+      );
+      const joinedResults = _.unionBy(
+        filteredDisplayedMessages,
+        messagesSearchUserResults,
+        'toUser',
+      );
+
+      return _.map(joinedResults, message => (
         <UserMessagePreview
-          key={user.name}
-          username={user.name}
-          navigateToUserMessage={this.navigateToUserMessage(user.name)}
-          navigateToUser={this.navigateToUser(user.name)}
+          key={message.toUser}
+          username={message.toUser}
+          navigateToUserMessage={this.navigateToUserMessage(message.toUser)}
+          navigateToUser={this.navigateToUser(message.toUser)}
+          previewText={message.text}
         />
       ));
     }
-    return null;
+
+    return _.map(displayedMessages, (message, index) => (
+      <UserMessagePreview
+        key={`${message.toUser}-${index}`}
+        username={message.toUser}
+        navigateToUserMessage={this.navigateToUserMessage(message.toUser)}
+        navigateToUser={this.navigateToUser(message.toUser)}
+        previewText={message.text}
+      />
+    ));
   }
 
   render() {

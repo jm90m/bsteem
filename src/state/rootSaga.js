@@ -93,7 +93,7 @@ const rootSaga = function*() {
     spawn(settingsSaga.watchFetchReportedPosts),
 
     // Messages Sagas
-    spawn(messagesSaga.watchFetchMessages),
+    spawn(messagesSaga.watchFetchDisplayedMessages),
     spawn(messagesSaga.watchSearchUserMessages),
     spawn(messagesSaga.watchSendMessage),
     spawn(messagesSaga.watchFetchCurrentMessage),

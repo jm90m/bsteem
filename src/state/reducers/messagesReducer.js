@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import {
-  FETCH_MESSAGES,
+  FETCH_DISPLAYED_MESSAGES,
   SEARCH_USER_MESSAGES,
   SEND_MESSAGE,
   FETCH_CURRENT_MESSAGES,
@@ -11,18 +11,32 @@ const INITIAL_STATE = {
   messages: {}, // username -> message obj
   messagesSearchUserResults: [],
   loadingMessagesSearchUserResults: false,
+  displayedMessages: [],
 };
 
 export default function(state = INITIAL_STATE, action) {
   switch (action.type) {
-    case FETCH_MESSAGES.ACTION:
+    case FETCH_DISPLAYED_MESSAGES.ACTION:
       return {
         ...state,
         loadingFetchMessages: true,
       };
-    case FETCH_MESSAGES.SUCCESS:
-    case FETCH_MESSAGES.ERROR:
-    case FETCH_MESSAGES.LOADING_END:
+    case FETCH_DISPLAYED_MESSAGES.SUCCESS: {
+      const displayedMessages = _.sortBy(
+        _.map(action.payload, (message, username) => ({
+          ...message,
+          toUser: username,
+        })),
+        'timestamp',
+      ).reverse();
+      return {
+        ...state,
+        loadingFetchMessages: false,
+        displayedMessages,
+      };
+    }
+    case FETCH_DISPLAYED_MESSAGES.ERROR:
+    case FETCH_DISPLAYED_MESSAGES.LOADING_END:
       return {
         ...state,
         loadingFetchMessages: false,
@@ -71,3 +85,4 @@ export const getMessages = state => state.messages;
 export const getMessagesSearchUserResults = state => state.messagesSearchUserResults;
 export const getLoadingMessagesSearchUserResults = state => state.loadingMessagesSearchUserResults;
 export const getUserMessages = (state, username) => _.get(state.messages, username);
+export const getDisplayedMessages = state => state.displayedMessages;

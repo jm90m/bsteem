@@ -6,6 +6,7 @@ import {
   TextInput,
   TouchableOpacity,
   RefreshControl,
+  Dimensions,
 } from 'react-native';
 import styled from 'styled-components/native';
 import { connect } from 'react-redux';
@@ -15,9 +16,13 @@ import Header from 'components/common/Header';
 import { FontAwesome } from '@expo/vector-icons';
 import { sendMessage, fetchCurrentMessages } from 'state/actions/firebaseActions';
 import _ from 'lodash';
-import { getUserMessages } from 'state/rootReducer';
+import { getUserMessages, getAuthUsername } from 'state/rootReducer';
+import firebase from 'firebase';
+import { getUsersMessagesRef } from 'util/firebaseUtils';
 import { COLORS, FONT_AWESOME_ICONS, ICON_SIZES } from 'constants/styles';
 import UserMessage from 'components/messages/UserMessage';
+
+const { width: deviceWidth } = Dimensions.get('screen');
 
 const TitleText = styled.Text`
   font-weight: bold;
@@ -42,9 +47,15 @@ const InputContainer = styled.View`
   border-top-color: ${COLORS.PRIMARY_BORDER_COLOR};
 `;
 
+const EmptyView = styled.View`
+  height: 300px;
+  width: ${Math.floor(deviceWidth / 2)};
+`;
+
 const mapStateToProps = (state, ownProps) => {
   const { username } = ownProps.navigation.state.params;
   return {
+    authUsername: getAuthUsername(state),
     messages: getUserMessages(state, username),
   };
 };
@@ -54,14 +65,18 @@ const mapDispatchToProps = dispatch => ({
     dispatch(sendMessage.action({ username, text, successCallback })),
   fetchCurrentMessages: (username, successCallback) =>
     dispatch(fetchCurrentMessages.action({ username, successCallback })),
+  fetchCurrentMessagesSuccess: (username, messages) =>
+    dispatch(fetchCurrentMessages.success({ username, messages })),
 });
 
 class UserMessageScreen extends Component {
   static propTypes = {
     navigation: PropTypes.shape().isRequired,
     sendMessage: PropTypes.func.isRequired,
-    messages: PropTypes.shape(),
+    authUsername: PropTypes.string.isRequired,
     fetchCurrentMessages: PropTypes.func.isRequired,
+    fetchCurrentMessagesSuccess: PropTypes.func.isRequired,
+    messages: PropTypes.shape(),
   };
 
   static defaultProps = {
@@ -81,11 +96,31 @@ class UserMessageScreen extends Component {
     this.onChangeText = this.onChangeText.bind(this);
     this.successSendMessage = this.successSendMessage.bind(this);
     this.handleRefreshMessages = this.handleRefreshMessages.bind(this);
+    this.handleListenToNewMessages = this.handleListenToNewMessages.bind(this);
+    this.handleScrollToBottom = this.handleScrollToBottom.bind(this);
+  }
+
+  componentWillMount() {
+    const { authUsername } = this.props;
+    const { username } = this.props.navigation.state.params;
+    firebase
+      .database()
+      .ref(getUsersMessagesRef(authUsername, username))
+      .on('value', this.handleListenToNewMessages);
   }
 
   componentDidMount() {
     const { username } = this.props.navigation.state.params;
-    this.props.fetchCurrentMessages(username);
+    this.props.fetchCurrentMessages(username, this.handleScrollToBottom);
+  }
+
+  componentWillUnmount() {
+    const { authUsername } = this.props;
+    const { username } = this.props.navigation.state.params;
+    firebase
+      .database()
+      .ref(getUsersMessagesRef(authUsername, username))
+      .off('value', this.handleListenToNewMessages);
   }
 
   onChangeText(text) {
@@ -98,6 +133,20 @@ class UserMessageScreen extends Component {
     this.setState({
       text: '',
     });
+  }
+
+  handleScrollToBottom() {
+    try {
+      if (this.scrollView) {
+        _.attempt(this.scrollView.scrollToEnd);
+      }
+    } catch (error) {}
+  }
+
+  handleListenToNewMessages(snapshot) {
+    const messages = snapshot.val() || {};
+    const { username } = this.props.navigation.state.params;
+    this.props.fetchCurrentMessagesSuccess(username, messages);
   }
 
   handleSetLoading = loading => () =>
@@ -145,6 +194,9 @@ class UserMessageScreen extends Component {
           <HeaderEmptyView />
         </Header>
         <ScrollViewContent
+          ref={scrollView => {
+            this.scrollView = scrollView;
+          }}
           refreshControl={
             <RefreshControl
               refreshing={loading}
@@ -155,6 +207,7 @@ class UserMessageScreen extends Component {
           }
         >
           {this.renderMessages()}
+          <EmptyView />
         </ScrollViewContent>
         <KeyboardAvoidingView behavior={behavior}>
           <InputContainer>

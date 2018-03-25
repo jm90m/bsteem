@@ -130,7 +130,7 @@ export const CURRENT_USER_UNREPORT_POST = createAsyncActionType(
 export const FETCH_REPORTED_POSTS = createAsyncActionType('@settings/fetch-reported-posts');
 
 // Messages
-export const FETCH_MESSAGES = createAsyncActionType('@messages/fetch-messages');
+export const FETCH_DISPLAYED_MESSAGES = createAsyncActionType('@messages/fetch-displayed-messages');
 export const SEARCH_USER_MESSAGES = createAsyncActionType('@messages/search-user-messages');
 export const SEND_MESSAGE = createAsyncActionType('@messages/send-message');
 export const FETCH_CURRENT_MESSAGES = createAsyncActionType('@messages/fetch-current-messages');

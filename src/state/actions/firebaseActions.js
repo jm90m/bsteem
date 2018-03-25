@@ -12,7 +12,7 @@ import {
   SAVE_DRAFT,
   DELETE_DRAFT,
   FETCH_DRAFTS,
-  FETCH_MESSAGES,
+  FETCH_DISPLAYED_MESSAGES,
   SEARCH_USER_MESSAGES,
   SEND_MESSAGE,
   FETCH_CURRENT_MESSAGES,
@@ -30,7 +30,7 @@ export const unsaveUser = createAsyncSagaAction(UNSAVE_USER);
 export const saveDraft = createAsyncSagaAction(SAVE_DRAFT);
 export const deleteDraft = createAsyncSagaAction(DELETE_DRAFT);
 export const fetchDrafts = createAsyncSagaAction(FETCH_DRAFTS);
-export const fetchMessages = createAsyncSagaAction(FETCH_MESSAGES);
+export const fetchDisplayedMessages = createAsyncSagaAction(FETCH_DISPLAYED_MESSAGES);
 export const searchUserMessages = createAsyncSagaAction(SEARCH_USER_MESSAGES);
 export const sendMessage = createAsyncSagaAction(SEND_MESSAGE);
 export const fetchCurrentMessages = createAsyncSagaAction(FETCH_CURRENT_MESSAGES);

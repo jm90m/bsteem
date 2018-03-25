@@ -24,6 +24,7 @@ const Username = styled.Text`
 
 const PreviewText = styled.Text`
   margin: 0 5px;
+  color: ${COLORS.TERTIARY_COLOR};
 `;
 
 const SendMessageContainer = styled.View`

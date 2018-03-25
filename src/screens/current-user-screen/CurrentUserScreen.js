@@ -1,10 +1,15 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components/native';
+import { connect } from 'react-redux';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Header from 'components/common/Header';
 import { ICON_SIZES, COLORS, MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
 import * as navigationConstants from 'constants/navigation';
+import { getAuthUsername } from 'state/rootReducer';
+import firebase from 'firebase';
+import { fetchDisplayedMessages } from 'state/actions/firebaseActions';
+import { getUserAllPrivateMessagesRef } from 'util/firebaseUtils';
 import CurrentUserFeed from './CurrentUserFeed';
 import CurrentUserBSteemFeed from './CurrentUserBSteemFeed';
 
@@ -30,15 +35,26 @@ const MiddleMenuContent = styled.View`
   padding: 10px 20px;
 `;
 
+const mapStateToProps = state => ({
+  authUsername: getAuthUsername(state),
+});
+
+const mapDispatchToProps = dispatch => ({
+  fetchDisplayedMessagesSuccess: messages => dispatch(fetchDisplayedMessages.success(messages)),
+});
+
 class CurrentUserScreen extends Component {
   static propTypes = {
     navigation: PropTypes.shape().isRequired,
+    authUsername: PropTypes.string.isRequired,
+    fetchDisplayedMessagesSuccess: PropTypes.func.isRequired,
   };
 
   static MENU = {
     home: 'Home',
     bSteem: 'bSteem',
   };
+
   constructor(props) {
     super(props);
 
@@ -48,12 +64,26 @@ class CurrentUserScreen extends Component {
 
     this.handleNavigateToSavedTags = this.handleNavigateToSavedTags.bind(this);
     this.handleNavigateToMessages = this.handleNavigateToMessages.bind(this);
+    this.handleSuccessFetchDisplayedMessages = this.handleSuccessFetchDisplayedMessages.bind(this);
+  }
+
+  componentWillMount() {
+    const { authUsername } = this.props;
+    firebase
+      .database()
+      .ref(getUserAllPrivateMessagesRef(authUsername))
+      .on('value', this.handleSuccessFetchDisplayedMessages);
   }
 
   setSelectedMenu = selectedMenu => () =>
     this.setState({
       selectedMenu,
     });
+
+  handleSuccessFetchDisplayedMessages(snapshot) {
+    const messages = snapshot.val() || {};
+    this.props.fetchDisplayedMessagesSuccess(messages);
+  }
 
   handleNavigateToMessages() {
     this.props.navigation.navigate(navigationConstants.MESSAGES);
@@ -107,4 +137,4 @@ class CurrentUserScreen extends Component {
   }
 }
 
-export default CurrentUserScreen;
+export default connect(mapStateToProps, mapDispatchToProps)(CurrentUserScreen);
