@@ -8,14 +8,14 @@ import { fetchComments } from 'state/actions/postsActions';
 import i18n from 'i18n/i18n';
 import CommentsContainer from 'components/post/comments/CommentsContainer';
 import { ICON_SIZES, MATERIAL_ICONS, COLORS } from 'constants/styles';
-import { getCommentsByPostId } from 'state/rootReducer';
-import withAuthActions from 'components/common/withAuthActions';
+import { getCommentsByPostId, getIsAuthenticated } from 'state/rootReducer';
 import Header from 'components/common/Header';
 import * as editorActions from 'state/actions/editorActions';
 import * as navigationConstants from 'constants/navigation';
 import { SORT_COMMENTS } from 'constants/comments';
 import BSteemModal from 'components/common/BSteemModal';
 import CommentsMenu from 'components/post/comments/CommentsMenu';
+import HeaderEmptyView from 'components/common/HeaderEmptyView';
 
 const Container = styled.View``;
 
@@ -37,6 +37,7 @@ const TitleContainer = styled.View`
 
 const mapStateToProps = state => ({
   commentsByPostId: getCommentsByPostId(state),
+  authenticated: getIsAuthenticated(state),
 });
 const mapDispatchToProps = dispatch => ({
   fetchComments: (category, author, permlink, postId) =>
@@ -55,21 +56,20 @@ const mapDispatchToProps = dispatch => ({
 
 @connect(mapStateToProps, mapDispatchToProps)
 class CommentScreen extends Component {
+  static navigationOptions = {
+    tabBarVisible: false,
+  };
+
   static propTypes = {
     navigation: PropTypes.shape(),
     fetchComments: PropTypes.func.isRequired,
-    onActionInitiated: PropTypes.func.isRequired,
     commentsByPostId: PropTypes.shape(),
+    authenticated: PropTypes.bool.isRequired,
   };
 
   static defaultProps = {
     navigation: {},
     commentsByPostId: {},
-  };
-
-  static navigationOptions = {
-    headerMode: 'none',
-    tabBarVisible: false,
   };
 
   constructor(props) {
@@ -121,11 +121,11 @@ class CommentScreen extends Component {
     });
 
   handleReplyToPost() {
-    this.props.onActionInitiated(this.navigateToReplyScreen);
+    this.navigateToReplyScreen();
   }
 
   render() {
-    const { navigation } = this.props;
+    const { navigation, authenticated } = this.props;
     const { displayMenu, sort } = this.state;
     const { postId, postData } = navigation.state.params;
     return (
@@ -142,13 +142,17 @@ class CommentScreen extends Component {
             />
             <Title>{i18n.titles.comments}</Title>
           </TitleContainer>
-          <TouchableIcon onPress={this.handleReplyToPost}>
-            <MaterialIcons
-              size={ICON_SIZES.menuIcon}
-              name={MATERIAL_ICONS.reply}
-              color={COLORS.PRIMARY_COLOR}
-            />
-          </TouchableIcon>
+          {authenticated ? (
+            <TouchableIcon onPress={this.handleReplyToPost}>
+              <MaterialIcons
+                size={ICON_SIZES.menuIcon}
+                name={MATERIAL_ICONS.reply}
+                color={COLORS.PRIMARY_COLOR}
+              />
+            </TouchableIcon>
+          ) : (
+            <HeaderEmptyView />
+          )}
         </Header>
         <CommentsContainer
           postId={postId}
@@ -170,4 +174,4 @@ class CommentScreen extends Component {
   }
 }
 
-export default withAuthActions(CommentScreen);
+export default CommentScreen;

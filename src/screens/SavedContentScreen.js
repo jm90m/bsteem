@@ -116,6 +116,10 @@ const MENU = {
   }),
 )
 class SavedContentScreen extends Component {
+  static navigationOptions = {
+    tabBarVisible: false,
+  };
+
   static propTypes = {
     navigation: PropTypes.shape().isRequired,
     fetchSavedTags: PropTypes.func.isRequired,

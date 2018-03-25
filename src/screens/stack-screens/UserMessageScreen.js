@@ -71,6 +71,10 @@ const mapDispatchToProps = dispatch => ({
 });
 
 class UserMessageScreen extends Component {
+  static navigationOptions = {
+    tabBarVisible: false,
+  };
+
   static propTypes = {
     navigation: PropTypes.shape().isRequired,
     sendMessage: PropTypes.func.isRequired,
