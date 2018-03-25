@@ -87,6 +87,7 @@ const mapDispatchToProps = dispatch => ({
 class UserScreen extends Component {
   static navigationOptions = {
     headerMode: 'none',
+    tabBarVisible: false,
   };
 
   static propTypes = {

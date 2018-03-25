@@ -28,6 +28,10 @@ const EmptyContainer = styled.View`
 const EmptyText = styled.Text``;
 
 class UserBlog extends Component {
+  static navigationOptions = {
+    tabBarVisible: false,
+  };
+
   static propTypes = {
     fetchMoreUserPosts: PropTypes.func.isRequired,
     isCurrentUser: PropTypes.bool,

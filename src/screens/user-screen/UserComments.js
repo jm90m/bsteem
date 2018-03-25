@@ -14,6 +14,10 @@ const StyledListView = styled.ListView`
 const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
 
 class UserComments extends Component {
+  static navigationOptions = {
+    tabBarVisible: false,
+  };
+
   static propTypes = {
     fetchMoreUserComments: PropTypes.func.isRequired,
     isCurrentUser: PropTypes.bool,
