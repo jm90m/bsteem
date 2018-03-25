@@ -1,19 +1,18 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components/native';
-import moment from 'moment';
 import Avatar from 'components/common/Avatar';
 import { COLORS } from 'constants/styles';
 import * as accountHistoryConstants from 'constants/accountHistory';
 import * as navigationConstants from 'constants/navigation';
+import TimeAgo from 'components/common/TimeAgo';
 import WalletTransactionContainer from './WalletTransactionContainer';
 
 const SavingsMessageContainer = styled.View`
   flex-direction: row;
 `;
 
-const SavingsMessage = styled.Text`
-`;
+const SavingsMessage = styled.Text``;
 
 const Touchable = styled.TouchableOpacity``;
 
@@ -22,13 +21,7 @@ const Username = styled.Text`
   font-weight: bold;
 `;
 
-const Memo = styled.Text`
-`;
-
-const TimeStamp = styled.Text`
-  color: ${COLORS.BLUE.BOTICELLI};
-  font-size: 14px;
-`;
+const Memo = styled.Text``;
 
 const SavingsContentContainer = styled.View`
   padding-left: 10px;
@@ -71,9 +64,8 @@ class SavingsTransaction extends Component {
 
   renderAvatar() {
     const { transactionType, transactionDetails } = this.props;
-    const username = transactionType === 'transfer_to_savings'
-      ? transactionDetails.to
-      : transactionDetails.from;
+    const username =
+      transactionType === 'transfer_to_savings' ? transactionDetails.to : transactionDetails.from;
     return <Avatar username={username} size={40} />;
   }
 
@@ -117,7 +109,7 @@ class SavingsTransaction extends Component {
         {this.renderAvatar()}
         <SavingsContentContainer>
           {this.renderSavingsTransactionMessage()}
-          <TimeStamp>{moment(timestamp).fromNow()}</TimeStamp>
+          <TimeAgo created={timestamp} />
           <Memo>{transactionDetails.memo}</Memo>
         </SavingsContentContainer>
       </WalletTransactionContainer>

@@ -95,6 +95,7 @@ const rootSaga = function*() {
     // Messages Sagas
     spawn(messagesSaga.watchFetchMessages),
     spawn(messagesSaga.watchSearchUserMessages),
+    spawn(messagesSaga.watchSendMessage),
   ]);
 };
 

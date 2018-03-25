@@ -5,7 +5,6 @@ import styled from 'styled-components/native';
 import { COLORS } from 'constants/styles';
 import BodyShort from 'components/post-preview/BodyShort';
 import _ from 'lodash';
-import moment from 'moment';
 import Tag from 'components/post/Tag';
 import Avatar from 'components/common/Avatar';
 import TimeAgo from 'components/common/TimeAgo';

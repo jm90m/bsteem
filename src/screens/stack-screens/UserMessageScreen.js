@@ -38,7 +38,7 @@ const mapStateToProps = state => ({});
 
 const mapDispatchToProps = dispatch => ({
   sendMessage: (username, text, successCallback) =>
-    sendMessage.action({ username, text, successCallback }),
+    dispatch(sendMessage.action({ username, text, successCallback })),
 });
 
 class UserMessageScreen extends Component {
@@ -66,7 +66,15 @@ class UserMessageScreen extends Component {
     });
   }
 
-  successSendMessage() {}
+  successSendMessage() {
+    this.setState({
+      text: '',
+    });
+  }
+
+  renderMessages() {
+
+  }
 
   handleSendMessage() {
     const { username } = this.props.navigation.state.params;
@@ -90,7 +98,9 @@ class UserMessageScreen extends Component {
           <TitleText>{username}</TitleText>
           <HeaderEmptyView />
         </Header>
-        <ScrollViewContent />
+        <ScrollViewContent>
+          {this.renderMessages()}
+        </ScrollViewContent>
         <KeyboardAvoidingView behavior={behavior}>
           <InputContainer>
             <TextInput

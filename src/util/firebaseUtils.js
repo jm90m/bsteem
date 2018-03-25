@@ -1,4 +1,5 @@
 import firebase from 'firebase';
+import _ from 'lodash';
 
 export const getFirebaseValueOnce = (ref, key) =>
   firebase
@@ -39,7 +40,12 @@ export const getUserDisplayedPrivateMessagesRef = (username, toUser) =>
   `${baseUserSettingsRef}/${username}/private-messages/${toUser}`;
 
 export const baseMessagesRef = 'user-messages';
-export const getUsersMessages = (firstUser = '', secondUser = '') => {
+export const getUsersMessagesRef = (firstUser = '', secondUser = '') => {
   const userMessageRef = _.join([firstUser, secondUser].sort(), '--');
   return `${baseMessagesRef}/${userMessageRef}`;
+};
+export const getSendUserMessagesRef = (firstUser, secondUser, timestamp) => {
+  const baseUserMessagesRef = getUsersMessagesRef(firstUser, secondUser);
+
+  return `${baseUserMessagesRef}/${timestamp}`;
 };

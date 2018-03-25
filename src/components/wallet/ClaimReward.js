@@ -2,23 +2,17 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { vestToSteem } from 'util/steemitFormatters';
 import styled from 'styled-components/native';
-import moment from 'moment';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS, MATERIAL_COMMUNITY_ICONS, ICON_COLORS, ICON_SIZES } from 'constants/styles';
+import TimeAgo from 'components/common/TimeAgo';
 import WalletTransactionContainer from './WalletTransactionContainer';
 import IconContainer from './IconContainer';
-import TimeAgo from 'components/common/TimeAgo';
 
 const RewardsPayoutContainer = styled.Text`
   flex-direction: row;
   flex-wrap: wrap;
   margin-left: auto;
   font-weight: bold;
-`;
-
-const TimeStamp = styled.Text`
-  color: ${COLORS.BLUE.BOTICELLI};
-  font-size: 14px;
 `;
 
 const ClaimRewardContent = styled.View`

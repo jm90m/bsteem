@@ -1,7 +1,13 @@
 import _ from 'lodash';
 import { takeLatest, all, call, put, select, takeEvery } from 'redux-saga/effects';
 import API from 'api/api';
-import { getFirebaseValueOnce, getUserAllPrivateMessagesRef } from 'util/firebaseUtils';
+import {
+  getFirebaseValueOnce,
+  getUserAllPrivateMessagesRef,
+  getUsersMessagesRef,
+  setFirebaseData,
+  getSendUserMessagesRef,
+} from 'util/firebaseUtils';
 import { FETCH_MESSAGES, SEARCH_USER_MESSAGES, SEND_MESSAGE } from '../actions/actionTypes';
 import * as firebaseActions from '../actions/firebaseActions';
 import { getAuthUsername } from '../rootReducer';
@@ -46,12 +52,32 @@ const searchUserMessages = function*(action) {
 const sendMessage = function*(action) {
   try {
     const { username, text, successCallback } = action.payload;
-    const currentTimestamp = new Date().getTime();
-    
+    const authUsername = yield select(getAuthUsername);
+    const timestamp = new Date().getTime();
+    const messageData = {
+      text,
+      username,
+      timestamp,
+    };
+    yield call(
+      setFirebaseData,
+      getSendUserMessagesRef(authUsername, username, timestamp),
+      messageData,
+    );
+    successCallback();
+  } catch (error) {
+    console.log(error);
+    yield put(firebaseActions.sendMessage.fail(error));
+  }
+};
+
+const fetchCurrentMessage = function*() {
+  try {
+
   } catch (error) {
 
   }
-};
+}
 
 export const watchFetchMessages = function*() {
   yield takeEvery(FETCH_MESSAGES.ACTION, fetchMessages);
