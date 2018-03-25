@@ -36,7 +36,6 @@ class UserMessagePreview extends Component {
   static propTypes = {
     username: PropTypes.string.isRequired,
     navigateToUserMessage: PropTypes.func.isRequired,
-    navigateToUser: PropTypes.func.isRequired,
     previewText: PropTypes.string,
   };
 
@@ -51,17 +50,13 @@ class UserMessagePreview extends Component {
     });
 
     return (
-      <Container>
-        <TouchableWithoutFeedback onPress={this.props.navigateToUser}>
+      <TouchableWithoutFeedback onPress={this.props.navigateToUserMessage}>
+        <Container>
           <Avatar username={username} size={40} />
-        </TouchableWithoutFeedback>
-        <TouchableWithoutFeedback onPress={this.props.navigateToUserMessage}>
           <PreviewTextContainer>
             <Username>{`@${username}`}</Username>
             <PreviewText>{truncatedPreviewText}</PreviewText>
           </PreviewTextContainer>
-        </TouchableWithoutFeedback>
-        <TouchableWithoutFeedback onPress={this.props.navigateToUserMessage}>
           <SendMessageContainer>
             <FontAwesome
               name={FONT_AWESOME_ICONS.sendMessage}
@@ -69,8 +64,8 @@ class UserMessagePreview extends Component {
               color={COLORS.PRIMARY_COLOR}
             />
           </SendMessageContainer>
-        </TouchableWithoutFeedback>
-      </Container>
+        </Container>
+      </TouchableWithoutFeedback>
     );
   }
 }

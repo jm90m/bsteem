@@ -71,10 +71,6 @@ class MessagesScreen extends Component {
     );
   }
 
-  navigateToUser = username => () => {
-    this.props.navigation.navigate(navigationConstants.USER, { username });
-  };
-
   navigateToUserMessage = username => () => {
     this.props.navigation.navigate(navigationConstants.USER_MESSAGE, {
       username,
@@ -104,7 +100,6 @@ class MessagesScreen extends Component {
           key={message.toUser}
           username={message.toUser}
           navigateToUserMessage={this.navigateToUserMessage(message.toUser)}
-          navigateToUser={this.navigateToUser(message.toUser)}
           previewText={message.text}
         />
       ));
@@ -115,7 +110,6 @@ class MessagesScreen extends Component {
         key={`${message.toUser}-${index}`}
         username={message.toUser}
         navigateToUserMessage={this.navigateToUserMessage(message.toUser)}
-        navigateToUser={this.navigateToUser(message.toUser)}
         previewText={message.text}
       />
     ));

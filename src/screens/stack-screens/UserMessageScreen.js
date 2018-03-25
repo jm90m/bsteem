@@ -140,7 +140,9 @@ class UserMessageScreen extends Component {
       if (this.scrollView) {
         _.attempt(this.scrollView.scrollToEnd);
       }
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   handleListenToNewMessages(snapshot) {
