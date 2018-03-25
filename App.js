@@ -22,6 +22,11 @@ export default class App extends React.Component {
   }
 
   componentDidMount() {
+    if (console) {
+      console.ignoredYellowBox = [
+        'Warning: Can only update a mounted or mounting component. This usually means you called setState, replaceState, or forceUpdate on an unmounted component. This is a no-op.',
+      ];
+    }
     sc2.init({
       app: 'bsteem',
       callbackURL: `${Constants.linkingUri}/redirect`,
