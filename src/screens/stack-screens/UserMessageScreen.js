@@ -8,6 +8,7 @@ import BackButton from 'components/common/BackButton';
 import HeaderEmptyView from 'components/common/HeaderEmptyView';
 import Header from 'components/common/Header';
 import { FontAwesome } from '@expo/vector-icons';
+import { sendMessage } from 'state/actions/firebaseActions';
 import { COLORS, FONT_AWESOME_ICONS, ICON_SIZES } from '../../constants/styles';
 
 const TitleText = styled.Text`
@@ -29,21 +30,49 @@ const InputContainer = styled.View`
   flex-direction: row;
   justify-content: center;
   align-items: center;
+  border-top-width: 1px;
+  border-top-color: ${COLORS.PRIMARY_BORDER_COLOR};
 `;
+
+const mapStateToProps = state => ({});
+
+const mapDispatchToProps = dispatch => ({
+  sendMessage: (username, text, successCallback) =>
+    sendMessage.action({ username, text, successCallback }),
+});
 
 class UserMessageScreen extends Component {
   static propTypes = {
     navigation: PropTypes.shape().isRequired,
+    sendMessage: PropTypes.func.isRequired,
   };
 
   constructor(props) {
     super(props);
 
+    this.state = {
+      text: '',
+    };
+
     this.handleNavigateBack = this.handleNavigateBack.bind(this);
     this.handleSendMessage = this.handleSendMessage.bind(this);
+    this.onChangeText = this.onChangeText.bind(this);
+    this.successSendMessage = this.successSendMessage.bind(this);
   }
 
-  handleSendMessage() {}
+  onChangeText(text) {
+    this.setState({
+      text,
+    });
+  }
+
+  successSendMessage() {}
+
+  handleSendMessage() {
+    const { username } = this.props.navigation.state.params;
+
+    this.props.sendMessage(username, this.state.text, this.successSendMessage);
+  }
 
   handleNavigateBack() {
     this.props.navigation.goBack();
@@ -51,7 +80,9 @@ class UserMessageScreen extends Component {
 
   render() {
     const { username } = this.props.navigation.state.params;
+    const { text } = this.state;
     const behavior = Platform.OS === 'ios' ? 'position' : null;
+
     return (
       <Container>
         <Header>
@@ -62,7 +93,12 @@ class UserMessageScreen extends Component {
         <ScrollViewContent />
         <KeyboardAvoidingView behavior={behavior}>
           <InputContainer>
-            <TextInput style={{ height: 40, width: '90%' }} />
+            <TextInput
+              style={{ height: 40, width: '90%' }}
+              placeholderTextColor={COLORS.SECONDARY_COLOR}
+              onChangeText={this.onChangeText}
+              value={text}
+            />
             <TouchableOpacity onPress={this.handleSendMessage}>
               <FontAwesome
                 name={FONT_AWESOME_ICONS.sendMessage}
@@ -77,4 +113,4 @@ class UserMessageScreen extends Component {
   }
 }
 
-export default UserMessageScreen;
+export default connect(mapStateToProps, mapDispatchToProps)(UserMessageScreen);

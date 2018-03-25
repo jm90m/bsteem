@@ -2,7 +2,7 @@ import _ from 'lodash';
 import { takeLatest, all, call, put, select, takeEvery } from 'redux-saga/effects';
 import API from 'api/api';
 import { getFirebaseValueOnce, getUserAllPrivateMessagesRef } from 'util/firebaseUtils';
-import { FETCH_MESSAGES, SEARCH_USER_MESSAGES } from '../actions/actionTypes';
+import { FETCH_MESSAGES, SEARCH_USER_MESSAGES, SEND_MESSAGE } from '../actions/actionTypes';
 import * as firebaseActions from '../actions/firebaseActions';
 import { getAuthUsername } from '../rootReducer';
 
@@ -43,7 +43,15 @@ const searchUserMessages = function*(action) {
   }
 };
 
+const sendMessage = function*(action) {
+  try {
+    const { username, text, successCallback } = action.payload;
+    const currentTimestamp = new Date().getTime();
+    
+  } catch (error) {
 
+  }
+};
 
 export const watchFetchMessages = function*() {
   yield takeEvery(FETCH_MESSAGES.ACTION, fetchMessages);
@@ -51,4 +59,8 @@ export const watchFetchMessages = function*() {
 
 export const watchSearchUserMessages = function*() {
   yield takeLatest(SEARCH_USER_MESSAGES.ACTION, searchUserMessages);
+};
+
+export const watchSendMessage = function*() {
+  yield takeLatest(SEND_MESSAGE.ACTION, sendMessage);
 };

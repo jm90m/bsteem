@@ -25,6 +25,7 @@ export default class App extends React.Component {
     if (console) {
       console.ignoredYellowBox = [
         'Warning: Can only update a mounted or mounting component. This usually means you called setState, replaceState, or forceUpdate on an unmounted component. This is a no-op.',
+        'Remote debugger is in a background tab which may cause apps to perform slowly. Fix this by foregrounding the tab (or opening it in a separate window).',
       ];
     }
     sc2.init({
