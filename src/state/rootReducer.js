@@ -152,3 +152,5 @@ export const getMessagesSearchUserResults = state =>
   fromMessages.getMessagesSearchUserResults(state.messages);
 export const getLoadingMessagesSearchUserResults = state =>
   fromMessages.getLoadingMessagesSearchUserResults(state.messages);
+export const getUserMessages = (state, username) =>
+  fromMessages.getUserMessages(state.messages, username);

@@ -10,6 +10,7 @@ import Avatar from 'components/common/Avatar';
 const Container = styled.View`
   flex-direction: row;
   align-items: center;
+  padding: 10px;
 `;
 
 const PreviewTextContainer = styled.View``;

@@ -1,15 +1,23 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { KeyboardAvoidingView, Platform, TextInput, TouchableOpacity } from 'react-native';
+import {
+  KeyboardAvoidingView,
+  Platform,
+  TextInput,
+  TouchableOpacity,
+  RefreshControl,
+} from 'react-native';
 import styled from 'styled-components/native';
-import i18n from 'i18n/i18n';
 import { connect } from 'react-redux';
 import BackButton from 'components/common/BackButton';
 import HeaderEmptyView from 'components/common/HeaderEmptyView';
 import Header from 'components/common/Header';
 import { FontAwesome } from '@expo/vector-icons';
-import { sendMessage } from 'state/actions/firebaseActions';
-import { COLORS, FONT_AWESOME_ICONS, ICON_SIZES } from '../../constants/styles';
+import { sendMessage, fetchCurrentMessages } from 'state/actions/firebaseActions';
+import _ from 'lodash';
+import { getUserMessages } from 'state/rootReducer';
+import { COLORS, FONT_AWESOME_ICONS, ICON_SIZES } from 'constants/styles';
+import UserMessage from 'components/messages/UserMessage';
 
 const TitleText = styled.Text`
   font-weight: bold;
@@ -34,17 +42,30 @@ const InputContainer = styled.View`
   border-top-color: ${COLORS.PRIMARY_BORDER_COLOR};
 `;
 
-const mapStateToProps = state => ({});
+const mapStateToProps = (state, ownProps) => {
+  const { username } = ownProps.navigation.state.params;
+  return {
+    messages: getUserMessages(state, username),
+  };
+};
 
 const mapDispatchToProps = dispatch => ({
   sendMessage: (username, text, successCallback) =>
     dispatch(sendMessage.action({ username, text, successCallback })),
+  fetchCurrentMessages: (username, successCallback) =>
+    dispatch(fetchCurrentMessages.action({ username, successCallback })),
 });
 
 class UserMessageScreen extends Component {
   static propTypes = {
     navigation: PropTypes.shape().isRequired,
     sendMessage: PropTypes.func.isRequired,
+    messages: PropTypes.shape(),
+    fetchCurrentMessages: PropTypes.func.isRequired,
+  };
+
+  static defaultProps = {
+    messages: {},
   };
 
   constructor(props) {
@@ -52,12 +73,19 @@ class UserMessageScreen extends Component {
 
     this.state = {
       text: '',
+      loading: false,
     };
 
     this.handleNavigateBack = this.handleNavigateBack.bind(this);
     this.handleSendMessage = this.handleSendMessage.bind(this);
     this.onChangeText = this.onChangeText.bind(this);
     this.successSendMessage = this.successSendMessage.bind(this);
+    this.handleRefreshMessages = this.handleRefreshMessages.bind(this);
+  }
+
+  componentDidMount() {
+    const { username } = this.props.navigation.state.params;
+    this.props.fetchCurrentMessages(username);
   }
 
   onChangeText(text) {
@@ -72,9 +100,10 @@ class UserMessageScreen extends Component {
     });
   }
 
-  renderMessages() {
-
-  }
+  handleSetLoading = loading => () =>
+    this.setState({
+      loading,
+    });
 
   handleSendMessage() {
     const { username } = this.props.navigation.state.params;
@@ -86,9 +115,26 @@ class UserMessageScreen extends Component {
     this.props.navigation.goBack();
   }
 
+  handleRefreshMessages() {
+    const { username } = this.props.navigation.state.params;
+    this.setState({ loading: true });
+    this.props.fetchCurrentMessages(username, this.handleSetLoading(false));
+  }
+
+  renderMessages() {
+    return _.map(this.props.messages, (message, index) => (
+      <UserMessage
+        key={`${message.username}-${message.timestamp}-${index}`}
+        username={message.username}
+        timestamp={message.timestamp}
+        text={message.text}
+      />
+    ));
+  }
+
   render() {
     const { username } = this.props.navigation.state.params;
-    const { text } = this.state;
+    const { text, loading } = this.state;
     const behavior = Platform.OS === 'ios' ? 'position' : null;
 
     return (
@@ -98,7 +144,16 @@ class UserMessageScreen extends Component {
           <TitleText>{username}</TitleText>
           <HeaderEmptyView />
         </Header>
-        <ScrollViewContent>
+        <ScrollViewContent
+          refreshControl={
+            <RefreshControl
+              refreshing={loading}
+              onRefresh={this.handleRefreshMessages}
+              tintColor={COLORS.PRIMARY_COLOR}
+              colors={[COLORS.PRIMARY_COLOR]}
+            />
+          }
+        >
           {this.renderMessages()}
         </ScrollViewContent>
         <KeyboardAvoidingView behavior={behavior}>

@@ -1,11 +1,9 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components/native';
-import { connect } from 'react-redux';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Header from 'components/common/Header';
 import { ICON_SIZES, COLORS, MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
-import { displayMessagesModal } from 'state/actions/appActions';
 import * as navigationConstants from 'constants/navigation';
 import CurrentUserFeed from './CurrentUserFeed';
 import CurrentUserBSteemFeed from './CurrentUserBSteemFeed';
@@ -32,14 +30,9 @@ const MiddleMenuContent = styled.View`
   padding: 10px 20px;
 `;
 
-const mapDispatchToProps = dispatch => ({
-  displayMessagesModal: () => dispatch(displayMessagesModal()),
-});
-
 class CurrentUserScreen extends Component {
   static propTypes = {
     navigation: PropTypes.shape().isRequired,
-    displayMessagesModal: PropTypes.func.isRequired,
   };
 
   static MENU = {
@@ -114,4 +107,4 @@ class CurrentUserScreen extends Component {
   }
 }
 
-export default connect(null, mapDispatchToProps)(CurrentUserScreen);
+export default CurrentUserScreen;

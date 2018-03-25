@@ -1,8 +1,14 @@
-import { FETCH_MESSAGES, SEARCH_USER_MESSAGES, SEND_MESSAGE } from '../actions/actionTypes';
+import _ from 'lodash';
+import {
+  FETCH_MESSAGES,
+  SEARCH_USER_MESSAGES,
+  SEND_MESSAGE,
+  FETCH_CURRENT_MESSAGES,
+} from '../actions/actionTypes';
 
 const INITIAL_STATE = {
   loadingFetchMessages: false,
-  messages: [],
+  messages: {}, // username -> message obj
   messagesSearchUserResults: [],
   loadingMessagesSearchUserResults: false,
 };
@@ -44,6 +50,17 @@ export default function(state = INITIAL_STATE, action) {
       return {
         ...state,
       };
+
+    case FETCH_CURRENT_MESSAGES.SUCCESS: {
+      const { username, messages } = action.payload;
+      return {
+        ...state,
+        messages: {
+          ...state.messages,
+          [username]: messages,
+        },
+      };
+    }
     default:
       return state;
   }
@@ -53,3 +70,4 @@ export const getLoadingFetchMessages = state => state.loadingFetchMessages;
 export const getMessages = state => state.messages;
 export const getMessagesSearchUserResults = state => state.messagesSearchUserResults;
 export const getLoadingMessagesSearchUserResults = state => state.loadingMessagesSearchUserResults;
+export const getUserMessages = (state, username) => _.get(state.messages, username);

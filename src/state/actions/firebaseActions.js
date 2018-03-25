@@ -15,6 +15,7 @@ import {
   FETCH_MESSAGES,
   SEARCH_USER_MESSAGES,
   SEND_MESSAGE,
+  FETCH_CURRENT_MESSAGES,
 } from './actionTypes';
 
 export const fetchSavedTags = createAsyncSagaAction(FETCH_SAVED_TAGS);
@@ -32,3 +33,4 @@ export const fetchDrafts = createAsyncSagaAction(FETCH_DRAFTS);
 export const fetchMessages = createAsyncSagaAction(FETCH_MESSAGES);
 export const searchUserMessages = createAsyncSagaAction(SEARCH_USER_MESSAGES);
 export const sendMessage = createAsyncSagaAction(SEND_MESSAGE);
+export const fetchCurrentMessages = createAsyncSagaAction(FETCH_CURRENT_MESSAGES);

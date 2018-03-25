@@ -8,7 +8,12 @@ import {
   setFirebaseData,
   getSendUserMessagesRef,
 } from 'util/firebaseUtils';
-import { FETCH_MESSAGES, SEARCH_USER_MESSAGES, SEND_MESSAGE } from '../actions/actionTypes';
+import {
+  FETCH_CURRENT_MESSAGES,
+  FETCH_MESSAGES,
+  SEARCH_USER_MESSAGES,
+  SEND_MESSAGE,
+} from '../actions/actionTypes';
 import * as firebaseActions from '../actions/firebaseActions';
 import { getAuthUsername } from '../rootReducer';
 
@@ -56,7 +61,7 @@ const sendMessage = function*(action) {
     const timestamp = new Date().getTime();
     const messageData = {
       text,
-      username,
+      username: authUsername,
       timestamp,
     };
     yield call(
@@ -71,13 +76,30 @@ const sendMessage = function*(action) {
   }
 };
 
-const fetchCurrentMessage = function*() {
+const fetchCurrentMessage = function*(action) {
   try {
-
+    const { username, successCallback } = action.payload;
+    const authUsername = yield select(getAuthUsername);
+    const snapshot = yield call(
+      getFirebaseValueOnce,
+      getUsersMessagesRef(username, authUsername),
+      'value',
+    );
+    const messages = snapshot.val() || {};
+    if (successCallback) {
+      _.attempt(successCallback);
+    }
+    yield put(
+      firebaseActions.fetchCurrentMessages.success({
+        username,
+        messages,
+      }),
+    );
   } catch (error) {
-
+    console.warn(error);
+    yield put(firebaseActions.fetchCurrentMessages.fail());
   }
-}
+};
 
 export const watchFetchMessages = function*() {
   yield takeEvery(FETCH_MESSAGES.ACTION, fetchMessages);
@@ -89,4 +111,8 @@ export const watchSearchUserMessages = function*() {
 
 export const watchSendMessage = function*() {
   yield takeLatest(SEND_MESSAGE.ACTION, sendMessage);
+};
+
+export const watchFetchCurrentMessage = function*() {
+  yield takeLatest(FETCH_CURRENT_MESSAGES.ACTION, fetchCurrentMessage);
 };

@@ -1,6 +1,4 @@
 import React, { Component } from 'react';
-import { TouchableWithoutFeedback } from 'react-native';
-import { FontAwesome } from '@expo/vector-icons';
 import { COLORS } from 'constants/styles';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
@@ -11,9 +9,8 @@ import moment from 'moment-timezone';
 const Container = styled.View`
   flex-direction: row;
   align-items: center;
+  padding: 10px;
 `;
-
-const PreviewTextContainer = styled.View``;
 
 const Username = styled.Text`
   margin: 0 5px;
@@ -26,30 +23,29 @@ const Text = styled.Text`
   margin: 0 5px;
 `;
 
-const SendMessageContainer = styled.View`
-  margin-left: auto;
-  padding: 10px;
-`;
-
 const TimeStampContainer = styled.View`
   flex-direction: row;
+  align-items: center;
 `;
 
 const TimeStamp = styled.Text`
-  color: ${COLOR.TERTIARY_COLOR};
+  margin-left: 5px;
+  color: ${COLORS.TERTIARY_COLOR};
+  font-size: 12px;
 `;
 
-class UserMessagePreview extends Component {
+const TextContainer = styled.View``;
+
+class UserMessage extends Component {
   static propTypes = {
     username: PropTypes.string.isRequired,
-    navigateToUserMessage: PropTypes.func.isRequired,
-    navigateToUser: PropTypes.func.isRequired,
     text: PropTypes.string,
     timestamp: PropTypes.number,
   };
 
   static defaultProps = {
     text: '',
+    timestamp: 0,
   };
 
   render() {
@@ -57,17 +53,17 @@ class UserMessagePreview extends Component {
 
     return (
       <Container>
-        <TouchableWithoutFeedback onPress={this.props.navigateToUser}>
-          <Avatar username={username} size={30} />
-        </TouchableWithoutFeedback>
-        <TimeStampContainer>
-          <Username>{`@${username}`}</Username>
-          <TimeStamp>{}</TimeStamp>
-        </TimeStampContainer>
-        <Text>{text}</Text>
+        <Avatar username={username} size={30} />
+        <TextContainer>
+          <TimeStampContainer>
+            <Username>{`@${username}`}</Username>
+            <TimeStamp>{moment(timestamp).format('MM/DD hh:mm A')}</TimeStamp>
+          </TimeStampContainer>
+          <Text>{text}</Text>
+        </TextContainer>
       </Container>
     );
   }
 }
 
-export default UserMessagePreview;
+export default UserMessage;
