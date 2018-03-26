@@ -32,6 +32,7 @@ class UserMessageMenu extends Component {
     handleNavigateToUser: PropTypes.func.isRequired,
     handleBlockUser: PropTypes.func.isRequired,
     isBlocked: PropTypes.bool.isRequired,
+    handleHideUserMessage: PropTypes.func.isRequired,
   };
 
   render() {
@@ -59,6 +60,16 @@ class UserMessageMenu extends Component {
                   name={MATERIAL_COMMUNITY_ICONS.block}
                 />
                 <MenuText>{blockedText}</MenuText>
+              </MenuModalContents>
+            </MenuModalButton>
+            <MenuModalButton onPress={this.props.handleHideUserMessage}>
+              <MenuModalContents>
+                <MaterialCommunityIcons
+                  size={ICON_SIZES.menuModalOptionIcon}
+                  color={COLORS.PRIMARY_COLOR}
+                  name={MATERIAL_COMMUNITY_ICONS.hide}
+                />
+                <MenuText>{i18n.messages.hideMessages}</MenuText>
               </MenuModalContents>
             </MenuModalButton>
           </MenuWrapper>

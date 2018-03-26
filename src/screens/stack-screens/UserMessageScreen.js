@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import {
   KeyboardAvoidingView,
-  Platform,
   TextInput,
   TouchableOpacity,
   RefreshControl,
@@ -19,6 +18,7 @@ import {
   fetchCurrentMessages,
   blockUser,
   unblockUser,
+  hideDisplayedUserMessage,
 } from 'state/actions/firebaseActions';
 import _ from 'lodash';
 import { getUserMessages, getAuthUsername, getBlockedUsers } from 'state/rootReducer';
@@ -64,6 +64,11 @@ const MenuIconContainer = styled.View`
 
 const Touchable = styled.TouchableOpacity``;
 
+const BlockedText = styled.Text`
+  padding: 10px;
+  color: ${COLORS.TERTIARY_COLOR};
+`;
+
 const mapStateToProps = (state, ownProps) => {
   const { username } = ownProps.navigation.state.params;
   return {
@@ -82,6 +87,7 @@ const mapDispatchToProps = dispatch => ({
     dispatch(fetchCurrentMessages.success({ username, messages })),
   blockUser: username => dispatch(blockUser.action({ username })),
   unblockUser: username => dispatch(unblockUser.action({ username })),
+  hideDisplayedUserMessage: username => dispatch(hideDisplayedUserMessage.action({ username })),
 });
 
 class UserMessageScreen extends Component {
@@ -97,6 +103,9 @@ class UserMessageScreen extends Component {
     fetchCurrentMessagesSuccess: PropTypes.func.isRequired,
     messages: PropTypes.shape(),
     blockedUsers: PropTypes.shape().isRequired,
+    unblockUser: PropTypes.func.isRequired,
+    blockUser: PropTypes.func.isRequired,
+    hideDisplayedUserMessage: PropTypes.func.isRequired,
   };
 
   static defaultProps = {
@@ -121,6 +130,7 @@ class UserMessageScreen extends Component {
     this.handleScrollToBottom = this.handleScrollToBottom.bind(this);
     this.handleBlockUser = this.handleBlockUser.bind(this);
     this.handleNavigateToUser = this.handleNavigateToUser.bind(this);
+    this.handleHideUserMessage = this.handleHideUserMessage.bind(this);
   }
 
   componentWillMount() {
@@ -189,6 +199,15 @@ class UserMessageScreen extends Component {
   }
 
   handleSetDisplayMenu = displayMenu => () => this.setState({ displayMenu });
+
+  handleHideUserMessage() {
+    const { username } = this.props.navigation.state.params;
+    this.setState({
+      displayMenu: false,
+    });
+    this.props.hideDisplayedUserMessage(username);
+    this.props.navigation.goBack();
+  }
 
   handleBlockUser() {
     const { blockedUsers } = this.props;
@@ -269,7 +288,11 @@ class UserMessageScreen extends Component {
           }
           onContentSizeChange={this.handleScrollToBottom}
         >
-          {this.renderMessages()}
+          {isBlocked ? (
+            <BlockedText>{i18n.messages.messageContentIsHidden}</BlockedText>
+          ) : (
+            this.renderMessages()
+          )}
           <EmptyView />
         </ScrollView>
         <KeyboardAvoidingView behavior="position">
@@ -297,6 +320,7 @@ class UserMessageScreen extends Component {
           handleNavigateToUser={this.handleNavigateToUser}
           handleBlockUser={this.handleBlockUser}
           isBlocked={isBlocked}
+          handleHideUserMessage={this.handleHideUserMessage}
         />
       </Container>
     );

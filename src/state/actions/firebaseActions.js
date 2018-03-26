@@ -19,6 +19,7 @@ import {
   FETCH_BLOCKED_USERS,
   BLOCK_USER,
   UNBLOCK_USER,
+  HIDE_DISPLAYED_USER_MESSAGE,
 } from './actionTypes';
 
 export const fetchSavedTags = createAsyncSagaAction(FETCH_SAVED_TAGS);
@@ -39,4 +40,5 @@ export const sendMessage = createAsyncSagaAction(SEND_MESSAGE);
 export const fetchCurrentMessages = createAsyncSagaAction(FETCH_CURRENT_MESSAGES);
 export const fetchBlockedUsers = createAsyncSagaAction(FETCH_BLOCKED_USERS);
 export const blockUser = createAsyncSagaAction(BLOCK_USER);
-export const unblockUser = createAsyncSagaAction(UNBLOCK_USER)
+export const unblockUser = createAsyncSagaAction(UNBLOCK_USER);
+export const hideDisplayedUserMessage = createAsyncSagaAction(HIDE_DISPLAYED_USER_MESSAGE);

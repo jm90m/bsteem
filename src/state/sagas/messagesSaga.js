@@ -20,6 +20,7 @@ import {
   FETCH_BLOCKED_USERS,
   BLOCK_USER,
   UNBLOCK_USER,
+  HIDE_DISPLAYED_USER_MESSAGE,
 } from '../actions/actionTypes';
 import * as firebaseActions from '../actions/firebaseActions';
 import { getAuthUsername } from '../rootReducer';
@@ -40,6 +41,18 @@ export const fetchDisplayedMessages = function*() {
     yield put(firebaseActions.fetchDisplayedMessages.fail({ error }));
   } finally {
     yield put(firebaseActions.fetchDisplayedMessages.loadingEnd());
+  }
+};
+
+export const hideDisplayedUserMessage = function*(action) {
+  try {
+    const { username } = action.payload;
+    const authUsername = yield select(getAuthUsername);
+    yield call(setFirebaseData, getUserDisplayedPrivateMessagesRef(authUsername, username), null);
+    yield put(firebaseActions.hideDisplayedUserMessage.success());
+  } catch (error) {
+    console.log(error);
+    yield put(firebaseActions.hideDisplayedUserMessage.fail({ error }));
   }
 };
 
@@ -181,9 +194,15 @@ export const watchFetchCurrentMessage = function*() {
 export const watchFetchBlockedUsers = function*() {
   yield takeLatest(FETCH_BLOCKED_USERS.ACTION, fetchBlockedUsers);
 };
+
 export const watchBlockUser = function*() {
   yield takeEvery(BLOCK_USER.ACTION, blockUser);
 };
+
 export const watchUnblockUser = function*() {
   yield takeEvery(UNBLOCK_USER.ACTION, unblockUser);
+};
+
+export const watchHideDisplayedUserMessage = function*() {
+  yield takeEvery(HIDE_DISPLAYED_USER_MESSAGE.ACTION, hideDisplayedUserMessage);
 };

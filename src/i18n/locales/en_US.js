@@ -174,5 +174,7 @@ export default {
     unblockUser: 'Unblock User',
     blockedUsers: 'Blocked Users',
     userIsBlocked: 'You have blocked this user.',
+    messageContentIsHidden: 'Messages are hidden because you have blocked the user',
+    hideMessages: 'Hide Messages',
   },
 };

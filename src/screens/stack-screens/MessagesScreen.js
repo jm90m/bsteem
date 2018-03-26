@@ -43,6 +43,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
   searchUserMessages: search => dispatch(firebaseActions.searchUserMessages.action(search)),
+  fetchBlockedUsers: () => dispatch(firebaseActions.fetchBlockedUsers.action()),
 });
 
 class MessagesScreen extends Component {
@@ -56,6 +57,7 @@ class MessagesScreen extends Component {
     navigation: PropTypes.shape().isRequired,
     displayedMessages: PropTypes.arrayOf(PropTypes.shape()).isRequired,
     blockedUsers: PropTypes.shape().isRequired,
+    fetchBlockedUsers: PropTypes.func.isRequired,
   };
 
   constructor(props) {
@@ -67,6 +69,10 @@ class MessagesScreen extends Component {
 
     this.handleSearchOnChangeText = this.handleSearchOnChangeText.bind(this);
     this.handleNavigateBack = this.handleNavigateBack.bind(this);
+  }
+
+  componentDidMount() {
+    this.props.fetchBlockedUsers();
   }
 
   handleSearchOnChangeText(value) {
@@ -102,14 +108,18 @@ class MessagesScreen extends Component {
         'toUser',
       );
 
-      return _.map(joinedResults, message => (
-        <UserMessagePreview
-          key={message.toUser}
-          username={message.toUser}
-          navigateToUserMessage={this.navigateToUserMessage(message.toUser)}
-          previewText={message.text}
-        />
-      ));
+      return _.map(joinedResults, message => {
+        const isBlocked = _.get(blockedUsers, message.toUser, false);
+
+        return (
+          <UserMessagePreview
+            key={message.toUser}
+            username={message.toUser}
+            navigateToUserMessage={this.navigateToUserMessage(message.toUser)}
+            previewText={isBlocked ? '' : message.text}
+          />
+        );
+      });
     }
 
     return _.map(displayedMessages, (message, index) => {

@@ -100,6 +100,7 @@ const rootSaga = function*() {
     spawn(messagesSaga.watchFetchBlockedUsers),
     spawn(messagesSaga.watchBlockUser),
     spawn(messagesSaga.watchUnblockUser),
+    spawn(messagesSaga.watchHideDisplayedUserMessage),
   ]);
 };
 

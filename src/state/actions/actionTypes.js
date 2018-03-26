@@ -137,3 +137,6 @@ export const FETCH_CURRENT_MESSAGES = createAsyncActionType('@messages/fetch-cur
 export const FETCH_BLOCKED_USERS = createAsyncActionType('@messages/fetch-blocked-users');
 export const BLOCK_USER = createAsyncActionType('@messages/block-user');
 export const UNBLOCK_USER = createAsyncActionType('@messages/unblock-user');
+export const HIDE_DISPLAYED_USER_MESSAGE = createAsyncActionType(
+  '@messages/hide-displayed-user-message',
+);
