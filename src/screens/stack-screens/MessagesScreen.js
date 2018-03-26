@@ -4,10 +4,10 @@ import styled from 'styled-components/native';
 import i18n from 'i18n/i18n';
 import { connect } from 'react-redux';
 import _ from 'lodash';
-import { COLORS } from 'constants/styles';
+import { COLORS, ICON_SIZES, MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
 import BackButton from 'components/common/BackButton';
-import HeaderEmptyView from 'components/common/HeaderEmptyView';
 import Header from 'components/common/Header';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import {
   getMessagesSearchUserResults,
   getLoadingFetchMessages,
@@ -31,6 +31,10 @@ const TitleText = styled.Text`
 
 const ScrollView = styled.ScrollView`
   height: 100%;
+`;
+
+const MenuIconContainer = styled.View`
+  padding: 5px;
 `;
 
 const mapStateToProps = state => ({
@@ -146,7 +150,13 @@ class MessagesScreen extends Component {
         <Header>
           <BackButton navigateBack={this.handleNavigateBack} />
           <TitleText>{i18n.titles.messages}</TitleText>
-          <HeaderEmptyView />
+          <MenuIconContainer>
+            <MaterialCommunityIcons
+              size={ICON_SIZES.menuIcon}
+              name={MATERIAL_COMMUNITY_ICONS.menuVertical}
+              color="transparent"
+            />
+          </MenuIconContainer>
         </Header>
         <SearchBar
           lightTheme

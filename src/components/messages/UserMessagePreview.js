@@ -52,10 +52,14 @@ class UserMessagePreview extends Component {
       const { previewText } = this.props;
       const bytes = CryptoJS.AES.decrypt(previewText, encryptionSecretKey);
       const plainText = bytes.toString(CryptoJS.enc.Utf8);
-      return _.trim(
-        _.truncate(plainText, {
-          length: 15,
-        }),
+      return _.replace(
+        _.trim(
+          _.truncate(plainText, {
+            length: 15,
+          }),
+        ),
+        /(?:\r\n|\r|\n)/g,
+        '',
       );
     } catch (error) {
       console.log(error);
