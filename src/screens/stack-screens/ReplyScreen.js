@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components/native';
 import { connect } from 'react-redux';
-import { Dimensions } from 'react-native';
+import { Dimensions, KeyboardAvoidingView } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { COLORS, MATERIAL_ICONS, ICON_SIZES } from 'constants/styles';
 import i18n from 'i18n/i18n';
@@ -22,7 +22,9 @@ const BackTouchable = styled.TouchableOpacity`
   padding: 10px;
 `;
 
-const Container = styled.View``;
+const Container = styled.View`
+  flex: 1;
+`;
 
 const ReplyContentContainer = styled.ScrollView``;
 
@@ -180,40 +182,42 @@ class ReplyScreen extends Component {
           </TitleContainer>
           <HeaderEmptyView />
         </Header>
-        <ReplyContentContainer>
-          <CommentContainer>
-            <CommentContentContainer>
-              <AvatarContainer>
-                <Avatar size={avatarSize} username={parentPost.author} />
-              </AvatarContainer>
-              <CommentContent
-                username={parentPost.author}
-                reputation={commentAuthorReputation}
-                created={parentPost.created}
-                body={parentPost.body}
-                commentDepth={parentPost.depth}
-                currentWidth={contentWidth}
-                navigation={this.props.navigation}
+        <KeyboardAvoidingView behavior="padding">
+          <ReplyContentContainer>
+            <CommentContainer>
+              <CommentContentContainer>
+                <AvatarContainer>
+                  <Avatar size={avatarSize} username={parentPost.author} />
+                </AvatarContainer>
+                <CommentContent
+                  username={parentPost.author}
+                  reputation={commentAuthorReputation}
+                  created={parentPost.created}
+                  body={parentPost.body}
+                  commentDepth={parentPost.depth}
+                  currentWidth={contentWidth}
+                  navigation={this.props.navigation}
+                />
+              </CommentContentContainer>
+            </CommentContainer>
+            <ReplyInputContainer>
+              <FormInput
+                onChangeText={this.onChangeReplyText}
+                placeholder={i18n.editor.replyPlaceholder}
+                multiline
+                value={replyText}
               />
-            </CommentContentContainer>
-          </CommentContainer>
-          <ReplyInputContainer>
-            <FormInput
-              onChangeText={this.onChangeReplyText}
-              placeholder={i18n.editor.replyPlaceholder}
-              multiline
-              value={replyText}
-            />
-            <ReplyButtonContainer>
-              <PrimaryButton
-                onPress={this.handleSubmit}
-                title={i18n.editor.reply}
-                disabled={replyLoading}
-                loading={replyLoading}
-              />
-            </ReplyButtonContainer>
-          </ReplyInputContainer>
-        </ReplyContentContainer>
+              <ReplyButtonContainer>
+                <PrimaryButton
+                  onPress={this.handleSubmit}
+                  title={i18n.editor.reply}
+                  disabled={replyLoading}
+                  loading={replyLoading}
+                />
+              </ReplyButtonContainer>
+            </ReplyInputContainer>
+          </ReplyContentContainer>
+        </KeyboardAvoidingView>
       </Container>
     );
   }
