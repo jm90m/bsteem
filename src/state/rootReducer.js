@@ -143,6 +143,7 @@ export const getDisplayNSFWContent = state => fromSettings.getDisplayNSFWContent
 export const getReportedPosts = state => fromSettings.getReportedPosts(state.settings);
 export const getPendingReportingPosts = state =>
   fromSettings.getPendingReportingPosts(state.settings);
+export const getEnableVotingSlider = state => fromSettings.getEnableVotingSlider(state.settings);
 
 // Messages Selectors
 export const getLoadingFetchMessages = state =>

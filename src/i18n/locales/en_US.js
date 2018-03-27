@@ -158,6 +158,7 @@ export default {
     reportPost: 'Report Post',
     reportedPost: 'Reported Post',
     unreportPost: 'Unreport Post',
+    enableVotingSlider: 'Enable Voting Slider',
   },
   editProfile: {
     name: 'Name',

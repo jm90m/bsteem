@@ -128,6 +128,9 @@ export const CURRENT_USER_UNREPORT_POST = createAsyncActionType(
   '@settings/current-user-unreport-post',
 );
 export const FETCH_REPORTED_POSTS = createAsyncActionType('@settings/fetch-reported-posts');
+export const UPDATE_VOTING_SLIDER_SETTING = createAsyncActionType(
+  '@settings/update-voting-slider-setting',
+);
 
 // Messages
 export const FETCH_DISPLAYED_MESSAGES = createAsyncActionType('@messages/fetch-displayed-messages');

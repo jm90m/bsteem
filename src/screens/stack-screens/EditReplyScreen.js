@@ -39,8 +39,6 @@ const ReplyButtonContainer = styled.View`
   padding-top: 20px;
 `;
 
-const mapStateToProps = state => ({});
-
 const mapDispatchToProps = dispatch => ({
   createComment: (
     parentPost,
@@ -181,4 +179,4 @@ class EditReplyScreen extends Component {
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(EditReplyScreen);
+export default connect(null, mapDispatchToProps)(EditReplyScreen);

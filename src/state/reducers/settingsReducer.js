@@ -4,6 +4,7 @@ import {
   UPDATE_NSFW_DISPLAY_SETTING,
   CURRENT_USER_REPORT_POST,
   FETCH_REPORTED_POSTS,
+  UPDATE_VOTING_SLIDER_SETTING,
 } from '../actions/actionTypes';
 
 const INITIAL_STATE = {
@@ -11,6 +12,7 @@ const INITIAL_STATE = {
   reportedPosts: [],
   pendingReportingPosts: [],
   loadingReportedPosts: false,
+  enableVotingSlider: false,
 };
 
 export default (state = INITIAL_STATE, action) => {
@@ -66,3 +68,4 @@ export default (state = INITIAL_STATE, action) => {
 export const getDisplayNSFWContent = state => state.displayNSFWContent;
 export const getReportedPosts = state => state.reportedPosts;
 export const getPendingReportingPosts = state => state.pendingReportingPosts;
+export const getEnableVotingSlider = state => state.enableVotingSlider;
