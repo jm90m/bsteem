@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Modal } from 'react-native';
 import _ from 'lodash';
 import styled from 'styled-components/native';
 import {
