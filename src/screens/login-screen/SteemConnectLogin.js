@@ -66,6 +66,7 @@ class SteemConnectLogin extends Component {
   static propTypes = {
     authenticateUserSuccess: PropTypes.func.isRequired,
     authenticateUserError: PropTypes.func.isRequired,
+    navigation: PropTypes.shape().isRequired,
   };
   constructor(props) {
     super(props);
@@ -81,7 +82,6 @@ class SteemConnectLogin extends Component {
   }
 
   async handleSteemConnectLogin() {
-    let redirectUrl = AuthSession.getRedirectUrl();
     const url = sc2.getLoginURL({ authenticated: true });
     try {
       let result = await AuthSession.startAsync({
@@ -142,6 +142,8 @@ class SteemConnectLogin extends Component {
         </View>
       );
     }
+
+    return null;
   }
 
   render() {
