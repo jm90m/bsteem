@@ -51,6 +51,8 @@ const ButtonContainer = styled.View`
 
 const ScrollView = styled.ScrollView``;
 
+const Slider = styled.Slider``;
+
 const mapStateToProps = state => ({
   authenticated: getIsAuthenticated(state),
   displayNSFWContent: getDisplayNSFWContent(state),
@@ -205,6 +207,9 @@ class SettingsScreen extends Component {
             checked={enableVotingSlider}
             onPress={this.handleUpdateVotingSliderSetting}
           />
+        )}
+        {authenticated && (
+          <Slider step={1} maximumValue={100} onValueChange={value => {}} value={10} />
         )}
         {displayReportedPostsModal && (
           <Modal
