@@ -9,7 +9,7 @@ import { connect } from 'react-redux';
 import Header from 'components/common/Header';
 import HeaderEmptyView from 'components/common/HeaderEmptyView';
 import i18n from 'i18n/i18n';
-import { CheckBox } from 'react-native-elements';
+import { CheckBox, ButtonGroup } from 'react-native-elements';
 import {
   getDisplayNSFWContent,
   getReportedPosts,
@@ -34,6 +34,7 @@ const EmptyText = styled.Text`
 
 const Container = styled.View`
   flex: 1;
+  background-color: ${COLORS.PRIMARY_BACKGROUND_COLOR};
 `;
 
 const BackTouchable = styled.TouchableOpacity`
@@ -49,21 +50,27 @@ const TitleText = styled.Text`
 const ButtonContainer = styled.View`
   margin: 10px 0;
   flex-direction: row;
-  align-items: center;
-  justify-content: center;
 `;
 
 const ScrollView = styled.ScrollView``;
 
-const Slider = styled.Slider`
-  padding: 0 20px;
-`;
+const Slider = styled.Slider``;
 
 const SettingContainer = styled.View``;
 
 const SettingDescription = styled.Text`
   color: ${COLORS.TERTIARY_COLOR};
   padding: 0 20px;
+`;
+
+const SettingTitle = styled.Text`
+  color: ${COLORS.SECONDARY_COLOR};
+  font-weight: bold;
+  padding: 15px 20px;
+`;
+
+const SettingValue = styled.Text`'
+  color: ${COLORS.PRIMARY_COLOR};
 `;
 
 const mapStateToProps = state => ({
@@ -81,12 +88,16 @@ const mapDispatchToProps = dispatch => ({
   fetchReportedPosts: () => dispatch(settingsActions.fetchReportedPosts.action()),
   updateVotingSliderSetting: enableVotingSlider =>
     dispatch(settingsActions.updateVotingSliderSetting.action({ enableVotingSlider })),
+  updateVotingPercentSetting: votingPercent =>
+    dispatch(settingsActions.updateVotingPercentSetting.action({ votingPercent })),
 });
 
 class SettingsScreen extends Component {
   static navigationOptions = {
     tabBarVisible: false,
   };
+
+  static VOTING_PERCENT_BUTTONS = ['1%', '25%', '50%', '75%', '100%'];
 
   static propTypes = {
     navigation: PropTypes.shape().isRequired,
@@ -97,6 +108,7 @@ class SettingsScreen extends Component {
     updateNSFWDisplaySettings: PropTypes.func.isRequired,
     fetchReportedPosts: PropTypes.func.isRequired,
     updateVotingSliderSetting: PropTypes.func.isRequired,
+    updateVotingPercentSetting: PropTypes.func.isRequired,
     reportedPosts: PropTypes.arrayOf(PropTypes.shape()),
     votingPercent: PropTypes.number.isRequired,
   };
@@ -120,6 +132,7 @@ class SettingsScreen extends Component {
     this.showReportedPostsModal = this.showReportedPostsModal.bind(this);
     this.handleOnVotingSliderValue = this.handleOnVotingSliderValue.bind(this);
     this.handleUpdateVotingSliderSetting = this.handleUpdateVotingSliderSetting.bind(this);
+    this.handleOnVotingPercentButtonPress = this.handleOnVotingPercentButtonPress.bind(this);
   }
 
   componentDidMount() {
@@ -152,9 +165,12 @@ class SettingsScreen extends Component {
   }
 
   handleOnVotingSliderValue(voteValue) {
-    this.setState({
-      voteValue,
-    });
+    this.props.updateVotingPercentSetting(voteValue);
+  }
+
+  handleOnVotingPercentButtonPress(index) {
+    const votePecent = parseFloat(_.get(SettingsScreen.VOTING_PERCENT_BUTTONS, index, '1'));
+    this.props.updateVotingPercentSetting(votePecent);
   }
 
   handleNavigateUser(username) {
@@ -205,6 +221,11 @@ class SettingsScreen extends Component {
   render() {
     const { displayNSFWContent, enableVotingSlider, authenticated, votingPercent } = this.props;
     const { displayReportedPostsModal } = this.state;
+    const selectedVotingPercentIndex = _.findIndex(SettingsScreen.VOTING_PERCENT_BUTTONS, percent =>
+      _.isEqual(parseFloat(percent), votingPercent),
+    );
+    const selectedButtonStyle = { backgroundColor: COLORS.PRIMARY_COLOR };
+    const selectedTextStyle = { color: COLORS.PRIMARY_COLOR };
     return (
       <Container>
         <Header>
@@ -214,36 +235,61 @@ class SettingsScreen extends Component {
           <TitleText>{i18n.titles.settings}</TitleText>
           <HeaderEmptyView />
         </Header>
-        <CheckBox
-          title={i18n.settings.enableNSFW}
-          checked={displayNSFWContent}
-          onPress={this.handleUpdateNSFWDisplay}
-        />
-
-        {authenticated && (
+        <ScrollView>
           <SettingContainer>
+            <SettingTitle>{i18n.settings.nsfwPosts}</SettingTitle>
             <CheckBox
-              title={i18n.settings.enableVotingSlider}
-              checked={enableVotingSlider}
-              onPress={this.handleUpdateVotingSliderSetting}
+              title={i18n.settings.enableNSFW}
+              checked={displayNSFWContent}
+              onPress={this.handleUpdateNSFWDisplay}
             />
-            <SettingDescription>{i18n.settings.votingPowerDescription}</SettingDescription>
           </SettingContainer>
-        )}
-        {authenticated && (
-          <Slider
-            step={25}
-            maximumValue={100}
-            onValueChange={this.handleOnVotingSliderValue}
-            value={votingPercent}
-          />
-        )}
-        <ButtonContainer>
-          <PrimaryButton
-            title={i18n.settings.ViewReportedPosts}
-            onPress={this.showReportedPostsModal}
-          />
-        </ButtonContainer>
+
+          {authenticated && (
+            <SettingContainer>
+              <SettingTitle>{i18n.settings.votingPower}</SettingTitle>
+              <SettingDescription>{i18n.settings.votingPowerDescription}</SettingDescription>
+              <CheckBox
+                title={i18n.settings.enableVotingSlider}
+                checked={enableVotingSlider}
+                onPress={this.handleUpdateVotingSliderSetting}
+              />
+            </SettingContainer>
+          )}
+          {authenticated && (
+            <SettingContainer>
+              <SettingTitle>
+                {`${i18n.settings.defaultVotePercent} - `}
+                <SettingValue>{`${votingPercent}%`}</SettingValue>
+              </SettingTitle>
+              <SettingDescription>{i18n.settings.votingPercentDescription}</SettingDescription>
+              <Slider
+                minimumValue={1}
+                step={1}
+                maximumValue={100}
+                onValueChange={this.handleOnVotingSliderValue}
+                value={votingPercent}
+              />
+              <ButtonGroup
+                onPress={this.handleOnVotingPercentButtonPress}
+                selectedIndex={selectedVotingPercentIndex}
+                buttons={SettingsScreen.VOTING_PERCENT_BUTTONS}
+                containerStyle={{ height: 50 }}
+                selectedButtonStyle={selectedButtonStyle}
+                selectedTextStyle={selectedTextStyle}
+              />
+            </SettingContainer>
+          )}
+          <SettingContainer>
+            <SettingTitle>{i18n.settings.reportedPosts}</SettingTitle>
+            <ButtonContainer>
+              <PrimaryButton
+                title={i18n.settings.ViewReportedPosts}
+                onPress={this.showReportedPostsModal}
+              />
+            </ButtonContainer>
+          </SettingContainer>
+        </ScrollView>
         {displayReportedPostsModal && (
           <Modal
             animationType="slide"

@@ -152,6 +152,7 @@ export default {
     claimRewards: 'Claim Rewards',
   },
   settings: {
+    nsfwPosts: 'NSFW Posts',
     enableNSFW: 'Enable NSFW Posts',
     ViewReportedPosts: 'View Reported Posts',
     noReportedPosts: 'No reported posts',
@@ -161,6 +162,11 @@ export default {
     enableVotingSlider: 'Enable Voting Slider',
     votingPowerDescription:
       'Enable the voting slider to specify the exact percentage of Voting Power that you want to use per vote.',
+    votingPercentDescription:
+      'Select your default vote value which will be used when the voting slider is enabled.',
+    votingPower: 'Voting Power',
+    defaultVotePercent: 'Default Vote Percent',
+    reportedPosts: 'Reported Posts',
   },
   editProfile: {
     name: 'Name',

@@ -1,7 +1,16 @@
 import Expo from 'expo';
 import { takeLatest, call, put, select, takeEvery } from 'redux-saga/effects';
 import _ from 'lodash';
-import firebase from 'firebase';
+import {
+  getUserEnableVoteSliderRef,
+  getUserVotePercentRef,
+  getNSFWDisplaySettingsRef,
+  getUserSettings,
+  getUserReportedPostsRef,
+  getReportPostRef,
+  getFirebaseValueOnce,
+  setFirebaseData,
+} from 'util/firebaseUtils';
 import { getAuthUsername } from '../rootReducer';
 import * as settingsActions from '../actions/settingsActions';
 import {
@@ -11,28 +20,8 @@ import {
   UPDATE_NSFW_DISPLAY_SETTING,
   FETCH_REPORTED_POSTS,
   UPDATE_VOTING_SLIDER_SETTING,
+  UPDATE_VOTING_PERCENT_SETTING,
 } from '../actions/actionTypes';
-import { getUserEnableVoteSliderRef, getUserVotePercentRef } from 'util/firebaseUtils';
-
-const baseUserSettingsRef = 'user-settings';
-const getUserSettings = username => `${baseUserSettingsRef}/${username}/settings`;
-const getNSFWDisplaySettingsRef = username => `${getUserSettings(username)}/display-nsfw-setting`;
-
-const getUserReportedPostsRef = username => `${baseUserSettingsRef}/${username}/reported-posts`;
-const getReportPostRef = (username, postID) => `${getUserReportedPostsRef(username)}/${postID}`;
-
-const getFirebaseValueOnce = (ref, key) =>
-  firebase
-    .database()
-    .ref(ref)
-    .once(key);
-
-const setFirebaseData = (ref, values = {}) => {
-  firebase
-    .database()
-    .ref(ref)
-    .set(values);
-};
 
 export const fetchUserSettings = function*() {
   try {
@@ -155,6 +144,18 @@ const updateVotingSliderSetting = function*(action) {
   }
 };
 
+const updateVotingPercentSetting = function*(action) {
+  try {
+    const { votingPercent } = action.payload;
+    const authUsername = yield select(getAuthUsername);
+
+    yield call(setFirebaseData, getUserVotePercentRef(authUsername), votingPercent);
+    yield put(settingsActions.updateVotingPercentSetting.success(votingPercent));
+  } catch (error) {
+    yield put(settingsActions.updateVotingPercentSetting.fail({ error }));
+  }
+};
+
 export const watchFetchUserSettings = function*() {
   yield takeLatest(FETCH_CURRENT_USER_SETTINGS.ACTION, fetchUserSettings);
 };
@@ -177,4 +178,8 @@ export const watchFetchReportedPosts = function*() {
 
 export const watchUpdateVotingSliderSetting = function*() {
   yield takeLatest(UPDATE_VOTING_SLIDER_SETTING.ACTION, updateVotingSliderSetting);
+};
+
+export const watchUpdateVotingPercentSetting = function*() {
+  yield takeLatest(UPDATE_VOTING_PERCENT_SETTING.ACTION, updateVotingPercentSetting);
 };

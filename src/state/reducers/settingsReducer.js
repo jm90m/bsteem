@@ -5,6 +5,7 @@ import {
   CURRENT_USER_REPORT_POST,
   FETCH_REPORTED_POSTS,
   UPDATE_VOTING_SLIDER_SETTING,
+  UPDATE_VOTING_PERCENT_SETTING,
 } from '../actions/actionTypes';
 
 const INITIAL_STATE = {
@@ -25,9 +26,13 @@ export default (state = INITIAL_STATE, action) => {
       };
     case FETCH_CURRENT_USER_SETTINGS.SUCCESS: {
       const displayNSFWContent = _.get(action.payload, 'display-nsfw-setting', false);
+      const votingPercent = _.get(action.payload, 'vote-percent', 100);
+      const enableVotingSlider = _.get(action.payload, 'vote-slider', false);
       return {
         ...state,
         displayNSFWContent,
+        enableVotingSlider,
+        votingPercent,
       };
     }
 
@@ -64,6 +69,11 @@ export default (state = INITIAL_STATE, action) => {
       return {
         ...state,
         enableVotingSlider: action.payload,
+      };
+    case UPDATE_VOTING_PERCENT_SETTING.SUCCESS:
+      return {
+        ...state,
+        votingPercent: action.payload,
       };
     default:
       return state;

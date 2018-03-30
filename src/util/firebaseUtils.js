@@ -15,6 +15,9 @@ export const setFirebaseData = (ref, values = {}) => {
 };
 
 export const baseUserSettingsRef = 'user-settings';
+export const getUserSettings = username => `${baseUserSettingsRef}/${username}/settings`;
+export const getNSFWDisplaySettingsRef = username =>
+  `${getUserSettings(username)}/display-nsfw-setting`;
 export const getUserSavedTagsRef = username => `${baseUserSettingsRef}/${username}/saved-tags`;
 export const getSaveTagRef = (username, tag) => `${getUserSavedTagsRef(username)}/${tag}`;
 
@@ -24,6 +27,11 @@ export const getSavePostRef = (username, postID) => `${getUserSavedPostsRef(user
 export const getUserSavedUsersRef = username => `${baseUserSettingsRef}/${username}/saved-users`;
 export const getSaveUserRef = (username, saveUser) =>
   `${getUserSavedUsersRef(username)}/${saveUser}`;
+
+export const getUserReportedPostsRef = username =>
+  `${baseUserSettingsRef}/${username}/reported-posts`;
+export const getReportPostRef = (username, postID) =>
+  `${getUserReportedPostsRef(username)}/${postID}`;
 
 export const getUserRebloggedPostsRef = username =>
   `${baseUserSettingsRef}/${username}/reblogged-posts`;
@@ -55,6 +63,5 @@ export const getUserBlockedUsersRef = username =>
 export const getBlockedUserRef = (username, blockUsername) =>
   `${getUserBlockedUsersRef(username)}/${blockUsername}`;
 
-export const getUserEnableVoteSliderRef = username =>
-  `${baseUserSettingsRef}/${username}/vote-slider`;
-export const getUserVotePercentRef = username => `${baseUserSettingsRef}/${username}/vote-percent`;
+export const getUserEnableVoteSliderRef = username => `${getUserSettings(username)}/vote-slider`;
+export const getUserVotePercentRef = username => `${getUserSettings(username)}/vote-percent`;

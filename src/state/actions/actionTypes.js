@@ -131,6 +131,9 @@ export const FETCH_REPORTED_POSTS = createAsyncActionType('@settings/fetch-repor
 export const UPDATE_VOTING_SLIDER_SETTING = createAsyncActionType(
   '@settings/update-voting-slider-setting',
 );
+export const UPDATE_VOTING_PERCENT_SETTING = createAsyncActionType(
+  '@settings/update-voting-percent-setting',
+);
 
 // Messages
 export const FETCH_DISPLAYED_MESSAGES = createAsyncActionType('@messages/fetch-displayed-messages');
