@@ -12,6 +12,8 @@ import {
   getCurrentUserRebloggedList,
   getDisplayNSFWContent,
   getReportedPosts,
+  getEnableVotingSlider,
+  getVotingPercent,
 } from 'state/rootReducer';
 import { currentUserVotePost, currentUserReblogPost } from 'state/actions/currentUserActions';
 import { isPostVoted } from 'util/voteUtils';
@@ -70,6 +72,8 @@ const mapStateToProps = state => ({
   rebloggedList: getCurrentUserRebloggedList(state),
   displayNSFWContent: getDisplayNSFWContent(state),
   reportedPosts: getReportedPosts(state),
+  enableVotingSlider: getEnableVotingSlider(state),
+  votingPercent: getVotingPercent(state),
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -120,6 +124,8 @@ class PostPreview extends Component {
     reportedPosts: PropTypes.arrayOf(PropTypes.shape()),
     currentUsername: PropTypes.string,
     displayNSFWContent: PropTypes.bool.isRequired,
+    enableVotingSlider: PropTypes.bool.isRequired,
+    votingPercent: PropTypes.number.isRequired,
   };
 
   static defaultProps = {
@@ -229,9 +235,13 @@ class PostPreview extends Component {
   }
 
   handleAuthVote() {
-    const { postData } = this.props;
+    const { postData, enableVotingSlider, votingPercent } = this.props;
     const { author, permlink } = postData;
     const { likedPost } = this.state;
+
+    if (enableVotingSlider) {
+      return;
+    }
 
     this.loadingVote();
 

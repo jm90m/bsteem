@@ -119,9 +119,14 @@ class SettingsScreen extends Component {
 
   constructor(props) {
     super(props);
-
+    const buttonVotingPercentIndex = _.findIndex(SettingsScreen.VOTING_PERCENT_BUTTONS, percent =>
+      _.isEqual(parseFloat(percent), props.votingPercent),
+    );
     this.state = {
       displayReportedPostsModal: false,
+      votingSliderValue: props.votingPercent,
+      initialVotingSliderValue: props.votingPercent,
+      buttonVotingPercentIndex,
     };
 
     this.navigateBack = this.navigateBack.bind(this);
@@ -133,11 +138,16 @@ class SettingsScreen extends Component {
     this.handleOnVotingSliderValue = this.handleOnVotingSliderValue.bind(this);
     this.handleUpdateVotingSliderSetting = this.handleUpdateVotingSliderSetting.bind(this);
     this.handleOnVotingPercentButtonPress = this.handleOnVotingPercentButtonPress.bind(this);
+    this.handleOnVotingSliderValueComplete = this.handleOnVotingSliderValueComplete.bind(this);
   }
 
   componentDidMount() {
     this.props.getCurrentUserSettings();
     this.props.fetchReportedPosts();
+  }
+
+  componentWillUnmount() {
+    this.props.updateVotingPercentSetting(this.state.votingSliderValue);
   }
 
   navigateBack() {
@@ -164,13 +174,27 @@ class SettingsScreen extends Component {
     });
   }
 
-  handleOnVotingSliderValue(voteValue) {
-    this.props.updateVotingPercentSetting(voteValue);
+  handleOnVotingSliderValue(votingSliderValue) {
+    const buttonVotingPercentIndex = _.findIndex(SettingsScreen.VOTING_PERCENT_BUTTONS, percent =>
+      _.isEqual(parseFloat(percent), votingSliderValue),
+    );
+    this.setState({
+      votingSliderValue,
+      buttonVotingPercentIndex,
+    });
+  }
+
+  handleOnVotingSliderValueComplete(votingSliderValue) {
+    this.props.updateVotingPercentSetting(votingSliderValue);
   }
 
   handleOnVotingPercentButtonPress(index) {
-    const votePecent = parseFloat(_.get(SettingsScreen.VOTING_PERCENT_BUTTONS, index, '1'));
-    this.props.updateVotingPercentSetting(votePecent);
+    const votePercent = parseFloat(_.get(SettingsScreen.VOTING_PERCENT_BUTTONS, index, '1'));
+    this.setState({
+      votingSliderValue: votePercent,
+      initialVotingSliderValue: votePercent,
+      buttonVotingPercentIndex: index,
+    });
   }
 
   handleNavigateUser(username) {
@@ -219,13 +243,16 @@ class SettingsScreen extends Component {
   }
 
   render() {
-    const { displayNSFWContent, enableVotingSlider, authenticated, votingPercent } = this.props;
-    const { displayReportedPostsModal } = this.state;
-    const selectedVotingPercentIndex = _.findIndex(SettingsScreen.VOTING_PERCENT_BUTTONS, percent =>
-      _.isEqual(parseFloat(percent), votingPercent),
-    );
+    const { displayNSFWContent, enableVotingSlider, authenticated } = this.props;
+    const {
+      displayReportedPostsModal,
+      votingSliderValue,
+      initialVotingSliderValue,
+      buttonVotingPercentIndex,
+    } = this.state;
     const selectedButtonStyle = { backgroundColor: COLORS.PRIMARY_COLOR };
     const selectedTextStyle = { color: COLORS.PRIMARY_COLOR };
+
     return (
       <Container>
         <Header>
@@ -260,19 +287,20 @@ class SettingsScreen extends Component {
             <SettingContainer>
               <SettingTitle>
                 {`${i18n.settings.defaultVotePercent} - `}
-                <SettingValue>{`${votingPercent}%`}</SettingValue>
+                <SettingValue>{`${votingSliderValue}%`}</SettingValue>
               </SettingTitle>
               <SettingDescription>{i18n.settings.votingPercentDescription}</SettingDescription>
               <Slider
                 minimumValue={1}
                 step={1}
                 maximumValue={100}
+                onSlidingComplete={this.handleOnVotingSliderValueComplete}
                 onValueChange={this.handleOnVotingSliderValue}
-                value={votingPercent}
+                value={initialVotingSliderValue}
               />
               <ButtonGroup
                 onPress={this.handleOnVotingPercentButtonPress}
-                selectedIndex={selectedVotingPercentIndex}
+                selectedIndex={buttonVotingPercentIndex}
                 buttons={SettingsScreen.VOTING_PERCENT_BUTTONS}
                 containerStyle={{ height: 50 }}
                 selectedButtonStyle={selectedButtonStyle}

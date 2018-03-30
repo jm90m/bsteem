@@ -122,8 +122,6 @@ class Header extends Component {
         </Reblogged>
       );
     } else if (firstRebloggedOn) {
-      console.log('POST_DATA FIRST REBLOGGED ON', postData.first_reblogged_on);
-      console.log('POST DATA', postData);
       return (
         <Reblogged>
           <MaterialCommunityIcons
