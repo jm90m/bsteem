@@ -108,7 +108,7 @@ class Footer extends Component {
   }
 
   render() {
-    const { postData, handleNavigateToComments, handleNavigateToVotes } = this.props;
+    const { postData, handleNavigateToComments, handleNavigateToVotes, onPressVote } = this.props;
     const { active_votes, children } = postData;
     const upVotes = getUpvotes(active_votes).sort(sortVotes);
     const payout = calculatePayout(postData);
@@ -122,7 +122,7 @@ class Footer extends Component {
       <Container>
         {this.renderVoteButton()}
         <TouchableOpacity
-          onPress={handleNavigateToVotes}
+          onPress={onPressVote}
           style={{ justifyContent: 'center', alignItems: 'center' }}
         >
           <FooterValue>{upVotes.length}</FooterValue>

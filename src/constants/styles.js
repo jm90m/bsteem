@@ -49,6 +49,8 @@ const appColors = {
   PRIMARY_BORDER_COLOR: colorsMap.WHITE.GAINSBORO,
   SECONDARY_COLOR: colorsMap.GREEN.DARK_GREEN,
   TERTIARY_COLOR: colorsMap.BLUE.BOTICELLI,
+  POSITIVE_COLOR: colorsMap.BLUE.MEDIUM_AQUAMARINE,
+  NEGATIVE_COLOR: colorsMap.RED.VALENCIA,
 
   SPLASH_SCREEN_BACKGROUND: '#FCFCFC',
 };
@@ -161,7 +163,7 @@ export const MATERIAL_COMMUNITY_ICONS = {
   savedPost: 'star',
 
   closeCircle: 'close-circle-outline',
-
+  checkCircle: 'check-circle-outline',
   image: 'image',
   pencil: 'pencil',
 

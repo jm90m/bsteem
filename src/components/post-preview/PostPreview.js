@@ -13,7 +13,6 @@ import {
   getDisplayNSFWContent,
   getReportedPosts,
   getEnableVotingSlider,
-  getVotingPercent,
 } from 'state/rootReducer';
 import { currentUserVotePost, currentUserReblogPost } from 'state/actions/currentUserActions';
 import { isPostVoted } from 'util/voteUtils';
@@ -30,6 +29,7 @@ import i18n from 'i18n/i18n';
 import Footer from './Footer';
 import Header from './Header';
 import BodyShort from './BodyShort';
+import PostVoteSlider from '../post/PostVoteSlider';
 import PostImage from '../post/PostImage';
 import { getPostPreviewComponents, getEmbeds } from '../../util/postPreviewUtils';
 import withAuthActions from '../common/withAuthActions';
@@ -73,7 +73,6 @@ const mapStateToProps = state => ({
   displayNSFWContent: getDisplayNSFWContent(state),
   reportedPosts: getReportedPosts(state),
   enableVotingSlider: getEnableVotingSlider(state),
-  votingPercent: getVotingPercent(state),
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -125,7 +124,6 @@ class PostPreview extends Component {
     currentUsername: PropTypes.string,
     displayNSFWContent: PropTypes.bool.isRequired,
     enableVotingSlider: PropTypes.bool.isRequired,
-    votingPercent: PropTypes.number.isRequired,
   };
 
   static defaultProps = {
@@ -161,6 +159,7 @@ class PostPreview extends Component {
       displayPhotoBrowser: false,
       displayMenu: false,
       displayPostPreview,
+      displayVoteSlider: false,
     };
 
     this.handleOnPressVote = this.handleOnPressVote.bind(this);
@@ -184,6 +183,8 @@ class PostPreview extends Component {
     this.handleReblogIconPress = this.handleReblogIconPress.bind(this);
     this.displayHiddenContent = this.displayHiddenContent.bind(this);
     this.handleEditPost = this.handleEditPost.bind(this);
+    this.sendVote = this.sendVote.bind(this);
+    this.handleVoteSliderSendVote = this.handleVoteSliderSendVote.bind(this);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -234,17 +235,12 @@ class PostPreview extends Component {
     });
   }
 
-  handleAuthVote() {
-    const { postData, enableVotingSlider, votingPercent } = this.props;
-    const { author, permlink } = postData;
-    const { likedPost } = this.state;
-
-    if (enableVotingSlider) {
-      return;
-    }
-
+  sendVote(voteWeight = postConstants.DEFAULT_VOTE_WEIGHT) {
     this.loadingVote();
 
+    const { postData } = this.props;
+    const { author, permlink } = postData;
+    const { likedPost } = this.state;
     if (likedPost) {
       const voteSuccessCallback = this.unlikedVoteSuccess;
       const voteFailCalback = this.likedVoteSuccess;
@@ -261,11 +257,31 @@ class PostPreview extends Component {
       this.props.currentUserVotePost(
         author,
         permlink,
-        postConstants.DEFAULT_VOTE_WEIGHT,
+        voteWeight,
         voteSuccessCallback,
         voteFailCallback,
       );
     }
+  }
+
+  handleVoteSliderSendVote(voteWeight) {
+    this.setState({
+      displayVoteSlider: false,
+    });
+    this.sendVote(voteWeight);
+  }
+
+  handleAuthVote() {
+    const { enableVotingSlider } = this.props;
+
+    if (enableVotingSlider) {
+      this.setState({
+        displayVoteSlider: true,
+      });
+      return;
+    }
+
+    this.sendVote();
   }
 
   displayHiddenContent() {
@@ -322,6 +338,8 @@ class PostPreview extends Component {
       this.loadingReblogEnd,
     );
   }
+
+  handleVoteSliderDisplay = displayVoteSlider => () => this.setState({ displayVoteSlider });
 
   handleDisplayMenu() {
     this.setState({
@@ -479,6 +497,7 @@ class PostPreview extends Component {
       loadingReblog,
       displayPhotoBrowser,
       displayMenu,
+      displayVoteSlider,
     } = this.state;
     const { title, json_metadata } = postData;
     const parsedJsonMetadata = jsonParse(json_metadata);
@@ -501,18 +520,26 @@ class PostPreview extends Component {
           </Touchable>
           {showPostPreview ? this.renderPreview() : hiddenStoryPreviewMessage}
         </Content>
-        <Footer
-          authUsername={authUsername}
-          likedPost={likedPost}
-          loadingReblog={loadingReblog}
-          loadingVote={loadingVote}
-          onPressVote={this.handleOnPressVote}
-          handleNavigateToComments={this.handleNavigateToComments}
-          postData={postData}
-          reblogPost={this.handleReblogIconPress}
-          rebloggedList={rebloggedList}
-          handleNavigateToVotes={this.handleNavigateToVotes}
-        />
+        {displayVoteSlider ? (
+          <PostVoteSlider
+            postData={postData}
+            hideVoteSlider={this.handleVoteSliderDisplay(false)}
+            handleVoteSliderSendVote={this.handleVoteSliderSendVote}
+          />
+        ) : (
+          <Footer
+            authUsername={authUsername}
+            likedPost={likedPost}
+            loadingReblog={loadingReblog}
+            loadingVote={loadingVote}
+            onPressVote={this.handleOnPressVote}
+            handleNavigateToComments={this.handleNavigateToComments}
+            postData={postData}
+            reblogPost={this.handleReblogIconPress}
+            rebloggedList={rebloggedList}
+            handleNavigateToVotes={this.handleNavigateToVotes}
+          />
+        )}
         {displayReblogModal && (
           <BSteemModal visible={displayReblogModal} handleOnClose={this.hideReblogModal}>
             <ReblogModal

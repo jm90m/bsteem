@@ -81,7 +81,6 @@ class UserHeader extends Component {
 
   static defaultProps = {
     authUsername: '',
-    authenticated: false,
     hideFollowButton: false,
   };
 

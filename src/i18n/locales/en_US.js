@@ -1,5 +1,6 @@
 export default {
   general: {
+    confirm: 'Confirm',
     cancel: 'Cancel',
     transferDisclaimer:
       'This app currently does not support transfer transactions such as buying or selling STEEM or SBD.',
@@ -101,6 +102,7 @@ export default {
     displayHiddenContent: 'Display hidden content.',
     lowAuthorReputationPostPreview:
       'The contents of this post is currently hidden because the author has a low reputation or the post has a low rating.',
+    voteWorth: 'Your vote will be worth',
   },
   comments: {
     noCommentsToShow: 'No comments to show.',

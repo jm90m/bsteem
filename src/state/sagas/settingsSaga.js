@@ -135,7 +135,7 @@ const unreportPost = function*(action) {
 const updateVotingSliderSetting = function*(action) {
   try {
     const { enableVotingSlider } = action.payload;
-    const authUsername = yield select(getAuthUsername);z
+    const authUsername = yield select(getAuthUsername);
 
     yield call(setFirebaseData, getUserEnableVoteSliderRef(authUsername), enableVotingSlider);
     yield put(settingsActions.updateVotingSliderSetting.success(enableVotingSlider));

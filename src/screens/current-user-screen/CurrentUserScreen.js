@@ -9,6 +9,7 @@ import * as navigationConstants from 'constants/navigation';
 import { getAuthUsername } from 'state/rootReducer';
 import firebase from 'firebase';
 import { fetchDisplayedMessages } from 'state/actions/firebaseActions';
+import { getCurrentUserSettings } from 'state/actions/settingsActions';
 import { getUserAllPrivateMessagesRef } from 'util/firebaseUtils';
 import CurrentUserFeed from './CurrentUserFeed';
 import CurrentUserBSteemFeed from './CurrentUserBSteemFeed';
@@ -41,6 +42,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
   fetchDisplayedMessagesSuccess: messages => dispatch(fetchDisplayedMessages.success(messages)),
+  getCurrentUserSettings: () => dispatch(getCurrentUserSettings.action()),
 });
 
 class CurrentUserScreen extends Component {
@@ -48,6 +50,7 @@ class CurrentUserScreen extends Component {
     navigation: PropTypes.shape().isRequired,
     authUsername: PropTypes.string.isRequired,
     fetchDisplayedMessagesSuccess: PropTypes.func.isRequired,
+    getCurrentUserSettings: PropTypes.func.isRequired,
   };
 
   static MENU = {
@@ -73,6 +76,10 @@ class CurrentUserScreen extends Component {
       .database()
       .ref(getUserAllPrivateMessagesRef(authUsername))
       .on('value', this.handleSuccessFetchDisplayedMessages);
+  }
+
+  componentDidMount() {
+    this.props.getCurrentUserSettings();
   }
 
   setSelectedMenu = selectedMenu => () =>
