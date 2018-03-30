@@ -15,6 +15,7 @@ import {
   getReportedPosts,
   getEnableVotingSlider,
   getIsAuthenticated,
+  getVotingPercent,
 } from 'state/rootReducer';
 import * as settingsActions from 'state/actions/settingsActions';
 import PrimaryButton from 'components/common/PrimaryButton';
@@ -47,17 +48,30 @@ const TitleText = styled.Text`
 
 const ButtonContainer = styled.View`
   margin: 10px 0;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
 `;
 
 const ScrollView = styled.ScrollView``;
 
-const Slider = styled.Slider``;
+const Slider = styled.Slider`
+  padding: 0 20px;
+`;
+
+const SettingContainer = styled.View``;
+
+const SettingDescription = styled.Text`
+  color: ${COLORS.TERTIARY_COLOR};
+  padding: 0 20px;
+`;
 
 const mapStateToProps = state => ({
   authenticated: getIsAuthenticated(state),
   displayNSFWContent: getDisplayNSFWContent(state),
   reportedPosts: getReportedPosts(state),
   enableVotingSlider: getEnableVotingSlider(state),
+  votingPercent: getVotingPercent(state),
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -65,7 +79,8 @@ const mapDispatchToProps = dispatch => ({
     dispatch(settingsActions.updateNSFWDisplaySettings.action(displayNSFWContent)),
   getCurrentUserSettings: () => dispatch(settingsActions.getCurrentUserSettings.action()),
   fetchReportedPosts: () => dispatch(settingsActions.fetchReportedPosts.action()),
-  updateVotingSliderSetting: () => dispatch(settingsActions.updateVotingSliderSetting.action()),
+  updateVotingSliderSetting: enableVotingSlider =>
+    dispatch(settingsActions.updateVotingSliderSetting.action({ enableVotingSlider })),
 });
 
 class SettingsScreen extends Component {
@@ -83,6 +98,7 @@ class SettingsScreen extends Component {
     fetchReportedPosts: PropTypes.func.isRequired,
     updateVotingSliderSetting: PropTypes.func.isRequired,
     reportedPosts: PropTypes.arrayOf(PropTypes.shape()),
+    votingPercent: PropTypes.number.isRequired,
   };
 
   static defaultProps = {
@@ -187,8 +203,8 @@ class SettingsScreen extends Component {
   }
 
   render() {
-    const { displayNSFWContent, enableVotingSlider, authenticated } = this.props;
-    const { displayReportedPostsModal, voteValue } = this.state;
+    const { displayNSFWContent, enableVotingSlider, authenticated, votingPercent } = this.props;
+    const { displayReportedPostsModal } = this.state;
     return (
       <Container>
         <Header>
@@ -203,27 +219,31 @@ class SettingsScreen extends Component {
           checked={displayNSFWContent}
           onPress={this.handleUpdateNSFWDisplay}
         />
-        <ButtonContainer>
-          <PrimaryButton
-            title={i18n.settings.ViewReportedPosts}
-            onPress={this.showReportedPostsModal}
-          />
-        </ButtonContainer>
+
         {authenticated && (
-          <CheckBox
-            title={i18n.settings.enableVotingSlider}
-            checked={enableVotingSlider}
-            onPress={this.handleUpdateVotingSliderSetting}
-          />
+          <SettingContainer>
+            <CheckBox
+              title={i18n.settings.enableVotingSlider}
+              checked={enableVotingSlider}
+              onPress={this.handleUpdateVotingSliderSetting}
+            />
+            <SettingDescription>{i18n.settings.votingPowerDescription}</SettingDescription>
+          </SettingContainer>
         )}
         {authenticated && (
           <Slider
             step={25}
             maximumValue={100}
             onValueChange={this.handleOnVotingSliderValue}
-            value={voteValue}
+            value={votingPercent}
           />
         )}
+        <ButtonContainer>
+          <PrimaryButton
+            title={i18n.settings.ViewReportedPosts}
+            onPress={this.showReportedPostsModal}
+          />
+        </ButtonContainer>
         {displayReportedPostsModal && (
           <Modal
             animationType="slide"

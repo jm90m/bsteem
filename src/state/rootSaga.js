@@ -91,6 +91,7 @@ const rootSaga = function*() {
     spawn(settingsSaga.watchReportPost),
     spawn(settingsSaga.watchUnreportPost),
     spawn(settingsSaga.watchFetchReportedPosts),
+    spawn(settingsSaga.watchUpdateVotingSliderSetting),
 
     // Messages Sagas
     spawn(messagesSaga.watchFetchDisplayedMessages),

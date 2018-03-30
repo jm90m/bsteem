@@ -10,7 +10,9 @@ import {
   CURRENT_USER_REPORT_POST,
   UPDATE_NSFW_DISPLAY_SETTING,
   FETCH_REPORTED_POSTS,
+  UPDATE_VOTING_SLIDER_SETTING,
 } from '../actions/actionTypes';
+import { getUserEnableVoteSliderRef, getUserVotePercentRef } from 'util/firebaseUtils';
 
 const baseUserSettingsRef = 'user-settings';
 const getUserSettings = username => `${baseUserSettingsRef}/${username}/settings`;
@@ -141,6 +143,18 @@ const unreportPost = function*(action) {
   }
 };
 
+const updateVotingSliderSetting = function*(action) {
+  try {
+    const { enableVotingSlider } = action.payload;
+    const authUsername = yield select(getAuthUsername);
+
+    yield call(setFirebaseData, getUserEnableVoteSliderRef(authUsername), enableVotingSlider);
+    yield put(settingsActions.updateVotingSliderSetting.success(enableVotingSlider));
+  } catch (error) {
+    yield put(settingsActions.updateVotingSliderSetting.fail({ error }));
+  }
+};
+
 export const watchFetchUserSettings = function*() {
   yield takeLatest(FETCH_CURRENT_USER_SETTINGS.ACTION, fetchUserSettings);
 };
@@ -159,4 +173,8 @@ export const watchUnreportPost = function*() {
 
 export const watchFetchReportedPosts = function*() {
   yield takeLatest(FETCH_REPORTED_POSTS.ACTION, fetchReportedPosts);
+};
+
+export const watchUpdateVotingSliderSetting = function*() {
+  yield takeLatest(UPDATE_VOTING_SLIDER_SETTING.ACTION, updateVotingSliderSetting);
 };

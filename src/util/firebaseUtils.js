@@ -54,3 +54,7 @@ export const getUserBlockedUsersRef = username =>
   `${baseUserSettingsRef}/${username}/blocked-users`;
 export const getBlockedUserRef = (username, blockUsername) =>
   `${getUserBlockedUsersRef(username)}/${blockUsername}`;
+
+export const getUserEnableVoteSliderRef = username =>
+  `${baseUserSettingsRef}/${username}/vote-slider`;
+export const getUserVotePercentRef = username => `${baseUserSettingsRef}/${username}/vote-percent`;

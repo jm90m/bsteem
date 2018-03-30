@@ -159,6 +159,8 @@ export default {
     reportedPost: 'Reported Post',
     unreportPost: 'Unreport Post',
     enableVotingSlider: 'Enable Voting Slider',
+    votingPowerDescription:
+      'Enable the voting slider to specify the exact percentage of Voting Power that you want to use per vote.',
   },
   editProfile: {
     name: 'Name',

@@ -144,6 +144,7 @@ export const getReportedPosts = state => fromSettings.getReportedPosts(state.set
 export const getPendingReportingPosts = state =>
   fromSettings.getPendingReportingPosts(state.settings);
 export const getEnableVotingSlider = state => fromSettings.getEnableVotingSlider(state.settings);
+export const getVotingPercent = state => fromSettings.getVotingPercent(state.settings);
 
 // Messages Selectors
 export const getLoadingFetchMessages = state =>

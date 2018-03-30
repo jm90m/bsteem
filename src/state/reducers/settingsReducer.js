@@ -13,6 +13,7 @@ const INITIAL_STATE = {
   pendingReportingPosts: [],
   loadingReportedPosts: false,
   enableVotingSlider: false,
+  votingPercent: 100,
 };
 
 export default (state = INITIAL_STATE, action) => {
@@ -59,7 +60,11 @@ export default (state = INITIAL_STATE, action) => {
         loadingReportedPosts: false,
       };
     }
-
+    case UPDATE_VOTING_SLIDER_SETTING.SUCCESS:
+      return {
+        ...state,
+        enableVotingSlider: action.payload,
+      };
     default:
       return state;
   }
@@ -69,3 +74,4 @@ export const getDisplayNSFWContent = state => state.displayNSFWContent;
 export const getReportedPosts = state => state.reportedPosts;
 export const getPendingReportingPosts = state => state.pendingReportingPosts;
 export const getEnableVotingSlider = state => state.enableVotingSlider;
+export const getVotingPercent = state => state.votingPercent;
