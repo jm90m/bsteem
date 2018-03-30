@@ -102,6 +102,8 @@ class SettingsScreen extends Component {
     this.handleNavigateUser = this.handleNavigateUser.bind(this);
     this.hideReportedPostsModal = this.hideReportedPostsModal.bind(this);
     this.showReportedPostsModal = this.showReportedPostsModal.bind(this);
+    this.handleOnVotingSliderValue = this.handleOnVotingSliderValue.bind(this);
+    this.handleUpdateVotingSliderSetting = this.handleUpdateVotingSliderSetting.bind(this);
   }
 
   componentDidMount() {
@@ -130,6 +132,12 @@ class SettingsScreen extends Component {
   showReportedPostsModal() {
     this.setState({
       displayReportedPostsModal: true,
+    });
+  }
+
+  handleOnVotingSliderValue(voteValue) {
+    this.setState({
+      voteValue,
     });
   }
 
@@ -180,7 +188,7 @@ class SettingsScreen extends Component {
 
   render() {
     const { displayNSFWContent, enableVotingSlider, authenticated } = this.props;
-    const { displayReportedPostsModal } = this.state;
+    const { displayReportedPostsModal, voteValue } = this.state;
     return (
       <Container>
         <Header>
@@ -209,7 +217,12 @@ class SettingsScreen extends Component {
           />
         )}
         {authenticated && (
-          <Slider step={1} maximumValue={100} onValueChange={value => {}} value={10} />
+          <Slider
+            step={25}
+            maximumValue={100}
+            onValueChange={this.handleOnVotingSliderValue}
+            value={voteValue}
+          />
         )}
         {displayReportedPostsModal && (
           <Modal
