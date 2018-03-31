@@ -129,7 +129,6 @@ class PostPreview extends Component {
   static defaultProps = {
     postData: {},
     authenticated: false,
-    displayNSFWContent: false,
     authUsername: '',
     rebloggedList: [],
     reportedPosts: [],
@@ -221,9 +220,36 @@ class PostPreview extends Component {
     });
   }
 
-  likedVoteSuccess() {
+  likedVoteSuccess(votePercent) {
+    const { enableVotingSlider, postData, authUsername } = this.props;
+    try {
+      // directly modify the current vote post data, if it does not have an active vote then
+      // create a new vote object
+      if (enableVotingSlider) {
+        let hasActiveVote = false;
+        for (let i = 0; i < _.size(postData.active_votes); i += 1) {
+          if (authUsername === postData.active_votes[i].voter) {
+            postData.active_votes[i].percent = votePercent;
+            hasActiveVote = true;
+            break;
+          }
+        }
+
+        if (!hasActiveVote) {
+          const newVoteObject = {
+            voter: authUsername,
+            percent: votePercent,
+          };
+          postData.active_votes.push(newVoteObject);
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    }
+    const likedPost = votePercent > 0;
+
     this.setState({
-      likedPost: true,
+      likedPost,
       loadingVote: false,
     });
   }
@@ -235,13 +261,14 @@ class PostPreview extends Component {
     });
   }
 
-  sendVote(voteWeight = postConstants.DEFAULT_VOTE_WEIGHT) {
+  sendVote(voteWeight) {
     this.loadingVote();
 
-    const { postData } = this.props;
+    const { postData, enableVotingSlider } = this.props;
     const { author, permlink } = postData;
     const { likedPost } = this.state;
-    if (likedPost) {
+
+    if (likedPost && !enableVotingSlider) {
       const voteSuccessCallback = this.unlikedVoteSuccess;
       const voteFailCalback = this.likedVoteSuccess;
       this.props.currentUserVotePost(

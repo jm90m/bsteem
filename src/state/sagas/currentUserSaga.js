@@ -142,7 +142,7 @@ const votePost = function*(action) {
     const { postAuthor, postPermlink, voteWeight, voteSuccessCallback } = action.payload;
     const currentUsername = yield select(getAuthUsername);
     const result = yield call(sc2.vote, currentUsername, postAuthor, postPermlink, voteWeight);
-    voteSuccessCallback();
+    voteSuccessCallback(voteWeight);
     yield put(currentUserActions.currentUserVotePost.success(result));
   } catch (error) {
     console.log('FAIL VOTE', error);

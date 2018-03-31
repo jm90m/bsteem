@@ -90,12 +90,24 @@ class PostVoteSlider extends Component {
 
   constructor(props) {
     super(props);
+    const activeVotes = _.get(props.postData, 'active_votes', []);
+    const currentUserActiveVote = _.find(activeVotes, vote => vote.voter === props.authUsername);
+    const hasActiveVote = !_.isUndefined(currentUserActiveVote);
+    let votePercent = props.votingPercent;
+
+    if (hasActiveVote) {
+      const voteAmount =
+        _.get(currentUserActiveVote, 'percent', DEFAULT_VOTE_WEIGHT) / DEFAULT_VOTE_WEIGHT;
+      votePercent = voteAmount * 100;
+    }
+
     const buttonVotingPercentIndex = _.findIndex(PostVoteSlider.VOTING_PERCENT_BUTTONS, percent =>
-      _.isEqual(parseFloat(percent), props.votingPercent),
+      _.isEqual(parseFloat(percent), votePercent),
     );
+
     this.state = {
       buttonVotingPercentIndex,
-      votePercent: props.votingPercent,
+      votePercent,
     };
 
     this.handleOnVotingSliderValue = this.handleOnVotingSliderValue.bind(this);
@@ -181,7 +193,7 @@ class PostVoteSlider extends Component {
         </HeaderContent>
         <SliderContainer>
           <Slider
-            minimumValue={1}
+            minimumValue={0}
             step={1}
             maximumValue={100}
             onValueChange={this.handleOnVotingSliderValue}
