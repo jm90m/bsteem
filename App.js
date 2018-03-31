@@ -1,5 +1,5 @@
 import React from 'react';
-import { View } from 'react-native';
+import { View, StatusBar } from 'react-native';
 import sc2 from 'api/sc2';
 import { Provider } from 'react-redux';
 import { Constants, Asset } from 'expo';
@@ -57,6 +57,7 @@ export default class App extends React.Component {
     return (
       <Provider store={store}>
         <View style={{ flex: 1 }}>
+          <StatusBar barStyle="dark-content" />
           <AppNavigation />
           <SteemConnectErrorModal />
           <NotifyModal />
