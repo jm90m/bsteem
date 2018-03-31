@@ -18,9 +18,9 @@ import {
   getSteemRate,
   getLoadingUsersDetails,
 } from 'state/rootReducer';
-import { MaterialIcons } from '@expo/vector-icons';
-import HeaderEmptyView from 'components/common/HeaderEmptyView';
-import { COLORS, MATERIAL_ICONS } from 'constants/styles';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { COLORS, MATERIAL_ICONS, ICON_SIZES, MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
+import BackButton from 'components/common/BackButton';
 import { hidePriceModal } from 'state/actions/appActions';
 import i18n from 'i18n/i18n';
 import { fetchUser } from 'state/actions/usersActions';
@@ -34,11 +34,6 @@ const Container = styled.View``;
 const TitleText = styled.Text`
   font-weight: bold;
   color: ${COLORS.PRIMARY_COLOR};
-`;
-
-const BackTouchable = styled.TouchableOpacity`
-  justify-content: center;
-  padding: 10px;
 `;
 
 const EmptyView = styled.View`
@@ -55,6 +50,10 @@ const UserWalletTitleText = styled(TitleText)`
 const DisclaimerText = styled.Text`
   color: ${COLORS.TERTIARY_COLOR};
   padding: 10px;
+`;
+
+const MenuIconContainer = styled.View`
+  padding: 5px;
 `;
 
 const mapStateToProps = state => ({
@@ -203,11 +202,15 @@ class CryptoPriceModal extends Component {
       >
         <Container>
           <Header>
-            <HeaderEmptyView />
+            <MenuIconContainer>
+              <MaterialCommunityIcons
+                size={ICON_SIZES.menuIcon}
+                name={MATERIAL_COMMUNITY_ICONS.menuVertical}
+                color="transparent"
+              />
+            </MenuIconContainer>
             <TitleText>{i18n.titles.market}</TitleText>
-            <BackTouchable onPress={this.props.hidePriceModal}>
-              <MaterialIcons size={24} name={MATERIAL_ICONS.close} />
-            </BackTouchable>
+            <BackButton navigateBack={this.props.hidePriceModal} iconName={MATERIAL_ICONS.close} />
           </Header>
           <ScrollView
             style={{ paddingBottom: 200 }}
