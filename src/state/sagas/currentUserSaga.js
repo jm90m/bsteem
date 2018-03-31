@@ -9,6 +9,7 @@ import {
   getRebloggedPostRef,
   setFirebaseData,
 } from 'util/firebaseUtils';
+import { VOTE_ERRORS, GENERIC_ERROR } from 'constants/errors';
 import {
   getAuthUsername,
   getCurrentUserFeed,
@@ -31,6 +32,7 @@ import {
   FETCH_MORE_CURRENT_USER_BSTEEM_FEED,
 } from '../actions/actionTypes';
 import * as currentUserActions from '../actions/currentUserActions';
+import { displayNotifyModal } from '../actions/appActions';
 import { refreshUserBlog } from '../actions/usersActions';
 
 const fetchCurrentUserFeed = function*() {
@@ -145,9 +147,22 @@ const votePost = function*(action) {
     voteSuccessCallback(voteWeight);
     yield put(currentUserActions.currentUserVotePost.success(result));
   } catch (error) {
-    console.log('FAIL VOTE', error);
+    const errorDescription = _.get(error, 'error_description', '');
+    const errorDetails = _.find(VOTE_ERRORS, voteError =>
+      _.includes(errorDescription, voteError.fingerprint),
+    );
+    let displayedError = GENERIC_ERROR;
+
+    if (!_.isEmpty(errorDetails)) {
+      displayedError = errorDetails;
+    }
+    const displayErrorTitle = _.get(displayedError, 'title', GENERIC_ERROR.title);
+    const displayErrorDescription = _.get(displayedError, 'description', GENERIC_ERROR.description);
+
+    console.log('FAIL VOTE', errorDescription);
     const { voteFailCallback } = action.payload;
     voteFailCallback();
+    yield put(displayNotifyModal(displayErrorTitle, displayErrorDescription));
     yield put(currentUserActions.currentUserVotePost.fail(error));
   }
 };

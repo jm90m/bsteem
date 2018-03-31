@@ -31,4 +31,25 @@ export default {
     title: i18n.errors.bandWidthErrorTitle,
     message: i18n.errors.bandWidthError,
   },
+  VOTE_CHANGED_EXCEEDED: {
+    fingerprint: 'error',
+  },
+};
+
+export const VOTE_ERRORS = [
+  {
+    title: 'Max Votes Exceeded',
+    fingerprint: 'Voter has used the maximum number',
+    description: 'Voter has used the maximum number of vote changes on this comment.',
+  },
+  {
+    title: 'Small Voting Weight',
+    fingerprint: 'Voting weight is too small',
+    description: 'Voting weight is too small, please accumulate more voting power or steem power.',
+  },
+];
+
+export const GENERIC_ERROR = {
+  title: i18n.errors.genericErrorTitle,
+  description: i18n.errors.genericErrorDescription,
 };

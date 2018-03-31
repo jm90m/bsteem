@@ -18,6 +18,8 @@ export default {
     postTooBig: 'Your post is too big.',
     bandWidthError: 'Your bandwith has been exceeded. Please wait to transact or power up STEEM.',
     bandWidthErrorTitle: 'Bandwidth Error',
+    genericErrorTitle: 'Error has occured',
+    genericErrorDescription: "An error has occured, and we can't process the action at this moment",
   },
   titles: {
     post: 'Post',
