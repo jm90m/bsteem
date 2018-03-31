@@ -41,7 +41,6 @@ const MenuModalContents = styled.View`
 
 class PostMenu extends Component {
   static propTypes = {
-    handleLikePost: PropTypes.func,
     handleNavigateToComments: PropTypes.func,
     handleReblog: PropTypes.func,
     hideMenu: PropTypes.func,
@@ -53,8 +52,6 @@ class PostMenu extends Component {
     }),
     authUsername: PropTypes.string.isRequired,
     rebloggedList: PropTypes.arrayOf(PropTypes.string),
-    likedPost: PropTypes.bool,
-    loadingVote: PropTypes.bool,
     hideReblogMenu: PropTypes.bool,
     displayPhotoBrowserMenu: PropTypes.bool,
     handleDisplayPhotoBrowser: PropTypes.func,
@@ -64,12 +61,9 @@ class PostMenu extends Component {
   static defaultProps = {
     postData: {},
     rebloggedList: [],
-    likedPost: false,
-    loadingVote: false,
     hideReblogMenu: false,
     displayPhotoBrowserMenu: false,
     hideMenu: () => {},
-    handleLikePost: () => {},
     handleNavigateToComments: () => {},
     handleReblog: () => {},
     handleDisplayPhotoBrowser: () => {},
@@ -100,15 +94,12 @@ class PostMenu extends Component {
   render() {
     const {
       hideMenu,
-      handleLikePost,
       handleNavigateToComments,
       handleReblog,
       handleEditPost,
       postData,
       authUsername,
       rebloggedList,
-      likedPost,
-      loadingVote,
       hideReblogMenu,
       displayPhotoBrowserMenu,
       handleDisplayPhotoBrowser,
@@ -140,20 +131,6 @@ class PostMenu extends Component {
                   name={MATERIAL_COMMUNITY_ICONS.comment}
                 />
                 <MenuText>{i18n.postMenu.comments}</MenuText>
-              </MenuModalContents>
-            </MenuModalButton>
-            <MenuModalButton onPress={handleLikePost}>
-              <MenuModalContents>
-                {loadingVote ? (
-                  <SmallLoading />
-                ) : (
-                  <MaterialIcons
-                    size={ICON_SIZES.menuModalOptionIcon}
-                    color={COLORS.PRIMARY_COLOR}
-                    name={MATERIAL_ICONS.like}
-                  />
-                )}
-                <MenuText>{likedPost ? i18n.postMenu.unlikePost : i18n.postMenu.likePost}</MenuText>
               </MenuModalContents>
             </MenuModalButton>
             {!hideReblog && (

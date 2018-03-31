@@ -308,7 +308,7 @@ class PostPreview extends Component {
       return;
     }
 
-    this.sendVote();
+    this.sendVote(postConstants.DEFAULT_VOTE_WEIGHT);
   }
 
   displayHiddenContent() {

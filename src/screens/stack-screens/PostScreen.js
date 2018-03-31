@@ -16,6 +16,7 @@ import {
   getPostLoading,
   getPostsDetails,
   getAuthUsername,
+  getEnableVotingSlider,
 } from 'state/rootReducer';
 import PostPhotoBrowser from 'components/post/PostPhotoBrowser';
 import PostMenu from 'components/post-menu/PostMenu';
@@ -26,6 +27,7 @@ import PostHeader from 'components/post-preview/Header';
 import Header from 'components/common/Header';
 import BSteemModal from 'components/common/BSteemModal';
 import EmbedContent from 'components/post-preview/EmbedContent';
+import PostVoteSlider from 'components/post/PostVoteSlider';
 import PrimaryButton from '../../components/common/PrimaryButton';
 import { currentUserVotePost } from '../../state/actions/currentUserActions';
 import * as postConstants from '../../constants/postConstants';
@@ -66,6 +68,7 @@ const mapStateToProps = state => ({
   authUsername: getAuthUsername(state),
   postsDetails: getPostsDetails(state),
   postLoading: getPostLoading(state),
+  enableVotingSlider: getEnableVotingSlider(state),
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -98,6 +101,7 @@ class PostScreen extends Component {
   static propTypes = {
     authenticated: PropTypes.bool.isRequired,
     navigation: PropTypes.shape().isRequired,
+    enableVotingSlider: PropTypes.bool,
     currentUserVotePost: PropTypes.func.isRequired,
     fetchPostDetails: PropTypes.func.isRequired,
     authUsername: PropTypes.string,
@@ -107,6 +111,7 @@ class PostScreen extends Component {
   static defaultProps = {
     authUsername: '',
     postsDetails: {},
+    enableVotingSlider: false,
   };
 
   constructor(props) {
@@ -119,6 +124,7 @@ class PostScreen extends Component {
       loadingVote: false,
       likedPost: isPostVoted(postData, props.authUsername),
       postDetails: postData,
+      displayVoteSlider: false,
     };
 
     this.setModalVisible = this.setModalVisible.bind(this);
@@ -142,6 +148,9 @@ class PostScreen extends Component {
     this.likedVoteSuccess = this.likedVoteSuccess.bind(this);
     this.unlikedVoteSuccess = this.unlikedVoteSuccess.bind(this);
     this.fetchCurrentPostDetails = this.fetchCurrentPostDetails.bind(this);
+
+    this.handleVoteSliderSendVote = this.handleVoteSliderSendVote.bind(this);
+    this.sendVote = this.sendVote.bind(this);
   }
 
   componentDidMount() {
@@ -202,35 +211,54 @@ class PostScreen extends Component {
     this.props.fetchPostDetails(author, permlink);
   }
 
+  handleVoteSliderDisplay = displayVoteSlider => () => this.setState({ displayVoteSlider });
+
+  handleVoteSliderSendVote(voteWeight) {
+    this.setState({
+      displayVoteSlider: false,
+    });
+    this.sendVote(voteWeight);
+  }
+
+  sendVote(voteWeight) {
+    this.loadingVote();
+    const { enableVotingSlider } = this.props;
+    const { postData } = this.props.navigation.state.params;
+    const { author, permlink } = postData;
+    const { likedPost } = this.state;
+
+    if (likedPost && !enableVotingSlider) {
+      const voteSuccessCallback = this.unlikedVoteSuccess;
+      const voteFailCalback = this.likedVoteSuccess;
+      this.props.currentUserVotePost(
+        author,
+        permlink,
+        postConstants.DEFAULT_UNVOTE_WEIGHT,
+        voteSuccessCallback,
+        voteFailCalback,
+      );
+    } else {
+      const voteSuccessCallback = this.likedVoteSuccess;
+      const voteFailCallback = this.unlikedVoteSuccess;
+      this.props.currentUserVotePost(
+        author,
+        permlink,
+        voteWeight,
+        voteSuccessCallback,
+        voteFailCallback,
+      );
+    }
+  }
+
   handleLikePost() {
-    const { authenticated } = this.props;
+    const { authenticated, enableVotingSlider } = this.props;
     if (authenticated) {
-      const { postData } = this.props.navigation.state.params;
-      const { author, permlink } = postData;
-      const { likedPost } = this.state;
-
-      this.loadingVote();
-
-      if (likedPost) {
-        const voteSuccessCallback = this.unlikedVoteSuccess;
-        const voteFailCalback = this.likedVoteSuccess;
-        this.props.currentUserVotePost(
-          author,
-          permlink,
-          postConstants.DEFAULT_UNVOTE_WEIGHT,
-          voteSuccessCallback,
-          voteFailCalback,
-        );
+      if (enableVotingSlider) {
+        this.setState({
+          displayVoteSlider: true,
+        });
       } else {
-        const voteSuccessCallback = this.likedVoteSuccess;
-        const voteFailCallback = this.unlikedVoteSuccess;
-        this.props.currentUserVotePost(
-          author,
-          permlink,
-          postConstants.DEFAULT_VOTE_WEIGHT,
-          voteSuccessCallback,
-          voteFailCallback,
-        );
+        this.sendVote(postConstants.DEFAULT_VOTE_WEIGHT);
       }
     } else {
       this.navigateToLoginTab();
@@ -339,7 +367,14 @@ class PostScreen extends Component {
   render() {
     const { authUsername } = this.props;
     const { body, parsedJsonMetadata, author } = this.props.navigation.state.params;
-    const { displayPhotoBrowser, menuVisible, likedPost, loadingVote, postDetails } = this.state;
+    const {
+      displayPhotoBrowser,
+      menuVisible,
+      likedPost,
+      loadingVote,
+      postDetails,
+      displayVoteSlider,
+    } = this.state;
     const title = _.get(postDetails, 'title', '');
     const parsedHtmlBody = getHtml(body, parsedJsonMetadata);
     const images = _.get(parsedJsonMetadata, 'image', []);
@@ -379,14 +414,22 @@ class PostScreen extends Component {
             onLinkPress={this.handlePostLinkPress}
           />
           <FooterTags tags={tags} handleFeedNavigation={this.navigateToFeed} />
-          <Footer
-            postData={postDetails}
-            navigation={this.props.navigation}
-            loadingVote={loadingVote}
-            likedPost={likedPost}
-            handleLikePost={this.handleLikePost}
-            handleNavigateToVotes={this.navigateToVotes}
-          />
+          {displayVoteSlider ? (
+            <PostVoteSlider
+              postData={postDetails}
+              hideVoteSlider={this.handleVoteSliderDisplay(false)}
+              handleVoteSliderSendVote={this.handleVoteSliderSendVote}
+            />
+          ) : (
+            <Footer
+              postData={postDetails}
+              navigation={this.props.navigation}
+              loadingVote={loadingVote}
+              likedPost={likedPost}
+              handleLikePost={this.handleLikePost}
+              handleNavigateToVotes={this.navigateToVotes}
+            />
+          )}
           <PrimaryButton
             onPress={this.navigateToComments}
             title={i18n.post.viewComments}
@@ -397,9 +440,6 @@ class PostScreen extends Component {
           <BSteemModal visible={menuVisible} handleOnClose={this.handleHideMenu}>
             <PostMenu
               hideMenu={this.handleHideMenu}
-              handleLikePost={this.handleLikePost}
-              likedPost={likedPost}
-              loadingVote={loadingVote}
               handleNavigateToComments={this.navigateToComments}
               postData={postDetails}
               displayPhotoBrowserMenu={displayPhotoBrowserMenu}

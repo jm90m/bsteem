@@ -395,9 +395,6 @@ class FetchPostScreen extends Component {
           <BSteemModal visible={menuVisible} handleOnClose={this.handleHideMenu}>
             <PostMenu
               hideMenu={this.handleHideMenu}
-              handleLikePost={this.handleLikePost}
-              likedPost={likedPost}
-              loadingVote={loadingVote}
               handleNavigateToComments={this.navigateToComments}
               postData={currentPostDetails}
               displayPhotoBrowserMenu={displayPhotoBrowserMenu}
