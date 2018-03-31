@@ -38,14 +38,14 @@ export default {
 
 export const VOTE_ERRORS = [
   {
-    title: 'Max Votes Exceeded',
+    title: i18n.errors.maxVoteChangeExceededTitle,
     fingerprint: 'Voter has used the maximum number',
-    description: 'Voter has used the maximum number of vote changes on this comment.',
+    description: i18n.errors.maxVoteChangeExceeded,
   },
   {
-    title: 'Small Voting Weight',
+    title: i18n.errors.smallVotingWeightTitle,
     fingerprint: 'Voting weight is too small',
-    description: 'Voting weight is too small, please accumulate more voting power or steem power.',
+    description: i18n.errors.smallVotingWeight,
   },
 ];
 

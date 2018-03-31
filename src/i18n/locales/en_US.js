@@ -20,6 +20,11 @@ export default {
     bandWidthErrorTitle: 'Bandwidth Error',
     genericErrorTitle: 'Error has occured',
     genericErrorDescription: "An error has occured, and we can't process the action at this moment",
+    maxVoteChangeExceeded: 'You have exceeded the maximum number of vote changes on this comment.',
+    maxVoteChangeExceededTitle: 'Max Vote Changes Exceeded',
+    smallVotingWeightTitle: 'Small Voting Weight',
+    smallVotingWeight:
+      'Voting weight is too small, please accumulate more voting power or steem power',
   },
   titles: {
     post: 'Post',
