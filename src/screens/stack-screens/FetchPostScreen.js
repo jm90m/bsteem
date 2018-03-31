@@ -15,6 +15,7 @@ import {
   getPostLoading,
   getIsAuthenticated,
   getAuthUsername,
+  getEnableVotingSlider,
 } from 'state/rootReducer';
 import PostPhotoBrowser from 'components/post/PostPhotoBrowser';
 import PostMenu from 'components/post-menu/PostMenu';
@@ -30,8 +31,9 @@ import i18n from 'i18n/i18n';
 import { currentUserVotePost } from 'state/actions/currentUserActions';
 import EmbedContent from 'components/post-preview/EmbedContent';
 import BSteemModal from 'components/common/BSteemModal';
-import { isPostVoted } from '../../util/voteUtils';
-import { getEmbeds } from '../../util/postPreviewUtils';
+import { isPostVoted } from 'util/voteUtils';
+import { getEmbeds } from 'util/postPreviewUtils';
+import PostVoteSlider from 'components/post/PostVoteSlider';
 
 const { width: deviceWidth } = Dimensions.get('screen');
 
@@ -72,6 +74,7 @@ const mapStateToProps = state => ({
   postLoading: getPostLoading(state),
   authenticated: getIsAuthenticated(state),
   authUsername: getAuthUsername(state),
+  enableVotingSlider: getEnableVotingSlider(state),
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -105,6 +108,7 @@ class FetchPostScreen extends Component {
     navigation: PropTypes.shape().isRequired,
     postsDetails: PropTypes.shape(),
     authenticated: PropTypes.bool.isRequired,
+    enableVotingSlider: PropTypes.bool.isRequired,
     fetchPostDetails: PropTypes.func.isRequired,
     currentUserVotePost: PropTypes.func.isRequired,
     authUsername: PropTypes.string,
@@ -125,6 +129,7 @@ class FetchPostScreen extends Component {
       initialPhotoIndex: 0,
       loadingVote: false,
       likedPost: isPostVoted(currentPostDetails, props.authUsername),
+      displayVoteSlider: false,
     };
 
     this.handleHideMenu = this.handleHideMenu.bind(this);
@@ -149,6 +154,8 @@ class FetchPostScreen extends Component {
 
     this.getCurrentPostDetails = this.getCurrentPostDetails.bind(this);
     this.fetchCurrentPostDetails = this.fetchCurrentPostDetails.bind(this);
+    this.sendVote = this.sendVote.bind(this);
+    this.handleVoteSliderSendVote = this.handleVoteSliderSendVote.bind(this);
   }
 
   componentDidMount() {
@@ -183,9 +190,39 @@ class FetchPostScreen extends Component {
     });
   }
 
-  likedVoteSuccess() {
+  likedVoteSuccess(votePercent) {
+    const { enableVotingSlider, authUsername, postsDetails } = this.props;
+    const { author, permlink } = this.props.navigation.state.params;
+    try {
+      // directly modify the current vote post data, if it does not have an active vote then
+      // create a new vote object
+      if (enableVotingSlider) {
+        let hasActiveVote = false;
+        const postKey = `${author}/${permlink}`;
+        const postData = postsDetails[postKey];
+        for (let i = 0; i < _.size(postData.active_votes); i += 1) {
+          if (authUsername === postData.active_votes[i].voter) {
+            postData.active_votes[i].percent = votePercent;
+            hasActiveVote = true;
+            break;
+          }
+        }
+
+        if (!hasActiveVote) {
+          const newVoteObject = {
+            voter: authUsername,
+            percent: votePercent,
+          };
+          postData.active_votes.push(newVoteObject);
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    }
+    const likedPost = votePercent > 0;
+
     this.setState({
-      likedPost: true,
+      likedPost,
       loadingVote: false,
     });
   }
@@ -197,35 +234,54 @@ class FetchPostScreen extends Component {
     });
   }
 
+  sendVote(voteWeight) {
+    this.loadingVote();
+    const { enableVotingSlider } = this.props;
+    const currentPostDetails = this.getCurrentPostDetails();
+    const { author, permlink } = currentPostDetails;
+    const { likedPost } = this.state;
+
+    if (likedPost && !enableVotingSlider) {
+      const voteSuccessCallback = this.unlikedVoteSuccess;
+      const voteFailCalback = this.likedVoteSuccess;
+      this.props.currentUserVotePost(
+        author,
+        permlink,
+        postConstants.DEFAULT_UNVOTE_WEIGHT,
+        voteSuccessCallback,
+        voteFailCalback,
+      );
+    } else {
+      const voteSuccessCallback = this.likedVoteSuccess;
+      const voteFailCallback = this.unlikedVoteSuccess;
+      this.props.currentUserVotePost(
+        author,
+        permlink,
+        voteWeight,
+        voteSuccessCallback,
+        voteFailCallback,
+      );
+    }
+  }
+
+  handleVoteSliderDisplay = displayVoteSlider => () => this.setState({ displayVoteSlider });
+
+  handleVoteSliderSendVote(voteWeight) {
+    this.setState({
+      displayVoteSlider: false,
+    });
+    this.sendVote(voteWeight);
+  }
+
   handleLikePost() {
-    const { authenticated } = this.props;
+    const { authenticated, enableVotingSlider } = this.props;
     if (authenticated) {
-      const currentPostDetails = this.getCurrentPostDetails();
-      const { author, permlink } = currentPostDetails;
-      const { likedPost } = this.state;
-
-      this.loadingVote();
-
-      if (likedPost) {
-        const voteSuccessCallback = this.unlikedVoteSuccess;
-        const voteFailCalback = this.likedVoteSuccess;
-        this.props.currentUserVotePost(
-          author,
-          permlink,
-          postConstants.DEFAULT_UNVOTE_WEIGHT,
-          voteSuccessCallback,
-          voteFailCalback,
-        );
+      if (enableVotingSlider) {
+        this.setState({
+          displayVoteSlider: true,
+        });
       } else {
-        const voteSuccessCallback = this.likedVoteSuccess;
-        const voteFailCallback = this.unlikedVoteSuccess;
-        this.props.currentUserVotePost(
-          author,
-          permlink,
-          postConstants.DEFAULT_VOTE_WEIGHT,
-          voteSuccessCallback,
-          voteFailCallback,
-        );
+        this.sendVote(postConstants.DEFAULT_VOTE_WEIGHT);
       }
     } else {
       this.navigateToLoginTab();
@@ -358,6 +414,7 @@ class FetchPostScreen extends Component {
       initialPhotoIndex,
       loadingVote,
       likedPost,
+      displayVoteSlider,
     } = this.state;
     const currentPostDetails = this.getCurrentPostDetails();
 
@@ -428,14 +485,22 @@ class FetchPostScreen extends Component {
             onLinkPress={this.handlePostLinkPress}
           />
           <FooterTags tags={tags} handleFeedNavigation={this.handleFeedNavigation} />
-          <Footer
-            postData={currentPostDetails}
-            navigation={this.props.navigation}
-            loadingVote={loadingVote}
-            likedPost={likedPost}
-            handleLikePost={this.handleLikePost}
-            handleNavigateToVotes={this.navigateToVotes}
-          />
+          {displayVoteSlider ? (
+            <PostVoteSlider
+              postData={currentPostDetails}
+              hideVoteSlider={this.handleVoteSliderDisplay(false)}
+              handleVoteSliderSendVote={this.handleVoteSliderSendVote}
+            />
+          ) : (
+            <Footer
+              postData={currentPostDetails}
+              navigation={this.props.navigation}
+              loadingVote={loadingVote}
+              likedPost={likedPost}
+              handleLikePost={this.handleLikePost}
+              handleNavigateToVotes={this.navigateToVotes}
+            />
+          )}
           <PrimaryButton
             onPress={this.navigateToComments}
             title={i18n.post.viewComments}
