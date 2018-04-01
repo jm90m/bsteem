@@ -17,42 +17,46 @@ const remarkable = new Remarkable({
 });
 
 export function getHtml(body, parsedJsonMetadata, returnType = 'Object') {
-  parsedJsonMetadata.image = _.get(parsedJsonMetadata, 'image', []);
+  try {
+    parsedJsonMetadata.image = _.get(parsedJsonMetadata, 'image', []);
+    let parsedBody = body.replace(/<!--([\s\S]+?)(-->|$)/g, '(html comment removed: $1)');
 
-  let parsedBody = body.replace(/<!--([\s\S]+?)(-->|$)/g, '(html comment removed: $1)');
+    parsedBody.replace(imageRegex, img => {
+      if (_.filter(parsedJsonMetadata.image, i => i.indexOf(img) !== -1).length === 0) {
+        parsedJsonMetadata.image.push(img);
+      }
+    });
 
-  parsedBody.replace(imageRegex, img => {
-    if (_.filter(parsedJsonMetadata.image, i => i.indexOf(img) !== -1).length === 0) {
-      parsedJsonMetadata.image.push(img);
+    const htmlReadyOptions = { mutate: true, resolveIframe: returnType === 'text' };
+    parsedBody = remarkable.render(parsedBody);
+    parsedBody = htmlReady(parsedBody, htmlReadyOptions).html;
+    parsedBody = sanitizeHtml(parsedBody, sanitizeConfig({}));
+    if (returnType === 'text') {
+      return parsedBody;
     }
-  });
+    const sections = [];
+    const splittedBody = parsedBody.split('~~~ embed:');
+    for (let i = 0; i < splittedBody.length; i += 1) {
+      let section = splittedBody[i];
 
-  const htmlReadyOptions = { mutate: true, resolveIframe: returnType === 'text' };
-  parsedBody = remarkable.render(parsedBody);
-  parsedBody = htmlReady(parsedBody, htmlReadyOptions).html;
-  parsedBody = sanitizeHtml(parsedBody, sanitizeConfig({}));
-  if (returnType === 'text') {
-    return parsedBody;
+      const match = section.match(/^([A-Za-z0-9_-]+) ([A-Za-z]+) (\S+) ~~~/);
+      if (match && match.length >= 4) {
+        const id = match[1];
+        const type = match[2];
+        const link = match[3];
+        const embed = SteemEmbed.get(link, { width: '100%', height: 400, autoplay: false });
+        sections.push(`<div>${embed.embed}</div>`);
+        section = section.substring(`${id} ${type} ${link} ~~~`.length);
+      }
+      if (section !== '') {
+        sections.push(section);
+      }
+    }
+    return sections.join('');
+  } catch (error) {
+    console.log(error);
   }
-  const sections = [];
-  const splittedBody = parsedBody.split('~~~ embed:');
-  for (let i = 0; i < splittedBody.length; i += 1) {
-    let section = splittedBody[i];
-
-    const match = section.match(/^([A-Za-z0-9_-]+) ([A-Za-z]+) (\S+) ~~~/);
-    if (match && match.length >= 4) {
-      const id = match[1];
-      const type = match[2];
-      const link = match[3];
-      const embed = SteemEmbed.get(link, { width: '100%', height: 400, autoplay: false });
-      sections.push(`<div>${embed.embed}</div>`);
-      section = section.substring(`${id} ${type} ${link} ~~~`.length);
-    }
-    if (section !== '') {
-      sections.push(section);
-    }
-  }
-  return sections.join('');
+  return '<div>Error parsing this post</div>';
 }
 
 export const isPostTaggedNSFW = post => {

@@ -63,6 +63,11 @@ const PostTitle = styled.Text`
   font-size: 20px;
 `;
 
+const EmptyView = styled.View`
+  width: 100%;
+  height: 100px;
+`;
+
 const mapStateToProps = state => ({
   authenticated: getIsAuthenticated(state),
   authUsername: getAuthUsername(state),
@@ -433,8 +438,9 @@ class PostScreen extends Component {
           <PrimaryButton
             onPress={this.navigateToComments}
             title={i18n.post.viewComments}
-            style={{ marginTop: 20, marginBottom: 100 }}
+            style={{ marginTop: 20 }}
           />
+          <EmptyView />
         </ScrollView>
         {menuVisible && (
           <BSteemModal visible={menuVisible} handleOnClose={this.handleHideMenu}>

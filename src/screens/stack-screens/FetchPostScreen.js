@@ -69,6 +69,11 @@ const PostTitle = styled.Text`
   font-size: 20px;
 `;
 
+const EmptyView = styled.View`
+  width: 100%;
+  height: 100px;
+`;
+
 const mapStateToProps = state => ({
   postsDetails: getPostsDetails(state),
   postLoading: getPostLoading(state),
@@ -506,6 +511,7 @@ class FetchPostScreen extends Component {
             title={i18n.post.viewComments}
             style={{ marginTop: 20, marginBottom: 100 }}
           />
+          <EmptyView />
         </ScrollView>
       </Container>
     );
