@@ -172,6 +172,7 @@ class MessagesScreen extends Component {
           showLoadingIcon={false}
           autoCorrect={false}
           autoCapitalize="none"
+          clearIcon
         />
         <ScrollView>{this.renderSearchResults()}</ScrollView>
       </Container>

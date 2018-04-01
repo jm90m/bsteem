@@ -36,6 +36,7 @@ export const getLoadingFetchMoreDiscussions = state =>
 export const getHomeFeedPosts = state => fromHome.getHomeFeedPosts(state.home);
 export const getHomeTags = state => fromHome.getHomeTags(state.home);
 export const getFilterFeedByFollowers = state => fromHome.getFilterFeedByFollowers(state.home);
+export const getTagsLoading = state => fromHome.getTagsLoading(state.home);
 
 // User Selectors
 export const getUsersDetails = state => fromUsers.getUsersDetails(state.users);

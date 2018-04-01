@@ -43,6 +43,7 @@ export default {
     drafts: 'Drafts',
     rewards: 'Rewards',
     messages: 'Messages',
+    trendingTags: 'Trending Tags',
   },
   editor: {
     title: 'Title',

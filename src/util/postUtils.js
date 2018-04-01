@@ -17,7 +17,7 @@ const remarkable = new Remarkable({
 });
 
 export function getHtml(body, parsedJsonMetadata, returnType = 'Object') {
-  parsedJsonMetadata.image = parsedJsonMetadata.image || [];
+  parsedJsonMetadata.image = _.get(parsedJsonMetadata, 'image', []);
 
   let parsedBody = body.replace(/<!--([\s\S]+?)(-->|$)/g, '(html comment removed: $1)');
 

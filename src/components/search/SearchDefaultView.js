@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
-import { ScrollView } from 'react-native';
+import { ScrollView, RefreshControl } from 'react-native';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import styled from 'styled-components/native';
 import Tag from 'components/post/Tag';
 import { COLORS } from 'constants/styles';
+import i18n from 'i18n/i18n';
 
 const Container = styled.View`
   flex: 1;
@@ -27,6 +28,8 @@ const TrendingTagsTitle = styled.Text`
 
 class SearchDefaultView extends Component {
   static propTypes = {
+    tagsLoading: PropTypes.bool.isRequired,
+    fetchTags: PropTypes.func.isRequired,
     tags: PropTypes.arrayOf(PropTypes.shape()),
     handleNavigateToFeed: PropTypes.func,
   };
@@ -45,10 +48,20 @@ class SearchDefaultView extends Component {
     ));
   }
   render() {
+    const { tagsLoading, fetchTags } = this.props;
     return (
-      <ScrollView>
+      <ScrollView
+        refreshControl={
+          <RefreshControl
+            refreshing={tagsLoading}
+            onRefresh={fetchTags}
+            tintColor={COLORS.PRIMARY_COLOR}
+            colors={[COLORS.PRIMARY_COLOR]}
+          />
+        }
+      >
         <Container>
-          <TrendingTagsTitle>{'Trending Tags'}</TrendingTagsTitle>
+          <TrendingTagsTitle>{i18n.titles.trendingTags}</TrendingTagsTitle>
           {this.renderTags()}
         </Container>
       </ScrollView>

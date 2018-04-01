@@ -77,6 +77,7 @@ class PostMenu extends Component {
   }
 
   handleShare() {
+    this.props.hideMenu();
     const { postData } = this.props;
     const title = _.get(postData, 'title', '');
     const message = bsteemShareText;

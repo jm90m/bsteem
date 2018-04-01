@@ -38,7 +38,7 @@ export const getCurrentDaysOfTheWeek = currentLocale => {
 function getPriceDifferencePercentage(currentCryptoPrice, previousCryptoPrice) {
   const priceDifference = currentCryptoPrice - previousCryptoPrice;
   const priceIncrease = priceDifference / currentCryptoPrice;
-  return Math.abs(priceIncrease);
+  return Math.abs(priceIncrease) * 100;
 }
 
 export function getCryptoPriceIncreaseDetails(usdCryptoPriceHistory, btcCryptoPriceHistory) {

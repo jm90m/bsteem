@@ -22,6 +22,7 @@ import {
   getLoadingSearchUser,
   getLoadingSearchPost,
   getLoadingSearchTag,
+  getTagsLoading,
 } from 'state/rootReducer';
 import SearchPostPreview from 'components/search/SearchPostPreview';
 import SearchUserPreview from 'components/search/SearchUserPreview';
@@ -95,6 +96,7 @@ const mapStateToProps = state => ({
   loadingSearchUser: getLoadingSearchUser(state),
   loadingSearchPost: getLoadingSearchPost(state),
   loadingSearchTag: getLoadingSearchTag(state),
+  tagsLoading: getTagsLoading(state),
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -120,6 +122,7 @@ class SearchScreen extends Component {
     loadingSearchUser: PropTypes.bool.isRequired,
     loadingSearchPost: PropTypes.bool.isRequired,
     loadingSearchTag: PropTypes.bool.isRequired,
+    tagsLoading: PropTypes.bool.isRequired,
     searchUserResults: PropTypes.arrayOf(PropTypes.shape()).isRequired,
     searchPostResults: PropTypes.arrayOf(PropTypes.shape()).isRequired,
     searchTagsResults: PropTypes.arrayOf(PropTypes.shape()).isRequired,
@@ -227,11 +230,18 @@ class SearchScreen extends Component {
   }
 
   renderDefaultsViews(isLoading, hasNoSearchValue, hasNoSearchResults) {
-    const { tags } = this.props;
+    const { tags, tagsLoading } = this.props;
     if (isLoading) {
       return this.renderLoader();
     } else if (hasNoSearchValue) {
-      return <SearchDefaultView handleNavigateToFeed={this.handleNavigateToFeed} tags={tags} />;
+      return (
+        <SearchDefaultView
+          handleNavigateToFeed={this.handleNavigateToFeed}
+          tags={tags}
+          tagsLoading={tagsLoading}
+          fetchTags={this.props.fetchTags}
+        />
+      );
     } else if (hasNoSearchResults) {
       return <NoResultsFoundText>{i18n.search.noResultsFound}</NoResultsFoundText>;
     }
@@ -412,6 +422,7 @@ class SearchScreen extends Component {
           showLoadingIcon={searchLoading}
           autoCorrect={false}
           autoCapitalize="none"
+          clearIcon
         />
         {displayMenu && this.renderMenu()}
         {this.renderSearchResults()}

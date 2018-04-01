@@ -155,7 +155,11 @@ class Header extends Component {
       const { postData } = this.props;
       const jsonMetadata = _.attempt(JSON.parse, postData.json_metadata);
       const app = _.isError(jsonMetadata) ? [] : _.split(jsonMetadata.app, '/');
-      const from = _.get(APPS, app[0], '');
+      const from = _.get(APPS, _.get(app, 0, ''), '');
+
+      if (_.isEmpty(from)) {
+        return <View />;
+      }
 
       return <PostedFrom>{`${i18n.post.postedFrom}: ${from}`}</PostedFrom>;
     } catch (e) {

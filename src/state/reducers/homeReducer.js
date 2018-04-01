@@ -31,6 +31,11 @@ export default (state = INITIAL_STATE, action) => {
         tags,
       };
     }
+    case FETCH_TAGS.ERROR:
+      return {
+        ...state,
+        tagsLoading: false,
+      };
     case FETCH_DISCUSSIONS.PENDING:
       return {
         ...state,
@@ -83,3 +88,4 @@ export const getLoadingFetchMoreDiscussions = state => state.loadingFetchMoreDis
 export const getHomeFeedPosts = state => state.posts;
 export const getHomeTags = state => state.tags;
 export const getFilterFeedByFollowers = state => state.filterFeedByFollowers;
+export const getTagsLoading = state => state.tagsLoading;
