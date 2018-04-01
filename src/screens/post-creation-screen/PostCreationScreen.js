@@ -476,6 +476,7 @@ class PostCreationScreen extends Component {
               ref={input => (this.additionalContents[ref] = input)}
               placeholder={i18n.editor.bodyPlaceholder}
               multiline
+              inputStyle={{ width: '100%' }}
             />
             <TouchableOpacity
               onPress={() => this.removeAdditionalContent(index, type)}
@@ -605,6 +606,7 @@ class PostCreationScreen extends Component {
             placeholder={i18n.editor.titlePlaceholder}
             value={titleInput}
             maxLength={255}
+            inputStyle={{ width: '100%' }}
           />
           {displayTitleError && <FormValidationMessage>{titleError}</FormValidationMessage>}
           <TagsInput
@@ -620,6 +622,7 @@ class PostCreationScreen extends Component {
             placeholder={i18n.editor.bodyPlaceholder}
             multiline
             value={bodyInput}
+            inputStyle={{ width: '100%' }}
           />
           {this.renderAdditionalContents()}
           {imageLoading && <SmallLoading style={{ marginTop: 20, alignSelf: 'center' }} />}
