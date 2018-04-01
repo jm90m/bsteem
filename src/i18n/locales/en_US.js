@@ -197,5 +197,6 @@ export default {
     userIsBlocked: 'You have blocked this user.',
     messageContentIsHidden: 'Messages are hidden because you have blocked the user',
     hideMessages: 'Hide Messages',
+    sendMessage: 'Send Message',
   },
 };

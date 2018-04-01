@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components/native';
 import _ from 'lodash';
-import { View } from 'react-native';
+import { View, TouchableWithoutFeedback } from 'react-native';
 import { connect } from 'react-redux';
 import { getVoteValue } from 'util/userUtils';
 import { calculateVotingPower } from 'util/steemitUtils';
@@ -17,10 +17,10 @@ import {
 } from 'state/rootReducer';
 import UserProfile from 'components/user/user-profile/UserProfile';
 import * as navigationConstants from 'constants/navigation';
-import { COLORS, MATERIAL_ICONS } from 'constants/styles';
+import { COLORS, MATERIAL_ICONS, FONT_AWESOME_ICONS, ICON_SIZES } from 'constants/styles';
 import i18n from 'i18n/i18n';
 import SaveUserButton from 'components/common/SaveUserButton';
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons, FontAwesome } from '@expo/vector-icons';
 import UserStats from './UserStats';
 import UserCover from './UserCover';
 import UserFollowButton from './UserFollowButton';
@@ -67,6 +67,17 @@ const VoteContainer = styled.View`
   background-color: ${COLORS.WHITE.WHITE};
 `;
 
+const SendMessageContainer = styled.View`
+  padding: 10px 16px;
+  background-color: ${COLORS.PRIMARY_BACKGROUND_COLOR};
+  flex-direction: row;
+`;
+
+const SendMessageText = styled.Text`
+  color: ${COLORS.PRIMARY_COLOR};
+  margin-left: 5px;
+`;
+
 @connect(mapStateToProps)
 class UserHeader extends Component {
   static propTypes = {
@@ -77,6 +88,7 @@ class UserHeader extends Component {
     hideFollowButton: PropTypes.bool,
     navigation: PropTypes.shape().isRequired,
     rewardFund: PropTypes.shape().isRequired,
+    authenticated: PropTypes.bool.isRequired,
   };
 
   static defaultProps = {
@@ -88,6 +100,7 @@ class UserHeader extends Component {
     super(props);
     this.handleOnPressFollowers = this.handleOnPressFollowers.bind(this);
     this.handleOnPressFollowing = this.handleOnPressFollowing.bind(this);
+    this.handleNavigateToUserMessage = this.handleNavigateToUserMessage.bind(this);
   }
 
   handleOnPressFollowers() {
@@ -98,6 +111,11 @@ class UserHeader extends Component {
   handleOnPressFollowing() {
     const { username } = this.props;
     this.props.navigation.navigate(navigationConstants.USER_FOLLOWING, { username });
+  }
+
+  handleNavigateToUserMessage() {
+    const { username } = this.props;
+    this.props.navigation.navigate(navigationConstants.USER_MESSAGE, { username });
   }
 
   renderActionButtons() {
@@ -115,6 +133,25 @@ class UserHeader extends Component {
         </SaveUserButtonContainer>
       </ActionButtonsContainer>
     );
+  }
+
+  renderSendMessage() {
+    const { authenticated } = this.props;
+    if (authenticated) {
+      return (
+        <TouchableWithoutFeedback onPress={this.handleNavigateToUserMessage}>
+          <SendMessageContainer>
+            <FontAwesome
+              name={FONT_AWESOME_ICONS.sendMessage}
+              color={COLORS.PRIMARY_COLOR}
+              size={15}
+            />
+            <SendMessageText>{i18n.messages.sendMessage}</SendMessageText>
+          </SendMessageContainer>
+        </TouchableWithoutFeedback>
+      );
+    }
+    return null;
   }
 
   render() {
@@ -159,14 +196,23 @@ class UserHeader extends Component {
         <UserProfile userProfile={userProfile} userDetails={userDetails} />
         <VoteContainer>
           <VoteContentContainer>
-            <MaterialIcons name={MATERIAL_ICONS.money} size={20} color={COLORS.GREY.CHARCOAL} />
+            <MaterialIcons
+              name={MATERIAL_ICONS.money}
+              size={ICON_SIZES.userHeaderIcon}
+              color={COLORS.GREY.CHARCOAL}
+            />
             <VoteText>{voteWorthText}</VoteText>
           </VoteContentContainer>
           <VoteContentContainer>
-            <MaterialIcons name={MATERIAL_ICONS.flashOn} size={20} color={COLORS.GREY.CHARCOAL} />
+            <MaterialIcons
+              name={MATERIAL_ICONS.flashOn}
+              size={ICON_SIZES.userHeaderIcon}
+              color={COLORS.GREY.CHARCOAL}
+            />
             <VoteText>{votePowerText}</VoteText>
           </VoteContentContainer>
         </VoteContainer>
+        {this.renderSendMessage()}
         <UserStats
           postCount={postCount}
           followerCount={followerCount}

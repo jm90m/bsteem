@@ -20,6 +20,7 @@ import EditReplyScreen from '../stack-screens/EditReplyScreen';
 import SettingsScreen from '../stack-screens/SettingsScreen';
 import EditPostScreen from '../post-creation-screen/EditPostScreen';
 import EditProfileScreen from '../stack-screens/EditProfileScreen';
+import UserMessageScreen from '../stack-screens/UserMessageScreen';
 
 const screenNavigationOptions = {
   tabBarIcon: ({ tintColor }) => (
@@ -94,6 +95,10 @@ const LoginNavigator = StackNavigator(
     },
     [navigationConstants.EDIT_PROFILE]: {
       screen: EditProfileScreen,
+      navigationOptions: screenNavigationOptions,
+    },
+    [navigationConstants.USER_MESSAGE]: {
+      screen: UserMessageScreen,
       navigationOptions: screenNavigationOptions,
     },
   },
