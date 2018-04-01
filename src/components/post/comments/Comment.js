@@ -13,6 +13,7 @@ import withAuthActions from 'components/common/withAuthActions';
 import CommentFooter from './CommentFooter';
 import CommentContent from './CommentContent';
 import { calculatePayout } from '../../../util/steemitUtils';
+import PostVoteSlider from 'components/post/PostVoteSlider';
 
 const { width: deviceWidth } = Dimensions.get('screen');
 
@@ -45,6 +46,7 @@ class Comment extends Component {
     comment: PropTypes.shape().isRequired,
     parent: PropTypes.shape().isRequired,
     navigation: PropTypes.shape().isRequired,
+    enableVotingSlider: PropTypes.bool.isRequired,
     currentUserVoteComment: PropTypes.func.isRequired,
     onActionInitiated: PropTypes.func,
     sort: PropTypes.oneOf([
@@ -97,6 +99,7 @@ class Comment extends Component {
       loadingDislike: false,
       newReplyComment: {},
       currentCommentBody: comment.body,
+      displayVoteSlider: false,
     };
 
     this.setLiked = this.setLiked.bind(this);
@@ -115,6 +118,11 @@ class Comment extends Component {
     this.likeComment = this.likeComment.bind(this);
     this.dislikeComment = this.dislikeComment.bind(this);
     this.replyComment = this.replyComment.bind(this);
+
+    this.handleVoteSliderSendVote = this.handleVoteSliderSendVote.bind(this);
+    this.handleLikeCommentWithSlider = this.handleLikeCommentWithSlider.bind(this);
+    this.handleDislikeCommentWithSlider = this.handleDislikeCommentWithSlider.bind(this);
+    this.modifyCommentDataForVote = this.modifyCommentDataForVote.bind(this);
   }
 
   setLiked(liked) {
@@ -166,48 +174,125 @@ class Comment extends Component {
     });
   }
 
-  likeComment() {
+  modifyCommentDataForVote(voteWeightPercent) {
+    const { enableVotingSlider, authUsername, comment } = this.props;
+    try {
+      // directly modify the current vote post data, if it does not have an active vote then
+      // create a new vote object
+      if (enableVotingSlider) {
+        let hasActiveVote = false;
+        for (let i = 0; i < _.size(comment.active_votes); i += 1) {
+          if (authUsername === comment.active_votes[i].voter) {
+            comment.active_votes[i].percent = voteWeightPercent;
+            hasActiveVote = true;
+            break;
+          }
+        }
+
+        if (!hasActiveVote) {
+          const newVoteObject = {
+            voter: authUsername,
+            percent: voteWeightPercent,
+          };
+          comment.active_votes.push(newVoteObject);
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  likeComment(voteWeight) {
     const { liked } = this.state;
     const { comment, rootPostId } = this.props;
 
     this.setLoadingLike(true);
 
-    const weight = liked ? 0 : 10000;
-    const voteSuccessCallback = () => this.setLiked(!liked);
+    const voteSuccessCallback = () => {
+      this.setLiked(!liked);
+      this.modifyCommentDataForVote(voteWeight);
+    };
     const voteFailCallback = () => this.setLoadingLike(false);
 
     this.props.currentUserVoteComment(
       comment.id,
       rootPostId,
-      weight,
+      voteWeight,
       voteSuccessCallback,
       voteFailCallback,
       comment,
     );
   }
 
-  handleLike() {
-    const { authenticated, onActionInitiated } = this.props;
-    if (!_.isUndefined(onActionInitiated)) {
-      onActionInitiated(this.likeComment);
-    } else if (authenticated) {
-      this.likeComment();
+  handleVoteSliderSendVote(voteWeight) {
+    this.setState({
+      displayVoteSlider: false,
+    });
+    const isUpvote = voteWeight > 0;
+
+    if (isUpvote) {
+      this.likeComment(voteWeight);
+    } else {
+      this.dislikeComment(voteWeight);
     }
   }
 
-  dislikeComment() {
+  handleSetVoteSliderDisplay = displayVoteSlider => () => {
+    this.setState({
+      displayVoteSlider,
+    });
+  };
+
+  handleLikeCommentWithSlider() {
+    const { enableVotingSlider } = this.props;
+    if (enableVotingSlider) {
+      this.setState({
+        displayVoteSlider: true,
+      });
+    } else {
+      const { liked } = this.state;
+      const weight = liked ? 0 : 10000;
+      this.likeComment(weight);
+    }
+  }
+
+  handleDislikeCommentWithSlider() {
+    const { enableVotingSlider } = this.props;
+    if (enableVotingSlider) {
+      this.setState({
+        displayVoteSlider: true,
+      });
+    } else {
+      const { disliked } = this.state;
+      const weight = disliked ? 0 : -10000;
+      this.dislikeComment(weight);
+    }
+  }
+
+  handleLike() {
+    const { authenticated, onActionInitiated } = this.props;
+    if (!_.isUndefined(onActionInitiated)) {
+      onActionInitiated(this.handleLikeCommentWithSlider);
+    } else if (authenticated) {
+      this.handleLikeCommentWithSlider();
+    }
+  }
+
+  dislikeComment(voteWeight) {
     const { disliked } = this.state;
     const { comment, rootPostId } = this.props;
     this.setLoadingDislike(true);
 
-    const weight = disliked ? 0 : -10000;
-    const voteSuccessCallback = () => this.setDisliked(!disliked);
+    const voteSuccessCallback = () => {
+      this.setDisliked(!disliked);
+      this.modifyCommentDataForVote(voteWeight);
+    };
     const voteFailCallback = () => this.setLoadingDislike(false);
 
     this.props.currentUserVoteComment(
       comment.id,
       rootPostId,
-      weight,
+      voteWeight,
       voteSuccessCallback,
       voteFailCallback,
       comment,
@@ -218,9 +303,9 @@ class Comment extends Component {
     const { authenticated, onActionInitiated } = this.props;
 
     if (!_.isUndefined(onActionInitiated)) {
-      this.props.onActionInitiated(this.dislikeComment);
+      this.props.onActionInitiated(this.handleDislikeCommentWithSlider);
     } else if (authenticated) {
-      this.dislikeComment();
+      this.handleDislikeCommentWithSlider();
     }
   }
 
@@ -282,6 +367,7 @@ class Comment extends Component {
       currentUserVoteComment,
       rootPostId,
       sort,
+      enableVotingSlider,
     } = this.props;
 
     if (!_.isEmpty(newReplyComment)) {
@@ -303,6 +389,7 @@ class Comment extends Component {
           currentUserVoteComment={currentUserVoteComment}
           rootPostId={rootPostId}
           sort={sort}
+          enableVotingSlider={enableVotingSlider}
         />
       );
     }
@@ -326,6 +413,7 @@ class Comment extends Component {
       navigation,
       currentUserVoteComment,
       rootPostId,
+      enableVotingSlider,
     } = this.props;
 
     if (!_.isEmpty(commentsChildren[comment.id])) {
@@ -347,6 +435,7 @@ class Comment extends Component {
           currentUserVoteComment={currentUserVoteComment}
           rootPostId={rootPostId}
           sort={sort}
+          enableVotingSlider={enableVotingSlider}
         />
       ));
     }
@@ -355,7 +444,14 @@ class Comment extends Component {
 
   render() {
     const { comment, authUsername, currentWidth, navigation } = this.props;
-    const { liked, disliked, loadingLike, loadingDislike, currentCommentBody } = this.state;
+    const {
+      liked,
+      disliked,
+      loadingLike,
+      loadingDislike,
+      currentCommentBody,
+      displayVoteSlider,
+    } = this.state;
     const anchorId = `@${comment.author}/${comment.permlink}`;
     // const anchorLink = `${comment.url.slice(0, comment.url.indexOf('#'))}#${anchorId}`;
     const editable =
@@ -381,19 +477,27 @@ class Comment extends Component {
             navigation={navigation}
           />
         </CommentContentContainer>
-        <CommentFooter
-          liked={liked}
-          disliked={disliked}
-          loadingLike={loadingLike}
-          loadingDislike={loadingDislike}
-          handleLike={this.handleLike}
-          handleDislike={this.handleDislike}
-          handleReply={this.handleReply}
-          handleEdit={this.handleEdit}
-          handlePayout={this.handlePayout}
-          payout={payout}
-          editable={editable}
-        />
+        {displayVoteSlider ? (
+          <PostVoteSlider
+            postData={comment}
+            handleVoteSliderSendVote={this.handleVoteSliderSendVote}
+            hideVoteSlider={this.handleSetVoteSliderDisplay(false)}
+          />
+        ) : (
+          <CommentFooter
+            liked={liked}
+            disliked={disliked}
+            loadingLike={loadingLike}
+            loadingDislike={loadingDislike}
+            handleLike={this.handleLike}
+            handleDislike={this.handleDislike}
+            handleReply={this.handleReply}
+            handleEdit={this.handleEdit}
+            handlePayout={this.handlePayout}
+            payout={payout}
+            editable={editable}
+          />
+        )}
 
         <CommentChildrenContainer>
           {this.renderReplyComment()}

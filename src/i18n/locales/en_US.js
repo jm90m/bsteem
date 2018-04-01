@@ -25,6 +25,8 @@ export default {
     smallVotingWeightTitle: 'Small Voting Weight',
     smallVotingWeight:
       'Voting weight is too small, please accumulate more voting power or steem power',
+    alreadyVotedTitle: 'Already voted',
+    alreadyVotedDescription: 'You have already voted in a similar way.',
   },
   titles: {
     post: 'Post',

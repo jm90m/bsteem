@@ -8,6 +8,7 @@ import {
   getCommentsByPostId,
   getIsAuthenticated,
   getLoadingComments,
+  getEnableVotingSlider,
 } from 'state/rootReducer';
 import { currentUserVoteComment } from 'state/actions/currentUserActions';
 import { fetchComments } from 'state/actions/postsActions';
@@ -21,6 +22,7 @@ const mapStateToProps = state => ({
   commentsByPostId: getCommentsByPostId(state),
   authenticated: getIsAuthenticated(state),
   loadingComments: getLoadingComments(state),
+  enableVotingSlider: getEnableVotingSlider(state),
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -68,12 +70,14 @@ class CommentsContainer extends Component {
     sort: PropTypes.shape().isRequired,
     authUsername: PropTypes.string,
     authenticated: PropTypes.bool,
+    enableVotingSlider: PropTypes.bool,
     commentsByPostId: PropTypes.shape(),
   };
 
   static defaultProps = {
     authUsername: '',
     authenticated: false,
+    enableVotingSlider: false,
     commentsByPostId: {},
   };
 
@@ -100,6 +104,7 @@ class CommentsContainer extends Component {
       loadingComments,
       handleDisplayMenu,
       sort,
+      enableVotingSlider,
     } = this.props;
     const postComments = _.get(commentsByPostId, postId, null);
     const comments = _.get(postComments, 'comments', {});
@@ -132,6 +137,7 @@ class CommentsContainer extends Component {
           loadingComments={loadingComments}
           handleDisplayMenu={handleDisplayMenu}
           sort={sort}
+          enableVotingSlider={enableVotingSlider}
         />
       </Container>
     );

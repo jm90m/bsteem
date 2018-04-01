@@ -62,6 +62,7 @@ class CommentsList extends Component {
     authenticated: PropTypes.bool,
     sort: PropTypes.shape().isRequired,
     handleDisplayMenu: PropTypes.func.isRequired,
+    enableVotingSlider: PropTypes.bool.isRequired,
   };
 
   static defaultProps = {
@@ -102,6 +103,7 @@ class CommentsList extends Component {
       currentUserVoteComment,
       postId,
       sort,
+      enableVotingSlider,
     } = this.props;
     const postAuthor = postData.author;
 
@@ -119,6 +121,7 @@ class CommentsList extends Component {
         navigation={navigation}
         currentUserVoteComment={currentUserVoteComment}
         sort={sort}
+        enableVotingSlider={enableVotingSlider}
       />
     );
   }

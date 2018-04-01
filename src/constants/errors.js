@@ -47,6 +47,11 @@ export const VOTE_ERRORS = [
     fingerprint: 'Voting weight is too small',
     description: i18n.errors.smallVotingWeight,
   },
+  {
+    title: i18n.errors.alreadyVotedTitle,
+    fingerprint: 'You have already voted',
+    description: i18n.errors.alreadyVotedDescription,
+  },
 ];
 
 export const GENERIC_ERROR = {

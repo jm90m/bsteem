@@ -187,9 +187,22 @@ const voteComment = function*(action) {
     voteSuccessCallback();
     yield put(currentUserActions.currentUserVoteComment.success(result));
   } catch (error) {
+    const errorDescription = _.get(error, 'error_description', '');
+    const errorDetails = _.find(VOTE_ERRORS, voteError =>
+      _.includes(errorDescription, voteError.fingerprint),
+    );
+    let displayedError = GENERIC_ERROR;
+
+    if (!_.isEmpty(errorDetails)) {
+      displayedError = errorDetails;
+    }
+    const displayErrorTitle = _.get(displayedError, 'title', GENERIC_ERROR.title);
+    const displayErrorDescription = _.get(displayedError, 'description', GENERIC_ERROR.description);
+
+    console.log('FAIL VOTE COMMENT VOTE', errorDescription);
     const { voteFailCallback } = action.payload;
-    console.log('FAIL VOTE COMMENT', error);
     voteFailCallback();
+    yield put(displayNotifyModal(displayErrorTitle, displayErrorDescription));
     yield put(currentUserActions.currentUserVoteComment.fail(error));
   }
 };
