@@ -142,8 +142,15 @@ const fetchMoreCurrentUserBSteemFeed = function*(action) {
 const votePost = function*(action) {
   try {
     const { postAuthor, postPermlink, voteWeight, voteSuccessCallback } = action.payload;
+    const roundedVoteWeight = Math.round(voteWeight);
     const currentUsername = yield select(getAuthUsername);
-    const result = yield call(sc2.vote, currentUsername, postAuthor, postPermlink, voteWeight);
+    const result = yield call(
+      sc2.vote,
+      currentUsername,
+      postAuthor,
+      postPermlink,
+      roundedVoteWeight,
+    );
     voteSuccessCallback(voteWeight);
     yield put(currentUserActions.currentUserVotePost.success(result));
   } catch (error) {

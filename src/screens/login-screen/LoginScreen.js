@@ -45,7 +45,6 @@ class LoginScreen extends Component {
 
   renderUser() {
     if (!_.isEmpty(this.props.accessToken)) {
-      console.log('RENDER LOGIN SCREEN CURRENT USER SCREEN');
       return <CurrentUserProfileScreen navigation={this.props.navigation} />;
     }
     return null;
