@@ -245,6 +245,7 @@ class EditProfileScreen extends Component {
             placeholder=""
             value={nameInput}
             maxLength={255}
+            inputStyle={{ width: '100%' }}
           />
           <FormLabel>{i18n.editProfile.about}</FormLabel>
           <FormInput
@@ -252,6 +253,7 @@ class EditProfileScreen extends Component {
             placeholder=""
             value={aboutInput}
             multiline
+            inputStyle={{ width: '100%' }}
           />
           <FormLabel>{i18n.editProfile.location}</FormLabel>
           <FormInput onChangeText={this.onChangeLocation} placeholder="" value={locationInput} />
@@ -262,12 +264,14 @@ class EditProfileScreen extends Component {
             onChangeText={this.onChangeProfilePicture}
             placeholder=""
             value={profilePictureInput}
+            inputStyle={{ width: '100%' }}
           />
           <FormLabel>{i18n.editProfile.coverPicture}</FormLabel>
           <FormInput
             onChangeText={this.onChangeCoverPicture}
             placeholder=""
             value={coverPictureInput}
+            inputStyle={{ width: '100%' }}
           />
           <ActionButtonsContainer>
             <PrimaryButton

@@ -31,7 +31,7 @@ const mapDispatchToProps = dispatch => ({
 const Container = styled.View``;
 
 const ContentContainer = styled.View`
-  background-color: ${COLORS.SPLASH_SCREEN_BACKGROUND};
+  background-color: ${COLORS.PRIMARY_BACKGROUND_COLOR};
   align-items: center;
   height: 100%;
 `;

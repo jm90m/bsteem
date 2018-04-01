@@ -163,6 +163,7 @@ class FollowingScreen extends Component {
           <TitleText>{`${username} following`}</TitleText>
           <HeaderEmptyView />
         </Header>
+        {isLoading && <LargeLoading />}
         <StyledListView
           dataSource={ds.cloneWithRows(followers)}
           renderRow={this.renderRow}
@@ -177,7 +178,6 @@ class FollowingScreen extends Component {
             />
           }
         />
-        {isLoading && <LargeLoading />}
       </Container>
     );
   }

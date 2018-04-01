@@ -40,6 +40,7 @@ const CryptoName = styled.Text`
 
 const Percent = styled.Text`
   color: ${props => (props.increase ? COLORS.BLUE.MEDIUM_AQUAMARINE : COLORS.RED.VALENCIA)};
+  font-weight: bold;
   margin: 0 5px;
 `;
 

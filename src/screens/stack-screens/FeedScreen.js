@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { RefreshControl } from 'react-native';
 import _ from 'lodash';
 import styled from 'styled-components/native';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
@@ -207,7 +208,7 @@ class FeedScreen extends Component {
   render() {
     const { currentUserFollowList } = this.props;
     const { tag } = this.props.navigation.state.params;
-    const { currentFilter, menuVisible, posts, filterFeedByFollowers } = this.state;
+    const { currentFilter, menuVisible, posts, filterFeedByFollowers, loading } = this.state;
     const displayListView = _.size(posts) > 0;
     const displayedPosts = filterFeedByFollowers
       ? _.filter(posts, post => _.get(currentUserFollowList, post.author, false))
@@ -247,6 +248,14 @@ class FeedScreen extends Component {
             onEndReached={this.fetchMorePosts}
             initialNumToRender={4}
             keyExtractor={(item, index) => `${_.get(item, 'item.id', '')}${index}`}
+            refreshControl={
+              <RefreshControl
+                refreshing={loading}
+                onRefresh={this.fetchInitialPostsForFilter}
+                tintColor={COLORS.PRIMARY_COLOR}
+                colors={[COLORS.PRIMARY_COLOR]}
+              />
+            }
           />
         )}
       </Container>

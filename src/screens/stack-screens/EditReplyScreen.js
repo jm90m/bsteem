@@ -163,6 +163,7 @@ class EditReplyScreen extends Component {
               placeholder={i18n.editor.replyPlaceholder}
               multiline
               value={replyText}
+              inputStyle={{ width: '100%' }}
             />
             <ReplyButtonContainer>
               <PrimaryButton

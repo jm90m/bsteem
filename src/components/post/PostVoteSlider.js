@@ -165,6 +165,7 @@ class PostVoteSlider extends Component {
     const selectedButtonStyle = { backgroundColor: COLORS.PRIMARY_COLOR };
     const selectedTextStyle = { color: COLORS.PRIMARY_COLOR };
     const voteWorth = parseFloat(this.calculateVoteWorth()).toFixed(2);
+    const displayedVotePercent = parseFloat(votePercent).toFixed(0);
 
     return (
       <Container>
@@ -207,7 +208,7 @@ class PostVoteSlider extends Component {
             selectedButtonStyle={selectedButtonStyle}
             selectedTextStyle={selectedTextStyle}
           />
-          <VoteWorth>{`${i18n.post.voteWorth} $${voteWorth} (${votePercent}%)`}</VoteWorth>
+          <VoteWorth>{`${i18n.post.voteWorth} $${voteWorth} (${displayedVotePercent}%)`}</VoteWorth>
         </SliderContainer>
       </Container>
     );
