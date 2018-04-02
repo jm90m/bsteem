@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { KeyboardAvoidingView } from 'react-native';
 import styled from 'styled-components/native';
 import { connect } from 'react-redux';
 import _ from 'lodash';
@@ -17,7 +18,10 @@ const BackTouchable = styled.TouchableOpacity`
   padding: 10px;
 `;
 
-const Container = styled.View``;
+const Container = styled.View`
+  flex: 1;
+  background-color: ${COLORS.PRIMARY_BACKGROUND_COLOR};
+`;
 
 const ReplyContentContainer = styled.ScrollView``;
 
@@ -31,7 +35,7 @@ const Title = styled.Text`
 `;
 
 const ReplyInputContainer = styled.View`
-  background-color: ${COLORS.WHITE.WHITE};
+  background-color: ${COLORS.PRIMARY_BACKGROUND_COLOR};
   padding: 10px;
 `;
 
@@ -156,25 +160,27 @@ class EditReplyScreen extends Component {
           </TitleContainer>
           <HeaderEmptyView />
         </Header>
-        <ReplyContentContainer>
-          <ReplyInputContainer>
-            <FormInput
-              onChangeText={this.onChangeReplyText}
-              placeholder={i18n.editor.replyPlaceholder}
-              multiline
-              value={replyText}
-              inputStyle={{ width: '100%' }}
-            />
-            <ReplyButtonContainer>
-              <PrimaryButton
-                onPress={this.handleSubmit}
-                title={i18n.editor.reply}
-                disabled={replyLoading}
-                loading={replyLoading}
+        <KeyboardAvoidingView behavior="padding">
+          <ReplyContentContainer>
+            <ReplyInputContainer>
+              <FormInput
+                onChangeText={this.onChangeReplyText}
+                placeholder={i18n.editor.replyPlaceholder}
+                multiline
+                value={replyText}
+                inputStyle={{ width: '100%' }}
               />
-            </ReplyButtonContainer>
-          </ReplyInputContainer>
-        </ReplyContentContainer>
+              <ReplyButtonContainer>
+                <PrimaryButton
+                  onPress={this.handleSubmit}
+                  title={i18n.editor.reply}
+                  disabled={replyLoading}
+                  loading={replyLoading}
+                />
+              </ReplyButtonContainer>
+            </ReplyInputContainer>
+          </ReplyContentContainer>
+        </KeyboardAvoidingView>
       </Container>
     );
   }

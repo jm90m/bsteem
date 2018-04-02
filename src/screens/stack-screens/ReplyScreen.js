@@ -24,6 +24,7 @@ const BackTouchable = styled.TouchableOpacity`
 
 const Container = styled.View`
   flex: 1;
+  background: ${COLORS.PRIMARY_BACKGROUND_COLOR};
 `;
 
 const ReplyContentContainer = styled.ScrollView``;
@@ -33,7 +34,7 @@ const AvatarContainer = styled.View`
 `;
 
 const CommentContainer = styled.View`
-  background-color: ${COLORS.WHITE.WHITE};
+  background-color: ${COLORS.PRIMARY_BACKGROUND_COLOR};
   margin-top: 2px;
   margin-bottom: 2px;
 `;
