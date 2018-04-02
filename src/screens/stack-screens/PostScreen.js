@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Modal, ScrollView, Dimensions, Share } from 'react-native';
+import { ScrollView, Dimensions, Share } from 'react-native';
 import { connect } from 'react-redux';
 import Expo from 'expo';
 import styled from 'styled-components/native';
@@ -28,6 +28,7 @@ import Header from 'components/common/Header';
 import BSteemModal from 'components/common/BSteemModal';
 import EmbedContent from 'components/post-preview/EmbedContent';
 import PostVoteSlider from 'components/post/PostVoteSlider';
+import PostComments from 'components/post/PostComments';
 import PrimaryButton from '../../components/common/PrimaryButton';
 import { currentUserVotePost } from '../../state/actions/currentUserActions';
 import * as postConstants from '../../constants/postConstants';
@@ -435,6 +436,7 @@ class PostScreen extends Component {
               handleNavigateToVotes={this.navigateToVotes}
             />
           )}
+          <PostComments postData={postDetails} navigation={this.props.navigation} />
           <PrimaryButton
             onPress={this.navigateToComments}
             title={i18n.post.viewComments}

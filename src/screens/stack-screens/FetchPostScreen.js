@@ -34,6 +34,7 @@ import BSteemModal from 'components/common/BSteemModal';
 import { isPostVoted } from 'util/voteUtils';
 import { getEmbeds } from 'util/postPreviewUtils';
 import PostVoteSlider from 'components/post/PostVoteSlider';
+import PostComments from 'components/post/PostComments';
 
 const { width: deviceWidth } = Dimensions.get('screen');
 
@@ -506,6 +507,7 @@ class FetchPostScreen extends Component {
               handleNavigateToVotes={this.navigateToVotes}
             />
           )}
+          <PostComments postData={currentPostDetails} navigation={this.props.navigation} />
           <PrimaryButton
             onPress={this.navigateToComments}
             title={i18n.post.viewComments}

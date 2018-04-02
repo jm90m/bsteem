@@ -44,6 +44,8 @@ export default {
     accessTokenExpiredTitle: 'Access Token is expired',
     accessTokenExpiredDescription:
       'Your access token is expired, you need to logout and log back in',
+    voteWeightZeroTitle: 'Vote weight required',
+    voteWeightZeroDescription: 'Vote weight cannot be 0',
   },
   titles: {
     post: 'Post',
@@ -120,7 +122,7 @@ export default {
       ' If you want to logout of your account, you can press the logout button below',
   },
   post: {
-    viewComments: 'View Comments',
+    viewComments: 'View All Comments',
     reblogged: 'Reblogged',
     noPostFound: 'No post was found.',
     postedFrom: 'Posted from',

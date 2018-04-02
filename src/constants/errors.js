@@ -59,6 +59,11 @@ export const VOTE_ERRORS = [
     fingerprint: 'have permission to broadcast', //The app @bsteem doesn't have permission to broadcast for <username>
     description: i18n.errors.accessTokenExpiredDescription,
   },
+  {
+    title: i18n.errors.voteWeightZeroTitle,
+    fingerprint: 'Vote weight cannot be 0',
+    description: i18n.errors.voteWeightZeroDescription,
+  },
 ];
 
 export const GENERIC_ERROR = {
