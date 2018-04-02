@@ -9,7 +9,8 @@ import {
   getRebloggedPostRef,
   setFirebaseData,
 } from 'util/firebaseUtils';
-import { VOTE_ERRORS, GENERIC_ERROR } from 'constants/errors';
+import ERRORS, { VOTE_ERRORS, GENERIC_ERROR } from 'constants/errors';
+import { AsyncStorage } from 'react-native';
 import {
   getAuthUsername,
   getCurrentUserFeed,
@@ -34,6 +35,13 @@ import {
 import * as currentUserActions from '../actions/currentUserActions';
 import { displayNotifyModal } from '../actions/appActions';
 import { refreshUserBlog } from '../actions/usersActions';
+import { logoutUser } from '../actions/authActions';
+import {
+  AUTH_EXPIRATION,
+  AUTH_MAX_EXPIRATION_AGE,
+  AUTH_USERNAME,
+  STEEM_ACCESS_TOKEN,
+} from '../../constants/asyncStorageKeys';
 
 const fetchCurrentUserFeed = function*() {
   try {
@@ -52,6 +60,17 @@ const fetchCurrentUserFeed = function*() {
     yield put(currentUserActions.currentUserFeedFetch.fail(error));
   }
 };
+
+async function resetAuthUserInAsyncStorage() {
+  try {
+    AsyncStorage.setItem(STEEM_ACCESS_TOKEN, '');
+    AsyncStorage.setItem(AUTH_EXPIRATION, '');
+    AsyncStorage.setItem(AUTH_USERNAME, '');
+    AsyncStorage.setItem(AUTH_MAX_EXPIRATION_AGE, '');
+  } catch (e) {
+    console.log('FAILED TO RESET ASYNC STORAGE FOR AUTH USER');
+  }
+}
 
 const fetchMoreCurrentUserFeed = function*() {
   try {
@@ -165,11 +184,21 @@ const votePost = function*(action) {
     }
     const displayErrorTitle = _.get(displayedError, 'title', GENERIC_ERROR.title);
     const displayErrorDescription = _.get(displayedError, 'description', GENERIC_ERROR.description);
+    const displayErrorFingerprint = _.get(displayedError, 'fingerprint', '');
+
+    const isExpiredAccessToken = _.isEqual(
+      displayErrorFingerprint,
+      ERRORS.EXPIRED_ACCESS_TOKEN.fingerprint,
+    );
 
     console.log('FAIL VOTE', errorDescription);
     const { voteFailCallback } = action.payload;
     voteFailCallback();
     yield put(displayNotifyModal(displayErrorTitle, displayErrorDescription));
+    if (isExpiredAccessToken) {
+      yield put(logoutUser());
+      yield call(resetAuthUserInAsyncStorage);
+    }
     yield put(currentUserActions.currentUserVotePost.fail(error));
   }
 };
@@ -198,11 +227,21 @@ const voteComment = function*(action) {
     }
     const displayErrorTitle = _.get(displayedError, 'title', GENERIC_ERROR.title);
     const displayErrorDescription = _.get(displayedError, 'description', GENERIC_ERROR.description);
+    const displayErrorFingerprint = _.get(displayedError, 'fingerprint', '');
+
+    const isExpiredAccessToken = _.isEqual(
+      displayErrorFingerprint,
+      ERRORS.EXPIRED_ACCESS_TOKEN.fingerprint,
+    );
 
     console.log('FAIL VOTE COMMENT VOTE', errorDescription);
     const { voteFailCallback } = action.payload;
     voteFailCallback();
     yield put(displayNotifyModal(displayErrorTitle, displayErrorDescription));
+    if (isExpiredAccessToken) {
+      yield put(logoutUser());
+      yield call(resetAuthUserInAsyncStorage);
+    }
     yield put(currentUserActions.currentUserVoteComment.fail(error));
   }
 };

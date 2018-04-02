@@ -1,6 +1,6 @@
 import i18n from 'i18n/i18n';
 
-export default {
+const ERRORS = {
   POST_INTERVAL: {
     fingerprint: i18n.errors.postInterval,
     title: i18n.errors.postCreationError,
@@ -31,8 +31,10 @@ export default {
     title: i18n.errors.bandWidthErrorTitle,
     message: i18n.errors.bandWidthError,
   },
-  VOTE_CHANGED_EXCEEDED: {
-    fingerprint: 'error',
+  EXPIRED_ACCESS_TOKEN: {
+    title: i18n.errors.accessTokenExpiredTitle,
+    fingerprint: 'have permission to broadcast',
+    description: i18n.errors.accessTokenExpiredDescription,
   },
 };
 
@@ -52,9 +54,16 @@ export const VOTE_ERRORS = [
     fingerprint: 'You have already voted',
     description: i18n.errors.alreadyVotedDescription,
   },
+  {
+    title: i18n.errors.accessTokenExpiredTitle,
+    fingerprint: 'have permission to broadcast', //The app @bsteem doesn't have permission to broadcast for <username>
+    description: i18n.errors.accessTokenExpiredDescription,
+  },
 ];
 
 export const GENERIC_ERROR = {
   title: i18n.errors.genericErrorTitle,
   description: i18n.errors.genericErrorDescription,
 };
+
+export default ERRORS;

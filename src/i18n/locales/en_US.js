@@ -41,6 +41,9 @@ export default {
     amountHasToBeGreaterThanZero: 'Amount has to be greater than 0.',
     insufficientFunds: 'Insufficient funds',
     memoExchangeRequired: 'Memo is required when sending to an exchange.',
+    accessTokenExpiredTitle: 'Access Token is expired',
+    accessTokenExpiredDescription:
+      'Your access token is expired, you need to logout and log back in',
   },
   titles: {
     post: 'Post',
