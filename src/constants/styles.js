@@ -187,6 +187,7 @@ export const MATERIAL_COMMUNITY_ICONS = {
   messageText: 'message-text',
   block: 'block-helper',
   hide: 'eye-off',
+  cashUSD: 'cash-usd',
 };
 
 export const FEATHER_ICONS = {

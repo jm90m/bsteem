@@ -4,6 +4,15 @@ export default {
     cancel: 'Cancel',
     transferDisclaimer:
       'This app currently does not support transfer transactions such as buying or selling STEEM or SBD.',
+    sendTo: 'Send to',
+    amount: 'Amount',
+    memo: 'Memo',
+    transactionComplete:
+      'Click the send button to be redirected to SteemConnect to complete your transaction.',
+    send: 'Send',
+    currency: 'Currency',
+    balance: 'Balance',
+    usdValue: 'USD Value',
   },
   errors: {
     postInterval: 'You may only post once every 5 minutes',
@@ -27,6 +36,11 @@ export default {
       'Voting weight is too small, please accumulate more voting power or steem power',
     alreadyVotedTitle: 'Already voted',
     alreadyVotedDescription: 'You have already voted in a similar way.',
+    accountNameTooLong: 'Account name is too long',
+    accountNameTooShort: 'Account name is too short',
+    amountHasToBeGreaterThanZero: 'Amount has to be greater than 0.',
+    insufficientFunds: 'Insufficient funds',
+    memoExchangeRequired: 'Memo is required when sending to an exchange.',
   },
   titles: {
     post: 'Post',
@@ -46,6 +60,7 @@ export default {
     rewards: 'Rewards',
     messages: 'Messages',
     trendingTags: 'Trending Tags',
+    transferFunds: 'Transfer Funds',
   },
   editor: {
     title: 'Title',

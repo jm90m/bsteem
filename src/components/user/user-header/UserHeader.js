@@ -42,15 +42,6 @@ const ActionButtonsContainer = styled.View`
   align-items: center;
 `;
 
-const mapStateToProps = state => ({
-  usersDetails: getUsersDetails(state),
-  usersFollowCount: getUsersFollowCount(state),
-  authenticated: getIsAuthenticated(state),
-  authUsername: getAuthUsername(state),
-  rewardFund: getRewardFund(state),
-  steemRate: getSteemRate(state),
-});
-
 const VoteText = styled.Text`
   color: ${COLORS.GREY.CHARCOAL};
   margin-left: 5px;
@@ -77,6 +68,15 @@ const SendMessageText = styled.Text`
   color: ${COLORS.PRIMARY_COLOR};
   margin-left: 5px;
 `;
+
+const mapStateToProps = state => ({
+  usersDetails: getUsersDetails(state),
+  usersFollowCount: getUsersFollowCount(state),
+  authenticated: getIsAuthenticated(state),
+  authUsername: getAuthUsername(state),
+  rewardFund: getRewardFund(state),
+  steemRate: getSteemRate(state),
+});
 
 @connect(mapStateToProps)
 class UserHeader extends Component {
@@ -136,8 +136,10 @@ class UserHeader extends Component {
   }
 
   renderSendMessage() {
-    const { authenticated } = this.props;
-    if (authenticated) {
+    const { authenticated, authUsername } = this.props;
+    const { username } = this.props;
+    const isNotCurrentUser = username !== authUsername;
+    if (authenticated && isNotCurrentUser) {
       return (
         <TouchableWithoutFeedback onPress={this.handleNavigateToUserMessage}>
           <SendMessageContainer>

@@ -18,6 +18,7 @@ export const EDIT_POST = 'EDIT_POST';
 export const EDIT_PROFILE = 'EDIT_PROFILE';
 export const MESSAGES = 'MESSAGES';
 export const USER_MESSAGE = 'USER_MESSAGE';
+export const TRANSFERS = 'TRANSFERS';
 
 // user navigations
 export const USER_BLOG = 'USER_BLOG';

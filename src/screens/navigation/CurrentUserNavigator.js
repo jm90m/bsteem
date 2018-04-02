@@ -21,6 +21,7 @@ import EditPostScreen from '../post-creation-screen/EditPostScreen';
 import EditProfileScreen from '../stack-screens/EditProfileScreen';
 import MessagesScreen from '../stack-screens/MessagesScreen';
 import UserMessageScreen from '../stack-screens/UserMessageScreen';
+import TransferScreen from '../stack-screens/TransferScreen';
 
 const screenNavigationOptions = {
   tabBarIcon: ({ tintColor }) => (
@@ -100,6 +101,10 @@ const CurrentUserNavigator = StackNavigator(
     },
     [navigationConstants.USER_MESSAGE]: {
       screen: UserMessageScreen,
+      navigationOptions: screenNavigationOptions,
+    },
+    [navigationConstants.TRANSFERS]: {
+      screen: TransferScreen,
       navigationOptions: screenNavigationOptions,
     },
   },
