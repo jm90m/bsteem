@@ -14,6 +14,7 @@ import {
   getEnableVotingSlider,
   getAuthUsername,
 } from 'state/rootReducer';
+import i18n from 'i18n/i18n';
 import Comment from 'components/post/comments/Comment';
 
 const Container = styled.View``;
@@ -136,7 +137,7 @@ class PostComments extends Component {
 
     return (
       <Container>
-        <CommentsTitle>Comments</CommentsTitle>
+        <CommentsTitle>{i18n.titles.comments}</CommentsTitle>
         <Comment
           authUsername={authUsername}
           depth={0}
