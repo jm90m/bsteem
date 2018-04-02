@@ -150,6 +150,8 @@ export default {
     receivedFrom: 'Received from',
     transferredTo: 'Transferred to',
     reblogged: 'reblogged',
+    repliedTo: 'replied to',
+    createAccountWithDelegation: 'created account with delegation',
   },
   search: {
     noResultsFound: 'No results found for your search',

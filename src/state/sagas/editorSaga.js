@@ -78,48 +78,6 @@ const broadcastPost = (
   return sc2.broadcast(operations);
 };
 
-function broadcastComment(
-  parentAuthor,
-  parentPermlink,
-  author,
-  permlink,
-  title,
-  body,
-  jsonMetadata,
-  isUpdating,
-) {
-  const operations = [];
-
-  operations.push([
-    'comment',
-    {
-      parent_author: parentAuthor,
-      parent_permlink: parentPermlink,
-      author,
-      permlink,
-      title,
-      body,
-      json_metadata: JSON.stringify(jsonMetadata),
-    },
-  ]);
-
-  if (!isUpdating) {
-    operations.push([
-      'comment_options',
-      {
-        author,
-        permlink,
-        allow_votes: true,
-        allow_curation_rewards: true,
-        max_accepted_payout: '1000000.000 SBD',
-        percent_steem_dollars: 10000,
-      },
-    ]);
-  }
-
-  return sc2.broadcast(operations);
-}
-
 const createPost = function*(action) {
   try {
     const { postData, callback } = action.payload;
@@ -201,8 +159,8 @@ const createComment = function*(action) {
     const newBody = isUpdating
       ? getBodyPatchIfSmaller(originalComment.body, commentBody)
       : commentBody;
-    const result = yield call(
-      broadcastComment,
+    const sc2Comment = yield call(
+      sc2.comment,
       parentAuthor,
       parentPermlink,
       author,
@@ -210,9 +168,8 @@ const createComment = function*(action) {
       title,
       newBody,
       jsonMetadata,
-      isUpdating,
     );
-    const payload = result.result;
+    const payload = sc2Comment.result;
     const operations = _.get(payload, 'operations', []);
     const commentData = _.get(operations, 0, {});
     const commentDetails = _.get(commentData, 1, {});
@@ -240,42 +197,12 @@ const createComment = function*(action) {
 
     yield put(editorActions.createComment.success(payload));
   } catch (error) {
-    console.log('FAIL COMMENT REPLY', error);
+    console.log('FAIL COMMENT REPLY', error.fingerprint);
     const { failCallback } = action.payload;
     if (failCallback) failCallback(error);
     yield put(editorActions.createComment.fail(error));
   }
 };
-
-async function uploadToBusy(uri, authUsername, callback, errorCallback) {
-  let apiUrl = `https://img.busy.org/@${authUsername}/uploads`;
-  let uriParts = uri.split('.');
-  let fileType = uri[uri.length - 1];
-
-  let formData = new FormData();
-  formData.append('photo', {
-    uri,
-    name: `photo.${fileType}`,
-    type: `image/${fileType}`,
-  });
-
-  let options = {
-    method: 'POST',
-    body: formData,
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'multipart/form-data',
-    },
-  };
-
-  return fetch(apiUrl, options)
-    .then(res => res.json())
-    .then(res => callback(res.secure_url, uri.name))
-    .catch(err => {
-      console.log('err', err);
-      errorCallback();
-    });
-}
 
 async function uploadToImgur(imageData) {
   const { uri } = imageData;

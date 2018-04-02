@@ -4,7 +4,9 @@ import styled from 'styled-components/native';
 import { View, Text } from 'react-native';
 import * as accountHistoryConstants from 'constants/accountHistory';
 import * as navigationConstants from 'constants/navigation';
+import _ from 'lodash';
 import { COLORS } from 'constants/styles';
+import i18n from 'i18n/i18n';
 import CustomJSONMessage from './CustomJSONMessage';
 import VoteActionMessage from './VoteActionMessage';
 
@@ -12,10 +14,14 @@ const Container = styled.View`
   padding-left: 10px;
 `;
 
-const Touchable = styled.TouchableOpacity``;
+const Touchable = styled.TouchableWithoutFeedback``;
 
-const Username = styled.Text`
-  color: ${COLORS.PRIMARY_COLOR}
+const LinkText = styled.Text`
+  color: ${COLORS.PRIMARY_COLOR};
+`;
+
+const BoldText = styled.Text`
+  font-weight: bold;
 `;
 
 class UserActionMessage extends Component {
@@ -28,9 +34,13 @@ class UserActionMessage extends Component {
     navigation: PropTypes.shape().isRequired,
   };
 
-  handleNavigateToUser(username) {
+  handleNavigateToUser = username => () => {
     this.props.navigation.navigate(navigationConstants.USER, { username });
-  }
+  };
+
+  handleNavigateToPost = (author, permlink) => () => {
+    this.props.navigation.navigate(navigationConstants.FETCH_POST, { author, permlink });
+  };
 
   renderFormattedMessage() {
     const { actionType, actionDetails, currentUsername, navigation } = this.props;
@@ -41,15 +51,11 @@ class UserActionMessage extends Component {
         const account = actionDetails.new_account_name;
         return (
           <View>
-            <Touchable onPress={() => this.handleNavigateToUser(creator)}>
-              <Username>{creator}</Username>
+            <Touchable onPress={this.handleNavigateToUser(creator)}>
+              <LinkText>{creator}</LinkText>
             </Touchable>
-            <Text>
-              {' created account with delegation '}
-            </Text>
-            <Touchable onPress={() => this.handleNavigateToUser(account)}>
-              {account}
-            </Touchable>
+            <Text>{` ${i18n.activity.createAccountWithDelegation} `}</Text>
+            <Touchable onPress={this.handleNavigateToUser(account)}>{account}</Touchable>
           </View>
         );
       }
@@ -69,6 +75,54 @@ class UserActionMessage extends Component {
             navigation={navigation}
           />
         );
+      case accountHistoryConstants.COMMENT: {
+        const author = _.isEmpty(actionDetails.parent_author) ? (
+          <Touchable onPress={this.handleNavigateToUser(actionDetails.author)}>
+            <LinkText>{actionDetails.author}</LinkText>
+          </Touchable>
+        ) : (
+          <Touchable onPress={this.handleNavigateToUser(actionDetails.parent_author)}>
+            <LinkText>{actionDetails.parent_author}</LinkText>
+          </Touchable>
+        );
+        const postLink = _.isEmpty(actionDetails.parent_author) ? (
+          <Touchable
+            onPress={this.handleNavigateToPost(actionDetails.author, actionDetails.permlink)}
+          >
+            <LinkText>{actionDetails.permlink}</LinkText>
+          </Touchable>
+        ) : (
+          <Touchable
+            onPress={this.handleNavigateToPost(
+              actionDetails.parent_author,
+              actionDetails.parent_permlink,
+            )}
+          >
+            <LinkText>{actionDetails.parent_permlink}</LinkText>
+          </Touchable>
+        );
+        if (currentUsername === actionDetails.author) {
+          return (
+            <View>
+              <BoldText>
+                {i18n.activity.repliedTo} {author} ({postLink})
+              </BoldText>
+            </View>
+          );
+        }
+        const otherUser = (
+          <Touchable onPress={this.handleNavigateToUser(actionDetails.author)}>
+            <LinkText>{actionDetails.author}</LinkText>
+          </Touchable>
+        );
+        return (
+          <View>
+            <BoldText>
+              {otherUser} {i18n.activity.repliedTo} {author} ({postLink})
+            </BoldText>
+          </View>
+        );
+      }
       default:
         return (
           <View>
@@ -79,11 +133,7 @@ class UserActionMessage extends Component {
   }
 
   render() {
-    return (
-      <Container>
-        {this.renderFormattedMessage()}
-      </Container>
-    );
+    return <Container>{this.renderFormattedMessage()}</Container>;
   }
 }
 export default UserActionMessage;
