@@ -5,7 +5,7 @@
     "slug": "bsteem",
     "privacy": "public",
     "sdkVersion": "23.0.0",
-    "version": "1.0.37",
+    "version": "1.0.38",
     "orientation": "portrait",
     "primaryColor": "#ffffff",
     "icon": "./assets/bsteem-icon.png",
@@ -25,7 +25,7 @@
     },
     "android": {
       "package": "com.bsteem.bsteemapp",
-      "versionCode": 39,
+      "versionCode": 40,
       "permissions": ["READ_PHONE_STATE", "READ_CONTACTS", "CAMERA", "RECORD_AUDIO"]
     }
   }
