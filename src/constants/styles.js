@@ -126,6 +126,7 @@ export const MATERIAL_ICONS = {
   save: 'save',
   warning: 'warning',
   checkCircle: 'check-circle',
+  keyboardHide: 'keyboard-hide',
 };
 
 export const MATERIAL_COMMUNITY_ICONS = {

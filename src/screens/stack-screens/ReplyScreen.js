@@ -2,25 +2,20 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components/native';
 import { connect } from 'react-redux';
-import { Dimensions, KeyboardAvoidingView } from 'react-native';
+import { Dimensions, KeyboardAvoidingView, Keyboard, TouchableWithoutFeedback } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { COLORS, MATERIAL_ICONS, ICON_SIZES } from 'constants/styles';
 import i18n from 'i18n/i18n';
 import { getReputation } from 'util/steemitFormatters';
 import Header from 'components/common/Header';
-import HeaderEmptyView from 'components/common/HeaderEmptyView';
 import { FormInput } from 'react-native-elements';
 import CommentContent from 'components/post/comments/CommentContent';
 import Avatar from 'components/common/Avatar';
 import PrimaryButton from 'components/common/PrimaryButton';
+import BackButton from 'components/common/BackButton';
 import * as editorActions from '../../state/actions/editorActions';
 
 const { width: deviceWidth } = Dimensions.get('screen');
-
-const BackTouchable = styled.TouchableOpacity`
-  justify-content: center;
-  padding: 10px;
-`;
 
 const Container = styled.View`
   flex: 1;
@@ -61,6 +56,15 @@ const ReplyInputContainer = styled.View`
 const ReplyButtonContainer = styled.View`
   padding-top: 20px;
   padding-bottom: 200px;
+`;
+
+const EmptyView = styled.View`
+  height: 300px;
+  width: 100px;
+`;
+
+const MenuIconContainer = styled.View`
+  padding: 5px;
 `;
 
 const mapStateToProps = state => ({});
@@ -110,6 +114,7 @@ class ReplyScreen extends Component {
     this.state = {
       replyText: '',
       replyLoading: false,
+      keyboardDisplayed: false,
     };
     this.navigateBack = this.navigateBack.bind(this);
     this.onChangeReplyText = this.onChangeReplyText.bind(this);
@@ -117,6 +122,22 @@ class ReplyScreen extends Component {
     this.onSuccessReply = this.onSuccessReply.bind(this);
     this.onFailReply = this.onFailReply.bind(this);
     this.setReplyLoading = this.setReplyLoading.bind(this);
+  }
+
+  componentWillMount() {
+    this.keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      this.handleSetKeyboardDisplay(true),
+    );
+    this.keyboardDidHideListener = Keyboard.addListener(
+      'keyboardDidHide',
+      this.handleSetKeyboardDisplay(false),
+    );
+  }
+
+  componentWillUnmount() {
+    this.keyboardDidShowListener.remove();
+    this.keyboardDidHideListener.remove();
   }
 
   onChangeReplyText(replyText) {
@@ -142,6 +163,8 @@ class ReplyScreen extends Component {
     });
   }
 
+  handleSetKeyboardDisplay = keyboardDisplayed => () => this.setState({ keyboardDisplayed });
+
   handleSubmit() {
     const { replyText } = this.state;
     const { parentPost } = this.props.navigation.state.params;
@@ -163,16 +186,14 @@ class ReplyScreen extends Component {
 
   render() {
     const { parentPost } = this.props.navigation.state.params;
-    const { replyText, replyLoading } = this.state;
+    const { replyText, replyLoading, keyboardDisplayed } = this.state;
     const commentAuthorReputation = getReputation(parentPost.author_reputation);
     const contentWidth = deviceWidth - 30;
     const avatarSize = 40;
     return (
       <Container>
         <Header>
-          <BackTouchable onPress={this.navigateBack}>
-            <MaterialIcons size={ICON_SIZES.menuIcon} name={MATERIAL_ICONS.back} />
-          </BackTouchable>
+          <BackButton navigateBack={this.navigateBack} />
           <TitleContainer>
             <MaterialIcons
               size={ICON_SIZES.menuIcon}
@@ -181,7 +202,15 @@ class ReplyScreen extends Component {
             />
             <Title>{`${i18n.titles.replyTo} ${parentPost.author}`}</Title>
           </TitleContainer>
-          <HeaderEmptyView />
+          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <MenuIconContainer>
+              <MaterialIcons
+                size={ICON_SIZES.menuIcon}
+                color={keyboardDisplayed ? COLORS.PRIMARY_COLOR : 'transparent'}
+                name={MATERIAL_ICONS.keyboardHide}
+              />
+            </MenuIconContainer>
+          </TouchableWithoutFeedback>
         </Header>
         <KeyboardAvoidingView behavior="padding">
           <ReplyContentContainer>
@@ -218,6 +247,7 @@ class ReplyScreen extends Component {
                 />
               </ReplyButtonContainer>
             </ReplyInputContainer>
+            <EmptyView />
           </ReplyContentContainer>
         </KeyboardAvoidingView>
       </Container>
