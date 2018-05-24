@@ -5,13 +5,17 @@ import styled from 'styled-components/native';
 import { COLORS } from 'constants/styles';
 import Avatar from 'components/common/Avatar';
 import TimeAgo from 'components/common/TimeAgo';
+import { connect } from 'react-redux';
+import tinycolor from 'tinycolor2';
+import { getCustomTheme } from 'state/rootReducer';
 
 const Container = styled.View`
-  background-color: ${COLORS.WHITE.WHITE};
+  background-color: ${props => props.customTheme.primaryBackgroundColor};
   margin-top: 5px;
   margin-bottom: 5px;
-  border-color: ${COLORS.PRIMARY_BORDER_COLOR};
-  border-width: 1px;
+  border-color: ${props => props.customTheme.primaryBorderColor};
+  border-top-width: 1px;
+  border-bottom-width: 1px;
   padding: 10px;
 `;
 
@@ -25,7 +29,7 @@ const AuthorContents = styled.View`
 
 const AuthorText = styled.Text`
   font-weight: 700;
-  color: ${COLORS.PRIMARY_COLOR};
+  color: ${props => props.customTheme.primaryColor};
 `;
 
 const PostTitle = styled.Text`
@@ -33,14 +37,23 @@ const PostTitle = styled.Text`
   padding-bottom: 10px;
   font-weight: 700;
   font-size: 20px;
+  color: ${props =>
+    tinycolor(props.customTheme.primaryBackgroundColor).isDark()
+      ? COLORS.LIGHT_TEXT_COLOR
+      : COLORS.DARK_TEXT_COLOR};
 `;
 
 const ActionComponent = styled.View`
   margin-left: auto;
 `;
 
+const mapStateToProps = state => ({
+  customTheme: getCustomTheme(state),
+});
+
 class PostPreview extends Component {
   static propTypes = {
+    customTheme: PropTypes.shape().isRequired,
     author: PropTypes.string,
     title: PropTypes.string,
     created: PropTypes.string,
@@ -66,28 +79,29 @@ class PostPreview extends Component {
       handleNavigatePost,
       handleNavigateUser,
       actionComponent,
+      customTheme,
     } = this.props;
 
     return (
-      <Container>
+      <Container customTheme={customTheme}>
         <AuthorContainer>
           <TouchableOpacity onPress={handleNavigateUser}>
             <Avatar username={author} size={40} />
           </TouchableOpacity>
           <AuthorContents>
             <TouchableOpacity onPress={handleNavigateUser}>
-              <AuthorText>{`@${author}`}</AuthorText>
+              <AuthorText customTheme={customTheme}>{author}</AuthorText>
             </TouchableOpacity>
             <TimeAgo created={created} />
           </AuthorContents>
           <ActionComponent>{actionComponent}</ActionComponent>
         </AuthorContainer>
         <TouchableOpacity onPress={handleNavigatePost}>
-          <PostTitle>{title}</PostTitle>
+          <PostTitle customTheme={customTheme}>{title}</PostTitle>
         </TouchableOpacity>
       </Container>
     );
   }
 }
 
-export default PostPreview;
+export default connect(mapStateToProps)(PostPreview);

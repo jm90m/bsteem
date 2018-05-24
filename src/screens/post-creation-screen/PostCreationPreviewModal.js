@@ -7,11 +7,24 @@ class PostCreationPreviewModal extends Component {
   static propTypes = {
     handleHidePreview: PropTypes.func.isRequired,
     previewVisible: PropTypes.bool.isRequired,
+    createPostDisplayInPreview: PropTypes.bool,
     postData: PropTypes.shape().isRequired,
+    handlePostPreviewSubmit: PropTypes.func,
+  };
+
+  static defaultProps = {
+    handlePostPreviewSubmit: () => {},
+    createPostDisplayInPreview: false,
   };
 
   render() {
-    const { handleHidePreview, previewVisible, postData } = this.props;
+    const {
+      handleHidePreview,
+      previewVisible,
+      postData,
+      createPostDisplayInPreview,
+      handlePostPreviewSubmit,
+    } = this.props;
 
     if (!previewVisible) {
       return null;
@@ -19,7 +32,12 @@ class PostCreationPreviewModal extends Component {
 
     return (
       <Modal animationType="slide" visible={previewVisible} onRequestClose={handleHidePreview}>
-        <PostCreationPreview handleHidePreview={handleHidePreview} postData={postData} />
+        <PostCreationPreview
+          handleHidePreview={handleHidePreview}
+          postData={postData}
+          createPostDisplayInPreview={createPostDisplayInPreview}
+          handlePostPreviewSubmit={handlePostPreviewSubmit}
+        />
       </Modal>
     );
   }

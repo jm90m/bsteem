@@ -20,7 +20,7 @@ const LoadingContainer = styled.View`
 `;
 
 const Payout = styled.Text`
-  color: ${COLORS.TERTIARY_COLOR};
+  color: ${props => props.customTheme.tertiaryColor};
   margin-right: 10px;
   ${props => (props.payoutIsDeclined ? 'text-decoration-line: line-through' : '')};
 `;
@@ -48,6 +48,7 @@ class CommentFooter extends Component {
     handleEdit: PropTypes.func,
     handlePayout: PropTypes.func,
     payout: PropTypes.shape(),
+    customTheme: PropTypes.shape().isRequired,
   };
 
   static defaultProps = {
@@ -65,7 +66,7 @@ class CommentFooter extends Component {
   };
 
   renderPayout() {
-    const { payout, handlePayout } = this.props;
+    const { payout, handlePayout, customTheme } = this.props;
     const cashoutInTime = _.get(payout, 'cashoutInTime', false);
     const displayedPayout = cashoutInTime
       ? _.get(payout, 'potentialPayout')
@@ -76,7 +77,9 @@ class CommentFooter extends Component {
     const payoutIsDeclined = _.get(payout, 'isPayoutDeclined', false);
     return (
       <TouchablePayout onPress={handlePayout}>
-        <Payout payoutIsDeclined={payoutIsDeclined}>${formattedDisplayedPayout}</Payout>
+        <Payout customTheme={customTheme} payoutIsDeclined={payoutIsDeclined}>
+          ${formattedDisplayedPayout}
+        </Payout>
       </TouchablePayout>
     );
   }
@@ -92,6 +95,7 @@ class CommentFooter extends Component {
       handleDislike,
       handleReply,
       handleEdit,
+      customTheme,
     } = this.props;
 
     return (
@@ -102,8 +106,8 @@ class CommentFooter extends Component {
           <TouchableOpacity onPress={handleLike}>
             <MaterialCommunityIcons
               name={MATERIAL_COMMUNITY_ICONS.voteFill}
-              size={ICON_SIZES.menuIcon}
-              color={liked ? COLORS.PRIMARY_COLOR : COLORS.TERTIARY_COLOR}
+              size={ICON_SIZES.footerActionIcon}
+              color={liked ? customTheme.primaryColor : customTheme.tertiaryColor}
             />
           </TouchableOpacity>
         )}
@@ -113,24 +117,24 @@ class CommentFooter extends Component {
           <TouchableOpacity onPress={handleDislike}>
             <MaterialCommunityIcons
               name={MATERIAL_COMMUNITY_ICONS.unvoteFill}
-              size={ICON_SIZES.menuIcon}
-              color={disliked ? COLORS.PRIMARY_COLOR : COLORS.TERTIARY_COLOR}
+              size={ICON_SIZES.footerActionIcon}
+              color={disliked ? customTheme.primaryColor : customTheme.tertiaryColor}
             />
           </TouchableOpacity>
         )}
         <TouchableOpacity onPress={handleReply}>
           <MaterialCommunityIcons
             name={MATERIAL_COMMUNITY_ICONS.reply}
-            size={ICON_SIZES.menuIcon}
-            color={COLORS.TERTIARY_COLOR}
+            size={ICON_SIZES.footerActionIcon}
+            color={customTheme.tertiaryColor}
           />
         </TouchableOpacity>
         {editable && (
           <TouchableOpacity onPress={handleEdit}>
             <MaterialCommunityIcons
               name={MATERIAL_COMMUNITY_ICONS.pencil}
-              size={ICON_SIZES.menuIcon}
-              color={COLORS.TERTIARY_COLOR}
+              size={ICON_SIZES.footerActionIcon}
+              color={customTheme.tertiaryColor}
             />
           </TouchableOpacity>
         )}

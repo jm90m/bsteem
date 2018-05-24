@@ -9,10 +9,9 @@ import * as navigationConstants from 'constants/navigation';
 import styled from 'styled-components/native';
 import { fetchTags } from 'state/actions/homeActions';
 import * as searchActions from 'state/actions/searchActions';
-import { COLORS, MATERIAL_ICONS, MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
+import { COLORS, MATERIAL_ICONS, MATERIAL_COMMUNITY_ICONS, ICON_SIZES } from 'constants/styles';
 import LargeLoading from 'components/common/LargeLoading';
 import { abbreviateLargeNumber } from 'util/numberFormatter';
-import i18n from 'i18n/i18n';
 import {
   getHomeTags,
   getAllTrendingTags,
@@ -23,27 +22,28 @@ import {
   getLoadingSearchPost,
   getLoadingSearchTag,
   getTagsLoading,
+  getCustomTheme,
+  getIntl,
 } from 'state/rootReducer';
 import SearchPostPreview from 'components/search/SearchPostPreview';
 import SearchUserPreview from 'components/search/SearchUserPreview';
 import SearchDefaultView from 'components/search/SearchDefaultView';
 import Tag from 'components/post/Tag';
 import SaveTagButton from 'components/common/SaveTagButton';
+import StyledListView from 'components/common/StyledListView';
+import StyledViewPrimaryBackground from 'components/common/StyledViewPrimaryBackground';
+import StyledTextByBackground from 'components/common/StyledTextByBackground';
+import tinycolor from 'tinycolor2';
 
-const Container = styled.View`
+const Container = styled(StyledViewPrimaryBackground)`
   flex: 1;
-  background-color: ${COLORS.WHITE.WHITE};
   padding-top: 10px;
 `;
 
-const NoResultsFoundText = styled.Text`
+const NoResultsFoundText = styled(StyledTextByBackground)`
   padding: 20px;
   justify-content: center;
   font-size: 18px;
-`;
-
-const StyledListView = styled.ListView`
-  background-color: ${COLORS.LIST_VIEW_BACKGROUND};
 `;
 
 const Menu = styled.View`
@@ -55,7 +55,8 @@ const MenuContent = styled.View`
   flex-direction: row;
   padding: 10px 0;
   border-bottom-width: 2px;
-  border-bottom-color: ${props => (props.selected ? COLORS.PRIMARY_COLOR : 'transparent')};
+  border-bottom-color: ${props =>
+    props.selected ? props.customTheme.primaryColor : 'transparent'};
   width: 50px;
   justify-content: center;
 `;
@@ -68,7 +69,8 @@ const LoadingContainer = styled.View`
 
 const Count = styled.Text`
   margin-left: 5px;
-  color: ${props => (props.selected ? COLORS.PRIMARY_COLOR : COLORS.SECONDARY_COLOR)};
+  color: ${props =>
+    props.selected ? props.customTheme.primaryColor : props.customTheme.secondaryColor};
   font-size: 18px;
 `;
 
@@ -82,12 +84,13 @@ const TagOption = styled.View`
   justify-content: space-between;
   padding: 10px;
   margin: 5px 0;
-  background-color: ${COLORS.PRIMARY_BACKGROUND_COLOR};
+  background-color: ${props => props.customTheme.primaryBackgroundColor};
 `;
 
 const TagTouchble = styled.TouchableOpacity``;
 
 const mapStateToProps = state => ({
+  customTheme: getCustomTheme(state),
   tags: getHomeTags(state),
   allTrendingTags: getAllTrendingTags(state),
   searchUserResults: getSearchUsersResults(state),
@@ -97,6 +100,7 @@ const mapStateToProps = state => ({
   loadingSearchPost: getLoadingSearchPost(state),
   loadingSearchTag: getLoadingSearchTag(state),
   tagsLoading: getTagsLoading(state),
+  intl: getIntl(state),
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -117,6 +121,8 @@ const MENU = {
 class SearchScreen extends Component {
   static propTypes = {
     navigation: PropTypes.shape().isRequired,
+    customTheme: PropTypes.shape().isRequired,
+    intl: PropTypes.shape().isRequired,
     fetchTags: PropTypes.func.isRequired,
     tags: PropTypes.arrayOf(PropTypes.shape()),
     loadingSearchUser: PropTypes.bool.isRequired,
@@ -126,6 +132,9 @@ class SearchScreen extends Component {
     searchUserResults: PropTypes.arrayOf(PropTypes.shape()).isRequired,
     searchPostResults: PropTypes.arrayOf(PropTypes.shape()).isRequired,
     searchTagsResults: PropTypes.arrayOf(PropTypes.shape()).isRequired,
+    searchFetchPosts: PropTypes.func.isRequired,
+    searchFetchTags: PropTypes.func.isRequired,
+    searchFetchUsers: PropTypes.func.isRequired,
   };
 
   static defaultProps = {
@@ -189,6 +198,7 @@ class SearchScreen extends Component {
   }
 
   renderSearchResultRow(rowData) {
+    const { customTheme } = this.props;
     switch (rowData.type) {
       case 'user': {
         return (
@@ -216,7 +226,7 @@ class SearchScreen extends Component {
       case 'tag': {
         const tag = rowData.name;
         return (
-          <TagOption>
+          <TagOption customTheme={customTheme}>
             <TagTouchble onPress={() => this.handleNavigateToFeed(tag)}>
               <Tag tag={tag} />
             </TagTouchble>
@@ -230,7 +240,7 @@ class SearchScreen extends Component {
   }
 
   renderDefaultsViews(isLoading, hasNoSearchValue, hasNoSearchResults) {
-    const { tags, tagsLoading } = this.props;
+    const { tags, tagsLoading, intl } = this.props;
     if (isLoading) {
       return this.renderLoader();
     } else if (hasNoSearchValue) {
@@ -243,7 +253,7 @@ class SearchScreen extends Component {
         />
       );
     } else if (hasNoSearchResults) {
-      return <NoResultsFoundText>{i18n.search.noResultsFound}</NoResultsFoundText>;
+      return <NoResultsFoundText>{intl.no_search_results_found}</NoResultsFoundText>;
     }
     return null;
   }
@@ -276,7 +286,7 @@ class SearchScreen extends Component {
   }
 
   renderMenu() {
-    const { searchUserResults, searchPostResults, searchTagsResults } = this.props;
+    const { searchUserResults, searchPostResults, searchTagsResults, customTheme } = this.props;
     const { currentMenu } = this.state;
     const selectedUsers = _.isEqual(currentMenu, MENU.USERS);
     const selectedTags = _.isEqual(currentMenu, MENU.TAGS);
@@ -285,37 +295,37 @@ class SearchScreen extends Component {
     return (
       <Menu>
         <TouchableMenu onPress={() => this.setCurrentMenu(MENU.TAGS)}>
-          <MenuContent selected={selectedTags}>
+          <MenuContent selected={selectedTags} customTheme={customTheme}>
             <MaterialCommunityIcons
               name={MATERIAL_COMMUNITY_ICONS.tag}
-              size={24}
-              color={selectedTags ? COLORS.PRIMARY_COLOR : COLORS.SECONDARY_COLOR}
+              size={ICON_SIZES.menuIcon}
+              color={selectedTags ? customTheme.primaryColor : customTheme.secondaryColor}
             />
-            <Count selected={selectedTags}>
+            <Count selected={selectedTags} customTheme={customTheme}>
               {abbreviateLargeNumber(_.size(searchTagsResults))}
             </Count>
           </MenuContent>
         </TouchableMenu>
         <TouchableMenu onPress={() => this.setCurrentMenu(MENU.USERS)}>
-          <MenuContent selected={selectedUsers}>
+          <MenuContent selected={selectedUsers} customTheme={customTheme}>
             <MaterialCommunityIcons
               name={MATERIAL_COMMUNITY_ICONS.account}
-              size={24}
-              color={selectedUsers ? COLORS.PRIMARY_COLOR : COLORS.SECONDARY_COLOR}
+              size={ICON_SIZES.menuIcon}
+              color={selectedUsers ? customTheme.primaryColor : customTheme.secondaryColor}
             />
-            <Count selected={selectedUsers}>
+            <Count selected={selectedUsers} customTheme={customTheme}>
               {abbreviateLargeNumber(_.size(searchUserResults))}
             </Count>
           </MenuContent>
         </TouchableMenu>
         <TouchableMenu onPress={() => this.setCurrentMenu(MENU.POSTS)}>
-          <MenuContent selected={selectedPosts}>
+          <MenuContent selected={selectedPosts} customTheme={customTheme}>
             <MaterialCommunityIcons
               name={MATERIAL_COMMUNITY_ICONS.posts}
-              size={24}
-              color={selectedPosts ? COLORS.PRIMARY_COLOR : COLORS.SECONDARY_COLOR}
+              size={ICON_SIZES.menuIcon}
+              color={selectedPosts ? customTheme.primaryColor : customTheme.secondaryColor}
             />
-            <Count selected={selectedPosts}>
+            <Count selected={selectedPosts} customTheme={customTheme}>
               {abbreviateLargeNumber(_.size(searchPostResults))}
             </Count>
           </MenuContent>
@@ -402,14 +412,22 @@ class SearchScreen extends Component {
   }
 
   render() {
-    const { searchLoading, searchUserResults, searchPostResults, searchTagsResults } = this.props;
+    const {
+      searchLoading,
+      searchUserResults,
+      searchPostResults,
+      searchTagsResults,
+      customTheme,
+    } = this.props;
     const { currentSearchValue } = this.state;
     const hasSearchResults =
       !_.isEmpty(searchUserResults) ||
       !_.isEmpty(searchPostResults) ||
       !_.isEmpty(searchTagsResults);
     const displayMenu = hasSearchResults && !_.isEmpty(currentSearchValue);
-
+    const color = tinycolor(customTheme.primaryBackgroundColor).isDark()
+      ? COLORS.LIGHT_TEXT_COLOR
+      : COLORS.DARK_TEXT_COLOR;
     return (
       <Container>
         <SearchBar
@@ -417,8 +435,8 @@ class SearchScreen extends Component {
           onChangeText={this.handleSearchOnChangeText}
           placeholder=""
           value={currentSearchValue}
-          containerStyle={{ backgroundColor: COLORS.WHITE.WHITE, marginTop: 10 }}
-          inputStyle={{ backgroundColor: COLORS.WHITE.WHITE }}
+          containerStyle={{ backgroundColor: customTheme.primaryBackgroundColor, marginTop: 10 }}
+          inputStyle={{ backgroundColor: customTheme.primaryBackgroundColor, color }}
           showLoadingIcon={searchLoading}
           autoCorrect={false}
           autoCapitalize="none"

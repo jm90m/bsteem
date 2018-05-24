@@ -1,17 +1,18 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components/native';
-import { View } from 'react-native';
+import { View, TouchableWithoutFeedback } from 'react-native';
 import { getReputation } from 'util/steemitFormatters';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import _ from 'lodash';
 import APPS from 'constants/apps';
-import { COLORS, MATERIAL_COMMUNITY_ICONS, ICON_SIZES } from 'constants/styles';
+import { MATERIAL_COMMUNITY_ICONS, ICON_SIZES } from 'constants/styles';
 import Tag from 'components/post/Tag';
 import * as navigationConstants from 'constants/navigation';
-import i18n from 'i18n/i18n';
 import ReputationScore from 'components/post/ReputationScore';
 import Avatar from 'components/common/Avatar';
+import { getCustomTheme, getIntl } from 'state/rootReducer';
+import { connect } from 'react-redux';
 import TimeAgo from 'components/common/TimeAgo';
 
 const Container = styled.View`
@@ -28,17 +29,18 @@ const Author = styled.View`
 `;
 const AuthorText = styled.Text`
   font-weight: 700;
-  color: ${COLORS.PRIMARY_COLOR};
+  font-size: 18px;
+  color: ${props => props.customTheme.primaryColor};
 `;
 const HeaderContents = styled.View`
   margin: 0 12px;
 `;
 
 const RebloggedUsername = styled.Text`
-  color: ${COLORS.PRIMARY_COLOR};
+  color: ${props => props.customTheme.primaryColor};
 `;
 const RebloggedText = styled.Text`
-  color: ${props => (props.color ? props.color : COLORS.BLUE.LINK_WATER)};
+  color: ${props => props.customTheme.tertiaryColor};
 `;
 
 const Reblogged = styled.View`
@@ -55,14 +57,27 @@ const TagContainer = styled.View`
 `;
 
 const PostedFrom = styled.Text`
-  margin-left: 10px;
-  color: ${COLORS.TERTIARY_COLOR};
+  color: ${props => props.customTheme.tertiaryColor};
+  font-size: 12px;
 `;
+
+const Seperator = styled.Text`
+  color: ${props => props.customTheme.tertiaryColor};
+  margin-left: 5px;
+  margin-right: 5px;
+`;
+
+const mapStateToProps = state => ({
+  customTheme: getCustomTheme(state),
+  intl: getIntl(state),
+});
 
 class Header extends Component {
   static propTypes = {
     navigation: PropTypes.shape().isRequired,
     postData: PropTypes.shape().isRequired,
+    intl: PropTypes.shape().isRequired,
+    customTheme: PropTypes.shape().isRequired,
     currentUsername: PropTypes.string,
     displayMenu: PropTypes.func,
     hideMenuButton: PropTypes.bool,
@@ -80,6 +95,7 @@ class Header extends Component {
     this.handleUserNavigation = this.handleUserNavigation.bind(this);
     this.handleFeedNavigation = this.handleFeedNavigation.bind(this);
     this.handleReblogUserNavigation = this.handleReblogUserNavigation.bind(this);
+    this.handleNavigateToBeneficiaries = this.handleNavigateToBeneficiaries.bind(this);
   }
 
   handleUserNavigation() {
@@ -101,8 +117,16 @@ class Header extends Component {
     navigation.navigate(navigationConstants.FEED, { tag: category });
   }
 
+  handleNavigateToBeneficiaries() {
+    const { postData, navigation } = this.props;
+    const beneficiaries = _.get(postData, 'beneficiaries', []);
+    if (!_.isEmpty(beneficiaries)) {
+      navigation.navigate(navigationConstants.POST_BENEFICIARIES, { postData });
+    }
+  }
+
   renderReblogged() {
-    const { postData } = this.props;
+    const { postData, customTheme, intl } = this.props;
     const firstRebloggedBy = _.get(postData, 'first_reblogged_by');
     const firstRebloggedOn = _.get(postData, 'first_reblogged_on');
 
@@ -111,14 +135,16 @@ class Header extends Component {
         <Reblogged>
           <MaterialCommunityIcons
             name={MATERIAL_COMMUNITY_ICONS.reblog}
-            size={20}
-            color={COLORS.TERTIARY_COLOR}
+            size={ICON_SIZES.contentTitleBlockIcon}
+            color={customTheme.tertiaryColor}
             style={{ marginRight: 5 }}
           />
           <Touchable onPress={this.handleReblogUserNavigation}>
-            <RebloggedUsername>{postData.first_reblogged_by}</RebloggedUsername>
+            <RebloggedUsername customTheme={customTheme}>
+              {postData.first_reblogged_by}
+            </RebloggedUsername>
           </Touchable>
-          <RebloggedText>{` ${i18n.post.reblogged}`}</RebloggedText>
+          <RebloggedText customTheme={customTheme}>{` ${intl.reblogged}`}</RebloggedText>
         </Reblogged>
       );
     } else if (firstRebloggedOn) {
@@ -126,11 +152,11 @@ class Header extends Component {
         <Reblogged>
           <MaterialCommunityIcons
             name={MATERIAL_COMMUNITY_ICONS.reblog}
-            size={20}
-            color={COLORS.TERTIARY_COLOR}
+            size={ICON_SIZES.contentTitleBlockIcon}
+            color={customTheme.tertiaryColor}
             style={{ marginRight: 5 }}
           />
-          <RebloggedText>{i18n.post.reblogged}</RebloggedText>
+          <RebloggedText customTheme={customTheme}>{intl.reblogged}</RebloggedText>
         </Reblogged>
       );
     }
@@ -138,51 +164,64 @@ class Header extends Component {
   }
 
   renderAuthor() {
-    const { currentUsername, postData } = this.props;
+    const { currentUsername, postData, customTheme } = this.props;
     const { author } = postData;
     if (currentUsername === author) {
-      return <AuthorText>{author}</AuthorText>;
+      return <AuthorText customTheme={customTheme}>{author}</AuthorText>;
     }
     return (
       <Touchable onPress={this.handleUserNavigation}>
-        <AuthorText>{author}</AuthorText>
+        <AuthorText customTheme={customTheme}>{author}</AuthorText>
       </Touchable>
     );
   }
 
   renderPostedFrom() {
     try {
-      const { postData } = this.props;
+      const { postData, customTheme } = this.props;
       const jsonMetadata = _.attempt(JSON.parse, postData.json_metadata);
       const app = _.isError(jsonMetadata) ? [] : _.split(jsonMetadata.app, '/');
       const from = _.get(APPS, _.get(app, 0, ''), '');
+      const beneficiaries = _.get(postData, 'beneficiaries', []);
+      const hasBeneficiaries = !_.isEmpty(beneficiaries);
 
       if (_.isEmpty(from)) {
         return <View />;
       }
 
-      return <PostedFrom>{`${i18n.post.postedFrom}: ${from}`}</PostedFrom>;
+      return (
+        <TouchableWithoutFeedback onPress={this.handleNavigateToBeneficiaries}>
+          <PostedFrom customTheme={customTheme} hasBeneficiaries={hasBeneficiaries}>
+            {from}
+          </PostedFrom>
+        </TouchableWithoutFeedback>
+      );
     } catch (e) {
       return <View />;
     }
   }
-  render() {
-    const { postData, displayMenu, hideMenuButton } = this.props;
 
+  render() {
+    const { postData, displayMenu, hideMenuButton, customTheme } = this.props;
     const { category, author, author_reputation, created } = postData;
+
     return (
       <Container>
         {this.renderReblogged()}
         <UserHeaderContainer>
           <Avatar username={author} size={40} />
           <HeaderContents>
-            <Author>
-              <View>
+            <View>
+              <Author>
                 {this.renderAuthor()}
-                <TimeAgo created={created} />
-              </View>
-              <ReputationScore reputation={getReputation(author_reputation)} />
-            </Author>
+                <ReputationScore reputation={getReputation(author_reputation)} />
+              </Author>
+              <Author>
+                <TimeAgo created={created} style={{ fontSize: 12 }} />
+                <Seperator customTheme={customTheme}>•</Seperator>
+                {this.renderPostedFrom()}
+              </Author>
+            </View>
           </HeaderContents>
           {!hideMenuButton && (
             <Touchable
@@ -192,7 +231,7 @@ class Header extends Component {
               <MaterialCommunityIcons
                 name={MATERIAL_COMMUNITY_ICONS.menuHorizontal}
                 size={ICON_SIZES.menuIcon}
-                color={COLORS.PRIMARY_COLOR}
+                color={customTheme.primaryColor}
               />
             </Touchable>
           )}
@@ -201,11 +240,10 @@ class Header extends Component {
           <Touchable onPress={this.handleFeedNavigation}>
             <Tag tag={category} />
           </Touchable>
-          {this.renderPostedFrom()}
         </TagContainer>
       </Container>
     );
   }
 }
 
-export default Header;
+export default connect(mapStateToProps)(Header);

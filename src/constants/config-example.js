@@ -13,3 +13,5 @@ export const imgurConfig = {
 };
 
 export const encryptionSecretKey = '';
+
+export const sc2App = '';

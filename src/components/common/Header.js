@@ -1,16 +1,37 @@
-import { COLORS } from 'constants/styles';
+import React from 'react';
+import PropTypes from 'prop-types';
+import { Platform, StatusBar } from 'react-native';
 import styled from 'styled-components/native';
+import { connect } from 'react-redux';
+import { getCustomTheme } from 'state/rootReducer';
 
 const Header = styled.View`
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  background-color: ${COLORS.PRIMARY_BACKGROUND_COLOR};
-  border-bottom-color: ${COLORS.PRIMARY_BORDER_COLOR};
+  background-color: ${props => props.customTheme.primaryBackgroundColor};
+  border-bottom-color: ${props => props.customTheme.primaryBorderColor};
   border-bottom-width: 1px;
   width: 100%;
-  padding-top: 20px;
-  min-height: 45px;
+  padding-top: ${Platform.OS === 'ios' ? '20px' : '35px'};
+  min-height: ${Platform.OS === 'ios' ? '45px' : `${StatusBar.currentHeight + 45}px`};
 `;
 
-export default Header;
+const HeaderContainer = ({ customTheme, children }) => (
+  <Header customTheme={customTheme}>{children}</Header>
+);
+
+HeaderContainer.propTypes = {
+  customTheme: PropTypes.shape().isRequired,
+  children: PropTypes.node,
+};
+
+HeaderContainer.defaultProps = {
+  children: null,
+};
+
+const mapStateToProps = state => ({
+  customTheme: getCustomTheme(state),
+});
+
+export default connect(mapStateToProps)(HeaderContainer);

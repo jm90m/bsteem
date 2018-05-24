@@ -1,25 +1,23 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { TouchableWithoutFeedback, Share } from 'react-native';
-import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
+import { TouchableWithoutFeedback, Share, Clipboard } from 'react-native';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import styled from 'styled-components/native';
 import { connect } from 'react-redux';
 import _ from 'lodash';
-import i18n from 'i18n/i18n';
-import { bsteemShareText, getBusyUrl } from 'util/bsteemUtils';
+import { bsteemShareText, getBusyUrl, getSteemitURL } from 'util/bsteemUtils';
 import ReportPostMenuButton from './ReportPostMenuButton';
-import {
-  COLORS,
-  MATERIAL_ICONS,
-  MATERIAL_COMMUNITY_ICONS,
-  ICON_SIZES,
-} from '../../constants/styles';
+import { MATERIAL_COMMUNITY_ICONS, ICON_SIZES } from '../../constants/styles';
 import MenuModalButton from '../common/menu/MenuModalButton';
 import MenuWrapper from '../common/menu/MenuWrapper';
 import SavePostMenuButton from './SavePostMenuButton';
-import { getAuthUsername, getCurrentUserFollowList } from '../../state/rootReducer';
-import FollowMenuButton from './FollowMenuButton';
-import SmallLoading from '../common/SmallLoading';
+import SavePostOfflineMenuButton from './SavePostOfflineMenuButton';
+import {
+  getAuthUsername,
+  getCurrentUserFollowList,
+  getCustomTheme,
+  getIntl,
+} from '../../state/rootReducer';
 
 const Container = styled.View`
   align-items: center;
@@ -29,7 +27,7 @@ const Container = styled.View`
 
 const MenuText = styled.Text`
   margin-left: 5px;
-  color: ${COLORS.PRIMARY_COLOR};
+  color: ${props => props.customTheme.primaryColor};
   font-weight: bold;
 `;
 
@@ -51,6 +49,8 @@ class PostMenu extends Component {
       id: PropTypes.number,
     }),
     authUsername: PropTypes.string.isRequired,
+    customTheme: PropTypes.shape().isRequired,
+    intl: PropTypes.shape().isRequired,
     rebloggedList: PropTypes.arrayOf(PropTypes.string),
     hideReblogMenu: PropTypes.bool,
     displayPhotoBrowserMenu: PropTypes.bool,
@@ -74,6 +74,8 @@ class PostMenu extends Component {
     super(props);
 
     this.handleShare = this.handleShare.bind(this);
+    this.handleSetBusyURLClipboard = this.handleSetBusyURLClipboard.bind(this);
+    this.handleSetSteemitRLClipboard = this.handleSetSteemitRLClipboard.bind(this);
   }
 
   handleShare() {
@@ -92,6 +94,24 @@ class PostMenu extends Component {
     Share.share(content);
   }
 
+  handleSetSteemitRLClipboard() {
+    const { postData } = this.props;
+    const author = _.get(postData, 'author', '');
+    const permlink = _.get(postData, 'permlink', '');
+    const url = getSteemitURL(author, permlink);
+    Clipboard.setString(url);
+    this.props.hideMenu();
+  }
+
+  handleSetBusyURLClipboard() {
+    const { postData } = this.props;
+    const author = _.get(postData, 'author', '');
+    const permlink = _.get(postData, 'permlink', '');
+    const url = getBusyUrl(author, permlink);
+    Clipboard.setString(url);
+    this.props.hideMenu();
+  }
+
   render() {
     const {
       hideMenu,
@@ -104,6 +124,8 @@ class PostMenu extends Component {
       hideReblogMenu,
       displayPhotoBrowserMenu,
       handleDisplayPhotoBrowser,
+      customTheme,
+      intl,
     } = this.props;
     const { title, permlink, author, id, created, cashout_time } = postData;
     const displayMenuButton = authUsername !== author && !_.isEmpty(authUsername);
@@ -123,15 +145,15 @@ class PostMenu extends Component {
               id={id}
               created={created}
             />
-            {displayMenuButton && <FollowMenuButton username={author} />}
+            <SavePostOfflineMenuButton postData={postData} />
             <MenuModalButton onPress={handleNavigateToComments}>
               <MenuModalContents>
                 <MaterialCommunityIcons
                   size={ICON_SIZES.menuModalOptionIcon}
-                  color={COLORS.PRIMARY_COLOR}
+                  color={customTheme.primaryColor}
                   name={MATERIAL_COMMUNITY_ICONS.comment}
                 />
-                <MenuText>{i18n.postMenu.comments}</MenuText>
+                <MenuText customTheme={customTheme}>{intl.comments}</MenuText>
               </MenuModalContents>
             </MenuModalButton>
             {!hideReblog && (
@@ -139,10 +161,10 @@ class PostMenu extends Component {
                 <MenuModalContents>
                   <MaterialCommunityIcons
                     size={ICON_SIZES.menuModalOptionIcon}
-                    color={COLORS.PRIMARY_COLOR}
+                    color={customTheme.primaryColor}
                     name={MATERIAL_COMMUNITY_ICONS.reblog}
                   />
-                  <MenuText>{i18n.postMenu.reblog}</MenuText>
+                  <MenuText customTheme={customTheme}>{intl.reblog}</MenuText>
                 </MenuModalContents>
               </MenuModalButton>
             )}
@@ -151,10 +173,10 @@ class PostMenu extends Component {
                 <MenuModalContents>
                   <MaterialCommunityIcons
                     size={ICON_SIZES.menuModalOptionIcon}
-                    color={COLORS.PRIMARY_COLOR}
+                    color={customTheme.primaryColor}
                     name={MATERIAL_COMMUNITY_ICONS.image}
                   />
-                  <MenuText>{i18n.postMenu.postImages}</MenuText>
+                  <MenuText customTheme={customTheme}>{intl.post_images}</MenuText>
                 </MenuModalContents>
               </MenuModalButton>
             )}
@@ -171,10 +193,30 @@ class PostMenu extends Component {
               <MenuModalContents>
                 <MaterialCommunityIcons
                   size={ICON_SIZES.menuModalOptionIcon}
-                  color={COLORS.PRIMARY_COLOR}
+                  color={customTheme.primaryColor}
                   name={MATERIAL_COMMUNITY_ICONS.shareVariant}
                 />
-                <MenuText>{i18n.postMenu.sharePost}</MenuText>
+                <MenuText customTheme={customTheme}>{intl.share_post}</MenuText>
+              </MenuModalContents>
+            </MenuModalButton>
+            <MenuModalButton onPress={this.handleSetSteemitRLClipboard}>
+              <MenuModalContents>
+                <MaterialCommunityIcons
+                  size={ICON_SIZES.menuModalOptionIcon}
+                  color={customTheme.primaryColor}
+                  name={MATERIAL_COMMUNITY_ICONS.contentCopy}
+                />
+                <MenuText customTheme={customTheme}>{intl.copy_steemit_url}</MenuText>
+              </MenuModalContents>
+            </MenuModalButton>
+            <MenuModalButton onPress={this.handleSetBusyURLClipboard}>
+              <MenuModalContents>
+                <MaterialCommunityIcons
+                  size={ICON_SIZES.menuModalOptionIcon}
+                  color={customTheme.primaryColor}
+                  name={MATERIAL_COMMUNITY_ICONS.contentCopy}
+                />
+                <MenuText customTheme={customTheme}>{intl.copy_busy_url}</MenuText>
               </MenuModalContents>
             </MenuModalButton>
             {displayEditPostButton && (
@@ -182,10 +224,10 @@ class PostMenu extends Component {
                 <MenuModalContents>
                   <MaterialCommunityIcons
                     size={ICON_SIZES.menuModalOptionIcon}
-                    color={COLORS.PRIMARY_COLOR}
+                    color={customTheme.primaryColor}
                     name={MATERIAL_COMMUNITY_ICONS.pencil}
                   />
-                  <MenuText>{i18n.postMenu.editPost}</MenuText>
+                  <MenuText customTheme={customTheme}>{intl.edit_post}</MenuText>
                 </MenuModalContents>
               </MenuModalButton>
             )}
@@ -196,7 +238,11 @@ class PostMenu extends Component {
   }
 }
 
-export default connect(state => ({
+const mapStateToProps = state => ({
+  customTheme: getCustomTheme(state),
   authUsername: getAuthUsername(state),
   followingList: getCurrentUserFollowList(state),
-}))(PostMenu);
+  intl: getIntl(state),
+});
+
+export default connect(mapStateToProps)(PostMenu);

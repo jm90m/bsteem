@@ -25,6 +25,12 @@ export const SEARCH_SET_TRENDING_TAGS = '@search/search-set-trending-tags';
 // Auth Actions
 export const AUTHENTICATE_USER = createAsyncActionType('@authenticate-user');
 export const LOGOUT_USER = '@logout-user';
+export const GET_AUTH_USER_SC_DATA = createAsyncActionType('@auth/get-auth-user-sc-data');
+export const SAVE_NOTIFICATIONS_LAST_TIMESTAMP = createAsyncActionType(
+  '@auth/save-notifications-last-timestamp',
+);
+export const SET_CURRENT_USER_NAVIGATION = 'set-current-user-navigation';
+export const FETCH_BSTEEM_NOTIFICATIONS = createAsyncActionType('@auth/fetch-bsteem-notifications');
 
 // Current User Actions
 export const FETCH_CURRENT_USER_FEED = createAsyncActionType(
@@ -61,6 +67,8 @@ export const FETCH_CURRENT_USER_BSTEEM_FEED = createAsyncActionType(
 export const FETCH_MORE_CURRENT_USER_BSTEEM_FEED = createAsyncActionType(
   '@current-user/fetch-more-current-user-bsteem-feed',
 );
+export const GET_NOTIFICATIONS = createAsyncActionType('@current-user/get-notifications');
+export const ADD_NEW_NOTIFICATION = 'add-new-notification';
 
 // User Activity Actions
 export const FETCH_USER_ACCOUNT_HISTORY = createAsyncActionType(
@@ -82,8 +90,6 @@ export const FETCH_STEEM_GLOBAL_PROPERTIES = createAsyncActionType(
   '@app/fetch-steem-global-properties',
 );
 export const FETCH_NETWORK_CONNECTION = createAsyncActionType('@app/fetch-network-connection');
-export const SET_TRANSLATIONS = createAsyncActionType('@app/set-translations');
-export const SET_STEEMCONNECT_ERROR_MODAL_DISPLAY = '@app/set-steemconnect-error-modal-display';
 export const DISPLAY_NOTIFY_MODAL = '@app/display-notify-modal';
 export const HIDE_NOTIFY_MODAL = '@app/hide-notify-modal';
 export const APP_ONBOARDING = createAsyncActionType('@app/app-onboardig');
@@ -91,8 +97,7 @@ export const FETCH_CRYPTO_PRICE_HISTORY = createAsyncActionType('@app/fetch-cryp
 export const DISPLAY_PRICE_MODAL = '@app/display-price-modal';
 export const HIDE_PRICE_MODAL = '@app/hide-price-modal';
 export const FETCH_REWARD_FUND = createAsyncActionType('@app/fetch-reward-fund');
-export const HIDE_MESSAGES_MODAL = '@app/hide-messages-modal';
-export const DISPLAY_MESSAGES_MODAL = '@app/display-messages-modal';
+export const INITIAL_APP_LOADED = createAsyncActionType('@app/initial-app-loaded');
 
 // Editor Actions
 export const CREATE_POST = createAsyncActionType('@editor/create-post');
@@ -115,6 +120,11 @@ export const FETCH_DRAFTS = createAsyncActionType('@firebase/fetch-drafts');
 
 // Posts Actions
 export const FETCH_POST_DETAILS = createAsyncActionType('@posts/fetch-post-details');
+export const SAVE_POST_OFFLINE = createAsyncActionType('@posts/save-post-offline');
+export const FETCH_SAVED_OFFLINE_POSTS = createAsyncActionType('@posts/fetch-saved-offline-posts');
+export const ADD_POST_TO_SAVED_OFFLINE = '@post/add-post-to-saved-offline';
+export const UNSAVE_POST_OFFLINE = createAsyncActionType('@posts/unsave-post-offline');
+export const REMOVE_POST_SAVED_OFFLINE = '@post/remove-post-saved-offline';
 
 // Settings Actions
 export const UPDATE_NSFW_DISPLAY_SETTING = createAsyncActionType(
@@ -134,6 +144,15 @@ export const UPDATE_VOTING_SLIDER_SETTING = createAsyncActionType(
 export const UPDATE_VOTING_PERCENT_SETTING = createAsyncActionType(
   '@settings/update-voting-percent-setting',
 );
+export const UPDATE_CUSTOM_THEME = createAsyncActionType('@settings/update-custom-theme');
+export const UPDATE_POST_PREVIEW_COMPACT_MODE_SETTINGS = createAsyncActionType(
+  '@settings/update-post-preview-compact-mode-settings',
+);
+export const UPDATE_USER_LANGUAGE = createAsyncActionType('@settings/update-user-language');
+export const UPDATE_USER_SIGNATURE = createAsyncActionType('@settings/update-user-signature');
+export const UPDATE_ENABLE_USER_SIGNATURE = createAsyncActionType(
+  '@settings/update-enable-user-signature',
+);
 
 // Messages
 export const FETCH_DISPLAYED_MESSAGES = createAsyncActionType('@messages/fetch-displayed-messages');
@@ -146,3 +165,5 @@ export const UNBLOCK_USER = createAsyncActionType('@messages/unblock-user');
 export const HIDE_DISPLAYED_USER_MESSAGE = createAsyncActionType(
   '@messages/hide-displayed-user-message',
 );
+
+export const SET_LANGUAGE_SETTING = '@intl/set-language-setting';

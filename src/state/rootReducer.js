@@ -12,6 +12,7 @@ import firebaseReducer, * as fromFirebase from './reducers/firebaseReducer';
 import postsReducer, * as fromPosts from './reducers/postsReducer';
 import settingsReducer, * as fromSettings from './reducers/settingsReducer';
 import messagesReducer, * as fromMessages from './reducers/messagesReducer';
+import intlReducer, * as fromIntl from './reducers/intlReducer';
 
 export default combineReducers({
   app: appReducer,
@@ -27,6 +28,7 @@ export default combineReducers({
   posts: postsReducer,
   settings: settingsReducer,
   messages: messagesReducer,
+  intl: intlReducer,
 });
 
 // Home Selectors
@@ -64,6 +66,9 @@ export const getAuthUsername = state => fromAuth.getUsername(state.auth);
 export const getAuthAccessToken = state => fromAuth.getAccessToken(state.auth);
 export const getAuthExpiresIn = state => fromAuth.getExpiresIn(state.auth);
 export const getIsAuthenticated = state => fromAuth.getIsAuthenticated(state.auth);
+export const getAuthenticatedUserSCMetaData = state =>
+  fromAuth.getAuthenticatedUserSCMetaData(state.auth);
+export const getCurrentUserNavigation = state => fromAuth.getCurrentUserNavigation(state.auth);
 
 // Current User Selectors
 export const getCurrentUserFeed = state => fromCurrentUser.getCurrentUserFeed(state.currentUser);
@@ -81,6 +86,9 @@ export const getLoadingFetchCurrentUserBSteemFeed = state =>
   fromCurrentUser.getLoadingFetchCurrentUserBSteemFeed(state.currentUser);
 export const getLoadingFetchMoreCurrentBSteemUserFeed = state =>
   fromCurrentUser.getLoadingFetchMoreCurrentBSteemUserFeed(state.currentUser);
+export const getNotifications = state => fromCurrentUser.getNotifications(state.currentUser);
+export const getLoadingNotifications = state =>
+  fromCurrentUser.getLoadingNotifications(state.currentUser);
 
 // User Activity Selectors
 export const getUsersTransactions = state =>
@@ -113,6 +121,7 @@ export const getCryptosPriceHistory = state => fromApp.getCryptosPriceHistory(st
 export const getDisplayPriceModal = state => fromApp.getDisplayPriceModal(state.app);
 export const getDisplayedCryptos = state => fromApp.getDisplayedCryptos(state.app);
 export const getRewardFund = state => fromApp.getRewardFund(state.app);
+export const getInitialAppLoaded = state => fromApp.getInitialAppLoaded(state.app);
 
 // Comments Selectors
 export const getCommentsByPostId = state => fromComments.getCommentsByPostId(state.comments);
@@ -138,14 +147,32 @@ export const getLoadingSavingDraft = state => fromFirebase.getLoadingSavingDraft
 // Posts Selectors
 export const getPostsDetails = state => fromPosts.getPostsDetails(state.posts);
 export const getPostLoading = state => fromPosts.getPostLoading(state.posts);
+export const getSavedOfflinePosts = state => fromPosts.getSavedOfflinePosts(state.posts);
+export const getPendingSavingPostsOffline = state =>
+  fromPosts.getPendingSavingPostsOffline(state.posts);
 
 // Settings Selectors
 export const getDisplayNSFWContent = state => fromSettings.getDisplayNSFWContent(state.settings);
+export const getCompactViewEnabled = state => fromSettings.getCompactViewEnabled(state.settings);
 export const getReportedPosts = state => fromSettings.getReportedPosts(state.settings);
 export const getPendingReportingPosts = state =>
   fromSettings.getPendingReportingPosts(state.settings);
 export const getEnableVotingSlider = state => fromSettings.getEnableVotingSlider(state.settings);
 export const getVotingPercent = state => fromSettings.getVotingPercent(state.settings);
+export const getCustomTheme = state => fromSettings.getCustomTheme(state.settings);
+export const getLoadingUpdateCompactViewEnabled = state =>
+  fromSettings.getLoadingUpdateCompactViewEnabled(state.settings);
+export const getLoadingUpdateNSFWDisplaySetting = state =>
+  fromSettings.getLoadingUpdateNSFWDisplaySetting(state.settings);
+export const getLoadingUpdateVotingSliderSetting = state =>
+  fromSettings.getLoadingUpdateVotingSliderSetting(state.settings);
+export const getLanguageSetting = state => fromSettings.getLanguageSetting(state.settings);
+export const getSignature = state => fromSettings.getSignature(state.settings);
+export const getLoadingSavingSignature = state =>
+  fromSettings.getLoadingSavingSignature(state.settings);
+export const getEnableSignature = state => fromSettings.getEnableSignature(state.settings);
+export const getLoadingSavingEnableUserSignature = state =>
+  fromSettings.getLoadingSavingEnableUserSignature(state.settings);
 
 // Messages Selectors
 export const getLoadingFetchMessages = state =>
@@ -159,3 +186,6 @@ export const getUserMessages = (state, username) =>
   fromMessages.getUserMessages(state.messages, username);
 export const getDisplayedMessages = state => fromMessages.getDisplayedMessages(state.messages);
 export const getBlockedUsers = state => fromMessages.getBlockedUsers(state.messages);
+
+// Intl Selector
+export const getIntl = state => state.intl;

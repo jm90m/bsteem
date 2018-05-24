@@ -4,9 +4,9 @@ import _ from 'lodash';
 import { connect } from 'react-redux';
 import styled from 'styled-components/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { MATERIAL_COMMUNITY_ICONS, COLORS, ICON_SIZES } from '../../constants/styles';
+import { MATERIAL_COMMUNITY_ICONS, ICON_SIZES } from '../../constants/styles';
 import { saveUser, unsaveUser } from '../../state/actions/firebaseActions';
-import { getPendingSavingUsers, getSavedUsers } from '../../state/rootReducer';
+import { getPendingSavingUsers, getSavedUsers, getCustomTheme } from '../../state/rootReducer';
 import SmallLoading from './SmallLoading';
 
 const Touchable = styled.TouchableOpacity``;
@@ -15,6 +15,7 @@ const Touchable = styled.TouchableOpacity``;
   state => ({
     pendingSavingUsers: getPendingSavingUsers(state),
     savedUsers: getSavedUsers(state),
+    customTheme: getCustomTheme(state),
   }),
   dispatch => ({
     saveUser: username => dispatch(saveUser.action({ username })),
@@ -26,6 +27,7 @@ class SaveUserButton extends Component {
     username: PropTypes.string.isRequired,
     saveUser: PropTypes.func.isRequired,
     unsaveUser: PropTypes.func.isRequired,
+    customTheme: PropTypes.shape().isRequired,
   };
 
   constructor(props) {
@@ -46,7 +48,7 @@ class SaveUserButton extends Component {
   }
 
   render() {
-    const { username, savedUsers, pendingSavingUsers } = this.props;
+    const { username, savedUsers, pendingSavingUsers, customTheme } = this.props;
 
     if (_.includes(pendingSavingUsers, username)) {
       return <SmallLoading style={{ marginLeft: 5 }} />;
@@ -59,7 +61,7 @@ class SaveUserButton extends Component {
         <MaterialCommunityIcons
           name={MATERIAL_COMMUNITY_ICONS.saved}
           size={ICON_SIZES.menuIcon}
-          color={COLORS.PRIMARY_COLOR}
+          color={customTheme.primaryColor}
         />
       </Touchable>
     ) : (
@@ -67,7 +69,7 @@ class SaveUserButton extends Component {
         <MaterialCommunityIcons
           name={MATERIAL_COMMUNITY_ICONS.save}
           size={ICON_SIZES.menuIcon}
-          color={COLORS.PRIMARY_COLOR}
+          color={customTheme.primaryColor}
         />
       </Touchable>
     );

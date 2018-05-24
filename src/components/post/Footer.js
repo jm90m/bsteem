@@ -5,11 +5,11 @@ import { connect } from 'react-redux';
 import _ from 'lodash';
 import styled from 'styled-components/native';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS, MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
+import { MATERIAL_COMMUNITY_ICONS, ICON_SIZES, MATERIAL_ICONS } from 'constants/styles';
 import { sortVotes } from 'util/sortUtils';
 import { getUpvotes } from 'util/voteUtils';
 import { calculatePayout } from 'util/steemitUtils';
-import { getAuthUsername, getCurrentUserRebloggedList } from 'state/rootReducer';
+import { getAuthUsername, getCurrentUserRebloggedList, getCustomTheme } from 'state/rootReducer';
 import { currentUserReblogPost } from 'state/actions/currentUserActions';
 import * as navigationConstants from 'constants/navigation';
 import BSteemModal from 'components/common/BSteemModal';
@@ -17,7 +17,7 @@ import ReblogModal from './ReblogModal';
 
 const Container = styled.View`
   flex-direction: row;
-  padding: 10px 16px;
+  padding: 10px 0;
 `;
 
 const FooterValue = styled.Text`
@@ -25,7 +25,7 @@ const FooterValue = styled.Text`
   margin-left: 5px;
   font-size: 14px;
   font-weight: 700;
-  color: ${COLORS.TERTIARY_COLOR};
+  color: ${props => props.customTheme.tertiaryColor};
   align-self: center;
 `;
 
@@ -33,7 +33,7 @@ const Payout = styled.Text`
   margin-left: auto;
   font-size: 14px;
   font-weight: 700;
-  color: ${COLORS.TERTIARY_COLOR};
+  color: ${props => props.customTheme.tertiaryColor};
   align-self: center;
   ${props => (props.payoutIsDeclined ? 'text-decoration-line: line-through' : '')};
 `;
@@ -43,6 +43,7 @@ const Loading = styled.ActivityIndicator``;
 const mapStateToProps = state => ({
   authUsername: getAuthUsername(state),
   rebloggedList: getCurrentUserRebloggedList(state),
+  customTheme: getCustomTheme(state),
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -69,11 +70,14 @@ class Footer extends Component {
   static propTypes = {
     authUsername: PropTypes.string.isRequired,
     currentUserReblogPost: PropTypes.func.isRequired,
+    customTheme: PropTypes.shape().isRequired,
     handleLikePost: PropTypes.func,
     navigation: PropTypes.shape(),
     postData: PropTypes.shape(),
     rebloggedList: PropTypes.arrayOf(PropTypes.string).isRequired,
     handleNavigateToVotes: PropTypes.func,
+    likedPost: PropTypes.bool.isRequired,
+    loadingVote: PropTypes.bool.isRequired,
   };
 
   static defaultProps = {
@@ -151,46 +155,64 @@ class Footer extends Component {
   }
 
   renderVoteButton() {
-    const { likedPost, loadingVote } = this.props;
+    const { likedPost, loadingVote, customTheme } = this.props;
 
     if (loadingVote) {
-      return <Loading color={COLORS.PRIMARY_COLOR} size="small" />;
+      return <Loading color={customTheme.primaryColor} size="small" />;
     }
 
     if (likedPost) {
       return (
         <TouchableOpacity onPress={this.props.handleLikePost}>
-          <MaterialIcons name="thumb-up" size={24} color={COLORS.PRIMARY_COLOR} />
+          <MaterialIcons
+            name={MATERIAL_ICONS.like}
+            size={ICON_SIZES.footerActionIcon}
+            color={customTheme.primaryColor}
+          />
         </TouchableOpacity>
       );
     }
 
     return (
       <TouchableOpacity onPress={this.props.handleLikePost}>
-        <MaterialIcons name="thumb-up" size={24} color={COLORS.TERTIARY_COLOR} />
+        <MaterialIcons
+          name={MATERIAL_ICONS.like}
+          size={ICON_SIZES.footerActionIcon}
+          color={customTheme.tertiaryColor}
+        />
       </TouchableOpacity>
     );
   }
 
   renderReblogLink() {
-    const { postData, authUsername, rebloggedList } = this.props;
+    const { postData, authUsername, rebloggedList, customTheme } = this.props;
     const { loadingReblog } = this.state;
     const ownPost = authUsername === postData.author;
     const showReblogLink = !ownPost && postData.parent_author === '';
     const isReblogged = _.includes(rebloggedList, `${postData.id}`);
 
     if (loadingReblog) {
-      return <Loading color={COLORS.PRIMARY_COLOR} size="small" />;
+      return <Loading color={customTheme.primaryColor} size="small" />;
     }
 
     if (isReblogged) {
-      return <MaterialCommunityIcons name="tumblr-reblog" size={24} color={COLORS.PRIMARY_COLOR} />;
+      return (
+        <MaterialCommunityIcons
+          name={MATERIAL_COMMUNITY_ICONS.reblog}
+          size={ICON_SIZES.footerActionIcon}
+          color={customTheme.primaryColor}
+        />
+      );
     }
 
     if (showReblogLink) {
       return (
         <TouchableOpacity onPress={this.showReblogModal}>
-          <MaterialCommunityIcons name="tumblr-reblog" size={24} color={COLORS.TERTIARY_COLOR} />
+          <MaterialCommunityIcons
+            name={MATERIAL_COMMUNITY_ICONS.reblog}
+            size={ICON_SIZES.footerActionIcon}
+            color={customTheme.tertiaryColor}
+          />
         </TouchableOpacity>
       );
     }
@@ -198,7 +220,7 @@ class Footer extends Component {
   }
 
   render() {
-    const { postData, handleNavigateToVotes } = this.props;
+    const { postData, handleNavigateToVotes, customTheme } = this.props;
     const { displayReblogModal } = this.state;
     const { active_votes, children } = postData;
     const activeVotes = Array.isArray(active_votes) ? active_votes : [];
@@ -217,22 +239,24 @@ class Footer extends Component {
           onPress={handleNavigateToVotes}
           style={{ justifyContent: 'center', alignItems: 'center' }}
         >
-          <FooterValue>{upVotes.length}</FooterValue>
+          <FooterValue customTheme={customTheme}>{upVotes.length}</FooterValue>
         </TouchableOpacity>
         <TouchableOpacity onPress={this.handleNavigateToComments} style={{ flexDirection: 'row' }}>
           <MaterialCommunityIcons
             name={MATERIAL_COMMUNITY_ICONS.comment}
-            size={24}
-            color={COLORS.TERTIARY_COLOR}
+            size={ICON_SIZES.footerActionIcon}
+            color={customTheme.tertiaryColor}
           />
-          <FooterValue>{children}</FooterValue>
+          <FooterValue customTheme={customTheme}>{children}</FooterValue>
         </TouchableOpacity>
         {this.renderReblogLink()}
         <TouchableOpacity
           onPress={handleNavigateToVotes}
           style={{ marginLeft: 'auto', alignItems: 'center' }}
         >
-          <Payout payoutIsDeclined={payoutIsDeclined}>${formattedDisplayedPayout}</Payout>
+          <Payout customTheme={customTheme} payoutIsDeclined={payoutIsDeclined}>
+            ${formattedDisplayedPayout}
+          </Payout>
         </TouchableOpacity>
         {displayReblogModal && (
           <BSteemModal visible={displayReblogModal} handleOnClose={this.hideReblogModal}>

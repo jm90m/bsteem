@@ -4,10 +4,7 @@ import styled from 'styled-components/native';
 import _ from 'lodash';
 import Tag from './Tag';
 
-const Container = styled.View`
-  flex-direction: row;
-  width: 100%;
-  flex-wrap: wrap;
+const ScrollView = styled.ScrollView`
   padding: 10px 0;
 `;
 
@@ -17,13 +14,13 @@ const TagTouchable = styled.TouchableOpacity`
 `;
 
 const FooterTags = ({ tags, handleFeedNavigation }) => (
-  <Container>
+  <ScrollView horizontal>
     {_.map(tags, tag => (
       <TagTouchable key={tag} onPress={() => handleFeedNavigation(tag)}>
         <Tag tag={tag} />
       </TagTouchable>
     ))}
-  </Container>
+  </ScrollView>
 );
 
 FooterTags.propTypes = {

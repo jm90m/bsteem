@@ -3,11 +3,12 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components/native';
 import { COLORS } from 'constants/styles';
 import { abbreviateLargeNumber } from 'util/numberFormatter';
+import tinycolor from 'tinycolor2';
 
 const Container = styled.View`
   flex-direction: row;
   justify-content: space-between;
-  background: ${COLORS.WHITE.WHITE};
+  background: ${props => props.customTheme.primaryBackgroundColor};
   padding: 5px 16px;
 `;
 
@@ -17,10 +18,18 @@ const ValueLabelContainer = styled.View`
 
 const Value = styled.Text`
   font-weight: bold;
+  color: ${props =>
+    tinycolor(props.customTheme.primaryBackgroundColor).isDark()
+      ? COLORS.LIGHT_TEXT_COLOR
+      : COLORS.DARK_TEXT_COLOR};
 `;
 
 const Label = styled.Text`
   font-size: 12px;
+  color: ${props =>
+    tinycolor(props.customTheme.primaryBackgroundColor).isDark()
+      ? COLORS.LIGHT_TEXT_COLOR
+      : COLORS.DARK_TEXT_COLOR};
 `;
 
 const TouchableOpacity = styled.TouchableOpacity`
@@ -34,6 +43,8 @@ class UserStats extends Component {
     postCount: PropTypes.number,
     onPressFollowers: PropTypes.func,
     onPressFollowing: PropTypes.func,
+    customTheme: PropTypes.shape().isRequired,
+    intl: PropTypes.shape().isRequired,
   };
 
   static defaultProps = {
@@ -51,32 +62,22 @@ class UserStats extends Component {
       postCount,
       onPressFollowers,
       onPressFollowing,
+      customTheme,
+      intl,
     } = this.props;
     return (
-      <Container>
+      <Container customTheme={customTheme}>
         <ValueLabelContainer>
-          <Value>
-            {abbreviateLargeNumber(postCount)}
-          </Value>
-          <Label>
-            {'posts'}
-          </Label>
+          <Value customTheme={customTheme}>{abbreviateLargeNumber(postCount)}</Value>
+          <Label customTheme={customTheme}>{intl.posts}</Label>
         </ValueLabelContainer>
         <TouchableOpacity onPress={onPressFollowers}>
-          <Value>
-            {abbreviateLargeNumber(followerCount)}
-          </Value>
-          <Label>
-            {'followers'}
-          </Label>
+          <Value customTheme={customTheme}>{abbreviateLargeNumber(followerCount)}</Value>
+          <Label customTheme={customTheme}>{intl.followers}</Label>
         </TouchableOpacity>
         <TouchableOpacity onPress={onPressFollowing}>
-          <Value>
-            {abbreviateLargeNumber(followingCount)}
-          </Value>
-          <Label>
-            {'following'}
-          </Label>
+          <Value customTheme={customTheme}>{abbreviateLargeNumber(followingCount)}</Value>
+          <Label customTheme={customTheme}>{intl.following}</Label>
         </TouchableOpacity>
       </Container>
     );

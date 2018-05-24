@@ -24,12 +24,21 @@ export const getCurrentDaysOfTheWeek = currentLocale => {
   const date = new Date();
   date.setDate(date.getDate() - 7);
   const daysOfTheWeek = [];
-  const locale = 'en';
-
-  for (let i = 0; i < 7; i += 1) {
-    date.setDate(date.getDate() + 1);
-    const dateLocale = date.toLocaleString(locale, { weekday: 'short' });
-    daysOfTheWeek.push(dateLocale);
+  try {
+    for (let i = 0; i < 7; i += 1) {
+      date.setDate(date.getDate() + 1);
+      const dateLocale = date.toLocaleString(currentLocale, { weekday: 'short' });
+      daysOfTheWeek.push(dateLocale);
+    }
+  } catch (error) {
+    const defaultLocale = 'en';
+    const defaultDaysOfTheWeek = [];
+    for (let i = 0; i < 7; i += 1) {
+      date.setDate(date.getDate() + 1);
+      const dateLocale = date.toLocaleString(defaultLocale, { weekday: 'short' });
+      defaultDaysOfTheWeek.push(dateLocale);
+    }
+    return defaultDaysOfTheWeek;
   }
 
   return daysOfTheWeek;

@@ -1,3 +1,4 @@
+import { getUserDetailsHelper } from 'util/bsteemUtils';
 import _ from 'lodash';
 import {
   FETCH_USER,
@@ -36,6 +37,7 @@ export default (state = INITIAL_STATE, action) => {
         loadingUsersDetails: false,
       };
     }
+    case FETCH_USER.LOADING_END:
     case FETCH_USER.ERROR:
       return {
         ...state,
@@ -47,7 +49,7 @@ export default (state = INITIAL_STATE, action) => {
         loadingUsersComments: true,
       };
     case FETCH_USER_COMMENTS.SUCCESS: {
-      const userComments = state.usersComments[action.payload.username] || [];
+      const userComments = getUserDetailsHelper(state.usersComments, action.payload.username, []);
       const newUserComments = _.uniqBy(_.concat(userComments, action.payload.result), 'id');
       return {
         ...state,
@@ -71,7 +73,7 @@ export default (state = INITIAL_STATE, action) => {
     case FETCH_USER_BLOG.SUCCESS: {
       const { username, result, refreshUser } = action.payload;
       console.log('FETCH_USER_BLOG_SUCCESS', action.payload);
-      const userBlog = state.usersBlog[username] || [];
+      const userBlog = getUserDetailsHelper(state.usersBlog, username, []);
       const newUserBlog = refreshUser ? result : _.uniqBy(_.concat(userBlog, result), 'id');
       return {
         ...state,

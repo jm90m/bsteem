@@ -1,10 +1,12 @@
 import React, { Component } from 'react';
-
 import PropTypes from 'prop-types';
+import _ from 'lodash';
 import styled from 'styled-components/native';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS, ICON_SIZES, MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
+import { ICON_SIZES, MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
+import { connect } from 'react-redux';
 import Header from 'components/common/Header';
+import { getCustomTheme, getIntl } from 'state/rootReducer';
 
 const CurrentMenuDisplay = styled.View`
   flex-direction: row;
@@ -13,7 +15,7 @@ const CurrentMenuDisplay = styled.View`
 
 const CurrentMenuText = styled.Text`
   margin-left: 5px;
-  color: ${COLORS.PRIMARY_COLOR};
+  color: ${props => props.customTheme.primaryColor};
 `;
 
 const MenuIconContainer = styled.View`
@@ -24,13 +26,15 @@ const Touchable = styled.TouchableOpacity``;
 
 class CurrentUserHeader extends Component {
   static propTypes = {
+    customTheme: PropTypes.shape().isRequired,
     currentMenuOption: PropTypes.shape().isRequired,
+    intl: PropTypes.shape().isRequired,
     toggleCurrentUserMenu: PropTypes.func.isRequired,
     handleNavigateToEditProfile: PropTypes.func.isRequired,
   };
 
   render() {
-    const { currentMenuOption } = this.props;
+    const { currentMenuOption, customTheme, intl } = this.props;
     return (
       <Header>
         <Touchable onPress={this.props.handleNavigateToEditProfile}>
@@ -38,7 +42,7 @@ class CurrentUserHeader extends Component {
             <MaterialCommunityIcons
               size={ICON_SIZES.menuIcon}
               name={MATERIAL_COMMUNITY_ICONS.accountEdit}
-              color={COLORS.PRIMARY_COLOR}
+              color={customTheme.primaryColor}
             />
           </MenuIconContainer>
         </Touchable>
@@ -47,9 +51,11 @@ class CurrentUserHeader extends Component {
             <MaterialIcons
               size={ICON_SIZES.menuIcon}
               name={currentMenuOption.icon}
-              color={COLORS.PRIMARY_COLOR}
+              color={customTheme.primaryColor}
             />
-            <CurrentMenuText>{currentMenuOption.label}</CurrentMenuText>
+            <CurrentMenuText customTheme={customTheme}>
+              {_.capitalize(intl[currentMenuOption.label])}
+            </CurrentMenuText>
           </CurrentMenuDisplay>
         </Touchable>
         <Touchable onPress={this.props.toggleCurrentUserMenu}>
@@ -57,7 +63,7 @@ class CurrentUserHeader extends Component {
             <MaterialCommunityIcons
               size={ICON_SIZES.menuIcon}
               name={MATERIAL_COMMUNITY_ICONS.menuVertical}
-              color={COLORS.PRIMARY_COLOR}
+              color={customTheme.primaryColor}
             />
           </MenuIconContainer>
         </Touchable>
@@ -66,4 +72,9 @@ class CurrentUserHeader extends Component {
   }
 }
 
-export default CurrentUserHeader;
+const mapStateToProps = state => ({
+  customTheme: getCustomTheme(state),
+  intl: getIntl(state),
+});
+
+export default connect(mapStateToProps)(CurrentUserHeader);

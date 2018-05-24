@@ -16,6 +16,9 @@ import {
   getIsAuthenticated,
   getAuthUsername,
   getEnableVotingSlider,
+  getUsersDetails,
+  getCustomTheme,
+  getIntl,
 } from 'state/rootReducer';
 import PostPhotoBrowser from 'components/post/PostPhotoBrowser';
 import PostMenu from 'components/post-menu/PostMenu';
@@ -27,14 +30,19 @@ import BackButton from 'components/common/BackButton';
 import PostHeader from 'components/post-preview/Header';
 import PrimaryButton from 'components/common/PrimaryButton';
 import * as postConstants from 'constants/postConstants';
-import i18n from 'i18n/i18n';
 import { currentUserVotePost } from 'state/actions/currentUserActions';
 import EmbedContent from 'components/post-preview/EmbedContent';
 import BSteemModal from 'components/common/BSteemModal';
 import { isPostVoted } from 'util/voteUtils';
-import { getEmbeds } from 'util/postPreviewUtils';
 import PostVoteSlider from 'components/post/PostVoteSlider';
 import PostComments from 'components/post/PostComments';
+import TitleText from 'components/common/TitleText';
+import tinycolor from 'tinycolor2';
+import StyledViewPrimaryBackground from 'components/common/StyledViewPrimaryBackground';
+import StyledTextByBackground from 'components/common/StyledTextByBackground';
+import LargeLoading from 'components/common/LargeLoading';
+import ReplyHeader from 'components/post/ReplyHeader';
+import { getProxyImageURL } from '../../util/imageUtils';
 
 const { width: deviceWidth } = Dimensions.get('screen');
 
@@ -49,23 +57,13 @@ const Menu = styled.View`
   padding: 10px;
 `;
 
-const Loading = styled.ActivityIndicator`
-  padding-top: 100px;
-`;
-
-const Author = styled.Text`
-  color: ${COLORS.PRIMARY_COLOR};
-  font-weight: bold;
-`;
-
-const NoPostFoundContainer = styled.View`
+const NoPostFoundContainer = styled(StyledViewPrimaryBackground)`
   padding: 20px;
-  background-color: ${COLORS.WHITE.WHITE};
 `;
 
-const NoPostFoundText = styled.Text``;
+const NoPostFoundText = styled(StyledTextByBackground)``;
 
-const PostTitle = styled.Text`
+const PostTitle = styled(StyledTextByBackground)`
   font-weight: 700;
   font-size: 20px;
 `;
@@ -76,11 +74,14 @@ const EmptyView = styled.View`
 `;
 
 const mapStateToProps = state => ({
+  customTheme: getCustomTheme(state),
   postsDetails: getPostsDetails(state),
   postLoading: getPostLoading(state),
   authenticated: getIsAuthenticated(state),
   authUsername: getAuthUsername(state),
   enableVotingSlider: getEnableVotingSlider(state),
+  usersDetails: getUsersDetails(state),
+  intl: getIntl(state),
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -107,12 +108,16 @@ class FetchPostScreen extends Component {
   static navigationOptions = {
     headerMode: 'none',
     tabBarVisible: false,
+    drawerLockMode: 'locked-closed',
   };
 
   static propTypes = {
     postLoading: PropTypes.bool,
     navigation: PropTypes.shape().isRequired,
+    customTheme: PropTypes.shape().isRequired,
+    intl: PropTypes.shape().isRequired,
     postsDetails: PropTypes.shape(),
+    usersDetails: PropTypes.shape().isRequired,
     authenticated: PropTypes.bool.isRequired,
     enableVotingSlider: PropTypes.bool.isRequired,
     fetchPostDetails: PropTypes.func.isRequired,
@@ -162,6 +167,7 @@ class FetchPostScreen extends Component {
     this.fetchCurrentPostDetails = this.fetchCurrentPostDetails.bind(this);
     this.sendVote = this.sendVote.bind(this);
     this.handleVoteSliderSendVote = this.handleVoteSliderSendVote.bind(this);
+    this.renderNoPostFound = this.renderNoPostFound.bind(this);
   }
 
   componentDidMount() {
@@ -197,7 +203,7 @@ class FetchPostScreen extends Component {
   }
 
   likedVoteSuccess(votePercent) {
-    const { enableVotingSlider, authUsername, postsDetails } = this.props;
+    const { enableVotingSlider, authUsername, postsDetails, usersDetails } = this.props;
     const { author, permlink } = this.props.navigation.state.params;
     try {
       // directly modify the current vote post data, if it does not have an active vote then
@@ -215,9 +221,11 @@ class FetchPostScreen extends Component {
         }
 
         if (!hasActiveVote) {
+          const reputation = _.get(usersDetails, `${authUsername}.reputation`);
           const newVoteObject = {
             voter: authUsername,
             percent: votePercent,
+            reputation,
           };
           postData.active_votes.push(newVoteObject);
         }
@@ -385,13 +393,14 @@ class FetchPostScreen extends Component {
   }
 
   renderNoPostFound() {
+    const { intl } = this.props;
     return (
       <Container>
         <Header>
           <BackButton navigateBack={this.navigateBack} />
         </Header>
         <NoPostFoundContainer>
-          <NoPostFoundText>{i18n.post.noPostFound}</NoPostFoundText>
+          <NoPostFoundText>{intl.no_post_found}</NoPostFoundText>
         </NoPostFoundContainer>
       </Container>
     );
@@ -399,13 +408,26 @@ class FetchPostScreen extends Component {
 
   renderEmbed() {
     const currentPostDetails = this.getCurrentPostDetails();
-    const embedOptions = {};
-    const embeds = getEmbeds(currentPostDetails, embedOptions);
-    const firstEmbed = _.head(embeds);
-    const hasVideo = !_.isEmpty(firstEmbed);
+    const { json_metadata } = currentPostDetails;
+    const jsonParse = _.attempt(JSON.parse, json_metadata);
+    const parsedJsonMetadata = _.isError(jsonParse) ? {} : jsonParse;
+    const video = _.get(parsedJsonMetadata, 'video', {});
 
-    if (hasVideo) {
-      return <EmbedContent embedContent={firstEmbed} width={deviceWidth - 20} />;
+    if (_.has(video, 'content.videohash') && _.has(video, 'info.snaphash')) {
+      const author = _.get(video, 'info.author', '');
+      const permlink = _.get(video, 'info.permlink', '');
+      const dTubeEmbedUrl = `https://emb.d.tube/#!/${author}/${permlink}`;
+      const snaphash = _.get(video, 'info.snaphash', '');
+      const dTubeIFrame = `<iframe width="100%" height="340" src="${dTubeEmbedUrl}" allowFullScreen></iframe>`;
+      const dtubeEmbedContent = {
+        type: 'video',
+        provider_name: 'DTube',
+        embed: dTubeIFrame,
+        thumbnail: getProxyImageURL(`https://ipfs.io/ipfs/${snaphash}`, 'preview'),
+      };
+      const widthOffset = 20;
+      const width = deviceWidth - widthOffset;
+      return <EmbedContent embedContent={dtubeEmbedContent} width={width} />;
     }
 
     return null;
@@ -413,7 +435,7 @@ class FetchPostScreen extends Component {
 
   render() {
     const { author } = this.props.navigation.state.params;
-    const { postLoading, authUsername } = this.props;
+    const { postLoading, authUsername, customTheme, intl } = this.props;
     const {
       displayPhotoBrowser,
       menuVisible,
@@ -425,7 +447,7 @@ class FetchPostScreen extends Component {
     const currentPostDetails = this.getCurrentPostDetails();
 
     if (postLoading) {
-      return <Loading color={COLORS.PRIMARY_COLOR} size="large" />;
+      return <LargeLoading style={{ paddingTop: 100 }} />;
     } else if (_.isEmpty(currentPostDetails)) {
       return this.renderNoPostFound();
     }
@@ -444,12 +466,13 @@ class FetchPostScreen extends Component {
       <Container>
         <Header>
           <BackButton navigateBack={this.navigateBack} />
-          <Author>{author}</Author>
+          <TitleText>{author}</TitleText>
           <Menu>
             <Touchable onPress={() => this.setMenuVisible(!menuVisible)}>
               <MaterialCommunityIcons
                 size={ICON_SIZES.menuIcon}
                 name={MATERIAL_COMMUNITY_ICONS.menuVertical}
+                color={customTheme.secondaryColor}
               />
             </Touchable>
           </Menu>
@@ -476,7 +499,8 @@ class FetchPostScreen extends Component {
             handleAction={this.handlePhotoBrowserShare}
           />
         )}
-        <ScrollView style={{ padding: 10, backgroundColor: COLORS.WHITE.WHITE }}>
+        <ScrollView style={{ padding: 10, backgroundColor: customTheme.primaryBackgroundColor }}>
+          <ReplyHeader postData={currentPostDetails} navigation={this.props.navigation} />
           <PostHeader
             navigation={this.props.navigation}
             postData={currentPostDetails}
@@ -489,6 +513,13 @@ class FetchPostScreen extends Component {
             html={parsedHtmlBody}
             imagesMaxWidth={deviceWidth - widthOffset}
             onLinkPress={this.handlePostLinkPress}
+            staticContentMaxWidth={deviceWidth - widthOffset}
+            baseFontStyle={{
+              color: tinycolor(customTheme.primaryBackgroundColor).isDark()
+                ? COLORS.LIGHT_TEXT_COLOR
+                : COLORS.DARK_TEXT_COLOR,
+            }}
+            textSelectable
           />
           <FooterTags tags={tags} handleFeedNavigation={this.handleFeedNavigation} />
           {displayVoteSlider ? (
@@ -510,7 +541,7 @@ class FetchPostScreen extends Component {
           <PostComments postData={currentPostDetails} navigation={this.props.navigation} />
           <PrimaryButton
             onPress={this.navigateToComments}
-            title={i18n.post.viewComments}
+            title={intl.see_all_comments}
             style={{ marginTop: 20, marginBottom: 100 }}
           />
           <EmptyView />

@@ -1,29 +1,29 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components/native';
-import { View, Text } from 'react-native';
-import * as accountHistoryConstants from 'constants/accountHistory';
 import * as navigationConstants from 'constants/navigation';
-import { COLORS } from 'constants/styles';
+import StyledTextByBackground from 'components/common/StyledTextByBackground';
+import { connect } from 'react-redux';
+import { getCustomTheme } from 'state/rootReducer';
 
-const Container = styled.Text`
+const Container = styled(StyledTextByBackground)`
   flex-direction: row;
   align-items: center;
   flex-wrap: wrap;
 `;
 
 const LinkText = styled.Text`
-  color: ${COLORS.PRIMARY_COLOR}
+  color: ${props => props.customTheme.primaryColor}
   font-weight: bold;
   margin-right: 5px;
 `;
 
-const VoteWeight = styled.Text`
+const VoteWeight = styled(StyledTextByBackground)`
   font-weight: bold;
   margin-right: 5px;
 `;
 
-const CurrentUserVote = styled.Text`
+const CurrentUserVote = styled(StyledTextByBackground)`
   font-weight: bold;
   margin-right: 5px;
 `;
@@ -34,10 +34,10 @@ const VoteMessageContainer = styled.Text`
 
 const Touchable = styled.TouchableWithoutFeedback``;
 
-const VoteActionMessage = ({ actionDetails, currentUsername, navigation }) => {
+const VoteActionMessage = ({ actionDetails, currentUsername, navigation, customTheme }) => {
   const { author, permlink } = actionDetails;
   let voteType = 'unvoted';
-  const voteWeightValue = Math.abs(actionDetails.weight) / 10000 * 100;
+  const voteWeightValue = parseFloat(Math.abs(actionDetails.weight) / 10000 * 100).toFixed(0);
   const voteWeight = <VoteWeight>{` (${voteWeightValue}%) `}</VoteWeight>;
 
   if (actionDetails.weight > 0) {
@@ -59,16 +59,16 @@ const VoteActionMessage = ({ actionDetails, currentUsername, navigation }) => {
               })
             }
           >
-            <LinkText>{actionDetails.voter}</LinkText>
+            <LinkText customTheme={customTheme}>{actionDetails.voter}</LinkText>
           </Touchable>
-          <Text>{` ${voteType} `}</Text>
+          <StyledTextByBackground>{` ${voteType} `}</StyledTextByBackground>
         </VoteMessageContainer>
       )}
       {actionDetails.weight === 0 ? null : voteWeight}
       <Touchable
         onPress={() => navigation.navigate(navigationConstants.USER, { username: author })}
       >
-        <LinkText>{` ${author} `}</LinkText>
+        <LinkText customTheme={customTheme}>{` ${author} `}</LinkText>
       </Touchable>
       <Touchable
         onPress={() =>
@@ -78,7 +78,7 @@ const VoteActionMessage = ({ actionDetails, currentUsername, navigation }) => {
           })
         }
       >
-        <LinkText>{`(${permlink})`}</LinkText>
+        <LinkText customTheme={customTheme}>{`(${permlink})`}</LinkText>
       </Touchable>
     </Container>
   );
@@ -90,4 +90,8 @@ VoteActionMessage.propTypes = {
   navigation: PropTypes.shape().isRequired,
 };
 
-export default VoteActionMessage;
+const mapStateToProps = state => ({
+  customTheme: getCustomTheme(state),
+});
+
+export default connect(mapStateToProps)(VoteActionMessage);

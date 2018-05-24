@@ -1,43 +1,50 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { View } from 'react-native';
-import styled from 'styled-components/native';
 import { FontAwesome } from '@expo/vector-icons';
-import { FONT_AWESOME_ICONS, ICON_COLORS, ICON_SIZES } from 'constants/styles';
+import { FONT_AWESOME_ICONS, COLORS, ICON_SIZES } from 'constants/styles';
 import TimeAgo from 'components/common/TimeAgo';
-import i18n from 'i18n/i18n';
+import StyledTextByBackground from 'components/common/StyledTextByBackground';
+import { connect } from 'react-redux';
+import { getCustomTheme, getIntl } from 'state/rootReducer';
 import WalletTransactionContainer from './WalletTransactionContainer';
 import IconContainer from './IconContainer';
+import tinycolor from 'tinycolor2';
 
-const Label = styled.Text`
-  font-weight: bold;
-  padding-left: 10px;
-`;
-const Value = styled.Text`
-  font-weight: bold;
-  margin-left: auto;
-`;
-
-const PowerUpTransaction = ({ timestamp, amount }) => (
+const PowerUpTransaction = ({ timestamp, amount, customTheme, intl }) => (
   <WalletTransactionContainer>
     <IconContainer>
       <FontAwesome
         name={FONT_AWESOME_ICONS.bolt}
         size={ICON_SIZES.actionIcon}
-        color={ICON_COLORS.actionIcon}
+        color={
+          tinycolor(customTheme.tertiaryColor).isDark()
+            ? COLORS.LIGHT_TEXT_COLOR
+            : COLORS.DARK_TEXT_COLOR
+        }
       />
     </IconContainer>
     <View>
-      <Label>{i18n.activity.powerUp}</Label>
+      <StyledTextByBackground style={{ paddingLeft: 10, fontWeight: 'bold' }}>
+        {intl.powered_up}
+      </StyledTextByBackground>
       <TimeAgo created={timestamp} style={{ marginLeft: 10 }} />
     </View>
-    <Value>{amount}</Value>
+    <StyledTextByBackground style={{ marginLeft: 'auto', fontWeight: 'bold' }}>
+      {amount}
+    </StyledTextByBackground>
   </WalletTransactionContainer>
 );
 
 PowerUpTransaction.propTypes = {
+  customTheme: PropTypes.shape().isRequired,
   timestamp: PropTypes.string.isRequired,
   amount: PropTypes.string.isRequired,
 };
 
-export default PowerUpTransaction;
+const mapStateToProps = state => ({
+  customTheme: getCustomTheme(state),
+  intl: getIntl(state),
+});
+
+export default connect(mapStateToProps)(PowerUpTransaction);

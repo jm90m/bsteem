@@ -14,13 +14,16 @@ import {
   getAuthUsername,
   getRewardFund,
   getSteemRate,
+  getCustomTheme,
+  getIntl,
 } from 'state/rootReducer';
 import UserProfile from 'components/user/user-profile/UserProfile';
 import * as navigationConstants from 'constants/navigation';
 import { COLORS, MATERIAL_ICONS, FONT_AWESOME_ICONS, ICON_SIZES } from 'constants/styles';
-import i18n from 'i18n/i18n';
 import SaveUserButton from 'components/common/SaveUserButton';
+import { getUserDetailsHelper } from 'util/bsteemUtils';
 import { MaterialIcons, FontAwesome } from '@expo/vector-icons';
+import tinycolor from 'tinycolor2';
 import UserStats from './UserStats';
 import UserCover from './UserCover';
 import UserFollowButton from './UserFollowButton';
@@ -28,7 +31,8 @@ import UserFollowButton from './UserFollowButton';
 const Container = styled.View`
   margin-bottom: 5px;
   border-width: 1px;
-  border-color: ${COLORS.PRIMARY_BORDER_COLOR};
+  border-top-color: ${props => props.customTheme.primaryBorderColor};
+  border-bottom-color: ${props => props.customTheme.primaryBorderColor};
 `;
 const SaveUserButtonContainer = styled.View`
   padding-right: 10px;
@@ -38,12 +42,15 @@ const ActionButtonsContainer = styled.View`
   flex-direction: row;
   justify-content: space-between;
   width: 100%;
-  background-color: ${COLORS.WHITE.WHITE};
+  background-color: ${props => props.customTheme.primaryBackgroundColor};
   align-items: center;
 `;
 
 const VoteText = styled.Text`
-  color: ${COLORS.GREY.CHARCOAL};
+  color: ${props =>
+    tinycolor(props.customTheme.primaryBackgroundColor).isDark()
+      ? COLORS.LIGHT_TEXT_COLOR
+      : COLORS.DARK_TEXT_COLOR};
   margin-left: 5px;
 `;
 
@@ -55,17 +62,17 @@ const VoteContentContainer = styled.View`
 
 const VoteContainer = styled.View`
   padding: 0 10px;
-  background-color: ${COLORS.WHITE.WHITE};
+  background-color: ${props => props.customTheme.primaryBackgroundColor};
 `;
 
 const SendMessageContainer = styled.View`
   padding: 10px 16px;
-  background-color: ${COLORS.PRIMARY_BACKGROUND_COLOR};
+  background-color: ${props => props.customTheme.primaryBackgroundColor};
   flex-direction: row;
 `;
 
 const SendMessageText = styled.Text`
-  color: ${COLORS.PRIMARY_COLOR};
+  color: ${props => props.customTheme.primaryColor};
   margin-left: 5px;
 `;
 
@@ -76,11 +83,15 @@ const mapStateToProps = state => ({
   authUsername: getAuthUsername(state),
   rewardFund: getRewardFund(state),
   steemRate: getSteemRate(state),
+  customTheme: getCustomTheme(state),
+  intl: getIntl(state),
 });
 
 @connect(mapStateToProps)
 class UserHeader extends Component {
   static propTypes = {
+    customTheme: PropTypes.shape().isRequired,
+    intl: PropTypes.shape().isRequired,
     username: PropTypes.string.isRequired,
     authUsername: PropTypes.string,
     usersDetails: PropTypes.shape().isRequired,
@@ -119,14 +130,14 @@ class UserHeader extends Component {
   }
 
   renderActionButtons() {
-    const { hideFollowButton, username, authUsername } = this.props;
+    const { hideFollowButton, username, authUsername, customTheme } = this.props;
     const isAuthUser = authUsername === username;
     const hideActions = hideFollowButton || isAuthUser;
 
     if (hideActions) return <View />;
 
     return (
-      <ActionButtonsContainer>
+      <ActionButtonsContainer customTheme={customTheme}>
         <UserFollowButton username={username} />
         <SaveUserButtonContainer>
           <SaveUserButton username={username} />
@@ -136,19 +147,19 @@ class UserHeader extends Component {
   }
 
   renderSendMessage() {
-    const { authenticated, authUsername } = this.props;
+    const { authenticated, authUsername, customTheme, intl } = this.props;
     const { username } = this.props;
     const isNotCurrentUser = username !== authUsername;
     if (authenticated && isNotCurrentUser) {
       return (
         <TouchableWithoutFeedback onPress={this.handleNavigateToUserMessage}>
-          <SendMessageContainer>
+          <SendMessageContainer customTheme={customTheme}>
             <FontAwesome
               name={FONT_AWESOME_ICONS.sendMessage}
-              color={COLORS.PRIMARY_COLOR}
+              color={customTheme.primaryColor}
               size={15}
             />
-            <SendMessageText>{i18n.messages.sendMessage}</SendMessageText>
+            <SendMessageText customTheme={customTheme}>{intl.send_message}</SendMessageText>
           </SendMessageContainer>
         </TouchableWithoutFeedback>
       );
@@ -157,8 +168,16 @@ class UserHeader extends Component {
   }
 
   render() {
-    const { usersDetails, username, usersFollowCount, rewardFund, steemRate } = this.props;
-    const userDetails = usersDetails[username] || {};
+    const {
+      usersDetails,
+      username,
+      usersFollowCount,
+      rewardFund,
+      steemRate,
+      customTheme,
+      intl,
+    } = this.props;
+    const userDetails = getUserDetailsHelper(usersDetails, username, {});
     const userJsonMetaData = _.attempt(JSON.parse, userDetails.json_metadata);
     const userProfile = _.isError(userJsonMetaData) ? {} : userJsonMetaData.profile;
     const hasCover = _.has(userProfile, 'cover_image');
@@ -181,13 +200,13 @@ class UserHeader extends Component {
     const formattedVotingPower = _.isNaN(votingPowerPercent)
       ? 0
       : parseFloat(votingPowerPercent).toFixed(0);
-    const voteWorthText = `${i18n.user.voteValue}: $${
+    const voteWorthText = `${intl.vote_value}: $${
       _.isNaN(voteWorth) ? 0 : parseFloat(voteWorth).toFixed(2)
     }`;
-    const votePowerText = `${i18n.user.votingPower}: ${formattedVotingPower}%`;
+    const votePowerText = `${intl.voting_power}: ${formattedVotingPower}%`;
 
     return (
-      <Container>
+      <Container customTheme={customTheme}>
         <UserCover
           username={username}
           hasCover={hasCover}
@@ -196,22 +215,30 @@ class UserHeader extends Component {
         />
         {this.renderActionButtons()}
         <UserProfile userProfile={userProfile} userDetails={userDetails} />
-        <VoteContainer>
+        <VoteContainer customTheme={customTheme}>
           <VoteContentContainer>
             <MaterialIcons
               name={MATERIAL_ICONS.money}
               size={ICON_SIZES.userHeaderIcon}
-              color={COLORS.GREY.CHARCOAL}
+              color={
+                tinycolor(customTheme.primaryBackgroundColor).isDark()
+                  ? COLORS.LIGHT_TEXT_COLOR
+                  : COLORS.DARK_TEXT_COLOR
+              }
             />
-            <VoteText>{voteWorthText}</VoteText>
+            <VoteText customTheme={customTheme}>{voteWorthText}</VoteText>
           </VoteContentContainer>
           <VoteContentContainer>
             <MaterialIcons
               name={MATERIAL_ICONS.flashOn}
               size={ICON_SIZES.userHeaderIcon}
-              color={COLORS.GREY.CHARCOAL}
+              color={
+                tinycolor(customTheme.primaryBackgroundColor).isDark()
+                  ? COLORS.LIGHT_TEXT_COLOR
+                  : COLORS.DARK_TEXT_COLOR
+              }
             />
-            <VoteText>{votePowerText}</VoteText>
+            <VoteText customTheme={customTheme}>{votePowerText}</VoteText>
           </VoteContentContainer>
         </VoteContainer>
         {this.renderSendMessage()}
@@ -221,6 +248,8 @@ class UserHeader extends Component {
           followingCount={followingCount}
           onPressFollowers={this.handleOnPressFollowers}
           onPressFollowing={this.handleOnPressFollowing}
+          customTheme={customTheme}
+          intl={intl}
         />
       </Container>
     );

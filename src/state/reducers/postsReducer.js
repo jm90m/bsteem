@@ -1,9 +1,17 @@
 import _ from 'lodash';
-import { FETCH_POST_DETAILS } from 'state/actions/actionTypes';
+import {
+  FETCH_POST_DETAILS,
+  ADD_POST_TO_SAVED_OFFLINE,
+  SAVE_POST_OFFLINE,
+  UNSAVE_POST_OFFLINE,
+  REMOVE_POST_SAVED_OFFLINE
+} from 'state/actions/actionTypes';
 
 const INITIAL_STATE = {
   postsDetails: {}, //postID -> postDetails
   postLoading: false,
+  savedOfflinePosts: {},
+  pendingSavingPostsOffline: [],
 };
 
 export default function(state = INITIAL_STATE, action) {
@@ -30,6 +38,53 @@ export default function(state = INITIAL_STATE, action) {
         ...state,
         postLoading: false,
       };
+    case UNSAVE_POST_OFFLINE.ACTION:
+    case SAVE_POST_OFFLINE.ACTION: {
+      const id = _.get(action, 'payload.postData.id');
+      return {
+        ...state,
+        pendingSavingPostsOffline: _.concat(state.pendingSavingPosts, id),
+      };
+    }
+    case UNSAVE_POST_OFFLINE.ERROR:
+    case UNSAVE_POST_OFFLINE.LOADING_END:
+    case UNSAVE_POST_OFFLINE.SUCCESS:
+    case SAVE_POST_OFFLINE.ERROR:
+    case SAVE_POST_OFFLINE.LOADING_END:
+    case SAVE_POST_OFFLINE.SUCCESS: {
+      const id = _.get(action, 'payload.postData.id');
+      return {
+        ...state,
+        pendingSavingPostsOffline: _.remove(
+          state.pendingSavingPostsOffline,
+          postId => postId !== id,
+        ),
+      };
+    }
+    case ADD_POST_TO_SAVED_OFFLINE: {
+      const { postDataString } = action.payload;
+      const parsePostData = _.attempt(JSON.parse, postDataString);
+      const newState = { ...state };
+
+      if (!_.isError(parsePostData)) {
+        const id = _.get(parsePostData, 'id', 0);
+        newState.savedOfflinePosts = {
+          ...state.savedOfflinePosts,
+          [id]: parsePostData,
+        };
+      }
+
+      return newState;
+    }
+    case REMOVE_POST_SAVED_OFFLINE: {
+      const id = _.get(action, 'payload.postData.id');
+      const newSavedOfflinePosts = { ...state.savedOfflinePosts };
+      delete newSavedOfflinePosts[id];
+      return {
+        ...state,
+        savedOfflinePosts: newSavedOfflinePosts,
+      };
+    }
     default:
       return state;
   }
@@ -37,3 +92,5 @@ export default function(state = INITIAL_STATE, action) {
 
 export const getPostsDetails = state => state.postsDetails;
 export const getPostLoading = state => state.postLoading;
+export const getSavedOfflinePosts = state => state.savedOfflinePosts;
+export const getPendingSavingPostsOffline = state => state.pendingSavingPostsOffline;

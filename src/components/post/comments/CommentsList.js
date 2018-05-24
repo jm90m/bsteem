@@ -7,7 +7,7 @@ import { sortComments } from 'util/sortUtils';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS, ICON_SIZES, MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
 import LargeLoading from 'components/common/LargeLoading';
-import i18n from 'i18n/i18n';
+import tinycolor from 'tinycolor2';
 import Comment from './Comment';
 
 const EmptyView = styled.View`
@@ -17,7 +17,7 @@ const EmptyView = styled.View`
 
 const LoadingContainer = styled.View`
   padding: 40px 0;
-  background: ${COLORS.WHITE.WHITE}
+  background: ${props => props.customTheme.primaryBackgroundColor};
   width: 100%;
   justify-content: center;
   align-items: center;
@@ -25,14 +25,21 @@ const LoadingContainer = styled.View`
 
 const EmptyCommentsTextContainer = styled.View`
   padding: 20px;
-  background-color: ${COLORS.WHITE.WHITE};
+  background-color: ${props => props.customTheme.primaryBackgroundColor};
 `;
-const EmptyCommentsText = styled.Text``;
+const EmptyCommentsText = styled.Text`
+  color: ${props =>
+    tinycolor(props.customTheme.primaryBackgroundColor).isDark()
+      ? COLORS.LIGHT_TEXT_COLOR
+      : COLORS.DARK_TEXT_COLOR};
+`;
 
 const TouchableFilter = styled.TouchableOpacity`
   flex-direction: row;
   align-items: center;
   padding: 5px;
+  background-color: ${props => props.customTheme.primaryBackgroundColor}
+  width: 100%;
 `;
 
 const FilterMenuIcon = styled.View`
@@ -40,7 +47,7 @@ const FilterMenuIcon = styled.View`
 `;
 
 const FilterText = styled.Text`
-  color: ${COLORS.PRIMARY_COLOR};
+  color: ${props => props.customTheme.primaryColor};
   margin-left: 3px;
 `;
 
@@ -51,6 +58,7 @@ const BoldText = styled.Text`
 class CommentsList extends Component {
   static propTypes = {
     postData: PropTypes.shape().isRequired,
+    customTheme: PropTypes.shape().isRequired,
     postId: PropTypes.number.isRequired,
     currentUserVoteComment: PropTypes.func.isRequired,
     fetchComments: PropTypes.func.isRequired,
@@ -63,6 +71,7 @@ class CommentsList extends Component {
     sort: PropTypes.shape().isRequired,
     handleDisplayMenu: PropTypes.func.isRequired,
     enableVotingSlider: PropTypes.bool.isRequired,
+    intl: PropTypes.shape().isRequired,
   };
 
   static defaultProps = {
@@ -104,6 +113,7 @@ class CommentsList extends Component {
       postId,
       sort,
       enableVotingSlider,
+      customTheme,
     } = this.props;
     const postAuthor = postData.author;
 
@@ -122,31 +132,32 @@ class CommentsList extends Component {
         currentUserVoteComment={currentUserVoteComment}
         sort={sort}
         enableVotingSlider={enableVotingSlider}
+        customTheme={customTheme}
       />
     );
   }
 
   renderHeaderComponent() {
-    const { handleDisplayMenu, sort, loadingComments } = this.props;
+    const { handleDisplayMenu, sort, loadingComments, customTheme, intl } = this.props;
 
     if (loadingComments) return null;
 
     return (
-      <TouchableFilter onPress={handleDisplayMenu}>
+      <TouchableFilter onPress={handleDisplayMenu} customTheme={customTheme}>
         <MaterialCommunityIcons
           name={sort.icon}
           size={ICON_SIZES.menuIcon}
-          color={COLORS.PRIMARY_COLOR}
+          color={customTheme.primaryColor}
         />
-        <FilterText>
-          {`${i18n.comments.sortBy} `}
-          <BoldText>{sort.label}</BoldText>
+        <FilterText customTheme={customTheme}>
+          {`${intl.sort_by} `}
+          <BoldText>{intl[sort.label]}</BoldText>
         </FilterText>
         <FilterMenuIcon>
           <MaterialCommunityIcons
             name={MATERIAL_COMMUNITY_ICONS.chevronDown}
             size={ICON_SIZES.menuIcon}
-            color={COLORS.PRIMARY_COLOR}
+            color={customTheme.primaryColor}
           />
         </FilterMenuIcon>
       </TouchableFilter>
@@ -154,18 +165,20 @@ class CommentsList extends Component {
   }
 
   renderEmptyComponent() {
-    const { comments, loadingComments } = this.props;
+    const { comments, loadingComments, customTheme, intl } = this.props;
 
     if (loadingComments) {
       return (
-        <LoadingContainer>
+        <LoadingContainer customTheme={customTheme}>
           <LargeLoading />
         </LoadingContainer>
       );
     } else if (_.isNull(comments) || _.isEmpty(comments)) {
       return (
-        <EmptyCommentsTextContainer>
-          <EmptyCommentsText>{i18n.comments.noCommentsToShow}</EmptyCommentsText>
+        <EmptyCommentsTextContainer customTheme={customTheme}>
+          <EmptyCommentsText customTheme={customTheme}>
+            {intl.no_comments_to_show}
+          </EmptyCommentsText>
         </EmptyCommentsTextContainer>
       );
     }
@@ -173,7 +186,7 @@ class CommentsList extends Component {
   }
 
   render() {
-    const { comments, loadingComments, sort } = this.props;
+    const { comments, loadingComments, sort, customTheme } = this.props;
     const sortedComments = sortComments(comments, sort.id);
     const displayComments = _.concat(sortedComments, { bsteemEmptyView: true });
 
@@ -192,8 +205,8 @@ class CommentsList extends Component {
           <RefreshControl
             refreshing={loadingComments}
             onRefresh={this.refreshCommentsList}
-            tintColor={COLORS.PRIMARY_COLOR}
-            colors={[COLORS.PRIMARY_COLOR]}
+            tintColor={customTheme.primaryColor}
+            colors={[customTheme.primaryColor]}
           />
         }
       />

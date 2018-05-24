@@ -1,17 +1,17 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
-import { RefreshControl } from 'react-native';
+import { RefreshControl, View } from 'react-native';
 import styled from 'styled-components/native';
-import { COLORS } from 'constants/styles';
 import PostPreview from 'components/post-preview/PostPreview';
 import UserHeader from 'components/user/user-header/UserHeader';
 import LargeLoading from 'components/common/LargeLoading';
-import i18n from 'i18n/i18n';
-
-const StyledFlatList = styled.FlatList`
-  background-color: ${COLORS.WHITE.WHITE_SMOKE};
-`;
+import StyledViewPrimaryBackground from 'components/common/StyledViewPrimaryBackground';
+import StyledFlatList from 'components/common/StyledFlatList';
+import StyledTextByBackground from 'components/common/StyledTextByBackground';
+import CompactViewFeedHeaderSetting from 'components/common/CompactViewFeedHeaderSetting';
+import { connect } from 'react-redux';
+import { getCustomTheme, getIntl } from 'state/rootReducer';
 
 const LoadingContainer = styled.View`
   padding: 20px;
@@ -19,13 +19,17 @@ const LoadingContainer = styled.View`
   align-items: center;
 `;
 
-const EmptyContainer = styled.View`
+const EmptyContainer = styled(StyledViewPrimaryBackground)`
   margin: 5px 0;
   padding: 20px;
-  background-color: ${COLORS.WHITE.WHITE};
 `;
 
-const EmptyText = styled.Text``;
+const EmptyText = styled(StyledTextByBackground)``;
+
+const mapStateToProps = state => ({
+  customTheme: getCustomTheme(state),
+  intl: getIntl(state),
+});
 
 class UserBlog extends Component {
   static navigationOptions = {
@@ -35,7 +39,9 @@ class UserBlog extends Component {
   static propTypes = {
     fetchMoreUserPosts: PropTypes.func.isRequired,
     isCurrentUser: PropTypes.bool,
+    customTheme: PropTypes.shape().isRequired,
     navigation: PropTypes.shape().isRequired,
+    intl: PropTypes.shape().isRequired,
     userBlog: PropTypes.arrayOf(PropTypes.shape()),
     username: PropTypes.string,
     loadingUserBlog: PropTypes.bool.isRequired,
@@ -58,7 +64,7 @@ class UserBlog extends Component {
   }
 
   renderEmptyComponent() {
-    const { loadingUserBlog } = this.props;
+    const { loadingUserBlog, intl } = this.props;
 
     if (loadingUserBlog) {
       return (
@@ -70,7 +76,7 @@ class UserBlog extends Component {
 
     return (
       <EmptyContainer>
-        <EmptyText>{i18n.feed.userFeedEmpty}</EmptyText>
+        <EmptyText>{intl.empty_user_profile}</EmptyText>
       </EmptyContainer>
     );
   }
@@ -91,6 +97,7 @@ class UserBlog extends Component {
       username,
       navigation,
       isCurrentUser,
+      customTheme,
     } = this.props;
 
     return (
@@ -100,11 +107,14 @@ class UserBlog extends Component {
         enableEmptySections
         onEndReached={fetchMoreUserPosts}
         ListHeaderComponent={
-          <UserHeader
-            username={username}
-            navigation={navigation}
-            hideFollowButton={isCurrentUser}
-          />
+          <View>
+            <UserHeader
+              username={username}
+              navigation={navigation}
+              hideFollowButton={isCurrentUser}
+            />
+            <CompactViewFeedHeaderSetting />
+          </View>
         }
         keyExtractor={(item, index) => `${_.get(item, 'item.id', '')}${index}`}
         ListEmptyComponent={this.renderEmptyComponent}
@@ -112,8 +122,8 @@ class UserBlog extends Component {
           <RefreshControl
             refreshing={refreshUserBlogLoading}
             onRefresh={refreshUserBlog}
-            tintColor={COLORS.PRIMARY_COLOR}
-            colors={[COLORS.PRIMARY_COLOR]}
+            tintColor={customTheme.primaryColor}
+            colors={[customTheme.primaryColor]}
           />
         }
       />
@@ -121,4 +131,4 @@ class UserBlog extends Component {
   }
 }
 
-export default UserBlog;
+export default connect(mapStateToProps)(UserBlog);

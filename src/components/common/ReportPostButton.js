@@ -5,15 +5,19 @@ import { connect } from 'react-redux';
 import styled from 'styled-components/native';
 import { MaterialIcons } from '@expo/vector-icons';
 import * as settingsActions from 'state/actions/settingsActions';
-import { MATERIAL_ICONS, COLORS, ICON_SIZES } from 'constants/styles';
-import { getPendingReportingPosts, getReportedPosts } from 'state/rootReducer';
-import i18n from 'i18n/i18n';
+import { MATERIAL_ICONS, ICON_SIZES } from 'constants/styles';
+import {
+  getPendingReportingPosts,
+  getReportedPosts,
+  getCustomTheme,
+  getIntl,
+} from 'state/rootReducer';
 import SmallLoading from './SmallLoading';
 
 const Touchable = styled.TouchableOpacity``;
 
 const ActionLink = styled.Text`
-  color: ${COLORS.PRIMARY_COLOR};
+  color: ${props => props.customTheme.primaryColor};
   font-weight: bold;
 `;
 
@@ -21,6 +25,8 @@ const ActionLink = styled.Text`
   state => ({
     pendingReportingPosts: getPendingReportingPosts(state),
     reportedPosts: getReportedPosts(state),
+    customTheme: getCustomTheme(state),
+    intl: getIntl(state),
   }),
   dispatch => ({
     reportPost: (author, permlink, title, id, created) =>
@@ -32,6 +38,8 @@ class ReportPostButton extends Component {
   static propTypes = {
     reportPost: PropTypes.func.isRequired,
     unreportPost: PropTypes.func.isRequired,
+    customTheme: PropTypes.shape().isRequired,
+    intl: PropTypes.shape().isRequired,
     title: PropTypes.string,
     permlink: PropTypes.string,
     author: PropTypes.string,
@@ -69,12 +77,12 @@ class ReportPostButton extends Component {
   }
 
   render() {
-    const { id, pendingReportingPosts, reportedPosts } = this.props;
+    const { id, pendingReportingPosts, reportedPosts, customTheme, intl } = this.props;
 
     const isLoading = _.includes(pendingReportingPosts, id);
     const isReported = _.findIndex(reportedPosts, post => post.id === id) > -1;
     const onPress = isReported ? this.handleUnreportPost : this.handleReportPost;
-    const menuIconColor = isReported ? COLORS.PRIMARY_COLOR : COLORS.TERTIARY_COLOR;
+    const menuIconColor = isReported ? customTheme.primaryColor : customTheme.tertiaryColor;
 
     if (isLoading) {
       return <SmallLoading />;
@@ -83,7 +91,7 @@ class ReportPostButton extends Component {
     if (isReported) {
       return (
         <Touchable onPress={this.handleUnreportPost}>
-          <ActionLink>{i18n.settings.unreportPost}</ActionLink>
+          <ActionLink customTheme={customTheme}>{intl.unreport_post}</ActionLink>
         </Touchable>
       );
     }

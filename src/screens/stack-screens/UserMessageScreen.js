@@ -21,36 +21,38 @@ import {
   hideDisplayedUserMessage,
 } from 'state/actions/firebaseActions';
 import _ from 'lodash';
-import { getUserMessages, getAuthUsername, getBlockedUsers } from 'state/rootReducer';
+import {
+  getUserMessages,
+  getAuthUsername,
+  getBlockedUsers,
+  getCustomTheme,
+  getIntl,
+} from 'state/rootReducer';
 import firebase from 'firebase';
 import { getUsersMessagesRef } from 'util/firebaseUtils';
 import { COLORS, FONT_AWESOME_ICONS, ICON_SIZES, MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
 import * as navigationConstants from 'constants/navigation';
 import UserMessageMenuModal from 'components/messages/UserMessageMenuModal';
 import UserMessage from 'components/messages/UserMessage';
-import i18n from 'i18n/i18n';
+import TitleText from 'components/common/TitleText';
+import tinycolor from 'tinycolor2';
 
 const { width: deviceWidth } = Dimensions.get('screen');
 
-const TitleText = styled.Text`
-  font-weight: bold;
-  color: ${COLORS.PRIMARY_COLOR};
-`;
-
 const Container = styled.View`
-  background: ${COLORS.PRIMARY_BACKGROUND_COLOR};
+  background: ${props => props.customTheme.primaryBackgroundColor};
   flex: 1;
 `;
 
 const InputContainer = styled.View`
   height: 50px;
-  background: ${COLORS.PRIMARY_BACKGROUND_COLOR};
+  background: ${props => props.customTheme.primaryBackgroundColor};
   width: 100%;
   flex-direction: row;
   justify-content: center;
   align-items: center;
   border-top-width: 1px;
-  border-top-color: ${COLORS.PRIMARY_BORDER_COLOR};
+  border-top-color: ${props => props.customTheme.primaryBorderColor};
 `;
 
 const EmptyView = styled.View`
@@ -66,7 +68,7 @@ const Touchable = styled.TouchableOpacity``;
 
 const BlockedText = styled.Text`
   padding: 10px;
-  color: ${COLORS.TERTIARY_COLOR};
+  color: ${props => props.customTheme.tertiaryColor};
 `;
 
 const mapStateToProps = (state, ownProps) => {
@@ -75,6 +77,8 @@ const mapStateToProps = (state, ownProps) => {
     blockedUsers: getBlockedUsers(state),
     authUsername: getAuthUsername(state),
     messages: getUserMessages(state, username),
+    customTheme: getCustomTheme(state),
+    intl: getIntl(state),
   };
 };
 
@@ -93,16 +97,19 @@ const mapDispatchToProps = dispatch => ({
 class UserMessageScreen extends Component {
   static navigationOptions = {
     tabBarVisible: false,
+    drawerLockMode: 'locked-closed',
   };
 
   static propTypes = {
     navigation: PropTypes.shape().isRequired,
+    intl: PropTypes.shape().isRequired,
     sendMessage: PropTypes.func.isRequired,
     authUsername: PropTypes.string.isRequired,
     fetchCurrentMessages: PropTypes.func.isRequired,
     fetchCurrentMessagesSuccess: PropTypes.func.isRequired,
     messages: PropTypes.shape(),
     blockedUsers: PropTypes.shape().isRequired,
+    customTheme: PropTypes.shape().isRequired,
     unblockUser: PropTypes.func.isRequired,
     blockUser: PropTypes.func.isRequired,
     hideDisplayedUserMessage: PropTypes.func.isRequired,
@@ -254,13 +261,16 @@ class UserMessageScreen extends Component {
   }
 
   render() {
-    const { blockedUsers } = this.props;
+    const { blockedUsers, customTheme, intl } = this.props;
     const { username } = this.props.navigation.state.params;
     const { text, loading, displayMenu } = this.state;
     const isBlocked = _.get(blockedUsers, username, false);
+    const color = tinycolor(customTheme.primaryBackgroundColor).isDark()
+      ? COLORS.LIGHT_TEXT_COLOR
+      : COLORS.DARK_TEXT_COLOR;
 
     return (
-      <Container>
+      <Container customTheme={customTheme}>
         <Header>
           <BackButton navigateBack={this.handleNavigateBack} />
           <TitleText>{username}</TitleText>
@@ -269,7 +279,7 @@ class UserMessageScreen extends Component {
               <MaterialCommunityIcons
                 size={ICON_SIZES.menuIcon}
                 name={MATERIAL_COMMUNITY_ICONS.menuVertical}
-                color={COLORS.PRIMARY_COLOR}
+                color={customTheme.primaryColor}
               />
             </MenuIconContainer>
           </Touchable>
@@ -282,26 +292,26 @@ class UserMessageScreen extends Component {
             <RefreshControl
               refreshing={loading}
               onRefresh={this.handleRefreshMessages}
-              tintColor={COLORS.PRIMARY_COLOR}
-              colors={[COLORS.PRIMARY_COLOR]}
+              tintColor={customTheme.primaryColor}
+              colors={[customTheme.primaryColor]}
             />
           }
           onContentSizeChange={this.handleScrollToBottom}
         >
           {isBlocked ? (
-            <BlockedText>{i18n.messages.messageContentIsHidden}</BlockedText>
+            <BlockedText customTheme={customTheme}>{intl.message_content_is_hidden}</BlockedText>
           ) : (
             this.renderMessages()
           )}
           <EmptyView />
         </ScrollView>
         <KeyboardAvoidingView behavior="position">
-          <InputContainer>
+          <InputContainer customTheme={customTheme}>
             <TextInput
-              style={{ height: 40, width: '90%' }}
-              placeholderTextColor={COLORS.SECONDARY_COLOR}
+              style={{ height: 40, width: '90%', color }}
+              placeholderTextColor={customTheme.secondaryColor}
               onChangeText={this.onChangeText}
-              value={isBlocked ? i18n.messages.userIsBlocked : text}
+              value={isBlocked ? intl.user_is_blocked : text}
               multiline
               editable={!isBlocked}
             />
@@ -309,7 +319,7 @@ class UserMessageScreen extends Component {
               <FontAwesome
                 name={FONT_AWESOME_ICONS.sendMessage}
                 size={ICON_SIZES.actionIcon}
-                color={COLORS.PRIMARY_COLOR}
+                color={customTheme.primaryColor}
               />
             </TouchableOpacity>
           </InputContainer>
@@ -321,6 +331,8 @@ class UserMessageScreen extends Component {
           handleBlockUser={this.handleBlockUser}
           isBlocked={isBlocked}
           handleHideUserMessage={this.handleHideUserMessage}
+          customTheme={customTheme}
+          intl={intl}
         />
       </Container>
     );

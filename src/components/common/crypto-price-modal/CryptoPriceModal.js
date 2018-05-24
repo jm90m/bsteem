@@ -17,24 +17,20 @@ import {
   getIsAuthenticated,
   getSteemRate,
   getLoadingUsersDetails,
+  getCustomTheme,
+  getIntl,
 } from 'state/rootReducer';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS, MATERIAL_ICONS, ICON_SIZES, MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
+import { MATERIAL_ICONS, ICON_SIZES, MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
 import BackButton from 'components/common/BackButton';
 import { hidePriceModal } from 'state/actions/appActions';
-import i18n from 'i18n/i18n';
 import { fetchUser } from 'state/actions/usersActions';
 import UserWalletSummary from 'components/wallet/UserWalletSummary';
+import TitleText from 'components/common/TitleText';
+import StyledViewPrimaryBackground from 'components/common/StyledViewPrimaryBackground';
 import Header from '../Header';
 import ClaimRewardsBlock from '../ClaimRewardsBlock';
 import CryptoChart from './CryptoChart';
-
-const Container = styled.View``;
-
-const TitleText = styled.Text`
-  font-weight: bold;
-  color: ${COLORS.PRIMARY_COLOR};
-`;
 
 const EmptyView = styled.View`
   height: 200;
@@ -42,15 +38,6 @@ const EmptyView = styled.View`
 `;
 
 const UserWalletContainer = styled.View``;
-
-const UserWalletTitleText = styled(TitleText)`
-  padding: 10px 15px;
-`;
-
-const DisclaimerText = styled.Text`
-  color: ${COLORS.TERTIARY_COLOR};
-  padding: 10px;
-`;
 
 const MenuIconContainer = styled.View`
   padding: 5px;
@@ -68,6 +55,8 @@ const mapStateToProps = state => ({
   authenticated: getIsAuthenticated(state),
   loadingUsersDetails: getLoadingUsersDetails(state),
   steemRate: getSteemRate(state),
+  customTheme: getCustomTheme(state),
+  intl: getIntl(state),
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -79,6 +68,7 @@ class CryptoPriceModal extends Component {
   static propTypes = {
     displayedCryptos: PropTypes.arrayOf(PropTypes.string),
     cryptosPriceHistory: PropTypes.shape().isRequired,
+    customTheme: PropTypes.shape().isRequired,
     displayPriceModal: PropTypes.bool.isRequired,
     authenticated: PropTypes.bool.isRequired,
     hidePriceModal: PropTypes.func.isRequired,
@@ -89,6 +79,7 @@ class CryptoPriceModal extends Component {
     currentAuthUsername: PropTypes.string.isRequired,
     steemRate: PropTypes.string.isRequired,
     usersDetails: PropTypes.shape().isRequired,
+    intl: PropTypes.shape().isRequired,
     fetchUser: PropTypes.func.isRequired,
   };
 
@@ -166,6 +157,7 @@ class CryptoPriceModal extends Component {
       currentAuthUsername,
       authenticated,
       usersDetails,
+      intl,
     } = this.props;
 
     if (!authenticated) return null;
@@ -174,7 +166,9 @@ class CryptoPriceModal extends Component {
 
     return (
       <UserWalletContainer>
-        <UserWalletTitleText>{`${currentAuthUsername} ${i18n.user.wallet}`}</UserWalletTitleText>
+        <TitleText
+          style={{ paddingTop: 10, paddingBottom: 10, paddingLeft: 15 }}
+        >{`${currentAuthUsername} ${intl.wallet}`}</TitleText>
         <UserWalletSummary
           user={user}
           loading={loadingUsersDetails}
@@ -188,7 +182,7 @@ class CryptoPriceModal extends Component {
   }
 
   render() {
-    const { displayPriceModal, authenticated } = this.props;
+    const { displayPriceModal, authenticated, customTheme, intl } = this.props;
 
     if (!displayPriceModal) return null;
 
@@ -200,7 +194,7 @@ class CryptoPriceModal extends Component {
         animationType="slide"
         onRequestClose={this.props.hidePriceModal}
       >
-        <Container>
+        <StyledViewPrimaryBackground style={{ flex: 1 }}>
           <Header>
             <MenuIconContainer>
               <MaterialCommunityIcons
@@ -209,7 +203,7 @@ class CryptoPriceModal extends Component {
                 color="transparent"
               />
             </MenuIconContainer>
-            <TitleText>{i18n.titles.market}</TitleText>
+            <TitleText>{intl.market}</TitleText>
             <BackButton navigateBack={this.props.hidePriceModal} iconName={MATERIAL_ICONS.close} />
           </Header>
           <ScrollView
@@ -218,18 +212,17 @@ class CryptoPriceModal extends Component {
               <RefreshControl
                 refreshing={this.state.refreshCharts}
                 onRefresh={this.handleRefresh}
-                colors={[COLORS.PRIMARY_COLOR]}
-                tintColor={COLORS.PRIMARY_COLOR}
+                colors={[customTheme.primaryColor]}
+                tintColor={customTheme.primaryColor}
               />
             }
           >
             {this.renderUserWallet()}
             {authenticated && <ClaimRewardsBlock />}
             {this.renderCryptoCharts()}
-            <DisclaimerText>{i18n.general.transferDisclaimer}</DisclaimerText>
             <EmptyView />
           </ScrollView>
-        </Container>
+        </StyledViewPrimaryBackground>
       </Modal>
     );
   }

@@ -1,34 +1,31 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import i18n from 'i18n/i18n';
-import { FEATHER_ICONS, ICON_SIZES, COLORS } from 'constants/styles';
+import { FEATHER_ICONS, ICON_SIZES } from 'constants/styles';
 import PrimaryButton from 'components/common/PrimaryButton';
 import { connect } from 'react-redux';
 import sc2 from 'api/sc2';
 import _ from 'lodash';
 import { Feather } from '@expo/vector-icons';
 import styled from 'styled-components/native';
-import { getUsersDetails, getAuthUsername } from 'state/rootReducer';
+import { getUsersDetails, getAuthUsername, getCustomTheme, getIntl } from 'state/rootReducer';
 import { fetchUserTransferHistory } from 'state/actions/userActivityActions';
+import { fetchUser } from 'state/actions/usersActions';
+import TitleText from 'components/common/TitleText';
 
 const Container = styled.View`
   padding: 10px;
-  background: ${COLORS.PRIMARY_BACKGROUND_COLOR};
+  background: ${props => props.customTheme.primaryBackgroundColor};
   border-bottom-width: 1px;
   border-top-width: 1px;
-  border-top-color: ${COLORS.PRIMARY_BORDER_COLOR};
-  border-bottom-color: ${COLORS.PRIMARY_BORDER_COLOR};
+  border-top-color: ${props => props.customTheme.primaryBorderColor};
+  border-bottom-color: ${props => props.customTheme.primaryBorderColor};
 `;
 
 const TitleContainer = styled.View`
   flex-direction: row;
   justify-content: center;
   align-items: center;
-`;
-
-const TitleText = styled.Text`
-  color: ${COLORS.SECONDARY_COLOR};
-  font-weight: bold;
+  margin-bottom: 10px;
 `;
 
 const Content = styled.View`
@@ -37,7 +34,9 @@ const Content = styled.View`
 `;
 
 const RewardContent = styled.View`
-  padding: 10px;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-bottom: 10px;
 `;
 
 const Reward = styled.View`
@@ -47,27 +46,33 @@ const Reward = styled.View`
 
 const RewardField = styled.Text`
   font-weight: bold;
-  color: ${COLORS.SECONDARY_COLOR};
+  color: ${props => props.customTheme.secondaryColor};
 `;
 
 const RewardValue = styled.Text`
   font-weight: bold;
-  color: ${COLORS.PRIMARY_COLOR};
+  color: ${props => props.customTheme.primaryColor};
 `;
 
 const mapStateToProps = state => ({
   usersDetails: getUsersDetails(state),
   authUsername: getAuthUsername(state),
+  customTheme: getCustomTheme(state),
+  intl: getIntl(state),
 });
 
 const mapDispatchToProps = dispatch => ({
   fetchUserTransferHistory: username => dispatch(fetchUserTransferHistory.action({ username })),
+  fetchUser: username => dispatch(fetchUser.action({ username })),
 });
 
 class ClaimRewardsBlock extends Component {
   static propTypes = {
     usersDetails: PropTypes.shape().isRequired,
+    customTheme: PropTypes.shape().isRequired,
+    intl: PropTypes.shape().isRequired,
     fetchUserTransferHistory: PropTypes.func.isRequired,
+    fetchUser: PropTypes.func.isRequired,
     authUsername: PropTypes.string.isRequired,
   };
 
@@ -103,6 +108,7 @@ class ClaimRewardsBlock extends Component {
           rewardClaimed: true,
         });
         this.props.fetchUserTransferHistory(authUsername);
+        this.props.fetchUser(authUsername);
       } else {
         this.setState({
           loading: false,
@@ -112,16 +118,19 @@ class ClaimRewardsBlock extends Component {
   }
 
   renderReward(value, currency, rewardField) {
+    const { customTheme } = this.props;
     return (
       <Reward>
-        <RewardField>{`${rewardField}:`}</RewardField>
-        <RewardValue>{` ${parseFloat(value).toFixed(3)} ${currency}`}</RewardValue>
+        <RewardField customTheme={customTheme}>{`${rewardField}:`}</RewardField>
+        <RewardValue customTheme={customTheme}>
+          {` ${parseFloat(value).toFixed(3)} ${currency}`}
+        </RewardValue>
       </Reward>
     );
   }
 
   render() {
-    const { usersDetails, authUsername } = this.props;
+    const { usersDetails, authUsername, customTheme, intl } = this.props;
     const { rewardClaimed } = this.state;
     const user = _.get(usersDetails, authUsername, {});
     const rewardSteem = parseFloat(_.get(user, 'reward_steem_balance', 0));
@@ -129,19 +138,19 @@ class ClaimRewardsBlock extends Component {
     const rewardSP = parseFloat(_.get(user, 'reward_vesting_steem', 0));
     const userHasRewards = rewardSteem > 0 || rewardSbd > 0 || rewardSP > 0;
 
-    const buttonText = rewardClaimed ? i18n.user.rewardClaimed : i18n.user.claimRewards;
+    const buttonText = rewardClaimed ? intl.reward_claimed : intl.claim_rewards;
 
     if (!userHasRewards) return null;
 
     return (
-      <Container>
+      <Container customTheme={customTheme}>
         <TitleContainer>
           <Feather
             name={FEATHER_ICONS.award}
             size={ICON_SIZES.contentTitleBlockIcon}
-            color={COLORS.SECONDARY_COLOR}
+            color={customTheme.secondaryColor}
           />
-          <TitleText>{i18n.titles.rewards}</TitleText>
+          <TitleText>{intl.rewards}</TitleText>
         </TitleContainer>
         <Content>
           {!rewardClaimed && (

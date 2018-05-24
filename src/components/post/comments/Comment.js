@@ -5,22 +5,21 @@ import { Dimensions } from 'react-native';
 import { SORT_COMMENTS } from 'constants/comments';
 import { getReputation } from 'util/steemitFormatters';
 import { sortComments } from 'util/sortUtils';
-import { COLORS } from 'constants/styles';
 import _ from 'lodash';
 import * as navigationConstants from 'constants/navigation';
 import Avatar from 'components/common/Avatar';
 import withAuthActions from 'components/common/withAuthActions';
+import PostVoteSlider from 'components/post/PostVoteSlider';
 import CommentFooter from './CommentFooter';
 import CommentContent from './CommentContent';
 import { calculatePayout } from '../../../util/steemitUtils';
-import PostVoteSlider from 'components/post/PostVoteSlider';
 
 const { width: deviceWidth } = Dimensions.get('screen');
 
 const COMMENT_PADDING = 10;
 
 const Container = styled.View`
-  background-color: ${COLORS.WHITE.WHITE};
+  background-color: ${props => props.customTheme.primaryBackgroundColor};
   margin-top: 2px;
   margin-bottom: 2px;
 `;
@@ -46,6 +45,7 @@ class Comment extends Component {
     comment: PropTypes.shape().isRequired,
     parent: PropTypes.shape().isRequired,
     navigation: PropTypes.shape().isRequired,
+    customTheme: PropTypes.shape().isRequired,
     enableVotingSlider: PropTypes.bool.isRequired,
     currentUserVoteComment: PropTypes.func.isRequired,
     onActionInitiated: PropTypes.func,
@@ -368,6 +368,7 @@ class Comment extends Component {
       rootPostId,
       sort,
       enableVotingSlider,
+      customTheme,
     } = this.props;
 
     if (!_.isEmpty(newReplyComment)) {
@@ -390,6 +391,7 @@ class Comment extends Component {
           rootPostId={rootPostId}
           sort={sort}
           enableVotingSlider={enableVotingSlider}
+          customTheme={customTheme}
         />
       );
     }
@@ -414,6 +416,7 @@ class Comment extends Component {
       currentUserVoteComment,
       rootPostId,
       enableVotingSlider,
+      customTheme,
     } = this.props;
 
     if (!_.isEmpty(commentsChildren[comment.id])) {
@@ -436,6 +439,7 @@ class Comment extends Component {
           rootPostId={rootPostId}
           sort={sort}
           enableVotingSlider={enableVotingSlider}
+          customTheme={customTheme}
         />
       ));
     }
@@ -443,7 +447,7 @@ class Comment extends Component {
   }
 
   render() {
-    const { comment, authUsername, currentWidth, navigation } = this.props;
+    const { comment, authUsername, currentWidth, navigation, customTheme } = this.props;
     const {
       liked,
       disliked,
@@ -462,7 +466,7 @@ class Comment extends Component {
     const payout = calculatePayout(comment);
 
     return (
-      <Container>
+      <Container customTheme={customTheme}>
         <CommentContentContainer>
           <AvatarContainer>
             <Avatar size={avatarSize} username={comment.author} />
@@ -475,6 +479,7 @@ class Comment extends Component {
             commentDepth={comment.depth}
             currentWidth={currentWidth}
             navigation={navigation}
+            customTheme={customTheme}
           />
         </CommentContentContainer>
         {displayVoteSlider ? (
@@ -496,6 +501,7 @@ class Comment extends Component {
             handlePayout={this.handlePayout}
             payout={payout}
             editable={editable}
+            customTheme={customTheme}
           />
         )}
 

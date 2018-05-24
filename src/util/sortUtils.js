@@ -1,4 +1,11 @@
 import { SORT_COMMENTS } from 'constants/comments';
+import {
+  REPUTATION_SORT,
+  VOTE_VALUE_SORT,
+  USERNAME_SORT,
+  TIME_SORT,
+} from 'constants/postConstants';
+import _ from 'lodash';
 import { getReputation } from 'util/steemitFormatters';
 
 export const sortComments = (comments, sortType = SORT_COMMENTS.BEST.id) => {
@@ -42,10 +49,25 @@ export const sortComments = (comments, sortType = SORT_COMMENTS.BEST.id) => {
   }
 };
 
+// By Value
 export const sortVotes = (a, b) => {
   const aShares = parseInt(a.rshares, 10);
   const bShares = parseInt(b.rshares, 10);
   return bShares - aShares;
+};
+
+export const getSortedVotes = (votes, sortType) => {
+  switch (sortType) {
+    case REPUTATION_SORT.id:
+      return _.orderBy(votes, vote => parseInt(_.get(vote, 'reputation'), 10), ['desc']);
+    case USERNAME_SORT.id:
+      return _.sortBy(votes, ['voter']);
+    case TIME_SORT.id:
+      return _.orderBy(votes, vote => Date.parse(_.get(vote, 'time')), ['desc']);
+    case VOTE_VALUE_SORT.id:
+    default:
+      return _.orderBy(votes, vote => parseInt(_.get(vote, 'rshares'), 10), ['desc']);
+  }
 };
 
 export default null;

@@ -7,6 +7,8 @@ import {
   FETCH_CURRENT_USER_FOLLOW_LIST,
   FETCH_CURRENT_USER_BSTEEM_FEED,
   FETCH_MORE_CURRENT_USER_BSTEEM_FEED,
+  ADD_NEW_NOTIFICATION,
+  FETCH_BSTEEM_NOTIFICATIONS,
 } from '../actions/actionTypes';
 
 const INITIAL_STATE = {
@@ -15,10 +17,11 @@ const INITIAL_STATE = {
   loadingFetchMoreCurrentUserFeed: false,
   rebloggedList: [],
   followList: {},
-
   currentUserBSteemFeed: [],
   loadingFetchCurrentUserBSteemFeed: false,
   loadingFetchMoreCurrentBSteemUserFeed: false,
+  notifications: [],
+  loadingNotifications: false,
 };
 
 export default (state = INITIAL_STATE, action) => {
@@ -115,6 +118,29 @@ export default (state = INITIAL_STATE, action) => {
         ...state,
         loadingFetchMoreCurrentBSteemUserFeed: false,
       };
+    case FETCH_BSTEEM_NOTIFICATIONS.ACTION:
+      return {
+        ...state,
+        loadingNotifications: true,
+      };
+    case FETCH_BSTEEM_NOTIFICATIONS.SUCCESS:
+      return {
+        ...state,
+        notifications: _.reverse(action.payload),
+        loadingNotifications: false,
+      };
+    case FETCH_BSTEEM_NOTIFICATIONS.ERROR:
+    case FETCH_BSTEEM_NOTIFICATIONS.LOADING_END:
+      return {
+        ...state,
+        loadingNotifications: false,
+      };
+    case ADD_NEW_NOTIFICATION:
+      return {
+        ...state,
+        notifications: [action.payload, ...state.notifications],
+        loadingNotifications: false,
+      };
     default:
       return state;
   }
@@ -130,3 +156,5 @@ export const getLoadingFetchCurrentUserBSteemFeed = state =>
   state.loadingFetchCurrentUserBSteemFeed;
 export const getLoadingFetchMoreCurrentBSteemUserFeed = state =>
   state.loadingFetchMoreCurrentBSteemUserFeed;
+export const getNotifications = state => state.notifications;
+export const getLoadingNotifications = state => state.loadingNotifications;

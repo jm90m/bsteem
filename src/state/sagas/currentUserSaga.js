@@ -276,7 +276,7 @@ const reblogPost = function*(action) {
     yield put(refreshUserBlog.action({ username: currentUsername }));
   } catch (error) {
     const { reblogFailCallback } = action.payload;
-    console.log('REBLOG FAIL', error);
+    console.log('REBLOG FAIL', error.message);
     reblogFailCallback();
     yield put(currentUserActions.currentUserReblogPost.fail(error));
   }
@@ -326,7 +326,7 @@ const followUser = function*(action) {
   } catch (error) {
     const { followFailCallback } = action.payload;
     followFailCallback();
-    console.log('FOLLOW FAIL', error);
+    console.log('FOLLOW FAIL', error.description);
     yield put(currentUserActions.currentUserFollowUser.fail(error));
   }
 };
@@ -343,7 +343,7 @@ const unfollowUser = function*(action) {
     console.log('UNFOLLOW SUCCESS', result, payload);
     yield put(currentUserActions.currentUserUnfollowUser.success(payload));
   } catch (error) {
-    console.log('UNFOLLOW FAIL', error);
+    console.log('UNFOLLOW FAIL', error.description);
     const { unfollowFailCallback } = action.payload;
     unfollowFailCallback();
     yield put(currentUserActions.currentUserUnfollowUser.fail(error));

@@ -6,16 +6,18 @@ import { connect } from 'react-redux';
 import _ from 'lodash';
 import { MaterialIcons } from '@expo/vector-icons';
 import { COLORS, MATERIAL_ICONS, ICON_SIZES } from 'constants/styles';
-import i18n from 'i18n/i18n';
 import Header from 'components/common/Header';
 import { FormInput } from 'react-native-elements';
 import PrimaryButton from 'components/common/PrimaryButton';
 import BackButton from 'components/common/BackButton';
-import * as editorActions from '../../state/actions/editorActions';
+import StyledViewPrimaryBackground from 'components/common/StyledViewPrimaryBackground';
+import tinycolor from 'tinycolor2';
+import * as editorActions from 'state/actions/editorActions';
+import { getCustomTheme, getIntl } from 'state/rootReducer';
+import TitleText from 'components/common/TitleText';
 
-const Container = styled.View`
+const Container = styled(StyledViewPrimaryBackground)`
   flex: 1;
-  background-color: ${COLORS.PRIMARY_BACKGROUND_COLOR};
 `;
 
 const ReplyContentContainer = styled.ScrollView``;
@@ -25,12 +27,12 @@ const TitleContainer = styled.View`
   align-items: center;
 `;
 
-const Title = styled.Text`
+const Title = styled(TitleText)`
   margin-left: 3px;
 `;
 
 const ReplyInputContainer = styled.View`
-  background-color: ${COLORS.PRIMARY_BACKGROUND_COLOR};
+  background-color: ${props => props.customTheme.primaryBackgroundColor};
   padding: 10px;
 `;
 
@@ -46,6 +48,11 @@ const EmptyView = styled.View`
 const MenuIconContainer = styled.View`
   padding: 5px;
 `;
+
+const mapStateToProps = state => ({
+  customTheme: getCustomTheme(state),
+  intl: getIntl(state),
+});
 
 const mapDispatchToProps = dispatch => ({
   createComment: (
@@ -71,6 +78,7 @@ const mapDispatchToProps = dispatch => ({
 class EditReplyScreen extends Component {
   static navigationOptions = {
     tabBarVisible: false,
+    drawerLockMode: 'locked-closed',
   };
 
   static propTypes = {
@@ -85,6 +93,8 @@ class EditReplyScreen extends Component {
       }),
     }).isRequired,
     createComment: PropTypes.func.isRequired,
+    customTheme: PropTypes.shape().isRequired,
+    intl: PropTypes.shape().isRequired,
   };
 
   constructor(props) {
@@ -166,7 +176,11 @@ class EditReplyScreen extends Component {
   }
 
   render() {
+    const { customTheme, intl } = this.props;
     const { replyText, replyLoading, keyboardDisplayed } = this.state;
+    const color = tinycolor(customTheme.primaryBackgroundColor).isDark()
+      ? COLORS.LIGHT_TEXT_COLOR
+      : COLORS.DARK_TEXT_COLOR;
     return (
       <Container>
         <Header>
@@ -175,15 +189,15 @@ class EditReplyScreen extends Component {
             <MaterialIcons
               size={ICON_SIZES.menuIcon}
               name={MATERIAL_ICONS.reply}
-              color={COLORS.PRIMARY_COLOR}
+              color={customTheme.primaryColor}
             />
-            <Title>{i18n.titles.editComment}</Title>
+            <Title>{intl.edit}</Title>
           </TitleContainer>
           <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
             <MenuIconContainer>
               <MaterialIcons
                 size={ICON_SIZES.menuIcon}
-                color={keyboardDisplayed ? COLORS.PRIMARY_COLOR : 'transparent'}
+                color={keyboardDisplayed ? customTheme.primaryColor : 'transparent'}
                 name={MATERIAL_ICONS.keyboardHide}
               />
             </MenuIconContainer>
@@ -191,18 +205,18 @@ class EditReplyScreen extends Component {
         </Header>
         <KeyboardAvoidingView behavior="padding">
           <ReplyContentContainer>
-            <ReplyInputContainer>
+            <ReplyInputContainer customTheme={customTheme}>
               <FormInput
                 onChangeText={this.onChangeReplyText}
-                placeholder={i18n.editor.replyPlaceholder}
+                placeholder={intl.reply_placeholder}
                 multiline
                 value={replyText}
-                inputStyle={{ width: '100%' }}
+                inputStyle={{ width: '100%', color }}
               />
               <ReplyButtonContainer>
                 <PrimaryButton
                   onPress={this.handleSubmit}
-                  title={i18n.editor.reply}
+                  title={intl.reply}
                   disabled={replyLoading}
                   loading={replyLoading}
                 />
@@ -216,4 +230,4 @@ class EditReplyScreen extends Component {
   }
 }
 
-export default connect(null, mapDispatchToProps)(EditReplyScreen);
+export default connect(mapStateToProps, mapDispatchToProps)(EditReplyScreen);

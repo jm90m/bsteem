@@ -4,7 +4,7 @@ import { TouchableWithoutFeedback } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import _ from 'lodash';
 import styled from 'styled-components/native';
-import { COLORS, ICON_SIZES } from 'constants/styles';
+import { ICON_SIZES } from 'constants/styles';
 import { COMMENT_FILTERS } from 'constants/comments';
 import MenuModalButton from 'components/common/menu/MenuModalButton';
 import MenuWrapper from 'components/common/menu/MenuWrapper';
@@ -23,17 +23,20 @@ const MenuModalContents = styled.View`
 
 const MenuText = styled.Text`
   margin-left: 5px;
-  color: ${COLORS.PRIMARY_COLOR};
+  color: ${props => props.customTheme.primaryColor};
   font-weight: bold;
 `;
 
-class CommentsMenu extends React.PureComponent {
+class CommentsMenu extends React.Component {
   static propTypes = {
     handleSortComments: PropTypes.func.isRequired,
     hideMenu: PropTypes.func.isRequired,
+    customTheme: PropTypes.shape().isRequired,
+    intl: PropTypes.shape().isRequired,
   };
 
   render() {
+    const { customTheme, intl } = this.props;
     return (
       <TouchableWithoutFeedback onPress={this.props.hideMenu}>
         <Container>
@@ -43,10 +46,10 @@ class CommentsMenu extends React.PureComponent {
                 <MenuModalContents>
                   <MaterialCommunityIcons
                     size={ICON_SIZES.menuModalOptionIcon}
-                    color={COLORS.PRIMARY_COLOR}
+                    color={customTheme.primaryColor}
                     name={filter.icon}
                   />
-                  <MenuText>{filter.label}</MenuText>
+                  <MenuText customTheme={customTheme}>{intl[filter.label]}</MenuText>
                 </MenuModalContents>
               </MenuModalButton>
             ))}

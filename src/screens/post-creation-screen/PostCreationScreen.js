@@ -1,24 +1,43 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Image, TouchableOpacity, View, Dimensions, Picker } from 'react-native';
+import {
+  Image,
+  TouchableOpacity,
+  View,
+  Dimensions,
+  Picker,
+  Keyboard,
+  TouchableWithoutFeedback,
+  Platform,
+} from 'react-native';
 import _ from 'lodash';
 import uuidv4 from 'uuid/v4';
 import { connect } from 'react-redux';
 import styled from 'styled-components/native';
 import { ImagePicker } from 'expo';
 import * as navigationConstants from 'constants/navigation';
-import i18n from 'i18n/i18n';
 import { FormLabel, FormInput, Icon, FormValidationMessage } from 'react-native-elements';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS, MATERIAL_ICONS, ICON_SIZES, MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
-import { getAuthUsername, getCreatePostLoading, getLoadingSavingDraft } from 'state/rootReducer';
+import {
+  getAuthUsername,
+  getCreatePostLoading,
+  getLoadingSavingDraft,
+  getCustomTheme,
+  getIntl,
+  getSignature,
+  getEnableSignature,
+} from 'state/rootReducer';
 import { createPost, uploadImage } from 'state/actions/editorActions';
 import { saveDraft } from 'state/actions/firebaseActions';
 import Header from 'components/common/Header';
 import TagsInput from 'components/editor/TagsInput';
 import SmallLoading from 'components/common/SmallLoading';
 import PrimaryButton from 'components/common/PrimaryButton';
+import StyledViewPrimaryBackground from 'components/common/StyledViewPrimaryBackground';
+import tinycolor from 'tinycolor2';
 import * as postConstants from 'constants/postConstants';
+import TitleText from 'components/common/TitleText';
 import PostCreationPreviewModal from './PostCreationPreviewModal';
 import DisclaimerText from './DisclaimerText';
 import DraftsModal from './DraftsModal';
@@ -26,7 +45,7 @@ import PostCreationMenu from './PostCreationMenu';
 
 const { width: deviceWidth } = Dimensions.get('screen');
 
-const Container = styled.View`
+const Container = styled(StyledViewPrimaryBackground)`
   flex: 1;
 `;
 
@@ -34,9 +53,9 @@ const StyledScrollView = styled.ScrollView`
   padding-bottom: 200px;
 `;
 
-const CreatePostText = styled.Text`
-  color: ${COLORS.PRIMARY_COLOR};
+const CreatePostText = styled(TitleText)`
   font-weight: bold;
+  margin-left: 3px;
 `;
 
 const TouchableMenu = styled.TouchableOpacity``;
@@ -49,7 +68,7 @@ const ActionButtonTouchable = styled.TouchableOpacity`
   width: 50px;
   height: 50px;
   justify-content: center;
-  background-color: ${COLORS.GREY.CHARCOAL};
+  background-color: ${props => props.customTheme.secondaryColor};
   border-radius: 25px;
   align-items: center;
   margin-right: 20px;
@@ -79,18 +98,27 @@ const StatusContent = styled.View`
 `;
 
 const StatusText = styled.Text`
-  margin-left: 5px;
-  color: ${COLORS.PRIMARY_COLOR};
+  color: ${props => props.customTheme.primaryColor};
+`;
+
+const TitleTextContainer = styled.View`
+  flex-direction: row;
+  align-items: center;
 `;
 
 const mapStateToProps = state => ({
+  customTheme: getCustomTheme(state),
   authUsername: getAuthUsername(state),
   createPostLoading: getCreatePostLoading(state),
   loadingSavingDraft: getLoadingSavingDraft(state),
+  signature: getSignature(state),
+  enableSignature: getEnableSignature(state),
+  intl: getIntl(state),
 });
 
 const mapDispatchToProps = dispatch => ({
-  createPost: (postData, callback) => dispatch(createPost.action({ postData, callback })),
+  createPost: (postData, callback, failCallback) =>
+    dispatch(createPost.action({ postData, callback, failCallback })),
   uploadImage: (imageData, callback, errorCallback) =>
     dispatch(uploadImage.action({ imageData, callback, errorCallback })),
   saveDraft: (postData, draftID, successCallback) =>
@@ -106,12 +134,20 @@ class PostCreationScreen extends Component {
   };
 
   static propTypes = {
+    customTheme: PropTypes.shape().isRequired,
+    intl: PropTypes.shape().isRequired,
     authUsername: PropTypes.string.isRequired,
     createPostLoading: PropTypes.bool.isRequired,
     loadingSavingDraft: PropTypes.bool.isRequired,
+    enableSignature: PropTypes.bool.isRequired,
+    signature: PropTypes.string,
     saveDraft: PropTypes.func.isRequired,
     uploadImage: PropTypes.func.isRequired,
     createPost: PropTypes.func.isRequired,
+  };
+
+  static defaultProps = {
+    signature: '',
   };
 
   static INITIAL_STATE = {
@@ -126,6 +162,7 @@ class PostCreationScreen extends Component {
     additionalPostContents: [],
     additionalInputCounter: 0,
     previewVisible: false,
+    createPostDisplayInPreview: false,
     errorImageUploading: false,
     imageLoading: false,
     currentPostData: { body: '' },
@@ -134,6 +171,7 @@ class PostCreationScreen extends Component {
     menuVisible: false,
     savePostError: false,
     savePostSuccess: false,
+    keyboardDisplayed: false,
     draftID: null,
   };
 
@@ -164,6 +202,25 @@ class PostCreationScreen extends Component {
 
     this.handleSavePost = this.handleSavePost.bind(this);
     this.handleSuccessSaveDraft = this.handleSuccessSaveDraft.bind(this);
+    this.handlePostPreviewSubmit = this.handlePostPreviewSubmit.bind(this);
+    this.handleEditSignature = this.handleEditSignature.bind(this);
+    this.handleErasePost = this.handleErasePost.bind(this);
+  }
+
+  componentWillMount() {
+    this.keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      this.handleSetKeyboardDisplay(true),
+    );
+    this.keyboardDidHideListener = Keyboard.addListener(
+      'keyboardDidHide',
+      this.handleSetKeyboardDisplay(false),
+    );
+  }
+
+  componentWillUnmount() {
+    this.keyboardDidShowListener.remove();
+    this.keyboardDidHideListener.remove();
   }
 
   onChangeRewards(rewards) {
@@ -220,9 +277,11 @@ class PostCreationScreen extends Component {
   }
 
   async pickImage() {
+    const allowsEditing = Platform.OS !== 'ios';
+
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: 'Images',
-      allowsEditing: true,
+      allowsEditing,
     });
     console.log('IMAGE PICKER', result);
 
@@ -231,6 +290,8 @@ class PostCreationScreen extends Component {
       this.props.uploadImage(result, this.handleSuccessImageUpload, this.handleErrorImageUpload);
     }
   }
+
+  handleSetKeyboardDisplay = keyboardDisplayed => () => this.setState({ keyboardDisplayed });
 
   handleSuccessImageUpload(url, name) {
     this.insertImage(url, name);
@@ -281,7 +342,11 @@ class PostCreationScreen extends Component {
     const tags = _.uniq([...this.state.tags, bsteemTag]);
     const images = _.map(this.state.currentImages, image => image.src);
     const postBody = this.getPostBody();
-    const body = _.isEmpty(postBody) ? ' ' : postBody;
+    let body = _.isEmpty(postBody) ? ' ' : postBody;
+
+    if (this.props.enableSignature) {
+      body += _.isEmpty(this.props.signature) ? '' : `\n${this.props.signature}`;
+    }
 
     const postTitle = this.state.titleInput;
     const data = {
@@ -346,6 +411,13 @@ class PostCreationScreen extends Component {
     });
   }
 
+  handleEditSignature() {
+    this.setState({
+      menuVisible: false,
+    });
+    this.props.navigation.navigate(navigationConstants.SIGNATURE_EDITOR);
+  }
+
   handleCreatePostSuccess(author, permlink) {
     // reset form state
     this.setState(PostCreationScreen.INITIAL_STATE);
@@ -396,22 +468,36 @@ class PostCreationScreen extends Component {
     }
   }
 
+  handleErasePost() {
+    // reset form state
+    this.setState(PostCreationScreen.INITIAL_STATE);
+    this.additionalContents = {};
+  }
+
   handleSubmit() {
     // validate form
+    const { intl } = this.props;
     const { tags, titleInput } = this.state;
     const errorState = {};
 
-    if (_.isEmpty(tags)) errorState.tagError = i18n.editor.errors.emptyTags;
-    if (_.isEmpty(titleInput)) errorState.titleError = i18n.editor.errors.emptyTitle;
+    if (_.isEmpty(tags)) errorState.tagError = intl.editor_error_empty_tags;
+    if (_.isEmpty(titleInput)) errorState.titleError = intl.editor_error_empty_title;
 
     if (_.isEmpty(errorState)) {
-      this.setState(errorState, () => {
-        const postData = this.getPostData();
-        this.props.createPost(postData, this.handleCreatePostSuccess);
+      this.setState({
+        previewVisible: true,
+        createPostDisplayInPreview: true,
+        currentPostData: this.getPostData(),
+        menuVisible: false,
       });
     } else {
       this.setState(errorState);
     }
+  }
+
+  handlePostPreviewSubmit(postPreviewFailCallback) {
+    const postData = this.getPostData();
+    this.props.createPost(postData, this.handleCreatePostSuccess, postPreviewFailCallback);
   }
 
   handleSelectDraft = postData => () => {
@@ -467,16 +553,21 @@ class PostCreationScreen extends Component {
       right: 0,
       backgroundColor: 'transparent',
     };
+    const { customTheme, intl } = this.props;
     return _.map(this.state.additionalPostContents, (content, index) => {
       const { type, key, ref } = content;
       if (type === 'text') {
+        const inputTextColor = tinycolor(customTheme.primaryBackgroundColor).isDark()
+          ? COLORS.LIGHT_TEXT_COLOR
+          : COLORS.DARK_TEXT_COLOR;
         return (
           <View key={key}>
             <FormInput
               ref={input => (this.additionalContents[ref] = input)}
-              placeholder={i18n.editor.bodyPlaceholder}
+              placeholder={intl.body_placeholder}
               multiline
-              inputStyle={{ width: '100%' }}
+              inputStyle={{ width: '100%', color: inputTextColor }}
+              placeholderTextColor={inputTextColor}
             />
             <TouchableOpacity
               onPress={() => this.removeAdditionalContent(index, type)}
@@ -485,7 +576,7 @@ class PostCreationScreen extends Component {
               <MaterialCommunityIcons
                 name={MATERIAL_COMMUNITY_ICONS.closeCircle}
                 size={ICON_SIZES.editorCloseIcon}
-                color={COLORS.PRIMARY_COLOR}
+                color={customTheme.primaryColor}
               />
             </TouchableOpacity>
           </View>
@@ -506,7 +597,7 @@ class PostCreationScreen extends Component {
               <MaterialCommunityIcons
                 name={MATERIAL_COMMUNITY_ICONS.closeCircle}
                 size={ICON_SIZES.editorCloseIcon}
-                color={COLORS.PRIMARY_COLOR}
+                color={customTheme.primaryColor}
               />
             </TouchableOpacity>
           </View>
@@ -516,14 +607,16 @@ class PostCreationScreen extends Component {
   }
 
   renderPostStatusMessages() {
-    const { loadingSavingDraft } = this.props;
+    const { loadingSavingDraft, customTheme, intl } = this.props;
     const { savePostError, savePostSuccess } = this.state;
 
     if (loadingSavingDraft) {
       return (
         <StatusContent>
           <SmallLoading />
-          <StatusText style={{ color: COLORS.PRIMARY_COLOR }}>{i18n.editor.savingPost}</StatusText>
+          <StatusText customTheme={customTheme} style={{ color: customTheme.primaryColor }}>
+            {intl.saving}
+          </StatusText>
         </StatusContent>
       );
     } else if (savePostError) {
@@ -531,11 +624,11 @@ class PostCreationScreen extends Component {
         <StatusContent>
           <MaterialIcons
             size={ICON_SIZES.menuModalOptionIcon}
-            color={COLORS.RED.VALENCIA}
+            color={customTheme.negativeColor}
             name={MATERIAL_ICONS.warning}
           />
-          <StatusText style={{ color: COLORS.RED.VALENCIA }}>
-            {i18n.editor.errorSavingEmptyTitleOrBody}
+          <StatusText customTheme={customTheme} style={{ color: customTheme.negativeColor }}>
+            {intl.error_saving_empty_title_or_body}
           </StatusText>
         </StatusContent>
       );
@@ -544,11 +637,11 @@ class PostCreationScreen extends Component {
         <StatusContent>
           <MaterialIcons
             size={ICON_SIZES.menuModalOptionIcon}
-            color={COLORS.BLUE.MEDIUM_AQUAMARINE}
+            color={customTheme.positiveColor}
             name={MATERIAL_ICONS.checkCircle}
           />
-          <StatusText style={{ color: COLORS.BLUE.MEDIUM_AQUAMARINE }}>
-            {i18n.editor.postSavedToDrafts}
+          <StatusText customTheme={customTheme} style={{ color: customTheme.positiveColor }}>
+            {intl.post_saved_to_drafts}
           </StatusText>
         </StatusContent>
       );
@@ -557,7 +650,7 @@ class PostCreationScreen extends Component {
   }
 
   render() {
-    const { createPostLoading, loadingSavingDraft } = this.props;
+    const { createPostLoading, loadingSavingDraft, customTheme, intl } = this.props;
     const {
       titleInput,
       tagsInput,
@@ -573,8 +666,13 @@ class PostCreationScreen extends Component {
       menuVisible,
       savePostError,
       savePostSuccess,
+      keyboardDisplayed,
+      createPostDisplayInPreview,
     } = this.state;
     const displayTitleError = !_.isEmpty(titleError);
+    const inputTextColor = tinycolor(customTheme.primaryBackgroundColor).isDark()
+      ? COLORS.LIGHT_TEXT_COLOR
+      : COLORS.DARK_TEXT_COLOR;
 
     return (
       <Container>
@@ -584,29 +682,39 @@ class PostCreationScreen extends Component {
               <MaterialCommunityIcons
                 size={ICON_SIZES.menuIcon}
                 name={MATERIAL_COMMUNITY_ICONS.noteMultipleOutline}
-                color={COLORS.PRIMARY_COLOR}
+                color={customTheme.primaryColor}
               />
             </TouchableMenuContainer>
           </TouchableMenu>
-          <CreatePostText>{i18n.titles.createPost}</CreatePostText>
+          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <TitleTextContainer>
+              <CreatePostText>{intl.create_post}</CreatePostText>
+              <MaterialIcons
+                size={ICON_SIZES.menuIcon}
+                color={keyboardDisplayed ? customTheme.primaryColor : 'transparent'}
+                name={MATERIAL_ICONS.keyboardHide}
+              />
+            </TitleTextContainer>
+          </TouchableWithoutFeedback>
           <TouchableMenu onPress={this.toggleMenu(true)}>
             <TouchableMenuContainer>
               <MaterialCommunityIcons
                 size={ICON_SIZES.menuIcon}
                 name={MATERIAL_COMMUNITY_ICONS.menuVertical}
-                color={COLORS.PRIMARY_COLOR}
+                color={customTheme.primaryColor}
               />
             </TouchableMenuContainer>
           </TouchableMenu>
         </Header>
         <StyledScrollView>
-          <FormLabel>{i18n.editor.title}</FormLabel>
+          <FormLabel>{intl.title}</FormLabel>
           <FormInput
             onChangeText={this.onChangeTitle}
-            placeholder={i18n.editor.titlePlaceholder}
+            placeholder={intl.title_placeholder}
             value={titleInput}
             maxLength={255}
-            inputStyle={{ width: '100%' }}
+            inputStyle={{ width: '100%', color: inputTextColor }}
+            placeholderTextColor={inputTextColor}
           />
           {displayTitleError && <FormValidationMessage>{titleError}</FormValidationMessage>}
           <TagsInput
@@ -616,22 +724,27 @@ class PostCreationScreen extends Component {
             removeTag={this.removeTag}
             tagError={tagError}
           />
-          <FormLabel>{i18n.editor.body}</FormLabel>
+          <FormLabel>{intl.body}</FormLabel>
           <FormInput
             onChangeText={this.onChangeBody}
-            placeholder={i18n.editor.bodyPlaceholder}
+            placeholder={intl.body_placeholder}
             multiline
             value={bodyInput}
-            inputStyle={{ width: '100%' }}
+            inputStyle={{ width: '100%', color: inputTextColor }}
+            placeholderTextColor={inputTextColor}
           />
           {this.renderAdditionalContents()}
           {imageLoading && <SmallLoading style={{ marginTop: 20, alignSelf: 'center' }} />}
-          <FormLabel>{i18n.editor.rewards}</FormLabel>
+          <FormLabel>{intl.rewards}</FormLabel>
           <PickerContainer>
-            <Picker selectedValue={rewards} onValueChange={this.onChangeRewards}>
-              <Picker.Item label={i18n.editor.halfRewards} value={postConstants.REWARDS.HALF} />
-              <Picker.Item label={i18n.editor.allRewards} value={postConstants.REWARDS.ALL} />
-              <Picker.Item label={i18n.editor.noRewards} value={postConstants.REWARDS.NONE} />
+            <Picker
+              selectedValue={rewards}
+              onValueChange={this.onChangeRewards}
+              itemStyle={{ color: inputTextColor }}
+            >
+              <Picker.Item label={intl.reward_option_50} value={postConstants.REWARDS.HALF} />
+              <Picker.Item label={intl.reward_option_100} value={postConstants.REWARDS.ALL} />
+              <Picker.Item label={intl.reward_option_0} value={postConstants.REWARDS.NONE} />
             </Picker>
           </PickerContainer>
           <DisclaimerText />
@@ -644,28 +757,52 @@ class PostCreationScreen extends Component {
               loading={createPostLoading}
             />
             <ActionButtons>
-              <ActionButtonTouchable onPress={this.handleSavePost} disabled={createPostLoading}>
+              <ActionButtonTouchable
+                customTheme={customTheme}
+                onPress={this.handleSavePost}
+                disabled={createPostLoading}
+              >
                 <Icon
                   name={MATERIAL_ICONS.save}
-                  backgroundColor={COLORS.GREY.NERO}
+                  backgroundColor={customTheme.secondaryColor}
                   size={ICON_SIZES.actionIcon}
-                  color={COLORS.WHITE.WHITE}
+                  color={
+                    tinycolor(customTheme.secondaryColor).isDark()
+                      ? COLORS.LIGHT_TEXT_COLOR
+                      : COLORS.DARK_TEXT_COLOR
+                  }
                 />
               </ActionButtonTouchable>
-              <ActionButtonTouchable onPress={this.addTextInput} disabled={createPostLoading}>
+              <ActionButtonTouchable
+                customTheme={customTheme}
+                onPress={this.addTextInput}
+                disabled={createPostLoading}
+              >
                 <Icon
                   name="note-add"
-                  backgroundColor={COLORS.GREY.NERO}
+                  backgroundColor={customTheme.secondaryColor}
                   size={ICON_SIZES.actionIcon}
-                  color={COLORS.WHITE.WHITE}
+                  color={
+                    tinycolor(customTheme.secondaryColor).isDark()
+                      ? COLORS.LIGHT_TEXT_COLOR
+                      : COLORS.DARK_TEXT_COLOR
+                  }
                 />
               </ActionButtonTouchable>
-              <ActionButtonTouchable onPress={this.pickImage} disabled={createPostLoading}>
+              <ActionButtonTouchable
+                customTheme={customTheme}
+                onPress={this.pickImage}
+                disabled={createPostLoading}
+              >
                 <Icon
                   name="add-a-photo"
-                  backgroundColor={COLORS.GREY.NERO}
+                  backgroundColor={customTheme.secondaryColor}
                   size={ICON_SIZES.actionIcon}
-                  color={COLORS.WHITE.WHITE}
+                  color={
+                    tinycolor(customTheme.secondaryColor).isDark()
+                      ? COLORS.LIGHT_TEXT_COLOR
+                      : COLORS.DARK_TEXT_COLOR
+                  }
                 />
               </ActionButtonTouchable>
             </ActionButtons>
@@ -675,6 +812,8 @@ class PostCreationScreen extends Component {
           handleHidePreview={this.hidePreview}
           previewVisible={previewVisible}
           postData={currentPostData}
+          createPostDisplayInPreview={createPostDisplayInPreview}
+          handlePostPreviewSubmit={this.handlePostPreviewSubmit}
         />
         <DraftsModal
           handleHideDrafts={this.toggleDrafts(false)}
@@ -690,6 +829,8 @@ class PostCreationScreen extends Component {
             loadingSavingDraft={loadingSavingDraft}
             savePostError={savePostError}
             savePostSuccess={savePostSuccess}
+            handleEditSignature={this.handleEditSignature}
+            handleErasePost={this.handleErasePost}
           />
         )}
       </Container>

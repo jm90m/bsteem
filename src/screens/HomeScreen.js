@@ -12,6 +12,9 @@ import {
   getHasNetworkConnection,
   getFilterFeedByFollowers,
   getCurrentUserFollowList,
+  getCustomTheme,
+  getCompactViewEnabled,
+  getIntl,
 } from 'state/rootReducer';
 import {
   fetchDiscussions,
@@ -19,25 +22,21 @@ import {
   enableFilterHomeFeedByFollowers,
   disableFilterHomeFeedByFollowers,
 } from 'state/actions/homeActions';
-import { MATERIAL_COMMUNITY_ICONS, COLORS, ICON_SIZES } from 'constants/styles';
+import { MATERIAL_COMMUNITY_ICONS, ICON_SIZES } from 'constants/styles';
 import { TRENDING } from 'constants/feedFilters';
 import PostPreview from 'components/post-preview/PostPreview';
 import FeedSort from 'components/feed-sort/FeedSort';
-import LargeLoading from 'components/common/LargeLoading';
 import * as navigationConstants from 'constants/navigation';
 import Header from 'components/common/Header';
 import BSteemModal from 'components/common/BSteemModal';
-import i18n from 'i18n/i18n';
+import TitleText from 'components/common/TitleText';
+import StyledTextByBackground from 'components/common/StyledTextByBackground';
+import StyledViewPrimaryBackground from 'components/common/StyledViewPrimaryBackground';
+import StyledFlatList from 'components/common/StyledFlatList';
+import CompactViewFeedHeaderSetting from 'components/common/CompactViewFeedHeaderSetting';
+import FeedHeader from 'components/feed/FeedHeader';
 import { displayPriceModal } from '../state/actions/appActions';
 
-const StyledFlatList = styled.FlatList`
-  background-color: ${COLORS.WHITE.WHITE_SMOKE};
-`;
-
-const HomeText = styled.Text`
-  color: ${COLORS.PRIMARY_COLOR};
-  margin-left: 3px;
-`;
 const TouchableMenu = styled.TouchableOpacity`
   flex-direction: row;
   align-items: center;
@@ -47,28 +46,23 @@ const FilterMenuIcon = styled.View`
   margin-top: 3px;
 `;
 
-const LoadingMoreContainer = styled.View`
-  align-items: center;
-  justify-content: center;
-  z-index: 1;
-  margin-top: 20px;
-`;
-
-const EmptyContainer = styled.View`
+const EmptyContainer = styled(StyledViewPrimaryBackground)`
   margin: 5px 0;
   padding: 20px;
-  background-color: ${COLORS.WHITE.WHITE};
 `;
 
-const EmptyText = styled.Text``;
+const EmptyText = styled(StyledTextByBackground)``;
 
 const mapStateToProps = state => ({
+  compactViewEnabled: getCompactViewEnabled(state),
+  customTheme: getCustomTheme(state),
   posts: getHomeFeedPosts(state),
   loadingFetchDiscussions: getLoadingFetchDiscussions(state),
   loadingFetchMoreDiscussions: getLoadingFetchMoreDiscussions(state),
   networkConnection: getHasNetworkConnection(state),
   filterFeedByFollowers: getFilterFeedByFollowers(state),
   currentUserFollowList: getCurrentUserFollowList(state),
+  intl: getIntl(state),
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -83,6 +77,7 @@ const mapDispatchToProps = dispatch => ({
 class HomeScreen extends Component {
   static propTypes = {
     posts: PropTypes.arrayOf(PropTypes.shape()).isRequired,
+    customTheme: PropTypes.shape().isRequired,
     loadingFetchDiscussions: PropTypes.bool.isRequired,
     loadingFetchMoreDiscussions: PropTypes.bool.isRequired,
     filterFeedByFollowers: PropTypes.bool.isRequired,
@@ -93,6 +88,7 @@ class HomeScreen extends Component {
     disableFilterHomeFeedByFollowers: PropTypes.func.isRequired,
     navigation: PropTypes.shape().isRequired,
     currentUserFollowList: PropTypes.shape(),
+    intl: PropTypes.shape().isRequired,
   };
 
   static defaultProps = {
@@ -107,7 +103,6 @@ class HomeScreen extends Component {
     super(props);
 
     this.state = {
-      menuVisible: false,
       currentFilter: TRENDING,
     };
 
@@ -120,6 +115,7 @@ class HomeScreen extends Component {
     this.handleNavigateToSavedTags = this.handleNavigateToSavedTags.bind(this);
     this.handleFilterFeedByFollowers = this.handleFilterFeedByFollowers.bind(this);
     this.handleDisplayPriceModal = this.handleDisplayPriceModal.bind(this);
+    this.renderEmptyText = this.renderEmptyText.bind(this);
   }
 
   onEndReached() {
@@ -160,7 +156,7 @@ class HomeScreen extends Component {
   }
 
   handleDisplayPriceModal() {
-    this.props.displayPriceModal(['STEEM', 'SBD']);
+    this.props.displayPriceModal(['STEEM', 'SBD*']);
   }
 
   handleHideMenu() {
@@ -177,9 +173,10 @@ class HomeScreen extends Component {
   }
 
   renderEmptyText() {
+    const { intl } = this.props;
     return (
       <EmptyContainer>
-        <EmptyText>{i18n.feed.emptyFeedCheckFilters}</EmptyText>
+        <EmptyText>{intl.empty_feed_check_filters}</EmptyText>
       </EmptyContainer>
     );
   }
@@ -187,61 +184,24 @@ class HomeScreen extends Component {
   render() {
     const {
       loadingFetchDiscussions,
-      loadingFetchMoreDiscussions,
       posts,
       filterFeedByFollowers,
       currentUserFollowList,
+      customTheme,
     } = this.props;
-    const { menuVisible, currentFilter } = this.state;
     const displayedPosts = filterFeedByFollowers
       ? _.filter(posts, post => _.get(currentUserFollowList, post.author, false))
       : posts;
     return (
-      <View>
-        <Header>
-          <TouchableOpacity onPress={this.handleDisplayPriceModal}>
-            <MaterialCommunityIcons
-              name={MATERIAL_COMMUNITY_ICONS.lineChart}
-              size={ICON_SIZES.menuIcon}
-              color={COLORS.PRIMARY_COLOR}
-              style={{ padding: 5 }}
-            />
-          </TouchableOpacity>
-          <TouchableMenu onPress={() => this.setMenuVisibile(!menuVisible)}>
-            <MaterialIcons
-              name={currentFilter.icon}
-              size={ICON_SIZES.menuIcon}
-              color={COLORS.PRIMARY_COLOR}
-            />
-            <HomeText>{currentFilter.label}</HomeText>
-            <FilterMenuIcon>
-              <MaterialCommunityIcons
-                name={MATERIAL_COMMUNITY_ICONS.chevronDown}
-                size={ICON_SIZES.menuIcon}
-                color={COLORS.PRIMARY_COLOR}
-              />
-            </FilterMenuIcon>
-          </TouchableMenu>
-          <TouchableOpacity onPress={this.handleNavigateToSavedTags}>
-            <MaterialCommunityIcons
-              name="star"
-              size={ICON_SIZES.menuIcon}
-              style={{ padding: 5 }}
-              color={COLORS.PRIMARY_COLOR}
-            />
-          </TouchableOpacity>
-        </Header>
-        {menuVisible && (
-          <BSteemModal visible={menuVisible} handleOnClose={this.handleHideMenu}>
-            <FeedSort
-              hideMenu={this.handleHideMenu}
-              handleSortPost={this.handleSortPost}
-              handleFilterFeedByFollowers={this.handleFilterFeedByFollowers}
-              filterFeedByFollowers={filterFeedByFollowers}
-            />
-          </BSteemModal>
-        )}
+      <View style={{ flex: 1 }}>
         <StyledFlatList
+          ListHeaderComponent={
+            <FeedHeader
+              filteredFeedByFollowers={filterFeedByFollowers}
+              handleFilterFeedByFollowers={this.handleFilterFeedByFollowers}
+              fetchDiscussions={this.props.fetchDiscussions}
+            />
+          }
           data={displayedPosts}
           renderItem={this.renderRow}
           enableEmptySections
@@ -252,17 +212,12 @@ class HomeScreen extends Component {
             <RefreshControl
               refreshing={loadingFetchDiscussions}
               onRefresh={this.onRefreshCurrentFeed}
-              tintColor={COLORS.PRIMARY_COLOR}
-              colors={[COLORS.PRIMARY_COLOR]}
+              tintColor={customTheme.primaryColor}
+              colors={[customTheme.primaryColor]}
             />
           }
         />
         {_.isEmpty(displayedPosts) && !loadingFetchDiscussions && this.renderEmptyText()}
-        {(loadingFetchMoreDiscussions || loadingFetchDiscussions) && (
-          <LoadingMoreContainer>
-            <LargeLoading />
-          </LoadingMoreContainer>
-        )}
       </View>
     );
   }

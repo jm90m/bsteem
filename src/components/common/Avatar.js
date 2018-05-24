@@ -1,14 +1,20 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { getAvatarImageUrl } from 'util/busyImageUtils';
-import { COLORS } from 'constants/styles';
 import { Image as ExpoImage } from 'react-native-expo-image-cache';
+import { connect } from 'react-redux';
+import { getCustomTheme } from 'state/rootReducer';
 
 const defaultImage =
   'https://res.cloudinary.com/hpiynhbhq/image/upload/v1506948447/p72avlprkfariyti7q2l.png';
 
+const mapStateToProps = state => ({
+  customTheme: getCustomTheme(state),
+});
+
 class Avatar extends Component {
   static propTypes = {
+    customTheme: PropTypes.shape().isRequired,
     username: PropTypes.string,
     size: PropTypes.number,
   };
@@ -47,14 +53,14 @@ class Avatar extends Component {
   }
 
   render() {
-    const { size } = this.props;
+    const { size, customTheme } = this.props;
     const { imageUrl } = this.state;
     const avatarStyle = {
       height: size,
       width: size,
       borderRadius: size / 2,
       borderWidth: 1,
-      borderColor: COLORS.BORDER_COLOR,
+      borderColor: customTheme.primaryBorderColor,
     };
 
     return (
@@ -63,4 +69,4 @@ class Avatar extends Component {
   }
 }
 
-export default Avatar;
+export default connect(mapStateToProps)(Avatar);

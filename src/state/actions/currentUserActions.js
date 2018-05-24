@@ -12,6 +12,8 @@ import {
   CURRENT_USER_FOLLOW_USER,
   CURRENT_USER_UNFOLLOW_USER,
   CURRENT_USER_VOTE_COMMENT,
+  GET_NOTIFICATIONS,
+  ADD_NEW_NOTIFICATION,
 } from './actionTypes';
 
 export const currentUserFeedFetch = createAsyncSagaAction(FETCH_CURRENT_USER_FEED);
@@ -30,3 +32,8 @@ export const currentUserFollowUser = createAsyncSagaAction(CURRENT_USER_FOLLOW_U
 export const currentUserUnfollowUser = createAsyncSagaAction(CURRENT_USER_UNFOLLOW_USER);
 
 export const currentUserOnboarding = createAsyncSagaAction(CURRENT_USER_ONBOARDING);
+export const getNotifications = createAsyncSagaAction(GET_NOTIFICATIONS);
+export const addNewNotification = notification => ({
+  type: ADD_NEW_NOTIFICATION,
+  payload: notification,
+});

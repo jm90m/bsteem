@@ -4,10 +4,11 @@ import styled from 'styled-components/native';
 import Expo, { AuthSession } from 'expo';
 import { Modal, AsyncStorage } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
-import i18n from 'i18n/i18n';
-import { COLORS, MATERIAL_ICONS } from 'constants/styles';
+import { MATERIAL_ICONS } from 'constants/styles';
 import PrimaryButton from 'components/common/PrimaryButton';
 import SecondaryButton from 'components/common/SecondaryButton';
+import TitleText from 'components/common/TitleText';
+import tinycolor from 'tinycolor2';
 import sc2 from 'api/sc2';
 import {
   AUTH_EXPIRATION,
@@ -15,22 +16,21 @@ import {
   AUTH_USERNAME,
   STEEM_ACCESS_TOKEN,
 } from '../../constants/asyncStorageKeys';
-import BsteemIcon from '../../../assets/bsteem-name-logo.png';
+import { COLORS } from '../../constants/styles';
 
 const Container = styled.View`
-  justify-content: center;
+  padding-top: 40px;
   align-items: center;
-  background-color: ${COLORS.SPLASH_SCREEN_BACKGROUND};
+  background-color: ${props => props.customTheme.primaryBackgroundColor};
+  flex: 1;
 `;
 
-const TitleText = styled.Text`
+const TitleTextContainer = styled(TitleText)`
   padding: 20px;
   text-align: center;
   font-weight: bold;
   font-size: 22px;
 `;
-
-const Logo = styled.Image``;
 
 const CloseTouchable = styled.TouchableOpacity`
   padding: 30px;
@@ -47,6 +47,8 @@ class LoginModal extends Component {
     handleLoginModalCancel: PropTypes.func.isRequired,
     authenticateUserSuccess: PropTypes.func.isRequired,
     authenticateUserError: PropTypes.func.isRequired,
+    customTheme: PropTypes.shape().isRequired,
+    intl: PropTypes.shape().isRequired,
   };
 
   constructor(props) {
@@ -57,6 +59,7 @@ class LoginModal extends Component {
   }
 
   async handleSignUp() {
+    this.props.handleLoginModalCancel();
     const signUpURL = 'https://signup.steemit.com/?ref=bsteem';
     try {
       Expo.WebBrowser.openBrowserAsync(signUpURL).catch(error => {
@@ -68,6 +71,7 @@ class LoginModal extends Component {
   }
 
   async handleSteemConnectLogin() {
+    this.props.handleLoginModalCancel();
     let redirectUrl = AuthSession.getRedirectUrl();
     const url = sc2.getLoginURL({ authenticated: true });
     try {
@@ -101,29 +105,44 @@ class LoginModal extends Component {
   }
 
   render() {
-    const { visible, handleLoginModalCancel } = this.props;
+    const { visible, handleLoginModalCancel, customTheme, intl } = this.props;
+    const loginButtonTextColor = tinycolor(customTheme.primaryColor).isDark()
+      ? COLORS.LIGHT_TEXT_COLOR
+      : COLORS.DARK_TEXT_COLOR;
+    const signupButtonTextColor = tinycolor(customTheme.secondaryColor).isDark()
+      ? COLORS.LIGHT_TEXT_COLOR
+      : COLORS.DARK_TEXT_COLOR;
 
     return (
       <Modal animationType="slide" visible={visible} onRequestClose={handleLoginModalCancel}>
-        <Container>
+        <Container customTheme={customTheme}>
           <CloseTouchable onPress={handleLoginModalCancel}>
-            <MaterialIcons name={MATERIAL_ICONS.close} size={40} />
+            <MaterialIcons
+              name={MATERIAL_ICONS.close}
+              size={40}
+              color={
+                tinycolor(customTheme.primaryBackgroundColor).isDark()
+                  ? COLORS.LIGHT_TEXT_COLOR
+                  : COLORS.DARK_TEXT_COLOR
+              }
+            />
           </CloseTouchable>
-          <Logo source={BsteemIcon} style={{ width: 200, height: 200 }} resizeMode="contain" />
-          <TitleText>{i18n.login.description}</TitleText>
+          <TitleTextContainer>{intl.steemconnect_login_description}</TitleTextContainer>
           <ButtonContainer>
             <PrimaryButton
               onPress={this.handleSteemConnectLogin}
-              title={i18n.login.loginWithSC}
+              title={intl.login_with_steemconnect}
               fontWeight="bold"
-              backgroundColor={COLORS.PRIMARY_COLOR}
+              backgroundColor={customTheme.primaryColor}
+              color={loginButtonTextColor}
             />
           </ButtonContainer>
           <ButtonContainer>
             <SecondaryButton
               onPress={this.handleSignUp}
               fontWeight="bold"
-              title={i18n.login.signUp}
+              title={intl.signup}
+              color={signupButtonTextColor}
             />
           </ButtonContainer>
         </Container>

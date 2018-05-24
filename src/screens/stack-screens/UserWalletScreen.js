@@ -14,28 +14,28 @@ import {
   getUserTransferHistory,
   getLoadingFetchUserTransferHistory,
   getIsAuthenticated,
+  getCustomTheme,
 } from 'state/rootReducer';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS, MATERIAL_COMMUNITY_ICONS, ICON_SIZES } from 'constants/styles';
+import { MATERIAL_COMMUNITY_ICONS, ICON_SIZES } from 'constants/styles';
 import { fetchUserTransferHistory } from 'state/actions/userActivityActions';
 import { fetchUser } from 'state/actions/usersActions';
 import Header from 'components/common/Header';
 import WalletTransaction from 'components/wallet/WalletTransaction';
 import UserWalletSummary from 'components/wallet/UserWalletSummary';
+import TitleText from 'components/common/TitleText';
 import BackButton from 'components/common/BackButton';
 import * as navigationConstants from 'constants/navigation';
 
 const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
 
-const Container = styled.View``;
-
-const StyledListView = styled.ListView`
-  padding-bottom: 200px;
+const Container = styled.View`
+  flex: 1;
 `;
 
-const TitleText = styled.Text`
-  font-weight: bold;
-  color: ${COLORS.PRIMARY_COLOR};
+const StyledListView = styled.ListView`
+  background-color: ${props => props.customTheme.primaryBackgroundColor};
+  padding-bottom: 200px;
 `;
 
 const MenuIconContainer = styled.View`
@@ -43,6 +43,7 @@ const MenuIconContainer = styled.View`
 `;
 
 const mapStateToProps = state => ({
+  customTheme: getCustomTheme(state),
   authenticated: getIsAuthenticated(state),
   usersDetails: getUsersDetails(state),
   loadingUsersDetails: getLoadingUsersDetails(state),
@@ -63,10 +64,12 @@ const mapDispatchToProps = dispatch => ({
 class UserWalletScreen extends Component {
   static navigationOptions = {
     tabBarVisible: false,
+    drawerLockMode: 'locked-closed',
   };
 
   static propTypes = {
     navigation: PropTypes.shape().isRequired,
+    customTheme: PropTypes.shape().isRequired,
     usersDetails: PropTypes.shape().isRequired,
     loadingUsersDetails: PropTypes.bool.isRequired,
     authenticated: PropTypes.bool.isRequired,
@@ -162,6 +165,7 @@ class UserWalletScreen extends Component {
       loadingUsersDetails,
       loadingFetchUserTransferHistory,
       authenticated,
+      customTheme,
     } = this.props;
     const { username } = this.props.navigation.state.params;
     const userWalletSummary = [{ isUserWalletSummary: true }];
@@ -180,12 +184,13 @@ class UserWalletScreen extends Component {
               <MaterialCommunityIcons
                 size={ICON_SIZES.menuIcon}
                 name={MATERIAL_COMMUNITY_ICONS.cashUSD}
-                color={authenticated ? COLORS.PRIMARY_COLOR : 'transparent'}
+                color={authenticated ? customTheme.primaryColor : 'transparent'}
               />
             </MenuIconContainer>
           </TouchableWithoutFeedback>
         </Header>
         <StyledListView
+          customTheme={customTheme}
           dataSource={ds.cloneWithRows(userTransactionsDataSource)}
           renderRow={this.renderUserWalletRow}
           enableEmptySections
@@ -193,7 +198,7 @@ class UserWalletScreen extends Component {
             <RefreshControl
               refreshing={loadingFetchUserTransferHistory || loadingUsersDetails}
               onRefresh={this.onRefreshUserWallet}
-              colors={[COLORS.PRIMARY_COLOR]}
+              colors={[customTheme.primaryColor]}
             />
           }
         />

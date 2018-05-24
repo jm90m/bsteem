@@ -5,11 +5,10 @@ import { connect } from 'react-redux';
 import Expo from 'expo';
 import styled from 'styled-components/native';
 import _ from 'lodash';
-import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { getHtml } from 'util/postUtils';
-import { COLORS, MATERIAL_ICONS, MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
+import { COLORS, MATERIAL_COMMUNITY_ICONS, ICON_SIZES } from 'constants/styles';
 import { POST_HTML_BODY_TAG, POST_HTML_BODY_USER } from 'constants/postConstants';
-import i18n from 'i18n/i18n';
 import * as navigationConstants from 'constants/navigation';
 import {
   getIsAuthenticated,
@@ -17,6 +16,8 @@ import {
   getPostsDetails,
   getAuthUsername,
   getEnableVotingSlider,
+  getCustomTheme,
+  getIntl,
 } from 'state/rootReducer';
 import PostPhotoBrowser from 'components/post/PostPhotoBrowser';
 import PostMenu from 'components/post-menu/PostMenu';
@@ -29,37 +30,32 @@ import BSteemModal from 'components/common/BSteemModal';
 import EmbedContent from 'components/post-preview/EmbedContent';
 import PostVoteSlider from 'components/post/PostVoteSlider';
 import PostComments from 'components/post/PostComments';
-import PrimaryButton from '../../components/common/PrimaryButton';
+import BackButton from 'components/common/BackButton';
+import PrimaryButton from 'components/common/PrimaryButton';
+import TitleText from 'components/common/TitleText';
+import StyledTextByBackground from 'components/common/StyledTextByBackground';
+import tinycolor from 'tinycolor2';
+import StyledViewPrimaryBackground from 'components/common/StyledViewPrimaryBackground';
 import { currentUserVotePost } from '../../state/actions/currentUserActions';
 import * as postConstants from '../../constants/postConstants';
 import { isPostVoted } from '../../util/voteUtils';
 import { fetchPostDetails } from '../../state/actions/postsActions';
-import { getEmbeds } from '../../util/postPreviewUtils';
+import { getProxyImageURL } from '../../util/imageUtils';
 
 const { width: deviceWidth } = Dimensions.get('screen');
 
-const Container = styled.View`
+const Container = styled(StyledViewPrimaryBackground)`
   flex: 1;
 `;
 
 const Touchable = styled.TouchableOpacity``;
-
-const BackTouchable = styled.TouchableOpacity`
-  justify-content: center;
-  padding: 10px;
-`;
 
 const Menu = styled.View`
   justify-content: center;
   padding: 10px;
 `;
 
-const Author = styled.Text`
-  color: ${COLORS.PRIMARY_COLOR};
-  font-weight: bold;
-`;
-
-const PostTitle = styled.Text`
+const PostTitle = styled(StyledTextByBackground)`
   font-weight: 700;
   font-size: 20px;
 `;
@@ -70,11 +66,13 @@ const EmptyView = styled.View`
 `;
 
 const mapStateToProps = state => ({
+  customTheme: getCustomTheme(state),
   authenticated: getIsAuthenticated(state),
   authUsername: getAuthUsername(state),
   postsDetails: getPostsDetails(state),
   postLoading: getPostLoading(state),
   enableVotingSlider: getEnableVotingSlider(state),
+  intl: getIntl(state),
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -102,11 +100,14 @@ class PostScreen extends Component {
   static navigationOptions = {
     headerMode: 'none',
     tabBarVisible: false,
+    drawerLockMode: 'locked-closed',
   };
 
   static propTypes = {
     authenticated: PropTypes.bool.isRequired,
     navigation: PropTypes.shape().isRequired,
+    intl: PropTypes.shape().isRequired,
+    customTheme: PropTypes.shape().isRequired,
     enableVotingSlider: PropTypes.bool,
     currentUserVotePost: PropTypes.func.isRequired,
     fetchPostDetails: PropTypes.func.isRequired,
@@ -357,21 +358,31 @@ class PostScreen extends Component {
   }
 
   renderEmbed() {
-    const { postDetails } = this.state;
-    const embedOptions = {};
-    const embeds = getEmbeds(postDetails, embedOptions);
-    const firstEmbed = _.head(embeds);
-    const hasVideo = !_.isEmpty(firstEmbed);
+    const { parsedJsonMetadata } = this.props.navigation.state.params;
+    const video = _.get(parsedJsonMetadata, 'video', {});
 
-    if (hasVideo) {
-      return <EmbedContent embedContent={firstEmbed} width={deviceWidth - 20} />;
+    if (_.has(video, 'content.videohash') && _.has(video, 'info.snaphash')) {
+      const author = _.get(video, 'info.author', '');
+      const permlink = _.get(video, 'info.permlink', '');
+      const dTubeEmbedUrl = `https://emb.d.tube/#!/${author}/${permlink}`;
+      const snaphash = _.get(video, 'info.snaphash', '');
+      const dTubeIFrame = `<iframe width="100%" height="340" src="${dTubeEmbedUrl}" allowFullScreen></iframe>`;
+      const dtubeEmbedContent = {
+        type: 'video',
+        provider_name: 'DTube',
+        embed: dTubeIFrame,
+        thumbnail: getProxyImageURL(`https://ipfs.io/ipfs/${snaphash}`, 'preview'),
+      };
+      const widthOffset = 20;
+      const width = deviceWidth - widthOffset;
+      return <EmbedContent embedContent={dtubeEmbedContent} width={width} />;
     }
 
     return null;
   }
 
   render() {
-    const { authUsername } = this.props;
+    const { authUsername, customTheme, intl } = this.props;
     const { body, parsedJsonMetadata, author } = this.props.navigation.state.params;
     const {
       displayPhotoBrowser,
@@ -395,17 +406,19 @@ class PostScreen extends Component {
     return (
       <Container>
         <Header>
-          <BackTouchable onPress={this.navigateBack}>
-            <MaterialIcons size={24} name={MATERIAL_ICONS.back} />
-          </BackTouchable>
-          <Author>{author}</Author>
+          <BackButton navigateBack={this.navigateBack} />
+          <StyledTextByBackground>{author}</StyledTextByBackground>
           <Menu>
             <Touchable onPress={() => this.setModalVisible(!this.state.menuVisible)}>
-              <MaterialCommunityIcons size={24} name={MATERIAL_COMMUNITY_ICONS.menuVertical} />
+              <MaterialCommunityIcons
+                size={ICON_SIZES.menuIcon}
+                name={MATERIAL_COMMUNITY_ICONS.menuVertical}
+                color={customTheme.secondaryColor}
+              />
             </Touchable>
           </Menu>
         </Header>
-        <ScrollView style={{ padding: 10, backgroundColor: COLORS.WHITE.WHITE }}>
+        <ScrollView style={{ padding: 10, backgroundColor: customTheme.primaryBackgroundColor }}>
           <PostHeader
             navigation={this.props.navigation}
             postData={postDetails}
@@ -418,6 +431,13 @@ class PostScreen extends Component {
             html={parsedHtmlBody}
             imagesMaxWidth={deviceWidth - widthOffset}
             onLinkPress={this.handlePostLinkPress}
+            staticContentMaxWidth={deviceWidth - widthOffset}
+            baseFontStyle={{
+              color: tinycolor(customTheme.primaryBackgroundColor).isDark()
+                ? COLORS.LIGHT_TEXT_COLOR
+                : COLORS.DARK_TEXT_COLOR,
+            }}
+            textSelectable
           />
           <FooterTags tags={tags} handleFeedNavigation={this.navigateToFeed} />
           {displayVoteSlider ? (
@@ -439,7 +459,7 @@ class PostScreen extends Component {
           <PostComments postData={postDetails} navigation={this.props.navigation} />
           <PrimaryButton
             onPress={this.navigateToComments}
-            title={i18n.post.viewComments}
+            title={intl.see_all_comments}
             style={{ marginTop: 20 }}
           />
           <EmptyView />

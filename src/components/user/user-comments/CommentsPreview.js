@@ -5,19 +5,23 @@ import { connect } from 'react-redux';
 import * as navigationConstants from 'constants/navigation';
 import { COLORS } from 'constants/styles';
 import { currentUserVotePost } from 'state/actions/currentUserActions';
+import _ from 'lodash';
+import { getCustomTheme } from 'state/rootReducer';
+import tinycolor from 'tinycolor2';
 import Header from '../../post-preview/Header';
 import CommentFooter from './CommentsFooter';
 import * as postConstants from '../../../constants/postConstants';
 import BodyShort from '../../post-preview/BodyShort';
 import { isPostVoted } from '../../../util/voteUtils';
-import _ from 'lodash';
 
 const Container = styled.View`
-  background-color: ${COLORS.WHITE.WHITE};
+  background-color: ${props => props.customTheme.primaryBackgroundColor};
   margin-top: 5px;
   margin-bottom: 5px;
-  border-color: ${COLORS.WHITE.WHITE_SMOKE};
-  border-width: 2px;
+  border-top-color: ${props => props.customTheme.primaryBorderColor};
+  border-top-width: 2px;
+  border-bottom-color: ${props => props.customTheme.primaryBorderColor};
+  border-bottom-width: 2px;
 `;
 
 const Title = styled.Text`
@@ -27,6 +31,10 @@ const Title = styled.Text`
   align-items: center;
   flex-wrap: wrap;
   flex: 1;
+  color: ${props =>
+    tinycolor(props.customTheme.primaryBackgroundColor).isDark()
+      ? COLORS.LIGHT_TEXT_COLOR
+      : COLORS.DARK_TEXT_COLOR};
 `;
 
 const TitleContainer = styled.View`
@@ -35,7 +43,7 @@ const TitleContainer = styled.View`
 `;
 
 const CommentTag = styled.View`
-  background-color: ${COLORS.GREY.GONDOLA};
+  background-color: ${props => props.customTheme.secondaryColor};
   padding: 3px;
   width: 30px;
   height: 20px;
@@ -47,7 +55,10 @@ const CommentTag = styled.View`
 `;
 
 const CommentTagText = styled.Text`
-  color: ${COLORS.WHITE.WHITE};
+  color: ${props =>
+    tinycolor(props.customTheme.secondaryColor).isDark()
+      ? COLORS.LIGHT_TEXT_COLOR
+      : COLORS.DARK_TEXT_COLOR};
   line-height: 20px;
   font-size: 12px;
   justify-content: center;
@@ -55,6 +66,10 @@ const CommentTagText = styled.Text`
 `;
 
 const Touchable = styled.TouchableOpacity``;
+
+const mapStateToProps = state => ({
+  customTheme: getCustomTheme(state),
+});
 
 const mapDispatchToProps = dispatch => ({
   currentUserVotePost: (
@@ -81,6 +96,7 @@ class CommentsPreview extends Component {
     navigation: PropTypes.shape().isRequired,
     currentUserVotePost: PropTypes.func.isRequired,
     currentUsername: PropTypes.string,
+    customTheme: PropTypes.shape().isRequired,
   };
 
   static defaultProps = {
@@ -200,11 +216,11 @@ class CommentsPreview extends Component {
   }
 
   render() {
-    const { commentData, navigation, currentUsername } = this.props;
+    const { commentData, navigation, currentUsername, customTheme } = this.props;
     const { likedPost, loadingVote } = this.state;
 
     return (
-      <Container>
+      <Container customTheme={customTheme}>
         <Header
           postData={commentData}
           navigation={navigation}
@@ -213,10 +229,10 @@ class CommentsPreview extends Component {
         />
         <Touchable onPress={this.navigateToParent}>
           <TitleContainer>
-            <CommentTag>
-              <CommentTagText>RE</CommentTagText>
+            <CommentTag customTheme={customTheme}>
+              <CommentTagText customTheme={customTheme}>RE</CommentTagText>
             </CommentTag>
-            <Title>{commentData.root_title}</Title>
+            <Title customTheme={customTheme}>{commentData.title || commentData.root_title}</Title>
           </TitleContainer>
         </Touchable>
         <Touchable onPress={this.navigateToFullComment}>
@@ -235,4 +251,4 @@ class CommentsPreview extends Component {
   }
 }
 
-export default connect(null, mapDispatchToProps)(CommentsPreview);
+export default connect(mapStateToProps, mapDispatchToProps)(CommentsPreview);

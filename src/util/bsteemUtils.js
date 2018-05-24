@@ -5,6 +5,8 @@ export const bsteemShareText =
 
 export const getBusyUrl = (author, permlink) => `https://busy.org/@${author}/${permlink}`;
 
+export const getSteemitURL = (author, permlink) => `https://steemit.com/@${author}/${permlink}`;
+
 export const jsonParse = jsonStr => {
   try {
     const jsonParsed = _.attempt(JSON.parse, jsonStr);
@@ -12,4 +14,18 @@ export const jsonParse = jsonStr => {
   } catch (error) {
     return {};
   }
+};
+
+export const epochToUTC = epochTimestamp => new Date(0).setUTCSeconds(epochTimestamp);
+
+export const getUserDetailsKey = username => `user-${username}`;
+
+export const getUserDetailsHelper = (usersDetails, username, defaultReturn) => {
+  const userDetails = _.get(usersDetails, username, defaultReturn);
+
+  if (_.isFunction(userDetails)) {
+    return defaultReturn;
+  }
+
+  return userDetails;
 };

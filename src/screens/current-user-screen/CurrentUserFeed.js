@@ -3,26 +3,25 @@ import PropTypes from 'prop-types';
 import { RefreshControl } from 'react-native';
 import styled from 'styled-components/native';
 import _ from 'lodash';
-import { COLORS } from 'constants/styles';
 import { connect } from 'react-redux';
 import {
   getCurrentUserFeed,
   getLoadingFetchCurrentUserFeed,
   getLoadingFetchMoreCurrentUserFeed,
   getAuthUsername,
+  getCustomTheme,
+  getIntl,
 } from 'state/rootReducer';
 import { currentUserFeedFetch, currentUserFeedFetchMore } from 'state/actions/currentUserActions';
 import PostPreview from 'components/post-preview/PostPreview';
-import LargeLoading from 'components/common/LargeLoadingCenter';
-import i18n from '../../i18n/i18n';
+import StyledTextByBackground from 'components/common/StyledTextByBackground';
+import StyledViewPrimaryBackground from 'components/common/StyledViewPrimaryBackground';
+import LargeLoading from 'components/common/LargeLoading';
+import CompactViewFeedHeaderSetting from 'components/common/CompactViewFeedHeaderSetting';
+import StyledFlatList from 'components/common/StyledFlatList';
 
 const Container = styled.View`
   flex: 1;
-`;
-
-const StyledFlatList = styled.FlatList`
-  flex: 1;
-  background-color: ${COLORS.PRIMARY_BORDER_COLOR};
 `;
 
 const LoadingContainer = styled.View`
@@ -31,19 +30,18 @@ const LoadingContainer = styled.View`
   align-items: center;
 `;
 
-const EmptyContainer = styled.View`
+const EmptyContainer = styled(StyledViewPrimaryBackground)`
   margin: 5px 0;
   padding: 20px;
-  background-color: ${COLORS.WHITE.WHITE};
 `;
 
-const EmptyText = styled.Text``;
-
 const mapStateToProps = state => ({
+  customTheme: getCustomTheme(state),
   currentAuthUsername: getAuthUsername(state),
   currentUserFeed: getCurrentUserFeed(state),
   loadingFetchCurrentUserFeed: getLoadingFetchCurrentUserFeed(state),
   loadingFetchMoreCurrentUserFeed: getLoadingFetchMoreCurrentUserFeed(state),
+  intl: getIntl(state),
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -53,12 +51,14 @@ const mapDispatchToProps = dispatch => ({
 
 class CurrentUserFeed extends Component {
   static propTypes = {
+    customTheme: PropTypes.shape().isRequired,
     currentUserFeed: PropTypes.arrayOf(PropTypes.shape()),
     loadingFetchCurrentUserFeed: PropTypes.bool.isRequired,
     loadingFetchMoreCurrentUserFeed: PropTypes.bool.isRequired,
     currentUserFeedFetch: PropTypes.func.isRequired,
     currentUserFeedFetchMore: PropTypes.func.isRequired,
     navigation: PropTypes.shape().isRequired,
+    intl: PropTypes.shape().isRequired,
     hideFeed: PropTypes.bool,
   };
 
@@ -116,12 +116,12 @@ class CurrentUserFeed extends Component {
   }
 
   renderEmptyComponent() {
-    const { currentUserFeed, loadingFetchCurrentUserFeed } = this.props;
+    const { currentUserFeed, loadingFetchCurrentUserFeed, intl } = this.props;
 
     if (_.isEmpty(currentUserFeed) && !loadingFetchCurrentUserFeed) {
       return (
         <EmptyContainer>
-          <EmptyText>{i18n.feed.currentUserFeedEmpty}</EmptyText>
+          <StyledTextByBackground>{intl.feed_empty}</StyledTextByBackground>
         </EmptyContainer>
       );
     }
@@ -130,7 +130,7 @@ class CurrentUserFeed extends Component {
   }
 
   render() {
-    const { currentUserFeed, loadingFetchCurrentUserFeed, hideFeed } = this.props;
+    const { currentUserFeed, loadingFetchCurrentUserFeed, hideFeed, customTheme } = this.props;
     return (
       <Container style={hideFeed && { height: 0, width: 0, display: 'none' }}>
         <StyledFlatList
@@ -139,14 +139,15 @@ class CurrentUserFeed extends Component {
           enableEmptySections
           initialNumToRender={4}
           onEndReached={this.onEndReached}
+          ListHeaderComponent={<CompactViewFeedHeaderSetting />}
           keyExtractor={(item, index) => `${_.get(item, 'id', '')}${index}`}
           ListEmptyComponent={this.renderEmptyComponent}
           refreshControl={
             <RefreshControl
               refreshing={loadingFetchCurrentUserFeed}
               onRefresh={this.onRefreshCurrentFeed}
-              tintColor={COLORS.PRIMARY_COLOR}
-              colors={[COLORS.PRIMARY_COLOR]}
+              tintColor={customTheme.primaryColor}
+              colors={[customTheme.primaryColor]}
             />
           }
         />

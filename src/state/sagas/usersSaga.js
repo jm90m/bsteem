@@ -8,6 +8,7 @@ import {
   FETCH_ALL_USER_DETAILS,
   REFRESH_USER_BLOG,
 } from 'state/actions/actionTypes';
+import _ from 'lodash';
 import * as userActions from 'state/actions/usersActions';
 
 const fetchUser = function*(action) {
@@ -22,12 +23,15 @@ const fetchUser = function*(action) {
     }
   } catch (error) {
     yield put(userActions.fetchUser.fail(error));
+  } finally {
+    yield put(userActions.fetchUser.loadingEnd());
   }
 };
 
 const fetchUserBlog = function*(action) {
   try {
-    const { username, query, refreshUser } = action.payload;
+    const { username, query } = action.payload;
+    const refreshUser = _.get(action.payload, 'refreshUser', false);
     const result = yield call(API.getDiscussionsByBlog, query);
 
     if (result.error) {

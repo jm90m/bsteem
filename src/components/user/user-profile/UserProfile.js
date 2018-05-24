@@ -5,7 +5,9 @@ import styled from 'styled-components/native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { COLORS, MATERIAL_ICONS, ICON_SIZES } from 'constants/styles';
 import moment from 'moment-timezone';
-import i18n from 'i18n/i18n';
+import { connect } from 'react-redux';
+import { getCustomTheme, getIntl } from 'state/rootReducer';
+import tinycolor from 'tinycolor2';
 import UserAbout from './UserAbout';
 import UserLocation from './UserLocation';
 import UserWebsite from './UserWebsite';
@@ -13,7 +15,7 @@ import UserWebsite from './UserWebsite';
 const Container = styled.View`
   padding: 10px;
   padding-bottom: 0px;
-  background-color: ${COLORS.WHITE.WHITE};
+  background-color: ${props => props.customTheme.primaryBackgroundColor};
 `;
 
 const ContentContainer = styled.View`
@@ -24,10 +26,13 @@ const ContentContainer = styled.View`
 
 const ContentText = styled.Text`
   margin-left: 5px;
-  color: ${COLORS.GREY.CHARCOAL};
+  color: ${props =>
+    tinycolor(props.customTheme.primaryBackgroundColor).isDark()
+      ? COLORS.LIGHT_TEXT_COLOR
+      : COLORS.DARK_TEXT_COLOR};
 `;
 
-const UserProfile = ({ userProfile, userDetails }) => {
+const UserProfile = ({ userProfile, userDetails, customTheme, intl }) => {
   const about = _.get(userProfile, 'about', '');
   const location = _.get(userProfile, 'location', '');
   const website = _.get(userProfile, 'website', '');
@@ -35,11 +40,21 @@ const UserProfile = ({ userProfile, userDetails }) => {
   const formattedCreatedDate = moment(createdDate).format('MMM DD, YYYY');
 
   return (
-    <Container>
+    <Container customTheme={customTheme}>
       {!_.isEmpty(about) && <UserAbout about={about} />}
       <ContentContainer>
-        <MaterialIcons name={MATERIAL_ICONS.timer} size={ICON_SIZES.userHeaderIcon} />
-        <ContentText>{`${i18n.user.joinedDate}: ${formattedCreatedDate}`}</ContentText>
+        <MaterialIcons
+          name={MATERIAL_ICONS.timer}
+          size={ICON_SIZES.userHeaderIcon}
+          color={
+            tinycolor(customTheme.primaryBackgroundColor).isDark()
+              ? COLORS.LIGHT_TEXT_COLOR
+              : COLORS.DARK_TEXT_COLOR
+          }
+        />
+        <ContentText customTheme={customTheme}>{`${
+          intl.joined_date
+        }: ${formattedCreatedDate}`}</ContentText>
       </ContentContainer>
       {!_.isEmpty(location) && <UserLocation location={location} />}
       {!_.isEmpty(website) && <UserWebsite website={website} />}
@@ -48,12 +63,19 @@ const UserProfile = ({ userProfile, userDetails }) => {
 };
 
 UserProfile.propTypes = {
+  customTheme: PropTypes.shape().isRequired,
   userProfile: PropTypes.shape(),
   userDetails: PropTypes.shape(),
 };
 
 UserProfile.defaultProps = {
   userProfile: {},
+  userDetails: {},
 };
 
-export default UserProfile;
+const mapStateToProps = state => ({
+  customTheme: getCustomTheme(state),
+  intl: getIntl(state),
+});
+
+export default connect(mapStateToProps)(UserProfile);

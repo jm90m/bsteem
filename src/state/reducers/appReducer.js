@@ -4,7 +4,6 @@ import {
   FETCH_STEEM_RATE,
   FETCH_STEEM_GLOBAL_PROPERTIES,
   FETCH_NETWORK_CONNECTION,
-  SET_STEEMCONNECT_ERROR_MODAL_DISPLAY,
   DISPLAY_NOTIFY_MODAL,
   HIDE_NOTIFY_MODAL,
   APP_ONBOARDING,
@@ -12,8 +11,7 @@ import {
   DISPLAY_PRICE_MODAL,
   HIDE_PRICE_MODAL,
   FETCH_REWARD_FUND,
-  DISPLAY_MESSAGES_MODAL,
-  HIDE_MESSAGES_MODAL,
+  INITIAL_APP_LOADED,
 } from '../actions/actionTypes';
 
 const INITIAL_STATE = {
@@ -29,6 +27,7 @@ const INITIAL_STATE = {
   appLoading: false,
   cryptosPriceHistory: {},
   displayPriceModal: false,
+  initialAppLoaded: false,
   displayedCryptos: [],
   rewardFund: {},
 };
@@ -69,12 +68,6 @@ export default (state = INITIAL_STATE, action) => {
       };
     }
 
-    case SET_STEEMCONNECT_ERROR_MODAL_DISPLAY:
-      return {
-        ...state,
-        steemConnectDisplayErrorModal: action.payload,
-      };
-
     case DISPLAY_NOTIFY_MODAL:
       return {
         ...state,
@@ -98,6 +91,19 @@ export default (state = INITIAL_STATE, action) => {
       return {
         ...state,
         appLoading: false,
+      };
+    case INITIAL_APP_LOADED.ACTION:
+      return {
+        ...state,
+        initialAppLoaded: false,
+      };
+
+    case INITIAL_APP_LOADED.SUCCESS:
+    case INITIAL_APP_LOADED.ERROR:
+    case INITIAL_APP_LOADED.LOADING_END:
+      return {
+        ...state,
+        initialAppLoaded: true,
       };
 
     case FETCH_CRYPTO_PRICE_HISTORY.SUCCESS: {
@@ -166,3 +172,4 @@ export const getCryptosPriceHistory = state => state.cryptosPriceHistory;
 export const getDisplayPriceModal = state => state.displayPriceModal;
 export const getDisplayedCryptos = state => state.displayedCryptos;
 export const getRewardFund = state => state.rewardFund;
+export const getInitialAppLoaded = state => state.initialAppLoaded;

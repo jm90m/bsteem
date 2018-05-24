@@ -3,12 +3,15 @@ import PropTypes from 'prop-types';
 import { TouchableWithoutFeedback } from 'react-native';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import styled from 'styled-components/native';
-import { COLORS, ICON_SIZES, MATERIAL_ICONS, MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
+import { ICON_SIZES, MATERIAL_ICONS, MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
 import MenuModalButton from 'components/common/menu/MenuModalButton';
+import { connect } from 'react-redux';
+import { CheckBox } from 'react-native-elements';
 import MenuWrapper from 'components/common/menu/MenuWrapper';
 import BSteemModal from 'components/common/BSteemModal';
-import i18n from 'i18n/i18n';
 import SmallLoading from 'components/common/SmallLoading';
+import { updateEnableUserSignature } from 'state/actions/settingsActions';
+import { getCustomTheme, getIntl, getEnableSignature } from '../../state/rootReducer';
 
 const Container = styled.View`
   flex: 1;
@@ -25,64 +28,83 @@ const MenuModalContents = styled.View`
 const StatusContent = styled(MenuModalContents)`
   padding: 10px;
   margin-top: 4px;
-  background: ${COLORS.PRIMARY_BACKGROUND_COLOR};
+  background: ${props => props.customTheme.primaryBackgroundColor};
 `;
 
 const MenuText = styled.Text`
   margin-left: 5px;
-  color: ${COLORS.PRIMARY_COLOR};
+  color: ${props => props.customTheme.primaryColor};
   font-weight: bold;
 `;
 
 const StatusText = styled.Text`
   margin-left: 5px;
-  color: ${COLORS.SECONDARY_COLOR};
+  color: ${props => props.customTheme.secondaryColor};
 `;
 
 class PostCreationMenu extends Component {
   static propTypes = {
+    customTheme: PropTypes.shape().isRequired,
     hideMenu: PropTypes.func.isRequired,
     menuVisible: PropTypes.bool.isRequired,
     handleShowPreview: PropTypes.func.isRequired,
     handleSavePost: PropTypes.func.isRequired,
     loadingSavingDraft: PropTypes.bool.isRequired,
+    handleEditSignature: PropTypes.func.isRequired,
     savePostError: PropTypes.bool.isRequired,
     savePostSuccess: PropTypes.bool.isRequired,
+    enableSignature: PropTypes.bool.isRequired,
+    updateEnableUserSignature: PropTypes.func.isRequired,
+    handleErasePost: PropTypes.func.isRequired,
+    intl: PropTypes.shape().isRequired,
   };
 
+  constructor(props) {
+    super(props);
+
+    this.handleToggleSignature = this.handleToggleSignature.bind(this);
+  }
+
+  handleToggleSignature() {
+    const { enableSignature } = this.props;
+    this.props.updateEnableUserSignature(!enableSignature);
+  }
+
   renderSavePostStatus() {
-    const { loadingSavingDraft, savePostError, savePostSuccess } = this.props;
+    const { loadingSavingDraft, savePostError, savePostSuccess, customTheme, intl } = this.props;
 
     if (loadingSavingDraft) {
       return (
-        <StatusContent>
+        <StatusContent customTheme={customTheme}>
           <SmallLoading />
-          <StatusText style={{ color: COLORS.PRIMARY_COLOR }}>{i18n.editor.savingPost}</StatusText>
+          <StatusText style={{ color: customTheme.primaryColor }} customTheme={customTheme}>
+            {intl.saving}
+          </StatusText>
         </StatusContent>
       );
     } else if (savePostError) {
       return (
-        <StatusContent>
+        <StatusContent customTheme={customTheme}>
           <MaterialIcons
             size={ICON_SIZES.menuModalOptionIcon}
-            color={COLORS.RED.VALENCIA}
+            color={customTheme.negativeColor}
             name={MATERIAL_ICONS.warning}
           />
-          <StatusText style={{ color: COLORS.RED.VALENCIA }}>
-            {i18n.editor.errorSavingEmptyTitleOrBody}
+          <StatusText style={{ color: customTheme.negativeColor }} customTheme={customTheme}>
+            {intl.error_saving_empty_title_or_body}
           </StatusText>
         </StatusContent>
       );
     } else if (savePostSuccess) {
       return (
-        <StatusContent>
+        <StatusContent customTheme={customTheme}>
           <MaterialIcons
             size={ICON_SIZES.menuModalOptionIcon}
-            color={COLORS.BLUE.MEDIUM_AQUAMARINE}
+            color={customTheme.positiveColor}
             name={MATERIAL_ICONS.checkCircle}
           />
-          <StatusText style={{ color: COLORS.BLUE.MEDIUM_AQUAMARINE }}>
-            {i18n.editor.postSavedToDrafts}
+          <StatusText style={{ color: customTheme.positiveColor }} customTheme={customTheme}>
+            {intl.post_saved_to_drafts}
           </StatusText>
         </StatusContent>
       );
@@ -91,7 +113,17 @@ class PostCreationMenu extends Component {
   }
 
   render() {
-    const { menuVisible, hideMenu, handleShowPreview, handleSavePost } = this.props;
+    const {
+      menuVisible,
+      hideMenu,
+      handleShowPreview,
+      handleSavePost,
+      customTheme,
+      intl,
+      handleEditSignature,
+      enableSignature,
+      handleErasePost,
+    } = this.props;
     return (
       <BSteemModal visible={menuVisible} handleOnClose={hideMenu}>
         <TouchableWithoutFeedback onPress={hideMenu}>
@@ -101,23 +133,52 @@ class PostCreationMenu extends Component {
                 <MenuModalContents>
                   <MaterialCommunityIcons
                     size={ICON_SIZES.menuModalOptionIcon}
-                    color={COLORS.PRIMARY_COLOR}
+                    color={customTheme.primaryColor}
                     name={MATERIAL_COMMUNITY_ICONS.magnify}
                   />
-                  <MenuText>{i18n.editor.postPreview}</MenuText>
+                  <MenuText customTheme={customTheme}>{intl.post_preview}</MenuText>
                 </MenuModalContents>
               </MenuModalButton>
               <MenuModalButton onPress={handleSavePost}>
                 <MenuModalContents>
                   <MaterialIcons
                     size={ICON_SIZES.menuModalOptionIcon}
-                    color={COLORS.PRIMARY_COLOR}
+                    color={customTheme.primaryColor}
                     name={MATERIAL_ICONS.save}
                   />
-                  <MenuText>{i18n.editor.savePost}</MenuText>
+                  <MenuText customTheme={customTheme}>{intl.save_post}</MenuText>
                 </MenuModalContents>
               </MenuModalButton>
               {this.renderSavePostStatus()}
+              <MenuModalButton onPress={handleEditSignature}>
+                <MenuModalContents>
+                  <MaterialCommunityIcons
+                    size={ICON_SIZES.menuModalOptionIcon}
+                    color={customTheme.primaryColor}
+                    name={MATERIAL_COMMUNITY_ICONS.approval}
+                  />
+                  <MenuText customTheme={customTheme}>{intl.edit_signature}</MenuText>
+                </MenuModalContents>
+              </MenuModalButton>
+              <MenuModalButton>
+                <MenuModalContents>
+                  <CheckBox
+                    title={intl.use_signature}
+                    checked={enableSignature}
+                    onPress={this.handleToggleSignature}
+                  />
+                </MenuModalContents>
+              </MenuModalButton>
+              <MenuModalButton onPress={handleErasePost} style={{ marginTop: 20 }}>
+                <MenuModalContents>
+                  <MaterialCommunityIcons
+                    size={ICON_SIZES.menuModalOptionIcon}
+                    color={customTheme.primaryColor}
+                    name={MATERIAL_COMMUNITY_ICONS.eraser}
+                  />
+                  <MenuText customTheme={customTheme}>{intl.erase_post}</MenuText>
+                </MenuModalContents>
+              </MenuModalButton>
             </MenuWrapper>
           </Container>
         </TouchableWithoutFeedback>
@@ -126,4 +187,15 @@ class PostCreationMenu extends Component {
   }
 }
 
-export default PostCreationMenu;
+const mapStateToProps = state => ({
+  customTheme: getCustomTheme(state),
+  intl: getIntl(state),
+  enableSignature: getEnableSignature(state),
+});
+
+const mapDispatchToProps = dispatch => ({
+  updateEnableUserSignature: enableSignature =>
+    dispatch(updateEnableUserSignature.action({ enableSignature })),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(PostCreationMenu);

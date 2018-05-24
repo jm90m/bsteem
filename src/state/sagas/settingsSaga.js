@@ -10,6 +10,11 @@ import {
   getReportPostRef,
   getFirebaseValueOnce,
   setFirebaseData,
+  getUserCustomThemeSettingsRef,
+  getPostPreviewCompactModeSettingRef,
+  getUserLanguageSettingRef,
+  getUserSignatureSettingRef,
+  getUserEnableSignatureSettingRef,
 } from 'util/firebaseUtils';
 import { getAuthUsername } from '../rootReducer';
 import * as settingsActions from '../actions/settingsActions';
@@ -21,6 +26,11 @@ import {
   FETCH_REPORTED_POSTS,
   UPDATE_VOTING_SLIDER_SETTING,
   UPDATE_VOTING_PERCENT_SETTING,
+  UPDATE_CUSTOM_THEME,
+  UPDATE_POST_PREVIEW_COMPACT_MODE_SETTINGS,
+  UPDATE_USER_LANGUAGE,
+  UPDATE_USER_SIGNATURE,
+  UPDATE_ENABLE_USER_SIGNATURE,
 } from '../actions/actionTypes';
 
 export const fetchUserSettings = function*() {
@@ -35,7 +45,9 @@ export const fetchUserSettings = function*() {
     }
     const snapshot = yield call(getFirebaseValueOnce, getUserSettings(userID), 'value');
     const settings = snapshot.val() || {};
+    const languageSetting = _.get(settings, 'language-setting', 'en_US');
     yield put(settingsActions.getCurrentUserSettings.success(settings));
+    yield put(settingsActions.setLanguageSetting(languageSetting));
   } catch (error) {
     console.log(error);
     yield put(settingsActions.getCurrentUserSettings.fail({ error }));
@@ -62,6 +74,27 @@ const saveNSFWDisplaySetting = function*(action) {
     yield put(settingsActions.updateNSFWDisplaySettings.fail({ error }));
   } finally {
     yield put(settingsActions.updateNSFWDisplaySettings.loadingEnd());
+  }
+};
+
+const savePostPreviewSetting = function*(action) {
+  try {
+    const compactMode = action.payload;
+    const authUsername = yield select(getAuthUsername);
+    let userID;
+    if (_.isEmpty(authUsername)) {
+      userID = Expo.Constants.deviceId;
+    } else {
+      userID = authUsername;
+    }
+    yield call(setFirebaseData, getPostPreviewCompactModeSettingRef(userID), compactMode);
+    yield call(fetchUserSettings);
+    yield put(settingsActions.updatePostPreviewCompactModeSettings.success(compactMode));
+  } catch (error) {
+    console.log(error);
+    yield put(settingsActions.updatePostPreviewCompactModeSettings.fail({ error }));
+  } finally {
+    yield put(settingsActions.updatePostPreviewCompactModeSettings.loadingEnd());
   }
 };
 
@@ -156,6 +189,88 @@ const updateVotingPercentSetting = function*(action) {
   }
 };
 
+const updateUserLanguageSetting = function*(action) {
+  try {
+    const languageSetting = action.payload;
+    const authUsername = yield select(getAuthUsername);
+    let userID;
+    if (_.isEmpty(authUsername)) {
+      userID = Expo.Constants.deviceId;
+    } else {
+      userID = authUsername;
+    }
+    yield call(setFirebaseData, getUserLanguageSettingRef(userID), languageSetting);
+    yield put(settingsActions.updateUserLanguageSetting.success(languageSetting));
+  } catch (error) {
+    yield put(settingsActions.updateUserLanguageSetting.fail({ error }));
+  }
+};
+
+const updateCustomTheme = function*(action) {
+  try {
+    const {
+      primaryColor,
+      secondaryColor,
+      tertiaryColor,
+      listBackgroundColor,
+      primaryBackgroundColor,
+      primaryBorderColor,
+      positiveColor,
+      negativeColor,
+    } = action.payload;
+    const authUsername = yield select(getAuthUsername);
+    let userID;
+    if (_.isEmpty(authUsername)) {
+      userID = Expo.Constants.deviceId;
+    } else {
+      userID = authUsername;
+    }
+
+    const customTheme = {
+      primaryColor,
+      secondaryColor,
+      tertiaryColor,
+      listBackgroundColor,
+      primaryBackgroundColor,
+      primaryBorderColor,
+      positiveColor,
+      negativeColor,
+    };
+
+    yield call(setFirebaseData, getUserCustomThemeSettingsRef(userID), customTheme);
+    yield put(settingsActions.updateCustomTheme.success(customTheme));
+  } catch (error) {
+    yield put(settingsActions.updateCustomTheme.fail({ error }));
+  }
+};
+
+const updateUserSignature = function*(action) {
+  try {
+    const { signature, successCallback } = action.payload;
+    const authUsername = yield select(getAuthUsername);
+
+    yield call(setFirebaseData, getUserSignatureSettingRef(authUsername), signature);
+
+    _.attempt(successCallback);
+
+    yield put(settingsActions.updateUserSignature.success(signature));
+  } catch (error) {
+    yield put(settingsActions.updateUserSignature.fail({ error }));
+  }
+};
+
+const updateEnableUserSignature = function*(action) {
+  try {
+    const { enableSignature } = action.payload;
+    const authUsername = yield select(getAuthUsername);
+
+    yield call(setFirebaseData, getUserEnableSignatureSettingRef(authUsername), enableSignature);
+    yield put(settingsActions.updateEnableUserSignature.success(enableSignature));
+  } catch (error) {
+    yield put(settingsActions.updateEnableUserSignature.fail({ error }));
+  }
+};
+
 export const watchFetchUserSettings = function*() {
   yield takeLatest(FETCH_CURRENT_USER_SETTINGS.ACTION, fetchUserSettings);
 };
@@ -182,4 +297,24 @@ export const watchUpdateVotingSliderSetting = function*() {
 
 export const watchUpdateVotingPercentSetting = function*() {
   yield takeLatest(UPDATE_VOTING_PERCENT_SETTING.ACTION, updateVotingPercentSetting);
+};
+
+export const watchUpdateCustomTheme = function*() {
+  yield takeLatest(UPDATE_CUSTOM_THEME.ACTION, updateCustomTheme);
+};
+
+export const watchSavePostPreviewSetting = function*() {
+  yield takeLatest(UPDATE_POST_PREVIEW_COMPACT_MODE_SETTINGS.ACTION, savePostPreviewSetting);
+};
+
+export const watchUpdateUserLanguageSetting = function*() {
+  yield takeLatest(UPDATE_USER_LANGUAGE.ACTION, updateUserLanguageSetting);
+};
+
+export const watchUpdateUserSignature = function*() {
+  yield takeLatest(UPDATE_USER_SIGNATURE.ACTION, updateUserSignature);
+};
+
+export const watchUpdateEnableUserSignature = function*() {
+  yield takeLatest(UPDATE_ENABLE_USER_SIGNATURE.ACTION, updateEnableUserSignature);
 };

@@ -4,7 +4,10 @@ import { TouchableWithoutFeedback } from 'react-native';
 import PropTypes from 'prop-types';
 import styled from 'styled-components/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { MATERIAL_COMMUNITY_ICONS, COLORS } from 'constants/styles';
+import { connect } from 'react-redux';
+import { getCustomTheme } from 'state/rootReducer';
+import tinycolor from 'tinycolor2';
+import { MATERIAL_COMMUNITY_ICONS, COLORS, ICON_SIZES } from 'constants/styles';
 
 const Container = styled.View`
   flex-direction: row;
@@ -14,11 +17,12 @@ const Container = styled.View`
 
 const Website = styled.Text`
   margin-left: 5px;
-  color: ${COLORS.PRIMARY_COLOR};
+  color: ${props => props.customTheme.primaryColor};
 `;
 
 class UserWebsite extends Component {
   static propTypes = {
+    customTheme: PropTypes.shape().isRequired,
     website: PropTypes.string,
   };
 
@@ -46,20 +50,28 @@ class UserWebsite extends Component {
   }
 
   render() {
-    const { website } = this.props;
+    const { website, customTheme } = this.props;
     return (
       <Container>
         <MaterialCommunityIcons
           name={MATERIAL_COMMUNITY_ICONS.linkVariant}
-          size={20}
-          color={COLORS.GREY.CHARCOAL}
+          size={ICON_SIZES.userHeaderIcon}
+          color={
+            tinycolor(customTheme.primaryBackgroundColor).isDark()
+              ? COLORS.LIGHT_TEXT_COLOR
+              : COLORS.DARK_TEXT_COLOR
+          }
         />
         <TouchableWithoutFeedback onPress={this.handleOnClickWebsite}>
-          <Website>{website}</Website>
+          <Website customTheme={customTheme}>{website}</Website>
         </TouchableWithoutFeedback>
       </Container>
     );
   }
 }
 
-export default UserWebsite;
+const mapStateToProps = state => ({
+  customTheme: getCustomTheme(state),
+});
+
+export default connect(mapStateToProps)(UserWebsite);

@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Share, View } from 'react-native';
+import { View } from 'react-native';
 import styled from 'styled-components/native';
 import { connect } from 'react-redux';
 import _ from 'lodash';
-import { COLORS } from 'constants/styles';
 import { jsonParse } from 'util/bsteemUtils';
 import {
   getIsAuthenticated,
@@ -13,19 +12,23 @@ import {
   getDisplayNSFWContent,
   getReportedPosts,
   getEnableVotingSlider,
+  getUsersDetails,
+  getCustomTheme,
+  getCompactViewEnabled,
+  getIntl,
 } from 'state/rootReducer';
+import { getProxyImageURL } from 'util/imageUtils';
 import { currentUserVotePost, currentUserReblogPost } from 'state/actions/currentUserActions';
 import { isPostVoted } from 'util/voteUtils';
 import BSteemModal from 'components/common/BSteemModal';
 import * as navigationConstants from 'constants/navigation';
 import * as postConstants from 'constants/postConstants';
-import PostPhotoBrowser from 'components/post/PostPhotoBrowser';
 import ReblogModal from 'components/post/ReblogModal';
 import PostMenu from 'components/post-menu/PostMenu';
 import EmbedContent from 'components/post-preview/EmbedContent';
 import { isPostTaggedNSFW } from 'util/postUtils';
 import { getReputation } from 'util/steemitFormatters';
-import i18n from 'i18n/i18n';
+import StyledTextByBackground from 'components/common/StyledTextByBackground';
 import Footer from './Footer';
 import Header from './Header';
 import BodyShort from './BodyShort';
@@ -35,18 +38,20 @@ import { getPostPreviewComponents, getEmbeds } from '../../util/postPreviewUtils
 import withAuthActions from '../common/withAuthActions';
 
 const Container = styled.View`
-  background-color: ${COLORS.WHITE.WHITE};
+  background-color: ${props => props.customTheme.primaryBackgroundColor};
   margin-top: 5px;
   margin-bottom: 5px;
-  border-color: ${COLORS.WHITE.WHITE_SMOKE};
-  border-width: 2px;
+  border-top-color: ${props => props.customTheme.primaryBorderColor};
+  border-bottom-color: ${props => props.customTheme.primaryBorderColor};
+  border-top-width: 2px;
+  border-bottom-width: 2px;
 `;
 
 const Content = styled.View`
   padding-bottom: 10px;
 `;
 
-const Title = styled.Text`
+const Title = styled(StyledTextByBackground)`
   padding-bottom: 10px;
   font-weight: 700;
   font-size: 20px;
@@ -55,12 +60,12 @@ const Title = styled.Text`
 
 const Touchable = styled.TouchableOpacity``;
 
-const HiddenPreviewText = styled.Text`
+const HiddenPreviewText = styled(StyledTextByBackground)`
   padding: 0 5px;
 `;
 
 const HiddenContentLink = styled.Text`
-  color: ${COLORS.PRIMARY_COLOR};
+  color: ${props => props.customTheme.primaryColor};
   padding: 0 5px;
 `;
 
@@ -71,8 +76,12 @@ const mapStateToProps = state => ({
   authUsername: getAuthUsername(state),
   rebloggedList: getCurrentUserRebloggedList(state),
   displayNSFWContent: getDisplayNSFWContent(state),
+  compactViewEnabled: getCompactViewEnabled(state),
   reportedPosts: getReportedPosts(state),
   enableVotingSlider: getEnableVotingSlider(state),
+  usersDetails: getUsersDetails(state),
+  customTheme: getCustomTheme(state),
+  intl: getIntl(state),
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -118,12 +127,16 @@ class PostPreview extends Component {
     currentUserVotePost: PropTypes.func.isRequired,
     onActionInitiated: PropTypes.func.isRequired,
     navigation: PropTypes.shape().isRequired,
+    usersDetails: PropTypes.shape().isRequired,
+    customTheme: PropTypes.shape().isRequired,
+    intl: PropTypes.shape().isRequired,
     postData: PropTypes.shape(),
     rebloggedList: PropTypes.arrayOf(PropTypes.string),
     reportedPosts: PropTypes.arrayOf(PropTypes.shape()),
     currentUsername: PropTypes.string,
     displayNSFWContent: PropTypes.bool.isRequired,
     enableVotingSlider: PropTypes.bool.isRequired,
+    compactViewEnabled: PropTypes.bool.isRequired,
   };
 
   static defaultProps = {
@@ -155,7 +168,6 @@ class PostPreview extends Component {
       loadingVote: false,
       displayReblogModal: false,
       loadingReblog: false,
-      displayPhotoBrowser: false,
       displayMenu: false,
       displayPostPreview,
       displayVoteSlider: false,
@@ -169,15 +181,12 @@ class PostPreview extends Component {
     this.hideReblogModal = this.hideReblogModal.bind(this);
     this.handleDisplayMenu = this.handleDisplayMenu.bind(this);
     this.handleHideMenu = this.handleHideMenu.bind(this);
-    this.handleDisplayPhotoBrowser = this.handleDisplayPhotoBrowser.bind(this);
     this.handleReblogConfirm = this.handleReblogConfirm.bind(this);
     this.loadingReblogStart = this.loadingReblogStart.bind(this);
     this.loadingReblogEnd = this.loadingReblogEnd.bind(this);
     this.handleNavigateToPost = this.handleNavigateToPost.bind(this);
     this.handleNavigateToComments = this.handleNavigateToComments.bind(this);
-    this.handleHidePhotoBrowser = this.handleHidePhotoBrowser.bind(this);
     this.handleNavigateToVotes = this.handleNavigateToVotes.bind(this);
-    this.handlePhotoBrowserShare = this.handlePhotoBrowserShare.bind(this);
     this.handleAuthVote = this.handleAuthVote.bind(this);
     this.handleReblogIconPress = this.handleReblogIconPress.bind(this);
     this.displayHiddenContent = this.displayHiddenContent.bind(this);
@@ -214,14 +223,8 @@ class PostPreview extends Component {
     }
   }
 
-  loadingVote() {
-    this.setState({
-      loadingVote: true,
-    });
-  }
-
   likedVoteSuccess(votePercent) {
-    const { enableVotingSlider, postData, authUsername } = this.props;
+    const { enableVotingSlider, postData, authUsername, usersDetails } = this.props;
     try {
       // directly modify the current vote post data, if it does not have an active vote then
       // create a new vote object
@@ -236,9 +239,11 @@ class PostPreview extends Component {
         }
 
         if (!hasActiveVote) {
+          const reputation = `${(_.get(usersDetails, `${authUsername}.reputation`), '')}`;
           const newVoteObject = {
             voter: authUsername,
             percent: votePercent,
+            reputation,
           };
           postData.active_votes.push(newVoteObject);
         }
@@ -380,26 +385,6 @@ class PostPreview extends Component {
     });
   }
 
-  handleDisplayPhotoBrowser() {
-    this.setState({
-      displayPhotoBrowser: true,
-    });
-  }
-
-  handleHidePhotoBrowser() {
-    this.setState({ displayPhotoBrowser: false });
-  }
-
-  handlePhotoBrowserShare(photoData) {
-    const { photo } = photoData;
-    const content = {
-      message: photo,
-      title: photo,
-      url: photo,
-    };
-    Share.share(content);
-  }
-
   handleNavigateToPost() {
     const { postData } = this.props;
     const { title, category, author, json_metadata, body, permlink, id } = postData;
@@ -455,22 +440,30 @@ class PostPreview extends Component {
     return true;
   }
 
+  loadingVote() {
+    this.setState({
+      loadingVote: true,
+    });
+  }
+
   renderHiddenPreviewText() {
-    const { postData, reportedPosts } = this.props;
+    const { postData, reportedPosts, customTheme, intl } = this.props;
     const isReported = _.findIndex(reportedPosts, post => post.id === postData.id) > -1;
-    let hiddenPreviewText = i18n.post.lowAuthorReputationPostPreview;
+    let hiddenPreviewText = intl.post_preview_hidden_for_low_ratings;
 
     if (isPostTaggedNSFW(postData)) {
-      hiddenPreviewText = i18n.post.nsfwPostHidden;
+      hiddenPreviewText = intl.post_preview_hidden_for_nsfw;
     } else if (isReported) {
-      hiddenPreviewText = i18n.post.reportedPostHidden;
+      hiddenPreviewText = intl.reported_post_hidden;
     }
 
     return (
       <View>
         <HiddenPreviewText>{`${hiddenPreviewText} `}</HiddenPreviewText>
         <TextTouchable onPress={this.displayHiddenContent}>
-          <HiddenContentLink>{i18n.post.displayHiddenContent}</HiddenContentLink>
+          <HiddenContentLink customTheme={customTheme}>
+            {intl.display_post_preview}
+          </HiddenContentLink>
         </TextTouchable>
       </View>
     );
@@ -485,9 +478,17 @@ class PostPreview extends Component {
   }
 
   renderPreview() {
-    const { postData } = this.props;
+    const { postData, compactViewEnabled } = this.props;
     const { id } = postData;
     const { json_metadata, body } = postData;
+    const textComponent = (
+      <Touchable onPress={this.handleNavigateToPost} key={`text-component-${id}`}>
+        <BodyShort content={body} />
+      </Touchable>
+    );
+
+    if (compactViewEnabled) return textComponent;
+
     const jsonMetadata = _.attempt(JSON.parse, json_metadata);
     const postJSONMetaData = _.isError(jsonMetadata) ? {} : jsonMetadata;
     const images = _.get(postJSONMetaData, 'image', []);
@@ -497,14 +498,32 @@ class PostPreview extends Component {
     const embeds = getEmbeds(postData, embedOptions);
     const firstEmbed = _.head(embeds);
     const hasVideo = !_.isEmpty(firstEmbed);
+    const video = _.get(postJSONMetaData, 'video', {});
+    let dTubeEmbedComponent = null;
 
-    const textComponent = (
-      <Touchable onPress={this.handleNavigateToPost} key={`text-component-${id}`}>
-        <BodyShort content={body} />
-      </Touchable>
-    );
+    if (_.has(video, 'content.videohash') && _.has(video, 'info.snaphash')) {
+      const author = _.get(video, 'info.author', '');
+      const permlink = _.get(video, 'info.permlink', '');
+      const dTubeEmbedUrl = `https://emb.d.tube/#!/${author}/${permlink}/true`;
+      const snaphash = _.get(video, 'info.snaphash', '');
+      const dTubeIFrame = `<iframe width="100%" height="340" src="${dTubeEmbedUrl}" allowFullScreen></iframe>`;
+      const dtubeEmbedContent = {
+        type: 'video',
+        provider_name: 'DTube',
+        embed: dTubeIFrame,
+        thumbnail: getProxyImageURL(`https://ipfs.io/ipfs/${snaphash}`, 'preview'),
+      };
+      dTubeEmbedComponent = (
+        <EmbedContent
+          embedContent={dtubeEmbedContent}
+          key={`dtube-embed-component-${id}`}
+          height={340}
+        />
+      );
+    }
+
     const imageComponent = hasPreviewImage ? (
-      <Touchable onPress={this.handleDisplayPhotoBrowser} key={`image-component-${id}`}>
+      <Touchable onPress={this.handleNavigateToPost} key={`image-component-${id}`}>
         <PostImage images={images} />
       </Touchable>
     ) : null;
@@ -512,29 +531,38 @@ class PostPreview extends Component {
       <EmbedContent embedContent={firstEmbed} key={`embed-component-${id}`} />
     ) : null;
 
-    return getPostPreviewComponents(body, textComponent, imageComponent, embedComponent);
+    return getPostPreviewComponents(
+      body,
+      textComponent,
+      imageComponent,
+      embedComponent,
+      dTubeEmbedComponent,
+    );
   }
 
   render() {
-    const { postData, navigation, authUsername, rebloggedList, currentUsername } = this.props;
+    const {
+      postData,
+      navigation,
+      authUsername,
+      rebloggedList,
+      currentUsername,
+      customTheme,
+    } = this.props;
     const {
       likedPost,
       loadingVote,
       displayReblogModal,
       loadingReblog,
-      displayPhotoBrowser,
       displayMenu,
       displayVoteSlider,
     } = this.state;
-    const { title, json_metadata } = postData;
-    const parsedJsonMetadata = jsonParse(json_metadata);
-    const images = parsedJsonMetadata.image || [];
-    const formattedImages = _.map(images, image => ({ photo: image }));
+    const { title } = postData;
     const showPostPreview = this.getDisplayPostPreview();
     const hiddenStoryPreviewMessage = this.renderHiddenPreviewText();
 
     return (
-      <Container>
+      <Container customTheme={customTheme}>
         <Header
           postData={postData}
           navigation={navigation}
@@ -574,15 +602,6 @@ class PostPreview extends Component {
               confirmReblog={this.handleReblogConfirm}
             />
           </BSteemModal>
-        )}
-        {displayPhotoBrowser && (
-          <PostPhotoBrowser
-            displayPhotoBrowser={displayPhotoBrowser}
-            mediaList={formattedImages}
-            handleClose={this.handleHidePhotoBrowser}
-            initialPhotoIndex={0}
-            handleAction={this.handlePhotoBrowserShare}
-          />
         )}
         {displayMenu && (
           <BSteemModal visible={displayMenu} handleOnClose={this.handleHideMenu}>

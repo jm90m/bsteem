@@ -45,14 +45,15 @@ export const getPostPreviewComponents = (
   textComponent,
   imageComponent,
   videoComponent,
+  dTubeEmbedComponent,
 ) => {
   const htmlBody = getHtml(postBody, {}, 'text');
   const tagPositions = getPositions(htmlBody);
   const previewComponents = [];
-  const hasVideo = !_.isEmpty(videoComponent);
   const hasImage = !_.isEmpty(imageComponent);
+  const hasDtubeVideo = !_.isNull(dTubeEmbedComponent);
 
-  if (hasVideo) {
+  if (hasDtubeVideo) {
     previewComponents.push(videoComponent);
     previewComponents.push(textComponent);
   } else if (htmlBody.length <= 1500 && postWithPicture(tagPositions, 100)) {

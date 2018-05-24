@@ -8,11 +8,19 @@ const colorsMap = {
     HAVELOCK_BLUE: '#4A80BE',
     HEATHER: '#a1afba',
     BALI_HAI: '#8798a4',
+    DODGER_BLUE: '#1890ff',
+    NAVY_BLUE: '#0274dc',
+    BLACK_ROCK: '#282A36',
+    COLUMBIA_BLUE: '#A5F7FE',
+    BLACK_PEARL: '#1D252B',
+    OXFORD_BLUE: '#242F38',
   },
 
   GREEN: {
     BUBBLES: '#EAF4EF',
     DARK_GREEN: '#000024',
+    SHAMROCK: '#25D5AA',
+    PALE_GREEN: '#6EFA99',
   },
 
   BLACK: {
@@ -21,23 +29,31 @@ const colorsMap = {
 
   RED: {
     VALENCIA: '#D9534F',
+    TORCH_RED: '#FC0D1C',
   },
 
   GREY: {
     GONDOLA: '#353535',
     CHARCOAL: '#454545',
     NERO: '#2A2A2A',
+    NIGHT_RIDER: '#323232',
+    GREY: '#7C7C7C',
+    BUNKER: '#222426',
+    EMPRESS: '#777676',
+    VERY_LIGHT_GREY: '#CACACA',
   },
 
   WHITE: {
     WHITE: '#FFFFFF',
     WHITE_SMOKE: '#EEEEEE',
     GAINSBORO: '#E9E7E7',
+    MINT_CREAM: '#F3FFFC',
   },
 
   VIOLET: {
     PAUA: '#232A57',
     HAN_PURPLE: '#4630EB',
+    MAUVE: '#E2C2FD',
   },
 };
 
@@ -51,21 +67,82 @@ const appColors = {
   TERTIARY_COLOR: colorsMap.BLUE.BOTICELLI,
   POSITIVE_COLOR: colorsMap.BLUE.MEDIUM_AQUAMARINE,
   NEGATIVE_COLOR: colorsMap.RED.VALENCIA,
-
   SPLASH_SCREEN_BACKGROUND: '#FCFCFC',
+  LIGHT_TEXT_COLOR: colorsMap.WHITE.WHITE,
+  DARK_TEXT_COLOR: colorsMap.GREY.NERO,
+};
+
+// add utopian colors, dtube colors, busy colors, steemit colors,
+
+export const bSteemColors = {
+  primaryColor: colorsMap.BLUE.DODGER_BLUE,
+  secondaryColor: colorsMap.GREEN.DARK_GREEN,
+  tertiaryColor: colorsMap.BLUE.BOTICELLI,
+  listBackgroundColor: colorsMap.WHITE.WHITE_SMOKE,
+  primaryBackgroundColor: colorsMap.WHITE.WHITE,
+  primaryBorderColor: colorsMap.WHITE.GAINSBORO,
+  positiveColor: colorsMap.BLUE.MEDIUM_AQUAMARINE,
+  negativeColor: colorsMap.RED.VALENCIA,
+};
+
+export const bSteemDarkColors = {
+  primaryColor: colorsMap.VIOLET.MAUVE,
+  secondaryColor: colorsMap.BLUE.COLUMBIA_BLUE,
+  tertiaryColor: colorsMap.GREEN.PALE_GREEN,
+  listBackgroundColor: colorsMap.WHITE.MINT_CREAM,
+  primaryBackgroundColor: colorsMap.BLUE.BLACK_ROCK,
+  primaryBorderColor: colorsMap.WHITE.MINT_CREAM,
+  positiveColor: colorsMap.BLUE.MEDIUM_AQUAMARINE,
+  negativeColor: colorsMap.RED.VALENCIA,
+};
+
+export const dTubeColors = {
+  primaryColor: colorsMap.RED.TORCH_RED,
+  secondaryColor: colorsMap.GREY.NIGHT_RIDER,
+  tertiaryColor: colorsMap.GREY.GREY,
+  listBackgroundColor: colorsMap.WHITE.GAINSBORO,
+  primaryBackgroundColor: colorsMap.WHITE.WHITE,
+  primaryBorderColor: colorsMap.WHITE.GAINSBORO,
+  positiveColor: colorsMap.BLUE.MEDIUM_AQUAMARINE,
+  negativeColor: colorsMap.RED.VALENCIA,
+};
+
+export const busyColors = {
+  primaryColor: colorsMap.BLUE.DODGER_BLUE,
+  secondaryColor: colorsMap.BLUE.NAVY_BLUE,
+  tertiaryColor: colorsMap.GREY.EMPRESS,
+  listBackgroundColor: colorsMap.WHITE.GAINSBORO,
+  primaryBackgroundColor: colorsMap.WHITE.WHITE,
+  primaryBorderColor: colorsMap.WHITE.GAINSBORO,
+  positiveColor: colorsMap.BLUE.MEDIUM_AQUAMARINE,
+  negativeColor: colorsMap.RED.VALENCIA,
+};
+
+export const steemitColors = {
+  primaryColor: colorsMap.GREEN.SHAMROCK,
+  secondaryColor: colorsMap.GREY.NIGHT_RIDER,
+  tertiaryColor: colorsMap.GREY.VERY_LIGHT_GREY,
+  listBackgroundColor: colorsMap.WHITE.GAINSBORO,
+  primaryBackgroundColor: colorsMap.WHITE.WHITE,
+  primaryBorderColor: colorsMap.WHITE.GAINSBORO,
+  positiveColor: colorsMap.BLUE.MEDIUM_AQUAMARINE,
+  negativeColor: colorsMap.RED.VALENCIA,
+};
+
+export const steemitDarkColors = {
+  primaryColor: colorsMap.GREEN.SHAMROCK,
+  secondaryColor: colorsMap.WHITE.WHITE,
+  tertiaryColor: colorsMap.BLUE.HEATHER,
+  listBackgroundColor: colorsMap.BLUE.BLACK_PEARL,
+  primaryBackgroundColor: colorsMap.BLUE.BLACK_PEARL,
+  primaryBorderColor: colorsMap.BLUE.OXFORD_BLUE,
+  positiveColor: colorsMap.BLUE.MEDIUM_AQUAMARINE,
+  negativeColor: colorsMap.RED.VALENCIA,
 };
 
 export const COLORS = {
   ...colorsMap,
   ...appColors,
-};
-
-export const APP_STYLES = {
-  PRIMARY_BORDER_WIDTH: 1,
-};
-
-export const FONT_SIZES = {
-  TITLE: '20px',
 };
 
 export const MATERIAL_ICONS = {
@@ -127,6 +204,13 @@ export const MATERIAL_ICONS = {
   warning: 'warning',
   checkCircle: 'check-circle',
   keyboardHide: 'keyboard-hide',
+  replyAll: 'reply-all',
+  notifications: 'notifications',
+  notificationsActive: 'notifications-active',
+  moneyOff: 'money-off',
+  playCirlceOutline: 'play-circle-outline',
+  directionsRun: 'directions-run',
+  apps: 'apps',
 };
 
 export const MATERIAL_COMMUNITY_ICONS = {
@@ -158,6 +242,7 @@ export const MATERIAL_COMMUNITY_ICONS = {
 
   save: 'star-outline',
   saved: 'star',
+  star: 'star',
 
   // post
   savePost: 'star-outline',
@@ -189,6 +274,23 @@ export const MATERIAL_COMMUNITY_ICONS = {
   block: 'block-helper',
   hide: 'eye-off',
   cashUSD: 'cash-usd',
+  crown: 'crown', // for reputation
+  sort: 'sort',
+  sortAlphabetical: 'sort-alphabetical',
+  timer: 'timer',
+  unfollowIcon: 'account-multiple-minus',
+  followIcon: 'account-multiple-plus',
+
+  autoFix: 'auto-fix',
+
+  compact: 'view-headline',
+  card: 'view-agenda',
+  contentCopy: 'content-copy',
+  publish: 'publish',
+  contentSave: 'content-save',
+  approval: 'approval',
+  logout: 'logout',
+  eraser: 'eraser',
 };
 
 export const FEATHER_ICONS = {
@@ -211,8 +313,13 @@ export const ICON_SIZES = {
   editorCloseIcon: 30,
   userHeaderIcon: 20,
   contentTitleBlockIcon: 20,
+  footerActionIcon: 20,
 };
 
 export const ICON_COLORS = {
   actionIcon: COLORS.BLUE.HEATHER,
+};
+
+export const OCTICONS_ICONS = {
+  chevronDown: 'chevron-down',
 };

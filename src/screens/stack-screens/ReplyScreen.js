@@ -5,7 +5,6 @@ import { connect } from 'react-redux';
 import { Dimensions, KeyboardAvoidingView, Keyboard, TouchableWithoutFeedback } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { COLORS, MATERIAL_ICONS, ICON_SIZES } from 'constants/styles';
-import i18n from 'i18n/i18n';
 import { getReputation } from 'util/steemitFormatters';
 import Header from 'components/common/Header';
 import { FormInput } from 'react-native-elements';
@@ -13,13 +12,16 @@ import CommentContent from 'components/post/comments/CommentContent';
 import Avatar from 'components/common/Avatar';
 import PrimaryButton from 'components/common/PrimaryButton';
 import BackButton from 'components/common/BackButton';
-import * as editorActions from '../../state/actions/editorActions';
+import { getCustomTheme, getIntl } from 'state/rootReducer';
+import * as editorActions from 'state/actions/editorActions';
+import StyledViewPrimaryBackground from 'components/common/StyledViewPrimaryBackground';
+import TitleText from 'components/common/TitleText';
+import tinycolor from 'tinycolor2';
 
 const { width: deviceWidth } = Dimensions.get('screen');
 
-const Container = styled.View`
+const Container = styled(StyledViewPrimaryBackground)`
   flex: 1;
-  background: ${COLORS.PRIMARY_BACKGROUND_COLOR};
 `;
 
 const ReplyContentContainer = styled.ScrollView``;
@@ -29,7 +31,7 @@ const AvatarContainer = styled.View`
 `;
 
 const CommentContainer = styled.View`
-  background-color: ${COLORS.PRIMARY_BACKGROUND_COLOR};
+  background-color: ${props => props.customTheme.primaryBackgroundColor};
   margin-top: 2px;
   margin-bottom: 2px;
 `;
@@ -44,12 +46,12 @@ const TitleContainer = styled.View`
   align-items: center;
 `;
 
-const Title = styled.Text`
+const Title = styled(TitleText)`
   margin-left: 3px;
 `;
 
 const ReplyInputContainer = styled.View`
-  background-color: ${COLORS.WHITE.WHITE};
+  background-color: ${props => props.customTheme.primaryBackgroundColor};
   padding: 10px;
 `;
 
@@ -67,7 +69,10 @@ const MenuIconContainer = styled.View`
   padding: 5px;
 `;
 
-const mapStateToProps = state => ({});
+const mapStateToProps = state => ({
+  customTheme: getCustomTheme(state),
+  intl: getIntl(state),
+});
 
 const mapDispatchToProps = dispatch => ({
   createComment: (
@@ -93,9 +98,12 @@ const mapDispatchToProps = dispatch => ({
 class ReplyScreen extends Component {
   static navigationOptions = {
     tabBarVisible: false,
+    drawerLockMode: 'locked-closed',
   };
 
   static propTypes = {
+    customTheme: PropTypes.shape().isRequired,
+    intl: PropTypes.shape().isRequired,
     navigation: PropTypes.shape({
       goBack: PropTypes.func.isRequired,
       state: PropTypes.shape({
@@ -185,11 +193,16 @@ class ReplyScreen extends Component {
   }
 
   render() {
+    const { customTheme, intl } = this.props;
     const { parentPost } = this.props.navigation.state.params;
     const { replyText, replyLoading, keyboardDisplayed } = this.state;
     const commentAuthorReputation = getReputation(parentPost.author_reputation);
     const contentWidth = deviceWidth - 30;
     const avatarSize = 40;
+    const color = tinycolor(customTheme.primaryBackgroundColor).isDark()
+      ? COLORS.LIGHT_TEXT_COLOR
+      : COLORS.DARK_TEXT_COLOR;
+
     return (
       <Container>
         <Header>
@@ -198,15 +211,15 @@ class ReplyScreen extends Component {
             <MaterialIcons
               size={ICON_SIZES.menuIcon}
               name={MATERIAL_ICONS.reply}
-              color={COLORS.PRIMARY_COLOR}
+              color={customTheme.primaryColor}
             />
-            <Title>{`${i18n.titles.replyTo} ${parentPost.author}`}</Title>
+            <Title>{`${intl.reply_to} ${parentPost.author}`}</Title>
           </TitleContainer>
           <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
             <MenuIconContainer>
               <MaterialIcons
                 size={ICON_SIZES.menuIcon}
-                color={keyboardDisplayed ? COLORS.PRIMARY_COLOR : 'transparent'}
+                color={keyboardDisplayed ? customTheme.primaryColor : 'transparent'}
                 name={MATERIAL_ICONS.keyboardHide}
               />
             </MenuIconContainer>
@@ -214,7 +227,7 @@ class ReplyScreen extends Component {
         </Header>
         <KeyboardAvoidingView behavior="padding">
           <ReplyContentContainer>
-            <CommentContainer>
+            <CommentContainer customTheme={customTheme}>
               <CommentContentContainer>
                 <AvatarContainer>
                   <Avatar size={avatarSize} username={parentPost.author} />
@@ -227,21 +240,23 @@ class ReplyScreen extends Component {
                   commentDepth={parentPost.depth}
                   currentWidth={contentWidth}
                   navigation={this.props.navigation}
+                  customTheme={customTheme}
                 />
               </CommentContentContainer>
             </CommentContainer>
-            <ReplyInputContainer>
+            <ReplyInputContainer customTheme={customTheme}>
               <FormInput
                 onChangeText={this.onChangeReplyText}
-                placeholder={i18n.editor.replyPlaceholder}
+                placeholder={intl.reply_placeholder}
                 multiline
                 value={replyText}
-                inputStyle={{ width: '100%' }}
+                inputStyle={{ width: '100%', color }}
+                placeholderTextColor={color}
               />
               <ReplyButtonContainer>
                 <PrimaryButton
                   onPress={this.handleSubmit}
-                  title={i18n.editor.reply}
+                  title={intl.reply}
                   disabled={replyLoading}
                   loading={replyLoading}
                 />

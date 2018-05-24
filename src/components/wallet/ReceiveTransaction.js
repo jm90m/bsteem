@@ -1,12 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components/native';
-import { COLORS } from 'constants/styles';
 import Avatar from 'components/common/Avatar';
 import TimeAgo from 'components/common/TimeAgo';
 import { numberWithCommas } from 'util/steemitFormatters';
-import i18n from 'i18n/i18n';
+import { getCustomTheme, getIntl } from 'state/rootReducer';
+import { connect } from 'react-redux';
 import * as navigationConstants from 'constants/navigation';
+import StyledTextByBackground from 'components/common/StyledTextByBackground';
 import WalletTransactionContainer from './WalletTransactionContainer';
 
 const ReceiveContent = styled.Text`
@@ -15,23 +16,14 @@ const ReceiveContent = styled.Text`
   width: 200px;
 `;
 
-const Label = styled.Text`
-  font-weight: bold;
-`;
-
 const Received = styled.Text`
   font-weight: bold;
   margin-left: auto;
-  color: ${COLORS.BLUE.MEDIUM_AQUAMARINE};
-`;
-
-const Memo = styled.Text`
-  flex-wrap: wrap;
-  z-index: 1;
+  color: ${props => props.customTheme.positiveColor};
 `;
 
 const Username = styled.Text`
-  color: ${COLORS.PRIMARY_COLOR};
+  color: ${props => props.customTheme.primaryColor};
   font-weight: bold;
 `;
 
@@ -41,24 +33,26 @@ const ReceivedTextContainer = styled.Text`
 
 const Touchable = styled.TouchableWithoutFeedback``;
 
-const ReceiveTransaction = ({ from, memo, amount, timestamp, navigation }) => (
+const ReceiveTransaction = ({ from, memo, amount, timestamp, navigation, customTheme, intl }) => (
   <WalletTransactionContainer>
     <Avatar username={from} size={40} />
     <ReceiveContent>
       <ReceivedTextContainer>
-        <Label>{`${i18n.activity.receivedFrom} `}</Label>
+        <StyledTextByBackground>{`${intl.received_from} `}</StyledTextByBackground>
         <Touchable
           onPress={() => navigation.navigate(navigationConstants.USER, { username: from })}
         >
-          <Username>{from}</Username>
+          <Username customTheme={customTheme}>{from}</Username>
         </Touchable>
       </ReceivedTextContainer>
       {'\n'}
       <TimeAgo created={timestamp} />
       {'\n'}
-      <Memo>{memo}</Memo>
+      <StyledTextByBackground style={{ flexWrap: 'wrap', zIndex: 1 }}>
+        {memo}
+      </StyledTextByBackground>
     </ReceiveContent>
-    <Received>
+    <Received customTheme={customTheme}>
       {'+'}
       {numberWithCommas(amount)}
     </Received>
@@ -66,6 +60,8 @@ const ReceiveTransaction = ({ from, memo, amount, timestamp, navigation }) => (
 );
 
 ReceiveTransaction.propTypes = {
+  customTheme: PropTypes.shape().isRequired,
+  intl: PropTypes.shape().isRequired,
   navigation: PropTypes.shape().isRequired,
   from: PropTypes.string,
   memo: PropTypes.string,
@@ -80,4 +76,9 @@ ReceiveTransaction.defaultProps = {
   timestamp: '',
 };
 
-export default ReceiveTransaction;
+const mapStateToProps = state => ({
+  customTheme: getCustomTheme(state),
+  intl: getIntl(state),
+});
+
+export default connect(mapStateToProps)(ReceiveTransaction);

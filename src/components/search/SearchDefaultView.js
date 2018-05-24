@@ -4,8 +4,8 @@ import _ from 'lodash';
 import PropTypes from 'prop-types';
 import styled from 'styled-components/native';
 import Tag from 'components/post/Tag';
-import { COLORS } from 'constants/styles';
-import i18n from 'i18n/i18n';
+import { connect } from 'react-redux';
+import { getCustomTheme, getIntl } from 'state/rootReducer';
 
 const Container = styled.View`
   flex: 1;
@@ -22,15 +22,22 @@ const TrendingTagsTitle = styled.Text`
   font-weight: bold;
   font-size: 20px;
   width: 100%;
-  color: ${COLORS.BLUE.BOTICELLI};
+  color: ${props => props.customTheme.tertiaryColor};
   padding: 10px;
 `;
+
+const mapStateToProps = state => ({
+  customTheme: getCustomTheme(state),
+  intl: getIntl(state),
+});
 
 class SearchDefaultView extends Component {
   static propTypes = {
     tagsLoading: PropTypes.bool.isRequired,
     fetchTags: PropTypes.func.isRequired,
     tags: PropTypes.arrayOf(PropTypes.shape()),
+    customTheme: PropTypes.shape().isRequired,
+    intl: PropTypes.shape().isRequired,
     handleNavigateToFeed: PropTypes.func,
   };
 
@@ -48,20 +55,20 @@ class SearchDefaultView extends Component {
     ));
   }
   render() {
-    const { tagsLoading, fetchTags } = this.props;
+    const { tagsLoading, fetchTags, customTheme, intl } = this.props;
     return (
       <ScrollView
         refreshControl={
           <RefreshControl
             refreshing={tagsLoading}
             onRefresh={fetchTags}
-            tintColor={COLORS.PRIMARY_COLOR}
-            colors={[COLORS.PRIMARY_COLOR]}
+            tintColor={customTheme.primaryColor}
+            colors={[customTheme.primaryColor]}
           />
         }
       >
         <Container>
-          <TrendingTagsTitle>{i18n.titles.trendingTags}</TrendingTagsTitle>
+          <TrendingTagsTitle customTheme={customTheme}>{intl.trending_topics}</TrendingTagsTitle>
           {this.renderTags()}
         </Container>
       </ScrollView>
@@ -69,4 +76,4 @@ class SearchDefaultView extends Component {
   }
 }
 
-export default SearchDefaultView;
+export default connect(mapStateToProps)(SearchDefaultView);

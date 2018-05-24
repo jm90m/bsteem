@@ -1,12 +1,19 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
-import { Image, TouchableOpacity, View, Dimensions } from 'react-native';
+import {
+  Image,
+  TouchableOpacity,
+  View,
+  Dimensions,
+  Keyboard,
+  TouchableWithoutFeedback,
+  Platform,
+} from 'react-native';
 import styled from 'styled-components/native';
 import { FormInput, FormLabel, Icon, FormValidationMessage } from 'react-native-elements';
-import i18n from 'i18n/i18n';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS, ICON_SIZES, MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
+import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
+import { COLORS, ICON_SIZES, MATERIAL_COMMUNITY_ICONS, MATERIAL_ICONS } from 'constants/styles';
 import { connect } from 'react-redux';
 import Header from 'components/common/Header';
 import BackButton from 'components/common/BackButton';
@@ -16,6 +23,8 @@ import {
   getPostLoading,
   getPostsDetails,
   getCreatePostLoading,
+  getCustomTheme,
+  getIntl,
 } from 'state/rootReducer';
 import { ImagePicker } from 'expo';
 import { fetchPostDetails } from 'state/actions/postsActions';
@@ -25,6 +34,8 @@ import LargeLoading from 'components/common/LargeLoading';
 import SmallLoading from 'components/common/SmallLoading';
 import uuidv4 from 'uuid/v4';
 import { createPost, uploadImage } from 'state/actions/editorActions';
+import TitleText from 'components/common/TitleText';
+import tinycolor from 'tinycolor2';
 import PostCreationPreviewModal from './PostCreationPreviewModal';
 import * as navigationConstants from '../../constants/navigation';
 
@@ -32,7 +43,7 @@ const { width: deviceWidth } = Dimensions.get('screen');
 
 const Container = styled.View``;
 
-const Title = styled.Text`
+const Title = styled(TitleText)`
   margin-left: 3px;
 `;
 
@@ -43,14 +54,14 @@ const TitleContainer = styled.View`
 
 const StyledScrollView = styled.ScrollView`
   padding-bottom: 200px;
-  background-color: ${COLORS.WHITE.WHITE};
+  background-color: ${props => props.customTheme.primaryBackgroundColor};
 `;
 
 const ActionButtonTouchable = styled.TouchableOpacity`
   width: 50px;
   height: 50px;
   justify-content: center;
-  background-color: ${COLORS.GREY.CHARCOAL};
+  background-color: ${props => props.customTheme.secondaryColor};
   border-radius: 25px;
   align-items: center;
   margin-right: 20px;
@@ -79,11 +90,13 @@ const LoadingContainer = styled.View`
 `;
 
 const mapStateToProps = state => ({
+  customTheme: getCustomTheme(state),
   postsDetails: getPostsDetails(state),
   postLoading: getPostLoading(state),
   authenticated: getIsAuthenticated(state),
   authUsername: getAuthUsername(state),
   createPostLoading: getCreatePostLoading(state),
+  intl: getIntl(state),
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -95,7 +108,9 @@ const mapDispatchToProps = dispatch => ({
 
 class EditPostScreen extends Component {
   static propTypes = {
+    customTheme: PropTypes.shape().isRequired,
     postsDetails: PropTypes.shape().isRequired,
+    intl: PropTypes.shape().isRequired,
     postLoading: PropTypes.bool.isRequired,
     authenticated: PropTypes.bool.isRequired,
     authUsername: PropTypes.string.isRequired,
@@ -125,6 +140,7 @@ class EditPostScreen extends Component {
       errorImageUploading: false,
       additionalPostContents: [],
       additionalInputCounter: 0,
+      keyboardDisplayed: false,
     };
 
     this.navigateBack = this.navigateBack.bind(this);
@@ -149,6 +165,17 @@ class EditPostScreen extends Component {
 
     this.getCurrentPostDetails = this.getCurrentPostDetails.bind(this);
     this.handleCreatePostSuccess = this.handleCreatePostSuccess.bind(this);
+  }
+
+  componentWillMount() {
+    this.keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      this.handleSetKeyboardDisplay(true),
+    );
+    this.keyboardDidHideListener = Keyboard.addListener(
+      'keyboardDidHide',
+      this.handleSetKeyboardDisplay(false),
+    );
   }
 
   componentDidMount() {
@@ -179,6 +206,11 @@ class EditPostScreen extends Component {
         tags,
       });
     }
+  }
+
+  componentWillUnmount() {
+    this.keyboardDidShowListener.remove();
+    this.keyboardDidHideListener.remove();
   }
 
   getCurrentPostDetails() {
@@ -284,6 +316,8 @@ class EditPostScreen extends Component {
     });
   }
 
+  handleSetKeyboardDisplay = keyboardDisplayed => () => this.setState({ keyboardDisplayed });
+
   renderAdditionalContents() {
     const closeButtonStyles = {
       position: 'absolute',
@@ -291,16 +325,21 @@ class EditPostScreen extends Component {
       right: 0,
       backgroundColor: 'transparent',
     };
+    const { customTheme, intl } = this.props;
     return _.map(this.state.additionalPostContents, (content, index) => {
       const { type, key, ref } = content;
       if (type === 'text') {
+        const color = tinycolor(customTheme.primaryBackgroundColor).isDark()
+          ? COLORS.LIGHT_TEXT_COLOR
+          : COLORS.DARK_TEXT_COLOR;
         return (
           <View key={key}>
             <FormInput
               ref={input => (this.additionalContents[ref] = input)}
-              placeholder={i18n.editor.bodyPlaceholder}
+              placeholder={intl.story_placeholder}
               multiline
-              inputStyle={{ width: '100%' }}
+              inputStyle={{ width: '100%', color }}
+              placeholderTextColor={color}
             />
             <TouchableOpacity
               onPress={() => this.removeAdditionalContent(index, type)}
@@ -309,7 +348,7 @@ class EditPostScreen extends Component {
               <MaterialCommunityIcons
                 name={MATERIAL_COMMUNITY_ICONS.closeCircle}
                 size={ICON_SIZES.editorCloseIcon}
-                color={COLORS.PRIMARY_COLOR}
+                color={customTheme.primaryColor}
               />
             </TouchableOpacity>
           </View>
@@ -330,7 +369,7 @@ class EditPostScreen extends Component {
               <MaterialCommunityIcons
                 name={MATERIAL_COMMUNITY_ICONS.closeCircle}
                 size={ICON_SIZES.editorCloseIcon}
-                color={COLORS.PRIMARY_COLOR}
+                color={customTheme.primaryColor}
               />
             </TouchableOpacity>
           </View>
@@ -449,9 +488,10 @@ class EditPostScreen extends Component {
   }
 
   async pickImage() {
+    const allowsEditing = Platform.OS !== 'ios';
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: 'Images',
-      allowsEditing: true,
+      allowsEditing,
     });
 
     console.log('IMAGE PICKER', result);
@@ -464,11 +504,12 @@ class EditPostScreen extends Component {
 
   handleSubmit() {
     // validate form
+    const { intl } = this.props;
     const { tags, titleInput } = this.state;
     const errorState = {};
 
-    if (_.isEmpty(tags)) errorState.tagError = i18n.editor.errors.emptyTags;
-    if (_.isEmpty(titleInput)) errorState.titleError = i18n.editor.errors.emptyTitle;
+    if (_.isEmpty(tags)) errorState.tagError = intl.editor_error_empty_tags;
+    if (_.isEmpty(titleInput)) errorState.titleError = intl.editor_error_empty_title;
 
     if (_.isEmpty(errorState)) {
       this.setState(errorState, () => {
@@ -491,26 +532,34 @@ class EditPostScreen extends Component {
       previewVisible,
       currentPostData,
       imageLoading,
+      keyboardDisplayed,
     } = this.state;
-    const { createPostLoading, postLoading } = this.props;
+    const { createPostLoading, postLoading, customTheme, intl } = this.props;
     const displayTitleError = !_.isEmpty(titleError);
+    const color = tinycolor(customTheme.primaryBackgroundColor).isDark()
+      ? COLORS.LIGHT_TEXT_COLOR
+      : COLORS.DARK_TEXT_COLOR;
+
     return (
       <Container>
         <Header>
           <BackButton navigateBack={this.navigateBack} />
-          <TitleContainer>
-            <MaterialCommunityIcons
-              size={ICON_SIZES.menuIcon}
-              name={MATERIAL_COMMUNITY_ICONS.pencil}
-              color={COLORS.PRIMARY_COLOR}
-            />
-            <Title>{i18n.titles.editPost}</Title>
-          </TitleContainer>
+          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <TitleContainer>
+              <Title>{intl.edit_post}</Title>
+              <MaterialIcons
+                size={ICON_SIZES.menuIcon}
+                name={MATERIAL_ICONS.keyboardHide}
+                color={keyboardDisplayed ? customTheme.primaryColor : 'transparent'}
+              />
+            </TitleContainer>
+          </TouchableWithoutFeedback>
           <TouchableMenu onPress={this.showPreview}>
             <TouchableMenuContainer>
               <MaterialCommunityIcons
                 size={ICON_SIZES.menuIcon}
                 name={MATERIAL_COMMUNITY_ICONS.magnify}
+                color={customTheme.primaryColor}
               />
             </TouchableMenuContainer>
           </TouchableMenu>
@@ -520,14 +569,15 @@ class EditPostScreen extends Component {
             <LargeLoading />
           </LoadingContainer>
         ) : (
-          <StyledScrollView>
-            <FormLabel>{i18n.editor.title}</FormLabel>
+          <StyledScrollView customTheme={customTheme}>
+            <FormLabel>{intl.title}</FormLabel>
             <FormInput
               onChangeText={this.onChangeTitle}
-              placeholder={i18n.editor.titlePlaceholder}
+              placeholder={intl.title_placeholder}
               value={titleInput}
               maxLength={255}
-              inputStyle={{ width: '100%' }}
+              inputStyle={{ width: '100%', color }}
+              placeholderTextColor={color}
             />
             {displayTitleError && <FormValidationMessage>{titleError}</FormValidationMessage>}
             <TagsInput
@@ -537,38 +587,55 @@ class EditPostScreen extends Component {
               removeTag={this.removeTag}
               tagError={tagError}
             />
-            <FormLabel>{i18n.editor.body}</FormLabel>
+            <FormLabel>{intl.body}</FormLabel>
             <FormInput
               onChangeText={this.onChangeBody}
               placeholder=""
               multiline
               value={bodyInput}
-              inputStyle={{ width: '100%' }}
+              inputStyle={{ width: '100%', color }}
+              placeholderTextColor={color}
             />
             {this.renderAdditionalContents()}
             {imageLoading && <SmallLoading style={{ marginTop: 20, alignSelf: 'center' }} />}
             <ActionButtonsContainer>
               <PrimaryButton
                 onPress={this.handleSubmit}
-                title={i18n.editor.editPost}
+                title={intl.edit_post}
                 disabled={createPostLoading}
                 loading={createPostLoading}
               />
               <ActionButtons>
-                <ActionButtonTouchable onPress={this.addTextInput} disabled={createPostLoading}>
+                <ActionButtonTouchable
+                  onPress={this.addTextInput}
+                  disabled={createPostLoading}
+                  customTheme={customTheme}
+                >
                   <Icon
                     name="note-add"
-                    backgroundColor={COLORS.GREY.NERO}
+                    backgroundColor={customTheme.secondaryColor}
                     size={ICON_SIZES.actionIcon}
-                    color={COLORS.WHITE.WHITE}
+                    color={
+                      tinycolor(customTheme.secondaryColor).isDark()
+                        ? COLORS.LIGHT_TEXT_COLOR
+                        : COLORS.DARK_TEXT_COLOR
+                    }
                   />
                 </ActionButtonTouchable>
-                <ActionButtonTouchable onPress={this.pickImage} disabled={createPostLoading}>
+                <ActionButtonTouchable
+                  onPress={this.pickImage}
+                  disabled={createPostLoading}
+                  customTheme={customTheme}
+                >
                   <Icon
                     name="add-a-photo"
-                    backgroundColor={COLORS.GREY.NERO}
+                    backgroundColor={customTheme.secondaryColor}
                     size={ICON_SIZES.actionIcon}
-                    color={COLORS.WHITE.WHITE}
+                    color={
+                      tinycolor(customTheme.secondaryColor).isDark()
+                        ? COLORS.LIGHT_TEXT_COLOR
+                        : COLORS.DARK_TEXT_COLOR
+                    }
                   />
                 </ActionButtonTouchable>
               </ActionButtons>

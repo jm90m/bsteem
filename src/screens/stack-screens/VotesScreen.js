@@ -2,21 +2,27 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { ListView } from 'react-native';
+import { TouchableWithoutFeedback } from 'react-native';
+import { connect } from 'react-redux';
 import * as navigationConstants from 'constants/navigation';
 import styled from 'styled-components/native';
-import i18n from 'i18n/i18n';
 import Header from 'components/common/Header';
 import BackButton from 'components/common/BackButton';
 import Voter from 'components/votes/Voter';
-import { COLORS, MATERIAL_COMMUNITY_ICONS, ICON_SIZES } from 'constants/styles';
+import { MATERIAL_COMMUNITY_ICONS, ICON_SIZES } from 'constants/styles';
 import { getUpvotes, getDownvotes, getRatio } from 'util/voteUtils';
-import { sortVotes } from 'util/sortUtils';
+import moment from 'moment-timezone';
+import { getSortedVotes } from 'util/sortUtils';
+import { VOTE_VALUE_SORT } from 'constants/postConstants';
+import VoteSortMenu from 'components/votes/VoteSortMenu';
+import { getCustomTheme, getIntl } from 'state/rootReducer';
+import StyledFlatList from 'components/common/StyledFlatList';
+import StyledViewPrimaryBackground from 'components/common/StyledViewPrimaryBackground';
+import StyledTextByBackground from 'components/common/StyledTextByBackground';
+import { calculatePayout } from 'util/steemitUtils';
 
-const Container = styled.View``;
-
-const StyledListView = styled.ListView`
-  background-color: ${COLORS.LIST_VIEW_BACKGROUND};
+const Container = styled(StyledViewPrimaryBackground)`
+  flex: 1;
 `;
 
 const Menu = styled.View`
@@ -32,31 +38,47 @@ const MenuTouchable = styled.TouchableOpacity`
   margin-left: 10px;
 `;
 
-const VoteCounts = styled.Text`
+const VoteCounts = styled(StyledTextByBackground)`
   margin: 0 5px;
 `;
 
-const EmptyContainer = styled.View`
+const EmptyContainer = styled(StyledViewPrimaryBackground)`
   padding: 20px;
-  background-color: ${COLORS.WHITE.WHITE};
 `;
 
-const EmptyText = styled.Text``;
+const RightMenuIconContainer = styled.View`
+  padding: 5px;
+  flex-direction: row;
+`;
 
-const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
+const EmptyText = styled(StyledTextByBackground)``;
+
+const PayoutDetailsContainer = styled(StyledViewPrimaryBackground)``;
+
+const PayoutDetailsText = styled(StyledTextByBackground)`
+  padding: 10px;
+`;
 
 const MENU = {
   UP_VOTES: 'upvotes',
   DOWN_VOTES: 'downvotes',
 };
 
+const mapStateToProps = state => ({
+  customTheme: getCustomTheme(state),
+  intl: getIntl(state),
+});
+
 class VotesScreen extends Component {
   static navigationOptions = {
     tabBarVisible: false,
+    drawerLockMode: 'locked-closed',
   };
 
   static propTypes = {
     navigation: PropTypes.shape().isRequired,
+    customTheme: PropTypes.shape().isRequired,
+    intl: PropTypes.shape().isRequired,
   };
 
   constructor(props) {
@@ -67,12 +89,15 @@ class VotesScreen extends Component {
     this.state = {
       ratio,
       menu: MENU.UP_VOTES,
+      sortMenuDisplay: false,
+      sort: VOTE_VALUE_SORT,
     };
 
     this.navigateBack = this.navigateBack.bind(this);
     this.renderActiveVotesRow = this.renderActiveVotesRow.bind(this);
     this.handleShowUpVotes = this.handleShowUpVotes.bind(this);
     this.handleShowDownVotes = this.handleShowDownVotes.bind(this);
+    this.renderHeaderComponent = this.renderHeaderComponent.bind(this);
   }
 
   navigateBack() {
@@ -95,35 +120,90 @@ class VotesScreen extends Component {
     });
   }
 
+  handleSetSortMenuDisplay = sortMenuDisplay => () => this.setState({ sortMenuDisplay });
+
+  handleSortVotes = sort => () => {
+    this.setState({
+      sort,
+      sortMenuDisplay: false,
+    });
+  };
+
   renderActiveVotesRow(rowData) {
     const { ratio } = this.state;
-    const { voter, rshares, percent } = rowData;
+    const { voter, rshares, percent, time, reputation } = rowData.item;
     const calculatedVoteValue = rshares * ratio;
     const voteValue = calculatedVoteValue > 0 ? calculatedVoteValue : 0;
-    const votePercent = Math.abs(percent / 10000 * 100);
+    const votePercent = parseFloat(Math.abs(_.divide(percent, 10000) * 100)).toFixed(0);
     return (
       <Voter
         key={voter}
         voter={voter}
         voteValue={voteValue}
         votePercent={votePercent}
+        time={time}
+        reputation={reputation}
         handleNavigateToUser={() => this.handleNavigateToUser(voter)}
       />
     );
   }
 
-  render() {
+  renderHeaderComponent() {
+    const { intl } = this.props;
     const { postData } = this.props.navigation.state.params;
-    const { menu } = this.state;
+    const payoutDetails = calculatePayout(postData);
+    const {
+      payoutLimitHit,
+      potentialPayout,
+      cashoutInTime,
+      isPayoutDeclined,
+      pastPayouts,
+      authorPayouts,
+      curatorPayouts,
+    } = payoutDetails;
+    const displayedTime = moment(cashoutInTime)
+      .tz(moment.tz.guess())
+      .fromNow();
+
+    if (isPayoutDeclined) {
+      return <PayoutDetailsText>{intl.payout_declined}</PayoutDetailsText>;
+    }
+
+    return (
+      <PayoutDetailsContainer>
+        {payoutLimitHit && <PayoutDetailsText>{intl.payout_limit_reached}</PayoutDetailsText>}
+        {cashoutInTime ? (
+          <PayoutDetailsContainer>
+            <PayoutDetailsText>
+              {`${intl.payout_potential_payout}: $${potentialPayout}`}
+            </PayoutDetailsText>
+            <PayoutDetailsText>
+              {`${intl.payout_will_be_released} ${displayedTime}`}
+            </PayoutDetailsText>
+          </PayoutDetailsContainer>
+        ) : (
+          <PayoutDetailsContainer>
+            <PayoutDetailsText>{`${intl.payout_total_past}: $${pastPayouts}`}</PayoutDetailsText>
+            <PayoutDetailsText>{`${intl.payout_author}: $${authorPayouts}`}</PayoutDetailsText>
+            <PayoutDetailsText>{`${intl.payout_curator}: $${curatorPayouts}`}</PayoutDetailsText>
+          </PayoutDetailsContainer>
+        )}
+      </PayoutDetailsContainer>
+    );
+  }
+
+  render() {
+    const { customTheme, intl } = this.props;
+    const { postData } = this.props.navigation.state.params;
+    const { menu, sortMenuDisplay, sort } = this.state;
     const { active_votes: activeVotes } = postData;
-    const upVotes = getUpvotes(activeVotes).sort(sortVotes);
-    const downVotes = getDownvotes(activeVotes)
-      .sort(sortVotes)
-      .reverse();
+    const upVotes = getUpvotes(activeVotes);
+    const downVotes = getDownvotes(activeVotes);
     const selectedDownVotesMenu = _.isEqual(menu, MENU.DOWN_VOTES);
+    const emptyText = selectedDownVotesMenu ? intl.no_downvoted : intl.no_upvoted;
     const displayedVotes = selectedDownVotesMenu ? downVotes : upVotes;
+    const sortedVotes = getSortedVotes(displayedVotes, sort.id);
     const displayEmptyText = _.isEmpty(displayedVotes);
-    const emptyText = selectedDownVotesMenu ? i18n.votes.noDownvoted : i18n.votes.noUpvoted;
 
     return (
       <Container>
@@ -134,7 +214,9 @@ class VotesScreen extends Component {
               <MaterialCommunityIcons
                 name={MATERIAL_COMMUNITY_ICONS.voteFill}
                 size={ICON_SIZES.menuIcon}
-                color={menu === MENU.UP_VOTES ? COLORS.PRIMARY_COLOR : COLORS.SECONDARY_COLOR}
+                color={
+                  menu === MENU.UP_VOTES ? customTheme.primaryColor : customTheme.secondaryColor
+                }
               />
               <VoteCounts>{upVotes.length}</VoteCounts>
             </MenuTouchable>
@@ -142,25 +224,49 @@ class VotesScreen extends Component {
               <MaterialCommunityIcons
                 name={MATERIAL_COMMUNITY_ICONS.unvoteFill}
                 size={ICON_SIZES.menuIcon}
-                color={menu === MENU.DOWN_VOTES ? COLORS.PRIMARY_COLOR : COLORS.SECONDARY_COLOR}
+                color={
+                  menu === MENU.DOWN_VOTES ? customTheme.primaryColor : customTheme.secondaryColor
+                }
               />
               <VoteCounts>{downVotes.length}</VoteCounts>
             </MenuTouchable>
           </Menu>
+          <TouchableWithoutFeedback onPress={this.handleSetSortMenuDisplay(true)}>
+            <RightMenuIconContainer>
+              <MaterialCommunityIcons
+                name={sort.icon}
+                color={customTheme.primaryColor}
+                size={ICON_SIZES.menuIcon}
+              />
+              <MaterialCommunityIcons
+                name={MATERIAL_COMMUNITY_ICONS.menuVertical}
+                size={ICON_SIZES.menuIcon}
+                color={customTheme.secondaryColor}
+              />
+            </RightMenuIconContainer>
+          </TouchableWithoutFeedback>
         </Header>
         {displayEmptyText && (
           <EmptyContainer>
             <EmptyText>{emptyText}</EmptyText>
           </EmptyContainer>
         )}
-        <StyledListView
-          dataSource={ds.cloneWithRows(displayedVotes)}
-          renderRow={this.renderActiveVotesRow}
+        <StyledFlatList
+          data={sortedVotes}
+          ListHeaderComponent={this.renderHeaderComponent}
+          renderItem={this.renderActiveVotesRow}
           enableEmptySections
+          keyExtractor={(item, index) => `${_.get(item, 'item.voter', '')}${index}`}
+          initialNumToRender={10}
+        />
+        <VoteSortMenu
+          hideMenu={this.handleSetSortMenuDisplay(false)}
+          handleSortVotes={this.handleSortVotes}
+          visible={sortMenuDisplay}
         />
       </Container>
     );
   }
 }
 
-export default VotesScreen;
+export default connect(mapStateToProps)(VotesScreen);

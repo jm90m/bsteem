@@ -2,13 +2,14 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import _ from 'lodash';
-import { getCurrentUserFollowList, getAuthUsername } from 'state/rootReducer';
+import { getCurrentUserFollowList, getAuthUsername, getIntl } from 'state/rootReducer';
 import {
   currentUserFollowUser,
   currentUserUnfollowUser,
   currentUserFollowListFetch,
 } from 'state/actions/currentUserActions';
 import { fetchUserFollowCount } from 'state/actions/usersActions';
+import { MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
 import withAuthActions from 'components/common/withAuthActions';
 import PrimaryButton from './PrimaryButton';
 import DangerButton from './DangerButton';
@@ -16,6 +17,7 @@ import DangerButton from './DangerButton';
 const mapStateToProps = state => ({
   authUsername: getAuthUsername(state),
   currentUserFollowList: getCurrentUserFollowList(state),
+  intl: getIntl(state),
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -34,6 +36,7 @@ const mapDispatchToProps = dispatch => ({
 class FollowButton extends Component {
   static propTypes = {
     currentUserFollowList: PropTypes.shape().isRequired,
+    intl: PropTypes.shape().isRequired,
     username: PropTypes.string.isRequired,
     authUsername: PropTypes.string.isRequired,
     currentUserFollowUser: PropTypes.func.isRequired,
@@ -41,6 +44,11 @@ class FollowButton extends Component {
     fetchCurrentUserFollowList: PropTypes.func.isRequired,
     fetchUserFollowCount: PropTypes.func.isRequired,
     onActionInitiated: PropTypes.func.isRequired,
+    useIcon: PropTypes.bool,
+  };
+
+  static defaultProps = {
+    useIcon: false,
   };
 
   constructor(props) {
@@ -115,19 +123,28 @@ class FollowButton extends Component {
   }
 
   render() {
+    const { useIcon, intl } = this.props;
     const { loadingIsFollowing, isFollowing } = this.state;
+    const dangerIcon = useIcon
+      ? { name: MATERIAL_COMMUNITY_ICONS.unfollowIcon, type: 'material-community' }
+      : null;
+    const primaryIcon = useIcon
+      ? { name: MATERIAL_COMMUNITY_ICONS.followIcon, type: 'material-community' }
+      : null;
 
     return isFollowing ? (
       <DangerButton
-        title="Unfollow"
+        title={useIcon ? '' : intl.unfollow}
         onPress={() => this.props.onActionInitiated(this.handleUnfollow)}
         loading={loadingIsFollowing}
+        icon={dangerIcon}
       />
     ) : (
       <PrimaryButton
-        title="Follow"
+        title={useIcon ? '' : intl.follow}
         onPress={() => this.props.onActionInitiated(this.handleFollow)}
         loading={loadingIsFollowing}
+        icon={primaryIcon}
       />
     );
   }

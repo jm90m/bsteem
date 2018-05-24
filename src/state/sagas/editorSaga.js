@@ -130,9 +130,16 @@ const createPost = function*(action) {
     yield put(editorActions.createPost.success(payload));
     yield put(refreshUserBlog.action({ username: author }));
   } catch (error) {
-    console.log(error);
+    console.log('POST CREATION ERROR - description', error.description);
+    console.log('POST CREATION ERROR - fingerprint', error.fingerprint);
+    const { failCallback } = action.payload;
     const postCreationError = ERRORS.POST_INTERVAL;
-    yield put(appActions.displayNotifyModal(postCreationError.title, postCreationError.message));
+
+    if (failCallback) {
+      _.attempt(failCallback, postCreationError.title, postCreationError.message);
+    } else {
+      yield put(appActions.displayNotifyModal(postCreationError.title, postCreationError.message));
+    }
     yield put(editorActions.createPost.fail(error));
   }
 };
@@ -197,9 +204,14 @@ const createComment = function*(action) {
 
     yield put(editorActions.createComment.success(payload));
   } catch (error) {
-    console.log('FAIL COMMENT REPLY', error.fingerprint);
+    console.log('FAIL COMMENT REPLY - message', error.description);
+    console.log('FAIL COMMENT REPLY - fingerprint', error.fingerprint);
     const { failCallback } = action.payload;
     if (failCallback) failCallback(error);
+    const commentCreationError = ERRORS.COMMENT_INTERVAL;
+    yield put(
+      appActions.displayNotifyModal(commentCreationError.title, commentCreationError.message),
+    );
     yield put(editorActions.createComment.fail(error));
   }
 };

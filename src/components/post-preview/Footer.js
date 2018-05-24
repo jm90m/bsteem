@@ -4,7 +4,10 @@ import PropTypes from 'prop-types';
 import _ from 'lodash';
 import styled from 'styled-components/native';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS } from '../../constants/styles';
+import { connect } from 'react-redux';
+import { getCustomTheme } from 'state/rootReducer';
+import { MATERIAL_ICONS, MATERIAL_COMMUNITY_ICONS, ICON_SIZES } from 'constants/styles';
+import SmallLoading from 'components/common/SmallLoading';
 import { sortVotes } from '../../util/sortUtils';
 import { getUpvotes } from '../../util/voteUtils';
 import { calculatePayout } from '../../util/steemitUtils';
@@ -19,7 +22,7 @@ const FooterValue = styled.Text`
   margin-left: 5px;
   font-size: 14px;
   font-weight: 700;
-  color: ${COLORS.TERTIARY_COLOR};
+  color: ${props => props.customTheme.tertiaryColor};
   align-self: center;
 `;
 
@@ -27,12 +30,14 @@ const Payout = styled.Text`
   margin-left: auto;
   font-size: 14px;
   font-weight: 700;
-  color: ${COLORS.TERTIARY_COLOR};
+  color: ${props => props.customTheme.tertiaryColor};
   align-self: center;
   ${props => (props.payoutIsDeclined ? 'text-decoration-line: line-through' : '')};
 `;
 
-const Loading = styled.ActivityIndicator``;
+const mapStateToProps = state => ({
+  customTheme: getCustomTheme(state),
+});
 
 class Footer extends Component {
   static propTypes = {
@@ -46,6 +51,7 @@ class Footer extends Component {
     rebloggedList: PropTypes.arrayOf(PropTypes.string),
     handleNavigateToComments: PropTypes.func,
     handleNavigateToVotes: PropTypes.func,
+    customTheme: PropTypes.shape().isRequired,
   };
 
   static defaultProps = {
@@ -62,45 +68,70 @@ class Footer extends Component {
   };
 
   renderVoteButton() {
-    const { likedPost, onPressVote, loadingVote } = this.props;
+    const { likedPost, onPressVote, loadingVote, customTheme } = this.props;
 
     if (loadingVote) {
-      return <Loading color={COLORS.PRIMARY_COLOR} size="small" />;
+      return <SmallLoading />;
     }
 
     if (likedPost) {
       return (
         <TouchableOpacity onPress={onPressVote}>
-          <MaterialIcons name="thumb-up" size={24} color={COLORS.PRIMARY_COLOR} />
+          <MaterialIcons
+            name={MATERIAL_ICONS.like}
+            size={ICON_SIZES.footerActionIcon}
+            color={customTheme.primaryColor}
+          />
         </TouchableOpacity>
       );
     }
 
     return (
       <TouchableOpacity onPress={onPressVote}>
-        <MaterialIcons name="thumb-up" size={24} color={COLORS.TERTIARY_COLOR} />
+        <MaterialIcons
+          name={MATERIAL_ICONS.like}
+          size={ICON_SIZES.footerActionIcon}
+          color={customTheme.tertiaryColor}
+        />
       </TouchableOpacity>
     );
   }
 
   renderReblogLink() {
-    const { postData, authUsername, reblogPost, loadingReblog, rebloggedList } = this.props;
+    const {
+      postData,
+      authUsername,
+      reblogPost,
+      loadingReblog,
+      rebloggedList,
+      customTheme,
+    } = this.props;
     const ownPost = authUsername === postData.author;
     const showReblogLink = !ownPost && postData.parent_author === '';
     const isReblogged = _.includes(rebloggedList, `${postData.id}`);
 
     if (loadingReblog) {
-      return <Loading color={COLORS.PRIMARY_COLOR} size="small" />;
+      return <SmallLoading />;
     }
 
     if (isReblogged) {
-      return <MaterialCommunityIcons name="tumblr-reblog" size={24} color={COLORS.PRIMARY_COLOR} />;
+      return (
+        <MaterialCommunityIcons
+          name={MATERIAL_COMMUNITY_ICONS.reblog}
+          size={ICON_SIZES.footerActionIcon}
+          color={customTheme.primaryColor}
+        />
+      );
     }
 
     if (showReblogLink) {
       return (
         <TouchableOpacity onPress={reblogPost}>
-          <MaterialCommunityIcons name="tumblr-reblog" size={24} color={COLORS.TERTIARY_COLOR} />
+          <MaterialCommunityIcons
+            name={MATERIAL_COMMUNITY_ICONS.reblog}
+            size={ICON_SIZES.footerActionIcon}
+            color={customTheme.tertiaryColor}
+          />
         </TouchableOpacity>
       );
     }
@@ -108,7 +139,13 @@ class Footer extends Component {
   }
 
   render() {
-    const { postData, handleNavigateToComments, handleNavigateToVotes, onPressVote } = this.props;
+    const {
+      postData,
+      handleNavigateToComments,
+      handleNavigateToVotes,
+      onPressVote,
+      customTheme,
+    } = this.props;
     const { active_votes, children } = postData;
     const upVotes = getUpvotes(active_votes).sort(sortVotes);
     const payout = calculatePayout(postData);
@@ -125,26 +162,28 @@ class Footer extends Component {
           onPress={onPressVote}
           style={{ justifyContent: 'center', alignItems: 'center' }}
         >
-          <FooterValue>{upVotes.length}</FooterValue>
+          <FooterValue customTheme={customTheme}>{upVotes.length}</FooterValue>
         </TouchableOpacity>
         <TouchableOpacity onPress={handleNavigateToComments} style={{ flexDirection: 'row' }}>
           <MaterialCommunityIcons
-            name="comment-processing"
-            size={24}
-            color={COLORS.TERTIARY_COLOR}
+            name={MATERIAL_COMMUNITY_ICONS.comment}
+            size={ICON_SIZES.footerActionIcon}
+            color={customTheme.tertiaryColor}
           />
-          <FooterValue>{children}</FooterValue>
+          <FooterValue customTheme={customTheme}>{children}</FooterValue>
         </TouchableOpacity>
         {this.renderReblogLink()}
         <TouchableOpacity
           onPress={handleNavigateToVotes}
           style={{ marginLeft: 'auto', alignItems: 'center' }}
         >
-          <Payout payoutIsDeclined={payoutIsDeclined}>${formattedDisplayedPayout}</Payout>
+          <Payout customTheme={customTheme} payoutIsDeclined={payoutIsDeclined}>
+            ${formattedDisplayedPayout}
+          </Payout>
         </TouchableOpacity>
       </Container>
     );
   }
 }
 
-export default Footer;
+export default connect(mapStateToProps)(Footer);

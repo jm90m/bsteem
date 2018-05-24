@@ -3,11 +3,13 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components/native';
 import _ from 'lodash';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS } from 'constants/styles';
+import { MATERIAL_COMMUNITY_ICONS, MATERIAL_ICONS, ICON_SIZES } from 'constants/styles';
 import { sortVotes } from 'util/sortUtils';
+import { connect } from 'react-redux';
+import { getCustomTheme } from 'state/rootReducer';
 import { getUpvotes } from 'util/voteUtils';
 import { calculatePayout } from 'util/steemitUtils';
-import { MATERIAL_ICONS } from '../../../constants/styles';
+import SmallLoading from 'components/common/SmallLoading';
 
 const Container = styled.View`
   flex-direction: row;
@@ -19,7 +21,7 @@ const FooterValue = styled.Text`
   margin-left: 5px;
   font-size: 14px;
   font-weight: 700;
-  color: ${COLORS.BLUE.LINK_WATER};
+  color: ${props => props.customTheme.tertiaryColor};
   align-self: center;
 `;
 
@@ -27,19 +29,22 @@ const Payout = styled.Text`
   margin-left: auto;
   font-size: 14px;
   font-weight: 700;
-  color: ${COLORS.BLUE.LINK_WATER};
+  color: ${props => props.customTheme.tertiaryColor};
   align-self: center;
 `;
 
 const TouchableOpacity = styled.TouchableOpacity``;
 
-const Loading = styled.ActivityIndicator``;
+const mapStateToProps = state => ({
+  customTheme: getCustomTheme(state),
+});
 
 class CommentsFooter extends Component {
   static propTypes = {
     commentData: PropTypes.shape(),
     handleNavigateToVotes: PropTypes.func.isRequired,
     handleNavigateToComments: PropTypes.func.isRequired,
+    customTheme: PropTypes.shape().isRequired,
     loadingVote: PropTypes.bool.isRequired,
     likedPost: PropTypes.bool.isRequired,
     onPressVote: PropTypes.func.isRequired,
@@ -50,29 +55,42 @@ class CommentsFooter extends Component {
   };
 
   renderVoteButton() {
-    const { likedPost, onPressVote, loadingVote } = this.props;
+    const { likedPost, onPressVote, loadingVote, customTheme } = this.props;
 
     if (loadingVote) {
-      return <Loading color={COLORS.PRIMARY_COLOR} size="small" />;
+      return <SmallLoading />;
     }
 
     if (likedPost) {
       return (
         <TouchableOpacity onPress={onPressVote}>
-          <MaterialIcons name={MATERIAL_ICONS.voteFill} size={24} color={COLORS.PRIMARY_COLOR} />
+          <MaterialIcons
+            name={MATERIAL_ICONS.voteFill}
+            size={ICON_SIZES.footerActionIcon}
+            color={customTheme.primaryColor}
+          />
         </TouchableOpacity>
       );
     }
 
     return (
       <TouchableOpacity onPress={onPressVote}>
-        <MaterialIcons name={MATERIAL_ICONS.voteFill} size={24} color={COLORS.TERTIARY_COLOR} />
+        <MaterialIcons
+          name={MATERIAL_ICONS.voteFill}
+          size={ICON_SIZES.footerActionIcon}
+          color={customTheme.tertiaryColor}
+        />
       </TouchableOpacity>
     );
   }
 
   render() {
-    const { commentData, handleNavigateToVotes, handleNavigateToComments } = this.props;
+    const {
+      commentData,
+      handleNavigateToVotes,
+      handleNavigateToComments,
+      customTheme,
+    } = this.props;
     const { active_votes, children } = commentData;
     const upVotes = getUpvotes(active_votes).sort(sortVotes);
     const payout = calculatePayout(commentData);
@@ -88,25 +106,25 @@ class CommentsFooter extends Component {
           onPress={handleNavigateToVotes}
           style={{ justifyContent: 'center', alignItems: 'center' }}
         >
-          <FooterValue>{upVotes.length}</FooterValue>
+          <FooterValue customTheme={customTheme}>{upVotes.length}</FooterValue>
         </TouchableOpacity>
         <TouchableOpacity onPress={handleNavigateToComments} style={{ flexDirection: 'row' }}>
           <MaterialCommunityIcons
-            name="comment-processing"
-            size={24}
-            color={COLORS.TERTIARY_COLOR}
+            name={MATERIAL_COMMUNITY_ICONS.comment}
+            size={ICON_SIZES.footerActionIcon}
+            color={customTheme.tertiaryColor}
           />
-          <FooterValue>{children}</FooterValue>
+          <FooterValue customTheme={customTheme}>{children}</FooterValue>
         </TouchableOpacity>
         <TouchableOpacity
           onPress={handleNavigateToVotes}
           style={{ marginLeft: 'auto', alignItems: 'center' }}
         >
-          <Payout>${formattedDisplayedPayout}</Payout>
+          <Payout customTheme={customTheme}>${formattedDisplayedPayout}</Payout>
         </TouchableOpacity>
       </Container>
     );
   }
 }
 
-export default CommentsFooter;
+export default connect(mapStateToProps)(CommentsFooter);

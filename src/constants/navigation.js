@@ -19,6 +19,10 @@ export const EDIT_PROFILE = 'EDIT_PROFILE';
 export const MESSAGES = 'MESSAGES';
 export const USER_MESSAGE = 'USER_MESSAGE';
 export const TRANSFERS = 'TRANSFERS';
+export const CUSTOM_THEME = 'CUSTOM_THEME';
+export const NOTIFICATIONS = 'NOTIFICATIONS';
+export const POST_BENEFICIARIES = 'POST_BENEFICIARIES';
+export const SIGNATURE_EDITOR = 'SIGNATURE_EDITOR';
 
 // user navigations
 export const USER_BLOG = 'USER_BLOG';
@@ -27,3 +31,4 @@ export const USER_FOLLOWERS = 'USER_FOLLOWERS';
 export const USER_FOLLOWING = 'USER_FOLLOWING';
 export const USER_WALLET = 'USER_WALLET';
 export const USER_ACTIVITY = 'USER_ACTIVITY';
+export const USER_REPLIES = 'USER_REPLIES';

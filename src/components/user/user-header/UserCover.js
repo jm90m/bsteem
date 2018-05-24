@@ -5,7 +5,10 @@ import styled from 'styled-components/native';
 import _ from 'lodash';
 import Avatar from 'components/common/Avatar';
 import { getUserBackgroundCoverUrl } from 'util/busyImageUtils';
+import { connect } from 'react-redux';
+import { getCustomTheme } from 'state/rootReducer';
 import { COLORS } from 'constants/styles';
+import tinycolor from 'tinycolor2';
 import ReputationScore from 'components/post/ReputationScore';
 
 const { width } = Dimensions.get('screen');
@@ -13,7 +16,7 @@ const { width } = Dimensions.get('screen');
 const Container = styled.View`
   height: 75px;
   width: 100%;
-  background-color: ${props => (props.hasCover ? COLORS.VIOLET.PAUA : 'transparent')};
+  background-color: ${props => props.customTheme.primaryBackgroundColor};
 `;
 
 const UserHeaderContents = styled.View`
@@ -31,7 +34,7 @@ const BackgroundImage = styled.Image`
 
 const UsernameText = styled.Text`
   font-size: 20px;
-  color: ${props => (props.hasCover ? COLORS.WHITE.WHITE : COLORS.GREY.GONDOLA)};
+  color: ${props => props.textColor}};
   background-color: transparent;
   margin-right: 5px;
   font-weight: bold;
@@ -50,12 +53,17 @@ const HandleContainer = styled.View`
 const Handle = styled.Text`
   font-size: 14px;
   background-color: transparent;
-  color: ${props => (props.hasCover ? COLORS.WHITE.WHITE : COLORS.BLUE.BOTICELLI)};
+  color: ${props => props.textColor};
   font-weight: 500;
 `;
 
+const mapStateToProps = state => ({
+  customTheme: getCustomTheme(state),
+});
+
 class UserCover extends Component {
   static propTypes = {
+    customTheme: PropTypes.shape().isRequired,
     username: PropTypes.string,
     userReputation: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     hasCover: PropTypes.bool,
@@ -77,12 +85,25 @@ class UserCover extends Component {
     };
 
     this.handleBackgroundCoverError = this.handleBackgroundCoverError.bind(this);
+    this.getTextColor = this.getTextColor.bind(this);
   }
 
   componentWillReceiveProps(nextProps) {
     this.setState({
       hasCover: nextProps.hasCover,
     });
+  }
+  getTextColor() {
+    const { hasCover } = this.state;
+    const { customTheme } = this.props;
+
+    if (hasCover) {
+      return COLORS.LIGHT_TEXT_COLOR;
+    }
+
+    return tinycolor(customTheme.primaryBackgroundColor).isDark()
+      ? COLORS.LIGHT_TEXT_COLOR
+      : COLORS.DARK_TEXT_COLOR;
   }
 
   handleBackgroundCoverError() {
@@ -92,13 +113,14 @@ class UserCover extends Component {
   }
 
   render() {
-    const { username, userReputation, userProfile } = this.props;
-    const { hasCover } = this.state;
+    const { username, userReputation, userProfile, customTheme } = this.props;
     const name = _.get(userProfile, 'name', username);
     const coverImage = _.get(userProfile, 'cover_image', '');
     const displayName = _.isEmpty(_.trim(name)) ? username : name;
+    const textColor = this.getTextColor();
+
     return (
-      <Container hasCover={hasCover}>
+      <Container customTheme={customTheme}>
         <BackgroundImage
           resizeMode="cover"
           source={{ uri: getUserBackgroundCoverUrl(coverImage) }}
@@ -109,11 +131,11 @@ class UserCover extends Component {
           <Avatar username={username} size={50} />
           <View>
             <UsernameContainer>
-              <UsernameText hasCover={hasCover}>{displayName}</UsernameText>
+              <UsernameText textColor={textColor}>{displayName}</UsernameText>
               <ReputationScore reputation={userReputation} />
             </UsernameContainer>
             <HandleContainer>
-              <Handle hasCover={hasCover}>{`@${username}`}</Handle>
+              <Handle textColor={textColor}>{`@${username}`}</Handle>
             </HandleContainer>
           </View>
         </UserHeaderContents>
@@ -122,4 +144,4 @@ class UserCover extends Component {
   }
 }
 
-export default UserCover;
+export default connect(mapStateToProps)(UserCover);

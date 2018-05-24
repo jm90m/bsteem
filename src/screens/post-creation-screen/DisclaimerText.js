@@ -1,24 +1,30 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components/native';
-import { COLORS } from 'constants/styles';
-import i18n from 'i18n/i18n';
 import Expo from 'expo';
+import { connect } from 'react-redux';
+import { getCustomTheme, getIntl } from 'state/rootReducer';
 
 const Container = styled.View`
   padding: 20px;
 `;
 
 const Text = styled.Text`
-  color: ${COLORS.TERTIARY_COLOR};
+  color: ${props => props.customTheme.tertiaryColor};
 `;
 
 const LinkText = styled.Text`
-  color: ${COLORS.PRIMARY_COLOR};
+  color: ${props => props.customTheme.primaryColor};
 `;
 
 const Touchable = styled.TouchableWithoutFeedback``;
 
 class DisclaimerText extends Component {
+  static propTypes = {
+    customTheme: PropTypes.shape().isRequired,
+    intl: PropTypes.shape().isRequired,
+  };
+
   constructor(props) {
     super(props);
 
@@ -33,15 +39,21 @@ class DisclaimerText extends Component {
   }
 
   render() {
+    const { customTheme, intl } = this.props;
     return (
       <Container>
-        <Text>{i18n.editor.disclaimerText}</Text>
+        <Text customTheme={customTheme}>{intl.disclaimer_text}</Text>
         <Touchable onPress={this.handlePrivacyLink}>
-          <LinkText>{i18n.editor.tos}</LinkText>
+          <LinkText customTheme={customTheme}>{intl.terms_and_conditions}</LinkText>
         </Touchable>
       </Container>
     );
   }
 }
 
-export default DisclaimerText;
+const mapStateToProps = state => ({
+  customTheme: getCustomTheme(state),
+  intl: getIntl(state),
+});
+
+export default connect(mapStateToProps)(DisclaimerText);

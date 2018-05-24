@@ -2,10 +2,13 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components/native';
 import { COLORS } from 'constants/styles';
+import { connect } from 'react-redux';
+import { getCustomTheme } from 'state/rootReducer';
+import tinycolor from 'tinycolor2';
 
 const Container = styled.View`
   flex-direction: row-reverse;
-  border-bottom-color: ${COLORS.WHITE.WHITE_SMOKE};
+  border-bottom-color: ${props => props.customTheme.primaryBorderColor};
   border-bottom-width: 1px;
   padding: 10px 16px 10px 10px;
 `;
@@ -22,28 +25,52 @@ const ButtonText = styled.Text`
   color: ${props => props.color};
 `;
 
-const ModalFooter = ({ cancelText, cancelPress, successText, successPress, displaySuccess }) => (
-  <Container>
+const ModalFooter = ({
+  cancelText,
+  cancelPress,
+  successText,
+  successPress,
+  displaySuccess,
+  customTheme,
+}) => (
+  <Container customTheme={customTheme}>
     {displaySuccess && (
       <Button
-        backgroundColor={COLORS.PRIMARY_COLOR}
-        borderColor={COLORS.PRIMARY_COLOR}
+        backgroundColor={customTheme.primaryColor}
+        borderColor={customTheme.primaryColor}
         onPress={successPress}
       >
-        <ButtonText color={COLORS.WHITE.WHITE}>{successText}</ButtonText>
+        <ButtonText
+          color={
+            tinycolor(customTheme.primaryColor).isDark()
+              ? COLORS.LIGHT_TEXT_COLOR
+              : COLORS.DARK_TEXT_COLOR
+          }
+        >
+          {successText}
+        </ButtonText>
       </Button>
     )}
     <Button
-      backgroundColor={COLORS.WHITE.WHITE}
-      borderColor={COLORS.WHITE.WHITE_SMOKE}
+      backgroundColor={customTheme.tertiaryColor}
+      borderColor={customTheme.tertiaryColor}
       onPress={cancelPress}
     >
-      <ButtonText color={COLORS.PRIMARY_COLOR}>{cancelText}</ButtonText>
+      <ButtonText
+        color={
+          tinycolor(customTheme.tertiaryColor).isDark()
+            ? COLORS.LIGHT_TEXT_COLOR
+            : COLORS.DARK_TEXT_COLOR
+        }
+      >
+        {cancelText}
+      </ButtonText>
     </Button>
   </Container>
 );
 
 ModalFooter.propTypes = {
+  customTheme: PropTypes.shape().isRequired,
   cancelText: PropTypes.string,
   cancelPress: PropTypes.func,
   successText: PropTypes.string,
@@ -59,4 +86,8 @@ ModalFooter.defaultProps = {
   displaySuccess: true,
 };
 
-export default ModalFooter;
+const mapStateToProps = state => ({
+  customTheme: getCustomTheme(state),
+});
+
+export default connect(mapStateToProps)(ModalFooter);

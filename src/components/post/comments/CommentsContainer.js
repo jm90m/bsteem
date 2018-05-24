@@ -9,6 +9,8 @@ import {
   getIsAuthenticated,
   getLoadingComments,
   getEnableVotingSlider,
+  getCustomTheme,
+  getIntl,
 } from 'state/rootReducer';
 import { currentUserVoteComment } from 'state/actions/currentUserActions';
 import { fetchComments } from 'state/actions/postsActions';
@@ -23,6 +25,8 @@ const mapStateToProps = state => ({
   authenticated: getIsAuthenticated(state),
   loadingComments: getLoadingComments(state),
   enableVotingSlider: getEnableVotingSlider(state),
+  customTheme: getCustomTheme(state),
+  intl: getIntl(state),
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -63,6 +67,7 @@ class CommentsContainer extends Component {
     postId: PropTypes.number.isRequired,
     postData: PropTypes.shape().isRequired,
     navigation: PropTypes.shape().isRequired,
+    intl: PropTypes.shape().isRequired,
     currentUserVoteComment: PropTypes.func.isRequired,
     fetchComments: PropTypes.func.isRequired,
     loadingComments: PropTypes.bool.isRequired,
@@ -72,6 +77,7 @@ class CommentsContainer extends Component {
     authenticated: PropTypes.bool,
     enableVotingSlider: PropTypes.bool,
     commentsByPostId: PropTypes.shape(),
+    customTheme: PropTypes.shape().isRequired,
   };
 
   static defaultProps = {
@@ -105,6 +111,8 @@ class CommentsContainer extends Component {
       handleDisplayMenu,
       sort,
       enableVotingSlider,
+      customTheme,
+      intl,
     } = this.props;
     const postComments = _.get(commentsByPostId, postId, null);
     const comments = _.get(postComments, 'comments', {});
@@ -138,6 +146,8 @@ class CommentsContainer extends Component {
           handleDisplayMenu={handleDisplayMenu}
           sort={sort}
           enableVotingSlider={enableVotingSlider}
+          customTheme={customTheme}
+          intl={intl}
         />
       </Container>
     );

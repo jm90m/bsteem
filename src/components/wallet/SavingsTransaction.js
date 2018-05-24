@@ -2,26 +2,24 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components/native';
 import Avatar from 'components/common/Avatar';
-import { COLORS } from 'constants/styles';
 import * as accountHistoryConstants from 'constants/accountHistory';
 import * as navigationConstants from 'constants/navigation';
 import TimeAgo from 'components/common/TimeAgo';
+import StyledTextByBackground from 'components/common/StyledTextByBackground';
 import WalletTransactionContainer from './WalletTransactionContainer';
+import { getCustomTheme } from '../../state/rootReducer';
+import { connect } from 'react-redux';
 
 const SavingsMessageContainer = styled.View`
   flex-direction: row;
 `;
 
-const SavingsMessage = styled.Text``;
-
 const Touchable = styled.TouchableOpacity``;
 
 const Username = styled.Text`
-  color: ${COLORS.PRIMARY_COLOR};
+  color: ${props => props.customTheme.primaryColor};
   font-weight: bold;
 `;
-
-const Memo = styled.Text``;
 
 const SavingsContentContainer = styled.View`
   padding-left: 10px;
@@ -29,6 +27,7 @@ const SavingsContentContainer = styled.View`
 
 class SavingsTransaction extends Component {
   static propTypes = {
+    customTheme: PropTypes.shape().isRequired,
     navigation: PropTypes.shape().isRequired,
     timestamp: PropTypes.string,
     transactionDetails: PropTypes.shape(),
@@ -70,30 +69,30 @@ class SavingsTransaction extends Component {
   }
 
   renderSavingsTransactionMessage() {
-    const { transactionType, transactionDetails, amount } = this.props;
+    const { transactionType, transactionDetails, amount, customTheme } = this.props;
 
     switch (transactionType) {
       case accountHistoryConstants.CANCEL_TRANSFER_FROM_SAVINGS:
         return (
-          <SavingsMessage>
+          <StyledTextByBackground>
             {`Cancel transfer from savings (request ${transactionDetails.request_id}`}
-          </SavingsMessage>
+          </StyledTextByBackground>
         );
       case accountHistoryConstants.TRANSFER_TO_SAVINGS:
         return (
           <SavingsMessageContainer>
-            <SavingsMessage>{`Transfer to savings ${amount} to `}</SavingsMessage>
+            <StyledTextByBackground>{`Transfer to savings ${amount} to `}</StyledTextByBackground>
             <Touchable onPress={this.handleToUserNavigate}>
-              <Username>{transactionDetails.to}</Username>
+              <Username customTheme={customTheme}>{transactionDetails.to}</Username>
             </Touchable>
           </SavingsMessageContainer>
         );
       case accountHistoryConstants.TRANSFER_FROM_SAVINGS:
         return (
           <SavingsMessageContainer>
-            <SavingsMessage>{`Transfer from savings ${amount} to `}</SavingsMessage>
+            <StyledTextByBackground>{`Transfer from savings ${amount} to `}</StyledTextByBackground>
             <Touchable onPress={this.handleFromUserNavigate}>
-              <Username>{transactionDetails.from}</Username>
+              <Username customTheme={customTheme}>{transactionDetails.from}</Username>
             </Touchable>
           </SavingsMessageContainer>
         );
@@ -110,11 +109,15 @@ class SavingsTransaction extends Component {
         <SavingsContentContainer>
           {this.renderSavingsTransactionMessage()}
           <TimeAgo created={timestamp} />
-          <Memo>{transactionDetails.memo}</Memo>
+          <StyledTextByBackground>{transactionDetails.memo}</StyledTextByBackground>
         </SavingsContentContainer>
       </WalletTransactionContainer>
     );
   }
 }
 
-export default SavingsTransaction;
+const mapStateToProps = state => ({
+  customTheme: getCustomTheme(state),
+});
+
+export default connect(mapStateToProps)(SavingsTransaction);

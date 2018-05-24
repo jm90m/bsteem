@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components/native';
-import { KeyboardAvoidingView, Text } from 'react-native';
-import { COLORS, ICON_SIZES, MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
+import { KeyboardAvoidingView } from 'react-native';
+import { ICON_SIZES, MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
 import { STEEM, SBD } from 'constants/cryptos';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import Header from 'components/common/Header';
@@ -12,30 +12,30 @@ import { connect } from 'react-redux';
 import BackButton from 'components/common/BackButton';
 import { FormLabel, FormInput, FormValidationMessage, ButtonGroup } from 'react-native-elements';
 import sc2 from 'api/sc2';
-import i18n from 'i18n/i18n';
 import PrimaryButton from 'components/common/PrimaryButton';
 import { fetchUserTransferHistory } from 'state/actions/userActivityActions';
+import StyledViewPrimaryBackground from 'components/common/StyledViewPrimaryBackground';
+import Text from 'components/common/StyledTextByBackground';
+import TitleText from 'components/common/TitleText';
+import tinycolor from 'tinycolor2';
 import {
   getAuthUsername,
   getCryptosPriceHistory,
   getIsAuthenticated,
   getUsersDetails,
+  getCustomTheme,
+  getIntl,
 } from '../../state/rootReducer';
 import { fetchUser } from '../../state/actions/usersActions';
 import * as appActions from '../../state/actions/appActions';
+import { COLORS } from '../../constants/styles';
 
-const Container = styled.View`
+const Container = styled(StyledViewPrimaryBackground)`
   flex: 1;
-  background-color: ${COLORS.PRIMARY_BACKGROUND_COLOR};
 `;
 
 const ScrollView = styled.ScrollView`
-  background-color: ${COLORS.PRIMARY_BACKGROUND_COLOR};
-`;
-
-const TitleText = styled.Text`
-  font-weight: bold;
-  color: ${COLORS.PRIMARY_COLOR};
+  background-color: ${props => props.customTheme.primaryBackgroundColor};
 `;
 
 const MenuIconContainer = styled.View`
@@ -43,7 +43,7 @@ const MenuIconContainer = styled.View`
 `;
 
 const DisclaimerText = styled.Text`
-  color: ${COLORS.TERTIARY_COLOR};
+  color: ${props => props.customTheme.tertiaryColor};
   padding: 15px;
 `;
 
@@ -57,11 +57,11 @@ const BalanceContainer = styled.View`
 `;
 
 const Field = styled.Text`
-  color: ${COLORS.TERTIARY_COLOR};
+  color: ${props => props.customTheme.tertiaryColor};
 `;
 
 const Value = styled.Text`
-  color: ${COLORS.SECONDARY_COLOR};
+  color: ${props => props.customTheme.secondaryColor};
 `;
 
 const CURRENCIES = {
@@ -72,10 +72,12 @@ const CURRENCIES = {
 const CURRENCIES_ARRAY = [CURRENCIES.STEEM, CURRENCIES.SBD];
 
 const mapStateToProps = state => ({
+  customTheme: getCustomTheme(state),
   authUsername: getAuthUsername(state),
   usersDetails: getUsersDetails(state),
   authenticated: getIsAuthenticated(state),
   cryptosPriceHistory: getCryptosPriceHistory(state),
+  intl: getIntl(state),
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -88,9 +90,11 @@ const mapDispatchToProps = dispatch => ({
 class TransferScreen extends Component {
   static navigationOptions = {
     tabBarVisible: false,
+    drawerLockMode: 'locked-closed',
   };
 
   static propTypes = {
+    customTheme: PropTypes.shape().isRequired,
     authUsername: PropTypes.string.isRequired,
     authenticated: PropTypes.bool.isRequired,
     fetchUserTransferHistory: PropTypes.func.isRequired,
@@ -99,6 +103,7 @@ class TransferScreen extends Component {
     navigation: PropTypes.shape().isRequired,
     usersDetails: PropTypes.shape().isRequired,
     cryptosPriceHistory: PropTypes.shape().isRequired,
+    intl: PropTypes.shape().isRequired,
   };
 
   static minAccountLength = 3;
@@ -172,29 +177,31 @@ class TransferScreen extends Component {
 
   validateMemo(memo, sendTo) {
     const recipientIsExchange = TransferScreen.exchangeRegex.test(sendTo);
+    const { intl } = this.props;
     let memoError = '';
 
     if (recipientIsExchange && _.isEmpty(memo)) {
-      memoError = i18n.errors.memoExchangeRequired;
+      memoError = intl.memo_exchange_required;
     }
 
     return memoError;
   }
 
   validateSendTo(sendTo) {
+    const { intl } = this.props;
     let sendToError = '';
 
     if (_.size(sendTo) > TransferScreen.maxAccountLength) {
-      sendToError = i18n.errors.accountNameTooLong;
+      sendToError = intl.username_too_long;
     } else if (_.size(sendTo) < TransferScreen.minAccountLength) {
-      sendToError = i18n.errors.accountNameTooShort;
+      sendToError = intl.username_too_short;
     }
 
     return sendToError;
   }
 
   validateAmount(amount) {
-    const { authenticated, authUsername, usersDetails } = this.props;
+    const { authenticated, authUsername, usersDetails, intl } = this.props;
     const currentValue = parseFloat(amount);
     const userDetails = _.get(usersDetails, authUsername, {});
     const steemBalance = _.get(userDetails, 'balance', '0 STEEM');
@@ -204,11 +211,11 @@ class TransferScreen extends Component {
     const selectedBalance = this.state.currency === CURRENCIES.STEEM ? steemBalance : sbdBalance;
 
     if (amount && currentValue <= 0) {
-      amountError = i18n.errors.amountHasToBeGreaterThanZero;
+      amountError = intl.amount_error_zero;
     }
 
     if (authenticated && currentValue !== 0 && currentValue > parseFloat(selectedBalance)) {
-      amountError = i18n.errors.insufficientFunds;
+      amountError = intl.amount_error_funds;
     }
 
     return amountError;
@@ -301,25 +308,28 @@ class TransferScreen extends Component {
   }
 
   render() {
-    const { usersDetails, authUsername } = this.props;
+    const { usersDetails, authUsername, customTheme, intl } = this.props;
     const { sendToError, amountError, memoError, amount, sendTo, memo, currency } = this.state;
     const hasSendToError = !_.isEmpty(sendToError);
     const hasAmountError = !_.isEmpty(amountError);
     const hasMemoError = !_.isEmpty(memoError);
-    const selectedButtonStyle = { backgroundColor: COLORS.PRIMARY_COLOR };
-    const selectedTextStyle = { color: COLORS.PRIMARY_COLOR };
+    const selectedButtonStyle = { backgroundColor: customTheme.primaryColor };
+    const selectedTextStyle = { color: customTheme.primaryColor };
     const selectedCurrencyIndex = _.indexOf(CURRENCIES_ARRAY, currency);
     const userDetails = _.get(usersDetails, authUsername, {});
     const steemBalance = _.get(userDetails, 'balance', '0.000 STEEM');
     const sbdBalance = _.get(userDetails, 'sbd_balance', '0.000 SBD');
     const displayBalance = currency === CURRENCIES.STEEM ? steemBalance : sbdBalance;
     const usdValue = this.getUSDValue();
+    const color = tinycolor(customTheme.primaryBackgroundColor).isDark()
+      ? COLORS.LIGHT_TEXT_COLOR
+      : COLORS.DARK_TEXT_COLOR;
 
     return (
       <Container>
         <Header>
           <BackButton navigateBack={this.handleNavigateBack} />
-          <TitleText>{i18n.titles.transferFunds}</TitleText>
+          <TitleText>{intl.transfer_modal_title}</TitleText>
           <MenuIconContainer>
             <MaterialCommunityIcons
               size={ICON_SIZES.menuIcon}
@@ -329,17 +339,17 @@ class TransferScreen extends Component {
           </MenuIconContainer>
         </Header>
         <KeyboardAvoidingView behavior="padding">
-          <ScrollView>
-            <FormLabel>{i18n.general.sendTo}</FormLabel>
+          <ScrollView customTheme={customTheme}>
+            <FormLabel>{intl.to}</FormLabel>
             <FormInput
               onChangeText={this.handleSendToChange}
               value={sendTo}
-              inputStyle={{ width: '100%' }}
+              inputStyle={{ width: '100%', color }}
               autoCorrect={false}
               autoCapitalize="none"
             />
             {hasSendToError && <FormValidationMessage>{sendToError}</FormValidationMessage>}
-            <FormLabel>{i18n.general.currency}</FormLabel>
+            <FormLabel>{intl.currency}</FormLabel>
             <ButtonGroup
               onPress={this.handleOnPressChangeCurrency}
               containerStyle={{ height: 50 }}
@@ -348,15 +358,15 @@ class TransferScreen extends Component {
               buttons={CURRENCIES_ARRAY}
               selectedIndex={selectedCurrencyIndex}
             />
-            <FormLabel>{i18n.general.amount}</FormLabel>
+            <FormLabel>{intl.amount}</FormLabel>
             <BalanceContainer>
               <Text>
-                <Field>{`${i18n.general.balance}: `}</Field>
+                <Field customTheme={customTheme}>{`${intl.balance}: `}</Field>
                 <TitleText>{displayBalance}</TitleText>
               </Text>
               <Text>
-                <Field>{`${i18n.general.usdValue}: `}</Field>
-                <Value>{usdValue}</Value>
+                <Field customTheme={customTheme}>{`${intl.usd_value}: `}</Field>
+                <Value customTheme={customTheme}>{usdValue}</Value>
               </Text>
             </BalanceContainer>
             {hasAmountError && <FormValidationMessage>{amountError}</FormValidationMessage>}
@@ -364,9 +374,9 @@ class TransferScreen extends Component {
               onChangeText={this.handleAmountChange}
               keyboardType="numeric"
               value={amount}
-              inputStyle={{ width: '100%' }}
+              inputStyle={{ width: '100%', color }}
             />
-            <FormLabel>{i18n.general.memo}</FormLabel>
+            <FormLabel>{intl.memo}</FormLabel>
             {hasMemoError && <FormValidationMessage>{memoError}</FormValidationMessage>}
             <FormInput
               onChangeText={this.handleMemoChange}
@@ -374,12 +384,12 @@ class TransferScreen extends Component {
               value={memo}
               autoCorrect={false}
               autoCapitalize="none"
-              inputStyle={{ width: '100%' }}
+              inputStyle={{ width: '100%', color }}
             />
-            <DisclaimerText>{i18n.general.transactionComplete}</DisclaimerText>
+            <DisclaimerText customTheme={customTheme}>{intl.transaction_complete}</DisclaimerText>
             <PrimaryButton
               onPress={this.handleSubmit}
-              title={i18n.general.send}
+              title={intl.transfer}
               style={{ width: 150, alignSelf: 'center' }}
             />
             <EmptyView />

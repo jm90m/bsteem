@@ -3,14 +3,16 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components/native';
 import { connect } from 'react-redux';
 import { Platform } from 'react-native';
-import { getCryptosPriceHistory } from 'state/rootReducer';
+import { getCryptosPriceHistory, getCustomTheme, getLanguageSetting } from 'state/rootReducer';
 import { getCryptoDetails, getCurrentDaysOfTheWeek } from 'util/cryptoUtils';
 import _ from 'lodash';
-import { COLORS, MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
+import { MATERIAL_COMMUNITY_ICONS, COLORS } from 'constants/styles';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as appActions from 'state/actions/appActions';
+import tinycolor from 'tinycolor2';
 import LargeLoading from 'components/common/LargeLoading';
 import { LineChart, XAxis } from 'react-native-svg-charts';
+import StyledTextByBackground from 'components/common/StyledTextByBackground';
 import { Text } from 'react-native-svg';
 
 const Container = styled.View`
@@ -18,13 +20,13 @@ const Container = styled.View`
 `;
 
 const USDPriceDisplay = styled.Text`
-  color: ${COLORS.PRIMARY_COLOR};
+  color: ${props => props.customTheme.primaryColor};
   font-size: 24px;
   font-weight: bold;
 `;
 
 const BTCPriceDisplay = styled.Text`
-  color: ${COLORS.TERTIARY_COLOR};
+  color: ${props => props.customTheme.tertiaryColor};
   font-size: 22px;
   font-weight: bold;
 `;
@@ -34,12 +36,13 @@ const PriceDisplayContainer = styled.View`
   align-items: center;
 `;
 
-const CryptoName = styled.Text`
+const CryptoName = styled(StyledTextByBackground)`
   font-size: 20px;
 `;
 
 const Percent = styled.Text`
-  color: ${props => (props.increase ? COLORS.BLUE.MEDIUM_AQUAMARINE : COLORS.RED.VALENCIA)};
+  color: ${props =>
+    props.increase ? props.customTheme.positiveColor : props.customTheme.negativeColor};
   font-weight: bold;
   margin: 0 5px;
 `;
@@ -52,6 +55,8 @@ const LoadingContainer = styled.View`
 
 const mapStateToProps = state => ({
   cryptosPriceHistory: getCryptosPriceHistory(state),
+  customTheme: getCustomTheme(state),
+  languageSetting: getLanguageSetting(state),
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -62,14 +67,20 @@ const mapDispatchToProps = dispatch => ({
 class CryptoChart extends Component {
   static propTypes = {
     cryptosPriceHistory: PropTypes.shape().isRequired,
+    customTheme: PropTypes.shape().isRequired,
     fetchCryptoPriceHistory: PropTypes.func.isRequired,
     refreshCharts: PropTypes.bool,
+    hidePriceEveryOtherDay: PropTypes.bool,
     crypto: PropTypes.string,
+    languageSetting: PropTypes.string.isRequired,
+    height: PropTypes.number,
   };
 
   static defaultProps = {
     refreshCharts: false,
+    hidePriceEveryOtherDay: false,
     crypto: '',
+    height: 200,
   };
   constructor(props) {
     super(props);
@@ -105,7 +116,7 @@ class CryptoChart extends Component {
   }
 
   renderUSDPrice() {
-    const { cryptosPriceHistory } = this.props;
+    const { cryptosPriceHistory, customTheme } = this.props;
     const { currentCrypto } = this.state;
     const cryptoPriceDetailsKey = `${currentCrypto.symbol}.priceDetails`;
     const priceDetails = _.get(cryptosPriceHistory, cryptoPriceDetailsKey, {});
@@ -115,21 +126,21 @@ class CryptoChart extends Component {
 
     return (
       <PriceDisplayContainer>
-        <USDPriceDisplay>{`$${currentUSDPrice}`}</USDPriceDisplay>
-        <Percent increase={usdIncrease}>
+        <USDPriceDisplay customTheme={customTheme}>{`$${currentUSDPrice}`}</USDPriceDisplay>
+        <Percent customTheme={customTheme} increase={usdIncrease}>
           {parseFloat(usdPriceDifferencePercent).toFixed(2)}%
         </Percent>
         <MaterialCommunityIcons
           name={usdIncrease ? MATERIAL_COMMUNITY_ICONS.caretUp : MATERIAL_COMMUNITY_ICONS.caretDown}
           size={26}
-          color={usdIncrease ? COLORS.BLUE.MEDIUM_AQUAMARINE : COLORS.RED.VALENCIA}
+          color={usdIncrease ? customTheme.positiveColor : customTheme.negativeColor}
         />
       </PriceDisplayContainer>
     );
   }
 
   renderBTCPrice() {
-    const { cryptosPriceHistory } = this.props;
+    const { cryptosPriceHistory, customTheme } = this.props;
     const { currentCrypto } = this.state;
     const cryptoPriceDetailsKey = `${currentCrypto.symbol}.priceDetails`;
     const cryptoBTCAPIErrorKey = `${currentCrypto.symbol}.btcAPIError`;
@@ -143,21 +154,27 @@ class CryptoChart extends Component {
     const btcPriceDifferencePercent = _.get(priceDetails, 'btcPriceDifferencePercent', 0);
     return (
       <PriceDisplayContainer>
-        <BTCPriceDisplay>{`${currentBTCPrice} BTC`}</BTCPriceDisplay>
-        <Percent increase={btcIncrease}>
+        <BTCPriceDisplay customTheme={customTheme}>{`${currentBTCPrice} BTC`}</BTCPriceDisplay>
+        <Percent increase={btcIncrease} customTheme={customTheme}>
           {parseFloat(btcPriceDifferencePercent).toFixed(2)}%
         </Percent>
         <MaterialCommunityIcons
           name={btcIncrease ? MATERIAL_COMMUNITY_ICONS.caretUp : MATERIAL_COMMUNITY_ICONS.caretDown}
           size={26}
-          color={btcIncrease ? COLORS.BLUE.MEDIUM_AQUAMARINE : COLORS.RED.VALENCIA}
+          color={btcIncrease ? customTheme.positiveColor : customTheme.negativeColor}
         />
       </PriceDisplayContainer>
     );
   }
 
   render() {
-    const { cryptosPriceHistory } = this.props;
+    const {
+      cryptosPriceHistory,
+      customTheme,
+      height,
+      languageSetting,
+      hidePriceEveryOtherDay,
+    } = this.props;
     const { currentCrypto } = this.state;
     const usdAPIErrorKey = `${currentCrypto.symbol}.usdAPIError`;
     const usdAPIError = _.get(cryptosPriceHistory, usdAPIErrorKey, true);
@@ -165,7 +182,11 @@ class CryptoChart extends Component {
     const usdPriceHistory = _.get(cryptosPriceHistory, cryptoUSDPriceHistoryKey, null);
     const loading = _.isNull(usdPriceHistory);
     const chartData = _.get(cryptosPriceHistory, cryptoUSDPriceHistoryKey, []);
-    const daysOfTheWeek = getCurrentDaysOfTheWeek();
+    const parsedLanguaged = _.get(_.split(languageSetting, '_'), 0, 'en');
+    const daysOfTheWeek = getCurrentDaysOfTheWeek(parsedLanguaged);
+    const xAxisTextColor = tinycolor(customTheme.primaryBackgroundColor).isDark()
+      ? COLORS.LIGHT_TEXT_COLOR
+      : COLORS.DARK_TEXT_COLOR;
 
     if (loading) {
       return (
@@ -183,11 +204,11 @@ class CryptoChart extends Component {
         {this.renderUSDPrice()}
         {this.renderBTCPrice()}
         {Platform.OS === 'ios' && (
-          <Container style={{ height: 200, marginBottom: 20 }}>
+          <Container style={{ height, marginBottom: 20 }}>
             <LineChart
-              style={{ height: 200 }}
+              style={{ height }}
               data={chartData}
-              svg={{ stroke: COLORS.PRIMARY_COLOR, strokeWidth: 2 }}
+              svg={{ stroke: customTheme.primaryColor, strokeWidth: 2 }}
               contentInset={{ top: 40, bottom: 20, left: 20, right: 20 }}
               showGrid={false}
               animate={false}
@@ -195,6 +216,12 @@ class CryptoChart extends Component {
                 const dx = data.x(data.index);
                 const dy = data.y(data.value);
                 const key = `${data.value}${data.index}`;
+                const isEven = data.index % 2 === 0;
+
+                if (hidePriceEveryOtherDay && isEven) {
+                  return null;
+                }
+
                 return (
                   <Text
                     key={key}
@@ -202,7 +229,7 @@ class CryptoChart extends Component {
                     dy={dy - 30}
                     alignmentBaseline="hanging"
                     textAnchor="middle"
-                    stroke={COLORS.PRIMARY_COLOR}
+                    stroke={customTheme.primaryColor}
                   >
                     {`$${data.value}`}
                   </Text>
@@ -214,7 +241,7 @@ class CryptoChart extends Component {
               data={[0, 1, 2, 3, 4, 5, 6]}
               formatLabel={value => daysOfTheWeek[value]}
               contentInset={{ left: 20, right: 20 }}
-              svg={{ fontSize: 14 }}
+              svg={{ fontSize: 14, fill: xAxisTextColor }}
             />
           </Container>
         )}

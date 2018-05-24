@@ -3,12 +3,12 @@ import PropTypes from 'prop-types';
 import { RefreshControl } from 'react-native';
 import styled from 'styled-components/native';
 import _ from 'lodash';
-import { COLORS } from 'constants/styles';
 import { connect } from 'react-redux';
 import {
   getCurrentUserBSteemFeed,
   getLoadingFetchCurrentUserBSteemFeed,
   getLoadingFetchMoreCurrentBSteemUserFeed,
+  getIntl,
 } from 'state/rootReducer';
 import {
   currentUserBSteemFeedFetch,
@@ -19,29 +19,27 @@ import PostPreview from 'components/post-preview/PostPreview';
 import { TRENDING } from 'constants/feedFilters';
 import FeedSort from 'components/feed-sort/FeedSort';
 import BSteemModal from 'components/common/BSteemModal';
-import i18n from '../../i18n/i18n';
+import StyledFlatList from 'components/common/StyledFlatList';
+import StyledTextByBackground from 'components/common/StyledTextByBackground';
 import { ICON_SIZES, MATERIAL_COMMUNITY_ICONS } from '../../constants/styles';
-import { getCurrentUserFollowList } from '../../state/rootReducer';
+import { getCurrentUserFollowList, getCustomTheme } from '../../state/rootReducer';
 
 const Container = styled.View`
   flex: 1;
 `;
 
-const StyledFlatList = styled.FlatList`
-  flex: 1;
-  background-color: ${COLORS.PRIMARY_BORDER_COLOR};
-`;
-
 const EmptyContainer = styled.View`
   margin: 5px 0;
   padding: 20px;
-  background-color: ${COLORS.WHITE.WHITE};
+  background-color: ${props => props.customTheme.primaryBackgroundColor};
 `;
 
 const TouchableFilter = styled.TouchableOpacity`
   flex-direction: row;
   align-items: center;
   padding-top: 5px;
+  background-color: ${props => props.customTheme.primaryBackgroundColor};
+  width: 100%;
 `;
 
 const FilterMenuIcon = styled.View`
@@ -49,13 +47,14 @@ const FilterMenuIcon = styled.View`
 `;
 
 const FilterText = styled.Text`
-  color: ${COLORS.PRIMARY_COLOR};
+  color: ${props => props.customTheme.primaryColor};
+  font-weight: bold;
   margin-left: 3px;
 `;
 
-const EmptyText = styled.Text``;
-
 const mapStateToProps = state => ({
+  intl: getIntl(state),
+  customTheme: getCustomTheme(state),
   currentUserBSteemFeed: getCurrentUserBSteemFeed(state),
   loadingFetchCurrentUserBSteemFeed: getLoadingFetchCurrentUserBSteemFeed(state),
   loadingFetchMoreCurrentBSteemUserFeed: getLoadingFetchMoreCurrentBSteemUserFeed(state),
@@ -70,6 +69,8 @@ const mapDispatchToProps = dispatch => ({
 
 class CurrentUserBSteemFeed extends Component {
   static propTypes = {
+    customTheme: PropTypes.shape().isRequired,
+    intl: PropTypes.shape().isRequired,
     loadingFetchCurrentUserBSteemFeed: PropTypes.bool.isRequired,
     loadingFetchMoreCurrentBSteemUserFeed: PropTypes.bool.isRequired,
     currentUserBSteemFeedFetch: PropTypes.func.isRequired,
@@ -168,42 +169,49 @@ class CurrentUserBSteemFeed extends Component {
   }
 
   renderHeaderComponent() {
+    const { customTheme, intl } = this.props;
     const { currentFilter } = this.state;
     return (
-      <TouchableFilter onPress={this.handleDisplayMenu}>
+      <TouchableFilter onPress={this.handleDisplayMenu} customTheme={customTheme}>
         <MaterialIcons
           name={currentFilter.icon}
           size={ICON_SIZES.menuIcon}
-          color={COLORS.PRIMARY_COLOR}
+          color={customTheme.primaryColor}
         />
-        <FilterText>{currentFilter.label}</FilterText>
+        <FilterText customTheme={customTheme}>{intl[currentFilter.label]}</FilterText>
         <FilterMenuIcon>
           <MaterialCommunityIcons
             name={MATERIAL_COMMUNITY_ICONS.chevronDown}
             size={ICON_SIZES.menuIcon}
-            color={COLORS.PRIMARY_COLOR}
+            color={customTheme.primaryColor}
           />
         </FilterMenuIcon>
       </TouchableFilter>
     );
   }
+
   renderRow(rowData) {
     return <PostPreview postData={rowData.item} navigation={this.props.navigation} />;
   }
 
   renderEmptyComponent = displayedPosts => () => {
-    const { currentUserBSteemFeed, loadingFetchCurrentUserBSteemFeed } = this.props;
+    const {
+      currentUserBSteemFeed,
+      loadingFetchCurrentUserBSteemFeed,
+      customTheme,
+      intl,
+    } = this.props;
 
     if (_.isEmpty(currentUserBSteemFeed) && !loadingFetchCurrentUserBSteemFeed) {
       return (
-        <EmptyContainer>
-          <EmptyText>{i18n.feed.currentUserBSteemFeedEmpty}</EmptyText>
+        <EmptyContainer customTheme={customTheme}>
+          <StyledTextByBackground>{intl.currentUserBSteemFeedEmpty}</StyledTextByBackground>
         </EmptyContainer>
       );
     } else if (_.isEmpty(displayedPosts) && !loadingFetchCurrentUserBSteemFeed) {
       return (
-        <EmptyContainer>
-          <EmptyText>{i18n.feed.emptyFeedCheckFilters}</EmptyText>
+        <EmptyContainer customTheme={customTheme}>
+          <StyledTextByBackground>{intl.emptyFeedCheckFilters}</StyledTextByBackground>
         </EmptyContainer>
       );
     }
@@ -217,6 +225,7 @@ class CurrentUserBSteemFeed extends Component {
       loadingFetchCurrentUserBSteemFeed,
       currentUserFollowList,
       hideFeed,
+      customTheme,
     } = this.props;
     const { menuVisible, filterFeedByFollowers } = this.state;
     const displayedPosts = filterFeedByFollowers
@@ -238,8 +247,8 @@ class CurrentUserBSteemFeed extends Component {
             <RefreshControl
               refreshing={loadingFetchCurrentUserBSteemFeed}
               onRefresh={this.onRefreshCurrentFeed}
-              tintColor={COLORS.PRIMARY_COLOR}
-              colors={[COLORS.PRIMARY_COLOR]}
+              tintColor={customTheme.primaryColor}
+              colors={[customTheme.primaryColor]}
             />
           }
         />

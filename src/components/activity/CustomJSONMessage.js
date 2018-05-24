@@ -1,12 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Text } from 'react-native';
 import _ from 'lodash';
 import * as accountHistoryConstants from 'constants/accountHistory';
-import i18n from 'i18n/i18n';
 import * as navigationConstants from 'constants/navigation';
 import styled from 'styled-components/native';
-import { COLORS } from 'constants/styles';
+import StyledTextByBackground from 'components/common/StyledTextByBackground';
+import { connect } from 'react-redux';
+import { getCustomTheme, getIntl } from 'state/rootReducer';
 
 const Container = styled.View`
   flex-direction: row;
@@ -19,24 +19,24 @@ const Touchable = styled.TouchableWithoutFeedback`
 `;
 
 const LinkText = styled.Text`
-  color: ${COLORS.PRIMARY_COLOR}
+  color: ${props => props.customTheme.primaryColor}
   font-weight: bold;
   margin-right: 5px;
 `;
 
-const CustomJSONMessage = ({ actionDetails, currentUsername, navigation }) => {
+const CustomJSONMessage = ({ actionDetails, currentUsername, navigation, customTheme, intl }) => {
   const actionJSON = JSON.parse(actionDetails.json);
   const customActionType = actionJSON[0];
   const customActionDetails = actionJSON[1];
 
   if (customActionType === accountHistoryConstants.FOLLOW) {
-    const followAction = _.isEmpty(customActionDetails.what) ? 'unfollowed' : 'followed';
+    const followAction = _.isEmpty(customActionDetails.what) ? intl.unfollowed : intl.followed;
 
     if (currentUsername === customActionDetails.follower) {
       const { following } = customActionDetails;
       return (
         <Container>
-          <Text>{`${followAction} `}</Text>
+          <StyledTextByBackground>{`${followAction} `}</StyledTextByBackground>
           <Touchable
             onPress={() =>
               navigation.navigate(navigationConstants.USER, {
@@ -44,7 +44,7 @@ const CustomJSONMessage = ({ actionDetails, currentUsername, navigation }) => {
               })
             }
           >
-            <LinkText>{following}</LinkText>
+            <LinkText customTheme={customTheme}>{following}</LinkText>
           </Touchable>
         </Container>
       );
@@ -59,9 +59,9 @@ const CustomJSONMessage = ({ actionDetails, currentUsername, navigation }) => {
             })
           }
         >
-          <LinkText>{customActionDetails.follower}</LinkText>
+          <LinkText customTheme={customTheme}>{customActionDetails.follower}</LinkText>
         </Touchable>
-        <Text>{` ${followAction} `}</Text>
+        <StyledTextByBackground>{` ${followAction} `}</StyledTextByBackground>
         <Touchable
           onPress={() =>
             navigation.navigate(navigationConstants.USER, {
@@ -69,14 +69,14 @@ const CustomJSONMessage = ({ actionDetails, currentUsername, navigation }) => {
             })
           }
         >
-          <LinkText>{customActionDetails.following}</LinkText>
+          <LinkText customTheme={customTheme}>{customActionDetails.following}</LinkText>
         </Touchable>
       </Container>
     );
   } else if (customActionType === accountHistoryConstants.REBLOG) {
     return (
       <Container>
-        <Text>{`${i18n.activity.reblogged} `}</Text>
+        <StyledTextByBackground>{`${intl.reblogged} `}</StyledTextByBackground>
         <Touchable
           onPress={() =>
             navigation.navigate(navigationConstants.FETCH_POST, {
@@ -85,7 +85,9 @@ const CustomJSONMessage = ({ actionDetails, currentUsername, navigation }) => {
             })
           }
         >
-          <LinkText>{`@${customActionDetails.author}/${customActionDetails.permlink}`}</LinkText>
+          <LinkText customTheme={customTheme}>{`@${customActionDetails.author}/${
+            customActionDetails.permlink
+          }`}</LinkText>
         </Touchable>
       </Container>
     );
@@ -94,9 +96,15 @@ const CustomJSONMessage = ({ actionDetails, currentUsername, navigation }) => {
 };
 
 CustomJSONMessage.propTypes = {
+  customTheme: PropTypes.shape().isRequired,
   actionDetails: PropTypes.shape().isRequired,
   currentUsername: PropTypes.string.isRequired,
   navigation: PropTypes.shape().isRequired,
 };
 
-export default CustomJSONMessage;
+const mapStateToProps = state => ({
+  customTheme: getCustomTheme(state),
+  intl: getIntl(state),
+});
+
+export default connect(mapStateToProps)(CustomJSONMessage);

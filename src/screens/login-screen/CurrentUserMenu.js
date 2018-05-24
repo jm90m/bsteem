@@ -3,9 +3,11 @@ import PropTypes from 'prop-types';
 import { TouchableWithoutFeedback } from 'react-native';
 import _ from 'lodash';
 import styled from 'styled-components/native';
+import { connect } from 'react-redux';
 import { MaterialIcons } from '@expo/vector-icons';
 import { CURRENT_USER_MENU } from 'constants/userMenu';
-import { COLORS } from 'constants/styles';
+import { ICON_SIZES } from 'constants/styles';
+import { getCustomTheme, getIntl } from 'state/rootReducer';
 import MenuModalButton from 'components/common/menu/MenuModalButton';
 import MenuWrapper from 'components/common/menu/MenuWrapper';
 
@@ -17,7 +19,7 @@ const Container = styled.View`
 
 const MenuText = styled.Text`
   margin-left: 5px;
-  color: ${COLORS.PRIMARY_COLOR};
+  color: ${props => props.customTheme.primaryColor};
   font-weight: bold;
 `;
 
@@ -29,11 +31,14 @@ const MenuModalContents = styled.View`
 
 class CurrentUserMenu extends Component {
   static propTypes = {
+    customTheme: PropTypes.shape().isRequired,
+    intl: PropTypes.shape().isRequired,
     hideMenu: PropTypes.func.isRequired,
     handleChangeUserMenu: PropTypes.func.isRequired,
   };
 
   render() {
+    const { customTheme, intl } = this.props;
     return (
       <TouchableWithoutFeedback onPress={this.props.hideMenu}>
         <Container>
@@ -44,8 +49,12 @@ class CurrentUserMenu extends Component {
                 key={option.id}
               >
                 <MenuModalContents>
-                  <MaterialIcons size={20} name={option.icon} color={COLORS.PRIMARY_COLOR} />
-                  <MenuText>{option.label}</MenuText>
+                  <MaterialIcons
+                    size={ICON_SIZES.menuModalOptionIcon}
+                    name={option.icon}
+                    color={customTheme.primaryColor}
+                  />
+                  <MenuText customTheme={customTheme}>{_.capitalize(intl[option.label])}</MenuText>
                 </MenuModalContents>
               </MenuModalButton>
             ))}
@@ -56,4 +65,9 @@ class CurrentUserMenu extends Component {
   }
 }
 
-export default CurrentUserMenu;
+const mapStateToProps = state => ({
+  customTheme: getCustomTheme(state),
+  intl: getIntl(state),
+});
+
+export default connect(mapStateToProps)(CurrentUserMenu);

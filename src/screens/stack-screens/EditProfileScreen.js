@@ -1,19 +1,20 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components/native';
+import { Keyboard, TouchableWithoutFeedback, KeyboardAvoidingView } from 'react-native';
 import sc2 from 'api/sc2';
 import { connect } from 'react-redux';
 import _ from 'lodash';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS, MATERIAL_COMMUNITY_ICONS, ICON_SIZES } from 'constants/styles';
-import i18n from 'i18n/i18n';
+import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
+import { COLORS, MATERIAL_COMMUNITY_ICONS, ICON_SIZES, MATERIAL_ICONS } from 'constants/styles';
 import Header from 'components/common/Header';
 import BackButton from 'components/common/BackButton';
-import HeaderEmptyView from 'components/common/HeaderEmptyView';
 import { FormLabel, FormInput } from 'react-native-elements';
 import PrimaryButton from 'components/common/PrimaryButton';
+import TitleText from 'components/common/TitleText';
+import tinycolor from 'tinycolor2';
 import Expo from 'expo';
-import { getAuthUsername, getUsersDetails } from '../../state/rootReducer';
+import { getAuthUsername, getCustomTheme, getUsersDetails, getIntl } from '../../state/rootReducer';
 import { fetchUser } from '../../state/actions/usersActions';
 
 const Container = styled.View``;
@@ -31,19 +32,24 @@ const TitleContainer = styled.View`
   align-items: center;
 `;
 
-const Title = styled.Text`
-  color: ${COLORS.PRIMARY_COLOR};
+const Title = styled(TitleText)`
   margin-left: 3px;
 `;
 
 const StyledScrollView = styled.ScrollView`
   padding-bottom: 200px;
-  background-color: ${COLORS.WHITE.WHITE};
+  background-color: ${props => props.customTheme.primaryBackgroundColor};
+`;
+
+const KeyboardIconContainer = styled.View`
+  padding: 5px;
 `;
 
 const mapStateToProps = state => ({
+  customTheme: getCustomTheme(state),
   usersDetails: getUsersDetails(state),
   authUsername: getAuthUsername(state),
+  intl: getIntl(state),
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -53,10 +59,13 @@ const mapDispatchToProps = dispatch => ({
 class EditProfileScreen extends Component {
   static navigationOptions = {
     tabBarVisible: false,
+    drawerLockMode: 'locked-closed',
   };
 
   static propTypes = {
+    customTheme: PropTypes.shape().isRequired,
     navigation: PropTypes.shape().isRequired,
+    intl: PropTypes.shape().isRequired,
     usersDetails: PropTypes.shape().isRequired,
     authUsername: PropTypes.string.isRequired,
     fetchUser: PropTypes.func.isRequired,
@@ -82,6 +91,7 @@ class EditProfileScreen extends Component {
       websiteInput,
       profilePictureInput,
       coverPictureInput,
+      keyboardDisplayed: false,
     };
 
     this.navigateBack = this.navigateBack.bind(this);
@@ -92,6 +102,17 @@ class EditProfileScreen extends Component {
     this.onChangeProfilePicture = this.onChangeProfilePicture.bind(this);
     this.onChangeCoverPicture = this.onChangeCoverPicture.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+  }
+
+  componentWillMount() {
+    this.keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      this.handleSetKeyboardDisplay(true),
+    );
+    this.keyboardDidHideListener = Keyboard.addListener(
+      'keyboardDidHide',
+      this.handleSetKeyboardDisplay(false),
+    );
   }
 
   componentDidMount() {
@@ -132,6 +153,11 @@ class EditProfileScreen extends Component {
     }
   }
 
+  componentWillUnmount() {
+    this.keyboardDidShowListener.remove();
+    this.keyboardDidHideListener.remove();
+  }
+
   onChangeName(value) {
     this.setState({
       nameInput: value,
@@ -166,6 +192,8 @@ class EditProfileScreen extends Component {
       coverPictureInput: value,
     });
   }
+
+  handleSetKeyboardDisplay = keyboardDisplayed => () => this.setState({ keyboardDisplayed });
 
   handleSubmit() {
     const userDetails = _.get(this.props.usersDetails, this.props.authUsername, {});
@@ -215,6 +243,7 @@ class EditProfileScreen extends Component {
   }
 
   render() {
+    const { customTheme, intl } = this.props;
     const {
       nameInput,
       aboutInput,
@@ -223,7 +252,11 @@ class EditProfileScreen extends Component {
       profilePictureInput,
       coverPictureInput,
       editProfileLoading,
+      keyboardDisplayed,
     } = this.state;
+    const color = tinycolor(customTheme.primaryBackgroundColor).isDark()
+      ? COLORS.LIGHT_TEXT_COLOR
+      : COLORS.DARK_TEXT_COLOR;
     return (
       <Container>
         <Header>
@@ -232,55 +265,75 @@ class EditProfileScreen extends Component {
             <MaterialCommunityIcons
               size={ICON_SIZES.menuIcon}
               name={MATERIAL_COMMUNITY_ICONS.accountEdit}
-              color={COLORS.PRIMARY_COLOR}
+              color={customTheme.primaryColor}
             />
-            <Title>{i18n.titles.editProfile}</Title>
+            <Title>{intl.edit_profile}</Title>
           </TitleContainer>
-          <HeaderEmptyView />
+          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <KeyboardIconContainer>
+              <MaterialIcons
+                name={MATERIAL_ICONS.keyboardHide}
+                color={keyboardDisplayed ? customTheme.primaryColor : 'transparent'}
+                size={ICON_SIZES.menuIcon}
+              />
+            </KeyboardIconContainer>
+          </TouchableWithoutFeedback>
         </Header>
-        <StyledScrollView>
-          <FormLabel>{i18n.editProfile.name}</FormLabel>
-          <FormInput
-            onChangeText={this.onChangeName}
-            placeholder=""
-            value={nameInput}
-            maxLength={255}
-            inputStyle={{ width: '100%' }}
-          />
-          <FormLabel>{i18n.editProfile.about}</FormLabel>
-          <FormInput
-            onChangeText={this.onChangeAbout}
-            placeholder=""
-            value={aboutInput}
-            multiline
-            inputStyle={{ width: '100%' }}
-          />
-          <FormLabel>{i18n.editProfile.location}</FormLabel>
-          <FormInput onChangeText={this.onChangeLocation} placeholder="" value={locationInput} />
-          <FormLabel>{i18n.editProfile.website}</FormLabel>
-          <FormInput onChangeText={this.onChangeWebsite} placeholder="" value={websiteInput} />
-          <FormLabel>{i18n.editProfile.profilePicture}</FormLabel>
-          <FormInput
-            onChangeText={this.onChangeProfilePicture}
-            placeholder=""
-            value={profilePictureInput}
-            inputStyle={{ width: '100%' }}
-          />
-          <FormLabel>{i18n.editProfile.coverPicture}</FormLabel>
-          <FormInput
-            onChangeText={this.onChangeCoverPicture}
-            placeholder=""
-            value={coverPictureInput}
-            inputStyle={{ width: '100%' }}
-          />
-          <ActionButtonsContainer>
-            <PrimaryButton
-              onPress={this.handleSubmit}
-              title={i18n.editProfile.submit}
-              disabled={editProfileLoading}
-              loading={editProfileLoading}
+        <StyledScrollView customTheme={customTheme}>
+          <KeyboardAvoidingView behavior="padding">
+            <FormLabel>{intl.profile_name}</FormLabel>
+            <FormInput
+              onChangeText={this.onChangeName}
+              placeholder=""
+              value={nameInput}
+              maxLength={255}
+              inputStyle={{ width: '100%', color }}
             />
-          </ActionButtonsContainer>
+            <FormLabel>{intl.profile_about}</FormLabel>
+            <FormInput
+              onChangeText={this.onChangeAbout}
+              placeholder=""
+              value={aboutInput}
+              multiline
+              inputStyle={{ width: '100%', color }}
+            />
+            <FormLabel>{intl.profile_location}</FormLabel>
+            <FormInput
+              onChangeText={this.onChangeLocation}
+              placeholder=""
+              value={locationInput}
+              inputStyle={{ width: '100%', color }}
+            />
+            <FormLabel>{intl.profile_website}</FormLabel>
+            <FormInput
+              onChangeText={this.onChangeWebsite}
+              placeholder=""
+              value={websiteInput}
+              inputStyle={{ width: '100%', color }}
+            />
+            <FormLabel>{intl.profile_picture}</FormLabel>
+            <FormInput
+              onChangeText={this.onChangeProfilePicture}
+              placeholder=""
+              value={profilePictureInput}
+              inputStyle={{ width: '100%', color }}
+            />
+            <FormLabel>{intl.profile_cover}</FormLabel>
+            <FormInput
+              onChangeText={this.onChangeCoverPicture}
+              placeholder=""
+              value={coverPictureInput}
+              inputStyle={{ width: '100%', color }}
+            />
+            <ActionButtonsContainer>
+              <PrimaryButton
+                onPress={this.handleSubmit}
+                title={intl.submit}
+                disabled={editProfileLoading}
+                loading={editProfileLoading}
+              />
+            </ActionButtonsContainer>
+          </KeyboardAvoidingView>
         </StyledScrollView>
       </Container>
     );

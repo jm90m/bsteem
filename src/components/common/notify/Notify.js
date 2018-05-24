@@ -4,8 +4,7 @@ import styled from 'styled-components/native';
 import { Modal } from 'react-native';
 import ModalHeader from 'components/common/modal/ModalHeader';
 import ModalFooter from 'components/common/modal/ModalFooter';
-import { COLORS } from 'constants/styles';
-import i18n from 'i18n/i18n';
+import StyledTextByBackground from 'components/common/StyledTextByBackground';
 
 const TouchableContainer = styled.TouchableOpacity`
   flex: 1;
@@ -14,16 +13,14 @@ const TouchableContainer = styled.TouchableOpacity`
 
 const Container = styled.View`
   padding-top: 10px;
-  background-color: ${COLORS.WHITE.WHITE};
+  background-color: ${props => props.customTheme.primaryBackgroundColor};
 `;
 
 const ModalContent = styled.View`
   padding: 16px;
-  border-bottom-color: ${COLORS.WHITE.WHITE_SMOKE};
+  border-bottom-color: ${props => props.customTheme.primaryBorderColor};
   border-bottom-width: 1px;
 `;
-
-const ModalContentText = styled.Text``;
 
 class Notify extends Component {
   static propTypes = {
@@ -31,10 +28,19 @@ class Notify extends Component {
     hideNotifyModal: PropTypes.func.isRequired,
     title: PropTypes.string.isRequired,
     description: PropTypes.string.isRequired,
+    customTheme: PropTypes.shape().isRequired,
+    intl: PropTypes.shape().isRequired,
   };
 
   render() {
-    const { hideNotifyModal, displayNotifyModal, title, description } = this.props;
+    const {
+      hideNotifyModal,
+      displayNotifyModal,
+      title,
+      description,
+      customTheme,
+      intl,
+    } = this.props;
     return (
       <Modal
         animationType="slide"
@@ -43,13 +49,13 @@ class Notify extends Component {
         onRequestClose={hideNotifyModal}
       >
         <TouchableContainer onPress={hideNotifyModal}>
-          <Container>
+          <Container customTheme={customTheme}>
             <ModalHeader title={title} closeModal={hideNotifyModal} />
-            <ModalContent>
-              <ModalContentText>{description}</ModalContentText>
+            <ModalContent customTheme={customTheme}>
+              <StyledTextByBackground>{description}</StyledTextByBackground>
             </ModalContent>
             <ModalFooter
-              cancelText={i18n.general.cancel}
+              cancelText={intl.cancel}
               cancelPress={hideNotifyModal}
               displaySuccess={false}
             />
@@ -59,4 +65,5 @@ class Notify extends Component {
     );
   }
 }
+
 export default Notify;

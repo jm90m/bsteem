@@ -3,16 +3,24 @@ import PropTypes from 'prop-types';
 import Remarkable from 'remarkable';
 import styled from 'styled-components/native';
 import { striptags } from 'util/stripTags';
+import { connect } from 'react-redux';
+import tinycolor from 'tinycolor2';
+import { COLORS } from 'constants/styles';
+import { getCustomTheme } from 'state/rootReducer';
 
 const Body = styled.Text`
   padding: 5px;
+  color: ${props =>
+    tinycolor(props.customTheme.primaryBackgroundColor).isDark()
+      ? COLORS.LIGHT_TEXT_COLOR
+      : COLORS.DARK_TEXT_COLOR};
 `;
 
 const decodeEntities = body => {
   return body.replace(/&lt;/g, '<').replace(/&gt;/g, '>');
 };
 
-const BodyShort = ({ content }) => {
+const BodyShort = ({ content, customTheme }) => {
   const remarkable = new Remarkable({ html: true });
   let body = striptags(remarkable.render(striptags(decodeEntities(content))));
   body = body.replace(/(?:https?|ftp):\/\/[\S]+/g, '');
@@ -24,7 +32,7 @@ const BodyShort = ({ content }) => {
   }
 
   return (
-    <Body numberOfLines={4} ellipsizeMode="tail">
+    <Body numberOfLines={4} ellipsizeMode="tail" customTheme={customTheme}>
       {body}
     </Body>
   );
@@ -32,10 +40,15 @@ const BodyShort = ({ content }) => {
 
 BodyShort.propTypes = {
   content: PropTypes.string,
+  customTheme: PropTypes.shape().isRequired,
 };
 
 BodyShort.defaultProps = {
   content: '',
 };
 
-export default BodyShort;
+const mapStateToProps = state => ({
+  customTheme: getCustomTheme(state),
+});
+
+export default connect(mapStateToProps)(BodyShort);

@@ -8,31 +8,28 @@ import {
   getUsersAccountHistory,
   getLoadingFetchUserAccountHistory,
   getLoadingFetchMoreUserAccountHistory,
+  getTotalVestingFundSteem,
+  getTotalVestingShares,
+  getCustomTheme,
 } from 'state/rootReducer';
-import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS, MATERIAL_ICONS, MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { COLORS, ICON_SIZES, MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
 import {
   fetchMoreUserAccountHistory,
   fetchUserAccountHistory,
 } from 'state/actions/userActivityActions';
 import LargeLoading from 'components/common/LargeLoading';
 import Header from 'components/common/Header';
+import TitleText from 'components/common/TitleText';
 import UserAction from 'components/activity/UserAction';
+import BackButton from 'components/common/BackButton';
 
 const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
 
 const Container = styled.View``;
 
-const StyledListView = styled.ListView``;
-
-const BackTouchable = styled.TouchableOpacity`
-  justify-content: center;
-  padding: 10px;
-`;
-
-const TitleText = styled.Text`
-  font-weight: bold;
-  color: ${COLORS.PRIMARY_COLOR};
+const StyledListView = styled.ListView`
+  background-color: ${props => props.customTheme.listBackgroundColor};
 `;
 
 const FilterTouchable = styled.TouchableOpacity`
@@ -40,9 +37,12 @@ const FilterTouchable = styled.TouchableOpacity`
 `;
 
 const mapStateToProps = state => ({
+  customTheme: getCustomTheme(state),
   usersAccountHistory: getUsersAccountHistory(state),
   loadingFetchUserAccountHistory: getLoadingFetchUserAccountHistory(state),
   loadingFetchMoreUserAccountHistory: getLoadingFetchMoreUserAccountHistory(state),
+  totalVestingFundSteem: getTotalVestingFundSteem(state),
+  totalVestingShares: getTotalVestingShares(state),
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -55,15 +55,19 @@ const mapDispatchToProps = dispatch => ({
 class UserActivityScreen extends Component {
   static navigationOptions = {
     tabBarVisible: false,
+    drawerLockMode: 'locked-closed',
   };
 
   static propTypes = {
+    customTheme: PropTypes.shape().isRequired,
     navigation: PropTypes.shape().isRequired,
     usersAccountHistory: PropTypes.shape().isRequired,
     fetchUserAccountHistory: PropTypes.func.isRequired,
     fetchMoreUserAccountHistory: PropTypes.func.isRequired,
     loadingFetchUserAccountHistory: PropTypes.bool.isRequired,
     loadingFetchMoreUserAccountHistory: PropTypes.bool.isRequired,
+    totalVestingFundSteem: PropTypes.string.isRequired,
+    totalVestingShares: PropTypes.string.isRequired,
   };
 
   constructor(props) {
@@ -100,9 +104,16 @@ class UserActivityScreen extends Component {
   }
 
   renderUserActivityRow(rowData) {
+    const { totalVestingFundSteem, totalVestingShares } = this.props;
     const { username } = this.props.navigation.state.params;
     return (
-      <UserAction currentUsername={username} action={rowData} navigation={this.props.navigation} />
+      <UserAction
+        currentUsername={username}
+        action={rowData}
+        navigation={this.props.navigation}
+        totalVestingFundSteem={totalVestingFundSteem}
+        totalVestingShares={totalVestingShares}
+      />
     );
   }
 
@@ -111,6 +122,7 @@ class UserActivityScreen extends Component {
       usersAccountHistory,
       loadingFetchUserAccountHistory,
       loadingFetchMoreUserAccountHistory,
+      customTheme,
     } = this.props;
     const { username } = this.props.navigation.state.params;
     const userAccountHistoryDataSource = _.get(usersAccountHistory, username, []);
@@ -118,19 +130,18 @@ class UserActivityScreen extends Component {
     return (
       <Container>
         <Header>
-          <BackTouchable onPress={this.navigateBack}>
-            <MaterialIcons size={24} name={MATERIAL_ICONS.back} />
-          </BackTouchable>
+          <BackButton navigateBack={this.navigateBack} />
           <TitleText>{`${username} activity`}</TitleText>
           <FilterTouchable>
             <MaterialCommunityIcons
-              size={24}
+              size={ICON_SIZES.menuIcon}
               name={MATERIAL_COMMUNITY_ICONS.filter}
-              color={'transparent'}
+              color="transparent"
             />
           </FilterTouchable>
         </Header>
         <StyledListView
+          customTheme={customTheme}
           dataSource={ds.cloneWithRows(userAccountHistoryDataSource)}
           renderRow={this.renderUserActivityRow}
           enableEmptySections

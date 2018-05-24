@@ -2,14 +2,9 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { ListView } from 'react-native';
 import _ from 'lodash';
-import styled from 'styled-components/native';
-import { COLORS } from 'constants/styles';
 import UserHeader from 'components/user/user-header/UserHeader';
 import CommentsPreview from 'components/user/user-comments/CommentsPreview';
-
-const StyledListView = styled.ListView`
-  background-color: ${COLORS.WHITE.WHITE_SMOKE};
-`;
+import StyledListView from 'components/common/StyledListView';
 
 const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
 

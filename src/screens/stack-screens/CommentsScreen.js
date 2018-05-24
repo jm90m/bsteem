@@ -5,10 +5,14 @@ import { connect } from 'react-redux';
 import _ from 'lodash';
 import { MaterialIcons } from '@expo/vector-icons';
 import { fetchComments } from 'state/actions/postsActions';
-import i18n from 'i18n/i18n';
 import CommentsContainer from 'components/post/comments/CommentsContainer';
-import { ICON_SIZES, MATERIAL_ICONS, COLORS } from 'constants/styles';
-import { getCommentsByPostId, getIsAuthenticated } from 'state/rootReducer';
+import { ICON_SIZES, MATERIAL_ICONS } from 'constants/styles';
+import {
+  getCommentsByPostId,
+  getIsAuthenticated,
+  getCustomTheme,
+  getIntl,
+} from 'state/rootReducer';
 import Header from 'components/common/Header';
 import * as editorActions from 'state/actions/editorActions';
 import * as navigationConstants from 'constants/navigation';
@@ -16,18 +20,14 @@ import { SORT_COMMENTS } from 'constants/comments';
 import BSteemModal from 'components/common/BSteemModal';
 import CommentsMenu from 'components/post/comments/CommentsMenu';
 import HeaderEmptyView from 'components/common/HeaderEmptyView';
+import TitleText from 'components/common/TitleText';
+import BackButton from 'components/common/BackButton';
 
 const Container = styled.View``;
 
 const TouchableIcon = styled.TouchableOpacity`
   justify-content: center;
   padding: 10px;
-`;
-
-const Title = styled.Text`
-  margin-left: 3px;
-  color: ${COLORS.PRIMARY_COLOR};
-  font-weight: bold;
 `;
 
 const TitleContainer = styled.View`
@@ -38,6 +38,8 @@ const TitleContainer = styled.View`
 const mapStateToProps = state => ({
   commentsByPostId: getCommentsByPostId(state),
   authenticated: getIsAuthenticated(state),
+  customTheme: getCustomTheme(state),
+  intl: getIntl(state),
 });
 const mapDispatchToProps = dispatch => ({
   fetchComments: (category, author, permlink, postId) =>
@@ -58,11 +60,14 @@ const mapDispatchToProps = dispatch => ({
 class CommentScreen extends Component {
   static navigationOptions = {
     tabBarVisible: false,
+    drawerLockMode: 'locked-closed',
   };
 
   static propTypes = {
     navigation: PropTypes.shape(),
+    customTheme: PropTypes.shape().isRequired,
     fetchComments: PropTypes.func.isRequired,
+    intl: PropTypes.shape().isRequired,
     commentsByPostId: PropTypes.shape(),
     authenticated: PropTypes.bool.isRequired,
   };
@@ -84,6 +89,7 @@ class CommentScreen extends Component {
     this.navigateToReplyScreen = this.navigateToReplyScreen.bind(this);
     this.handleReplyToPost = this.handleReplyToPost.bind(this);
     this.handleFetchCurrentComments = this.handleFetchCurrentComments.bind(this);
+    this.successCreateReply = this.successCreateReply.bind(this);
   }
 
   componentDidMount() {
@@ -104,11 +110,18 @@ class CommentScreen extends Component {
     this.props.navigation.goBack();
   }
 
+  successCreateReply() {
+    this.handleFetchCurrentComments();
+    this.setState({
+      sort: SORT_COMMENTS.NEWEST,
+    });
+  }
+
   navigateToReplyScreen() {
     const { postData } = this.props.navigation.state.params;
     this.props.navigation.navigate(navigationConstants.REPLY, {
       parentPost: postData,
-      successCreateReply: this.handleFetchCurrentComments,
+      successCreateReply: this.successCreateReply,
     });
   }
 
@@ -125,29 +138,27 @@ class CommentScreen extends Component {
   }
 
   render() {
-    const { navigation, authenticated } = this.props;
+    const { navigation, authenticated, customTheme, intl } = this.props;
     const { displayMenu, sort } = this.state;
     const { postId, postData } = navigation.state.params;
     return (
       <Container>
         <Header>
-          <TouchableIcon onPress={this.navigateBack}>
-            <MaterialIcons size={ICON_SIZES.menuIcon} name={MATERIAL_ICONS.back} />
-          </TouchableIcon>
+          <BackButton navigateBack={this.navigateBack} />
           <TitleContainer>
             <MaterialIcons
               size={ICON_SIZES.menuIcon}
               name={MATERIAL_ICONS.comments}
-              color={COLORS.PRIMARY_COLOR}
+              color={customTheme.primaryColor}
             />
-            <Title>{i18n.titles.comments}</Title>
+            <TitleText style={{ marginLeft: 3 }}>{intl.comments}</TitleText>
           </TitleContainer>
           {authenticated ? (
             <TouchableIcon onPress={this.handleReplyToPost}>
               <MaterialIcons
                 size={ICON_SIZES.menuIcon}
                 name={MATERIAL_ICONS.reply}
-                color={COLORS.PRIMARY_COLOR}
+                color={customTheme.primaryColor}
               />
             </TouchableIcon>
           ) : (
@@ -166,6 +177,8 @@ class CommentScreen extends Component {
             <CommentsMenu
               handleSortComments={this.handleSortComments}
               hideMenu={this.handleSetDisplayMenu(false)}
+              customTheme={customTheme}
+              intl={intl}
             />
           </BSteemModal>
         )}

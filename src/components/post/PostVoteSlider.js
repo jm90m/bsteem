@@ -6,18 +6,20 @@ import { connect } from 'react-redux';
 import _ from 'lodash';
 import { ButtonGroup } from 'react-native-elements';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { MATERIAL_COMMUNITY_ICONS, ICON_SIZES, COLORS } from 'constants/styles';
+import { MATERIAL_COMMUNITY_ICONS, ICON_SIZES } from 'constants/styles';
 import {
   getUsersDetails,
   getVotingPercent,
   getAuthUsername,
   getRewardFund,
   getSteemRate,
+  getCustomTheme,
+  getIntl,
 } from 'state/rootReducer';
-import i18n from 'i18n/i18n';
 import { getVoteValue } from 'util/userUtils';
 import { calculatePayout } from 'util/steemitUtils';
 import { DEFAULT_VOTE_WEIGHT } from 'constants/postConstants';
+import StyledTextByBackground from 'components/common/StyledTextByBackground';
 
 const Container = styled.View`
   padding: 10px 16px;
@@ -42,7 +44,7 @@ const Payout = styled.Text`
   margin-left: auto;
   font-size: 14px;
   font-weight: 700;
-  color: ${COLORS.TERTIARY_COLOR};
+  color: ${props => props.customTheme.tertiaryColor};
   align-self: center;
   ${props => (props.payoutIsDeclined ? 'text-decoration-line: line-through' : '')};
 `;
@@ -54,7 +56,7 @@ const SliderContainer = styled.View`
   padding-bottom: 10px;
 `;
 
-const VoteWorth = styled.Text`
+const VoteWorth = styled(StyledTextByBackground)`
   justify-content: center;
   text-align: center;
   font-weight: bold;
@@ -67,12 +69,16 @@ const mapStateToProps = state => ({
   authUsername: getAuthUsername(state),
   rewardFund: getRewardFund(state),
   steemRate: getSteemRate(state),
+  customTheme: getCustomTheme(state),
+  intl: getIntl(state),
 });
 
 class PostVoteSlider extends Component {
   static propTypes = {
     hideVoteSlider: PropTypes.func.isRequired,
     postData: PropTypes.shape(),
+    customTheme: PropTypes.shape().isRequired,
+    intl: PropTypes.shape().isRequired,
     authUsername: PropTypes.string.isRequired,
     usersDetails: PropTypes.shape().isRequired,
     rewardFund: PropTypes.shape().isRequired,
@@ -154,7 +160,7 @@ class PostVoteSlider extends Component {
   }
 
   render() {
-    const { postData, hideVoteSlider } = this.props;
+    const { postData, hideVoteSlider, customTheme, intl } = this.props;
     const { buttonVotingPercentIndex, votePercent } = this.state;
     const payout = calculatePayout(postData);
     const displayedPayout = payout.cashoutInTime ? payout.potentialPayout : payout.pastPayouts;
@@ -162,8 +168,8 @@ class PostVoteSlider extends Component {
       ? '0.00'
       : parseFloat(displayedPayout).toFixed(2);
     const payoutIsDeclined = _.get(payout, 'isPayoutDeclined', false);
-    const selectedButtonStyle = { backgroundColor: COLORS.PRIMARY_COLOR };
-    const selectedTextStyle = { color: COLORS.PRIMARY_COLOR };
+    const selectedButtonStyle = { borderColor: customTheme.primaryColor };
+    const selectedTextStyle = { color: customTheme.primaryColor };
     const voteWorth = parseFloat(this.calculateVoteWorth()).toFixed(2);
     const displayedVotePercent = parseFloat(votePercent).toFixed(0);
 
@@ -175,9 +181,9 @@ class PostVoteSlider extends Component {
               <MaterialCommunityIcons
                 name={MATERIAL_COMMUNITY_ICONS.checkCircle}
                 size={ICON_SIZES.actionIcon}
-                color={COLORS.POSITIVE_COLOR}
+                color={customTheme.positiveColor}
               />
-              <ActionText color={COLORS.POSITIVE_COLOR}>{i18n.general.confirm}</ActionText>
+              <ActionText color={customTheme.positiveColor}>{intl.confirm}</ActionText>
             </ActionContainer>
           </TouchableOpacity>
           <TouchableOpacity onPress={hideVoteSlider}>
@@ -185,12 +191,14 @@ class PostVoteSlider extends Component {
               <MaterialCommunityIcons
                 name={MATERIAL_COMMUNITY_ICONS.closeCircle}
                 size={ICON_SIZES.actionIcon}
-                color={COLORS.NEGATIVE_COLOR}
+                color={customTheme.negativeColor}
               />
-              <ActionText color={COLORS.NEGATIVE_COLOR}>{i18n.general.cancel}</ActionText>
+              <ActionText color={customTheme.negativeColor}>{intl.cancel}</ActionText>
             </ActionContainer>
           </TouchableOpacity>
-          <Payout payoutIsDeclined={payoutIsDeclined}>${formattedDisplayedPayout}</Payout>
+          <Payout customTheme={customTheme} payoutIsDeclined={payoutIsDeclined}>
+            ${formattedDisplayedPayout}
+          </Payout>
         </HeaderContent>
         <SliderContainer>
           <Slider
@@ -199,6 +207,7 @@ class PostVoteSlider extends Component {
             maximumValue={100}
             onValueChange={this.handleOnVotingSliderValue}
             value={votePercent}
+            minimumTrackTintColor={customTheme.primaryColor}
           />
           <ButtonGroup
             onPress={this.handleOnVotingPercentButtonPress}
@@ -208,7 +217,9 @@ class PostVoteSlider extends Component {
             selectedButtonStyle={selectedButtonStyle}
             selectedTextStyle={selectedTextStyle}
           />
-          <VoteWorth>{`${i18n.post.voteWorth} $${voteWorth} (${displayedVotePercent}%)`}</VoteWorth>
+          <VoteWorth>{`${
+            intl.like_slider_info
+          } $${voteWorth} (${displayedVotePercent}%)`}</VoteWorth>
         </SliderContainer>
       </Container>
     );

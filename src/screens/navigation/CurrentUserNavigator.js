@@ -22,6 +22,11 @@ import EditProfileScreen from '../stack-screens/EditProfileScreen';
 import MessagesScreen from '../stack-screens/MessagesScreen';
 import UserMessageScreen from '../stack-screens/UserMessageScreen';
 import TransferScreen from '../stack-screens/TransferScreen';
+import RepliesFeedScreen from '../stack-screens/RepliesFeedScreen';
+import NotificationsScreen from '../stack-screens/NotificationsScreen';
+import BeneficiariesScreen from '../stack-screens/BeneficiariesScreen';
+import SettingsScreen from '../stack-screens/SettingsScreen';
+import CustomThemeScreen from '../stack-screens/CustomThemeScreen';
 
 const screenNavigationOptions = {
   tabBarIcon: ({ tintColor }) => (
@@ -105,6 +110,26 @@ const CurrentUserNavigator = StackNavigator(
     },
     [navigationConstants.TRANSFERS]: {
       screen: TransferScreen,
+      navigationOptions: screenNavigationOptions,
+    },
+    [navigationConstants.USER_REPLIES]: {
+      screen: RepliesFeedScreen,
+      navigationOptions: screenNavigationOptions,
+    },
+    [navigationConstants.NOTIFICATIONS]: {
+      screen: NotificationsScreen,
+      navigationOptions: screenNavigationOptions,
+    },
+    [navigationConstants.POST_BENEFICIARIES]: {
+      screen: BeneficiariesScreen,
+      navigationOptions: screenNavigationOptions,
+    },
+    [navigationConstants.SETTINGS]: {
+      screen: SettingsScreen,
+      navigationOptions: screenNavigationOptions,
+    },
+    [navigationConstants.CUSTOM_THEME]: {
+      screen: CustomThemeScreen,
       navigationOptions: screenNavigationOptions,
     },
   },

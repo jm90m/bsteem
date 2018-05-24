@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components/native';
-import { Text } from 'react-native';
 import { connect } from 'react-redux';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import _ from 'lodash';
@@ -12,7 +11,7 @@ import {
   fetchUserFollowCount,
   refreshUserBlog,
 } from 'state/actions/usersActions';
-import { COLORS, MATERIAL_ICONS, MATERIAL_COMMUNITY_ICONS, ICON_SIZES } from 'constants/styles';
+import { MATERIAL_COMMUNITY_ICONS, ICON_SIZES } from 'constants/styles';
 import * as userMenuConstants from 'constants/userMenu';
 import * as navigationConstants from 'constants/navigation';
 import {
@@ -26,24 +25,19 @@ import {
   getLoadingUsersFollowCount,
   getAuthUsername,
   getRefreshUserBlogLoading,
+  getCustomTheme,
+  getIntl,
 } from 'state/rootReducer';
+import { getUserDetailsHelper } from 'util/bsteemUtils';
 import UserMenu from 'components/user/UserMenu';
 import Header from 'components/common/Header';
+import BackButton from 'components/common/BackButton';
 import Modal from 'react-native-modal';
 import UserBlog from './UserBlog';
 import UserComments from './UserComments';
 
 const Container = styled.View`
   flex: 1;
-`;
-
-const Loading = styled.ActivityIndicator`
-  margin-top: 10px;
-`;
-
-const BackTouchable = styled.TouchableOpacity`
-  justify-content: center;
-  padding: 10px;
 `;
 
 const TouchableMenu = styled.TouchableOpacity``;
@@ -59,10 +53,11 @@ const CurrentUserDisplay = styled.View`
 
 const CurrentUserDisplayText = styled.Text`
   margin-left: 5px;
-  color: ${COLORS.PRIMARY_COLOR};
+  color: ${props => props.customTheme.primaryColor};
 `;
 
 const mapStateToProps = state => ({
+  customTheme: getCustomTheme(state),
   usersDetails: getUsersDetails(state),
   usersComments: getUsersComments(state),
   usersBlog: getUsersBlog(state),
@@ -73,6 +68,7 @@ const mapStateToProps = state => ({
   loadingUsersFollowCount: getLoadingUsersFollowCount(state),
   refreshUserBlogLoading: getRefreshUserBlogLoading(state),
   authUsername: getAuthUsername(state),
+  intl: getIntl(state),
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -94,6 +90,8 @@ class UserScreen extends Component {
     refreshUserBlogLoading: PropTypes.bool,
     authUsername: PropTypes.string,
     navigation: PropTypes.shape().isRequired,
+    intl: PropTypes.shape().isRequired,
+    customTheme: PropTypes.shape().isRequired,
     refreshUserBlog: PropTypes.func.isRequired,
     usersDetails: PropTypes.shape().isRequired,
     usersComments: PropTypes.shape().isRequired,
@@ -103,7 +101,6 @@ class UserScreen extends Component {
     fetchUserBlog: PropTypes.func.isRequired,
     fetchUserComments: PropTypes.func.isRequired,
     fetchUserFollowCount: PropTypes.func.isRequired,
-    loadingUsersComments: PropTypes.bool,
     loadingUsersBlog: PropTypes.bool,
   };
 
@@ -134,10 +131,10 @@ class UserScreen extends Component {
   componentDidMount() {
     const { username } = this.props.navigation.state.params;
     const { usersDetails, usersComments, usersBlog, usersFollowCount } = this.props;
-    const userDetails = usersDetails[username];
-    const userComments = usersComments[username];
-    const userBlog = usersBlog[username];
-    const userFollowCount = usersFollowCount[username];
+    const userDetails = getUserDetailsHelper(usersDetails, username, {});
+    const userComments = getUserDetailsHelper(usersComments, username, []);
+    const userBlog = getUserDetailsHelper(usersBlog, username, []);
+    const userFollowCount = getUserDetailsHelper(usersFollowCount, username, {});
 
     if (_.isEmpty(userDetails)) {
       this.props.fetchUser(username);
@@ -174,7 +171,7 @@ class UserScreen extends Component {
   fetchMoreUserPosts() {
     const { username } = this.props.navigation.state.params;
     const { usersBlog } = this.props;
-    const userBlog = usersBlog[username];
+    const userBlog = getUserDetailsHelper(usersBlog, username, []);
 
     if (_.isEmpty(userBlog)) {
       const query = { tag: username, limit: 10 };
@@ -194,7 +191,7 @@ class UserScreen extends Component {
   fetchMoreUserComments() {
     const { username } = this.props.navigation.state.params;
     const { usersComments } = this.props;
-    const userComments = usersComments[username];
+    const userComments = getUserDetailsHelper(usersComments, username, []);
 
     if (_.isEmpty(usersComments)) {
       const query = { start_author: username, limit: 10 };
@@ -241,6 +238,14 @@ class UserScreen extends Component {
           () => this.props.navigation.navigate(navigationConstants.USER_WALLET, { username }),
         );
         break;
+      case userMenuConstants.REPLIES.id:
+        this.setState(
+          {
+            menuVisible: false,
+          },
+          () => this.props.navigation.navigate(navigationConstants.USER_REPLIES, { username }),
+        );
+        break;
       default:
         this.setState({
           currentMenuOption: option,
@@ -266,8 +271,8 @@ class UserScreen extends Component {
     } = this.props;
     const { username } = this.props.navigation.state.params;
     const { usersComments, usersBlog } = this.props;
-    const userComments = usersComments[username] || [];
-    const userBlog = usersBlog[username] || [];
+    const userComments = getUserDetailsHelper(usersComments, username, []);
+    const userBlog = getUserDetailsHelper(usersBlog, username, []);
 
     switch (currentMenuOption.id) {
       case userMenuConstants.COMMENTS.id:
@@ -279,12 +284,6 @@ class UserScreen extends Component {
             username={username}
           />
         );
-      case userMenuConstants.FOLLOWERS.id:
-        return <Text>Followers</Text>;
-      case userMenuConstants.FOLLOWING.id:
-        return <Text>Following</Text>;
-      case userMenuConstants.WALLET.id:
-        return <Text>Wallet</Text>;
       case userMenuConstants.BLOG.id:
       default:
         return (
@@ -304,40 +303,30 @@ class UserScreen extends Component {
     }
   }
 
-  renderLoader() {
-    const { currentMenuOption } = this.state;
-    const { loadingUsersComments } = this.props;
-
-    switch (currentMenuOption.id) {
-      case userMenuConstants.COMMENTS.id:
-        return loadingUsersComments && <Loading color={COLORS.PRIMARY_COLOR} size="large" />;
-      default:
-        return null;
-    }
-  }
-
   render() {
+    const { customTheme, intl } = this.props;
     const { menuVisible, currentMenuOption } = this.state;
 
     return (
       <Container>
         <Header>
-          <BackTouchable onPress={this.navigateBack}>
-            <MaterialIcons size={ICON_SIZES.menuIcon} name={MATERIAL_ICONS.back} />
-          </BackTouchable>
+          <BackButton navigateBack={this.navigateBack} />
           <CurrentUserDisplay>
             <MaterialIcons
               size={ICON_SIZES.menuIcon}
               name={currentMenuOption.icon}
-              color={COLORS.PRIMARY_COLOR}
+              color={customTheme.primaryColor}
             />
-            <CurrentUserDisplayText>{currentMenuOption.label}</CurrentUserDisplayText>
+            <CurrentUserDisplayText customTheme={customTheme}>
+              {_.capitalize(intl[currentMenuOption.label])}
+            </CurrentUserDisplayText>
           </CurrentUserDisplay>
           <TouchableMenu onPress={() => this.setMenuVisible(!menuVisible)}>
             <TouchableMenuContainer>
               <MaterialCommunityIcons
                 size={ICON_SIZES.menuIcon}
                 name={MATERIAL_COMMUNITY_ICONS.menuVertical}
+                color={customTheme.secondaryColor}
               />
             </TouchableMenuContainer>
           </TouchableMenu>
@@ -355,7 +344,6 @@ class UserScreen extends Component {
           </Modal>
         )}
         {this.renderUserContent()}
-        {this.renderLoader()}
       </Container>
     );
   }

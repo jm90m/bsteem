@@ -18,6 +18,8 @@ export const baseUserSettingsRef = 'user-settings';
 export const getUserSettings = username => `${baseUserSettingsRef}/${username}/settings`;
 export const getNSFWDisplaySettingsRef = username =>
   `${getUserSettings(username)}/display-nsfw-setting`;
+export const getPostPreviewCompactModeSettingRef = username =>
+  `${getUserSettings(username)}/post-preview-compact-mode`;
 export const getUserSavedTagsRef = username => `${baseUserSettingsRef}/${username}/saved-tags`;
 export const getSaveTagRef = (username, tag) => `${getUserSavedTagsRef(username)}/${tag}`;
 
@@ -65,3 +67,15 @@ export const getBlockedUserRef = (username, blockUsername) =>
 
 export const getUserEnableVoteSliderRef = username => `${getUserSettings(username)}/vote-slider`;
 export const getUserVotePercentRef = username => `${getUserSettings(username)}/vote-percent`;
+
+export const getUserCustomThemeSettingsRef = username =>
+  `${getUserSettings(username)}/custom-theme`;
+
+export const getUserLanguageSettingRef = username =>
+  `${getUserSettings(username)}/language-setting`;
+
+export const getUserSignatureSettingRef = username => `${getUserSettings(username)}/user-signature`;
+export const getUserEnableSignatureSettingRef = username =>
+  `${getUserSettings(username)}/user-signature-enabled`;
+
+export const getUserUploadsRef = username => `${getUserSettings(username)}/uploads`;

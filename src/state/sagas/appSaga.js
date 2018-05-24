@@ -2,19 +2,18 @@ import { AsyncStorage, NetInfo } from 'react-native';
 import { takeLatest, call, put, all, takeEvery } from 'redux-saga/effects';
 import _ from 'lodash';
 import API from 'api/api';
-import { i18nInit } from 'i18n/i18n';
 import * as appActions from 'state/actions/appActions';
 import * as homeActions from 'state/actions/homeActions';
 import * as authActions from 'state/actions/authActions';
 import * as firebaseSaga from 'state/sagas/firebaseSaga';
 import * as messagesSaga from 'state/sagas/messagesSaga';
+import * as authSaga from 'state/sagas/authSaga';
 import * as currentUserActions from 'state/actions/currentUserActions';
 import * as feedFilters from 'constants/feedFilters';
 import {
   FETCH_STEEM_GLOBAL_PROPERTIES,
   FETCH_STEEM_RATE,
   FETCH_NETWORK_CONNECTION,
-  SET_TRANSLATIONS,
   APP_ONBOARDING,
   FETCH_CRYPTO_PRICE_HISTORY,
   FETCH_REWARD_FUND,
@@ -67,16 +66,6 @@ const fetchNetworkConnection = function*() {
   }
 };
 
-const setTranslations = function*(action) {
-  try {
-    const { locale } = action.payload;
-    yield call(i18nInit, locale);
-    console.log('success change locale to', locale);
-  } catch (error) {
-    console.log('failed to set translations');
-  }
-};
-
 const authenticateUser = function*() {
   const accessToken = yield call(AsyncStorage.getItem, STEEM_ACCESS_TOKEN);
   const username = yield call(AsyncStorage.getItem, AUTH_USERNAME);
@@ -107,13 +96,24 @@ const fetchRewardFund = function*() {
 
 const appOnboarding = function*() {
   try {
-    // authenticate
+    // authenticate & fetch user settings for custom themes
+    yield put(appActions.initialAppLoaded.action());
     yield call(authenticateUser);
+    const connectInfo = yield call(NetInfo.getConnectionInfo);
+    const connectInfoType = _.get(connectInfo, 'type');
+    const isNotConnected =
+      _.isEqual(connectInfoType, 'none') || _.isEqual(connectInfoType, 'unknown');
+
+    if (isNotConnected) {
+      yield put(appActions.initialAppLoaded.success());
+    }
+
+    yield call(settingsSaga.fetchUserSettings);
+    yield put(appActions.initialAppLoaded.success());
 
     // home screen onboarding
     yield all([
       call(fetchRewardFund),
-      call(settingsSaga.fetchUserSettings),
       call(fetchSteemRate),
       call(fetchGlobalSteemProperties),
       put(homeActions.fetchDiscussions(feedFilters.TRENDING)),
@@ -130,12 +130,15 @@ const appOnboarding = function*() {
         filter: feedFilters.TRENDING,
       }),
     );
+    yield call(authSaga.fetchSteemConnectAuthUserData);
 
     yield put(appActions.appOnboarding.success());
   } catch (error) {
+    yield put(appActions.initialAppLoaded.success());
     yield put(appActions.appOnboarding.fail(error));
   } finally {
     yield put(appActions.appOnboarding.loadingEnd());
+    yield put(appActions.initialAppLoaded.success());
   }
 };
 
@@ -167,10 +170,6 @@ export const watchFetchSteemRate = function*() {
 
 export const watchFetchNetworkConnection = function*() {
   yield takeLatest(FETCH_NETWORK_CONNECTION.ACTION, fetchNetworkConnection);
-};
-
-export const watchSetTranslations = function*() {
-  yield takeLatest(SET_TRANSLATIONS.ACTION, setTranslations);
 };
 
 export const watchAppOnboarding = function*() {

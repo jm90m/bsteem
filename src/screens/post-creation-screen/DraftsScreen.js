@@ -9,10 +9,12 @@ import * as firebaseActions from 'state/actions/firebaseActions';
 import Header from 'components/common/Header';
 import HeaderEmptyView from 'components/common/HeaderEmptyView';
 import BackButton from 'components/common/BackButton';
-import { getDrafts, getLoadingDrafts } from 'state/rootReducer';
-import i18n from 'i18n/i18n';
+import { getDrafts, getLoadingDrafts, getCustomTheme, getIntl } from 'state/rootReducer';
 import { COLORS, MATERIAL_ICONS, MATERIAL_COMMUNITY_ICONS, ICON_SIZES } from 'constants/styles';
 import BodyShort from 'components/post-preview/BodyShort';
+import StyledViewPrimaryBackground from 'components/common/StyledViewPrimaryBackground';
+import StyledTitleText from 'components/common/TitleText';
+import StyledTextByBackground from 'components/common/StyledTextByBackground';
 
 const Container = styled.View``;
 
@@ -21,22 +23,19 @@ const TitleContainer = styled.View`
   align-items: center;
 `;
 
-const TitleText = styled.Text`
-  color: ${COLORS.PRIMARY_COLOR};
-  font-weight: bold;
+const TitleText = styled(StyledTitleText)`
   margin-left: 3px;
 `;
 
-const DraftContainer = styled.View`
+const DraftContainer = styled(StyledViewPrimaryBackground)`
   padding: 5px 10px;
   margin: 5px 0;
-  background-color: ${COLORS.PRIMARY_BACKGROUND_COLOR};
   border-bottom-width: 1px;
   border-top-width: 1px;
-  border-color: ${COLORS.PRIMARY_BORDER_COLOR};
+  border-color: ${props => props.customTheme.primaryBorderColor};
 `;
 
-const DraftTitle = styled.Text`
+const DraftTitle = styled(StyledTextByBackground)`
   margin-left: 5px;
   padding-bottom: 10px;
   font-weight: 700;
@@ -51,17 +50,17 @@ const DeleteDraftContainer = styled.View`
 
 const StyledScrollView = styled.ScrollView`
   height: 100%;
-  background-color: ${COLORS.LIST_VIEW_BACKGROUND};
+  background-color: ${props => props.customTheme.listBackgroundColor};
 `;
 
-const DraftPreview = ({ postData, handleSelectDraft, handleDeleteDraft }) => (
-  <DraftContainer>
+const DraftPreview = ({ postData, handleSelectDraft, handleDeleteDraft, customTheme }) => (
+  <DraftContainer customTheme={customTheme}>
     <DeleteDraftContainer>
       <Touchable onPress={handleDeleteDraft(postData.draftID)}>
         <MaterialCommunityIcons
           name={MATERIAL_COMMUNITY_ICONS.closeCircle}
           size={30}
-          color={COLORS.RED.VALENCIA}
+          color={customTheme.negativeColor}
         />
       </Touchable>
     </DeleteDraftContainer>
@@ -73,14 +72,17 @@ const DraftPreview = ({ postData, handleSelectDraft, handleDeleteDraft }) => (
 );
 
 DraftPreview.propTypes = {
+  customTheme: PropTypes.shape().isRequired,
   postData: PropTypes.shape().isRequired,
   handleSelectDraft: PropTypes.func.isRequired,
   handleDeleteDraft: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = state => ({
+  customTheme: getCustomTheme(state),
   drafts: getDrafts(state),
   loadingDrafts: getLoadingDrafts(state),
+  intl: getIntl(state),
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -90,6 +92,8 @@ const mapDispatchToProps = dispatch => ({
 
 class DraftsScreen extends Component {
   static propTypes = {
+    customTheme: PropTypes.shape().isRequired,
+    intl: PropTypes.shape().isRequired,
     drafts: PropTypes.arrayOf(PropTypes.shape()).isRequired,
     loadingDrafts: PropTypes.bool.isRequired,
     fetchDrafts: PropTypes.func.isRequired,
@@ -107,7 +111,14 @@ class DraftsScreen extends Component {
   handleDeleteDraft = draftID => () => this.props.deleteDraft(draftID);
 
   render() {
-    const { handleHideDrafts, drafts, handleSelectDraft, loadingDrafts } = this.props;
+    const {
+      handleHideDrafts,
+      drafts,
+      handleSelectDraft,
+      loadingDrafts,
+      customTheme,
+      intl,
+    } = this.props;
     return (
       <Container>
         <Header>
@@ -116,13 +127,14 @@ class DraftsScreen extends Component {
             <MaterialCommunityIcons
               size={ICON_SIZES.menuIcon}
               name={MATERIAL_COMMUNITY_ICONS.noteMultipleOutline}
-              color={COLORS.PRIMARY_COLOR}
+              color={customTheme.primaryColor}
             />
-            <TitleText>{i18n.titles.drafts}</TitleText>
+            <TitleText>{intl.drafts}</TitleText>
           </TitleContainer>
           <HeaderEmptyView />
         </Header>
         <StyledScrollView
+          customTheme={customTheme}
           refreshControl={
             <RefreshControl
               refreshing={loadingDrafts}
@@ -138,6 +150,7 @@ class DraftsScreen extends Component {
               postData={draft}
               handleSelectDraft={handleSelectDraft}
               handleDeleteDraft={this.handleDeleteDraft}
+              customTheme={customTheme}
             />
           ))}
         </StyledScrollView>

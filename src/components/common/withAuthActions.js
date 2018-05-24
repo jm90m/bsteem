@@ -2,7 +2,7 @@ import React from 'react';
 import { View } from 'react-native';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { getIsAuthenticated } from 'state/rootReducer';
+import { getIsAuthenticated, getCustomTheme, getIntl } from 'state/rootReducer';
 import * as authActions from 'state/actions/authActions';
 import LoginModal from './LoginModal';
 
@@ -13,6 +13,8 @@ function getDisplayName(WrappedComponent) {
 export default function withAuthActions(WrappedComponent) {
   const mapStateToProps = state => ({
     authenticated: getIsAuthenticated(state),
+    customTheme: getCustomTheme(state),
+    intl: getIntl(state),
   });
 
   const mapDispatchToProps = dispatch => ({
@@ -33,6 +35,7 @@ export default function withAuthActions(WrappedComponent) {
       authenticated: PropTypes.bool,
       authenticateUserSuccess: PropTypes.func.isRequired,
       authenticateUserError: PropTypes.func.isRequired,
+      customTheme: PropTypes.shape().isRequired,
     };
 
     static defaultProps = {
@@ -72,6 +75,7 @@ export default function withAuthActions(WrappedComponent) {
 
     render() {
       const { displayLoginModal } = this.state;
+      const { customTheme, intl } = this.props;
       return (
         <View>
           {displayLoginModal && (
@@ -80,6 +84,8 @@ export default function withAuthActions(WrappedComponent) {
               handleLoginModalCancel={this.hideLoginModal}
               authenticateUserSuccess={this.props.authenticateUserSuccess}
               authenticateUserError={this.props.authenticateUserError}
+              customTheme={customTheme}
+              intl={intl}
             />
           )}
           <WrappedComponent onActionInitiated={this.handleActionInit} {...this.props} />

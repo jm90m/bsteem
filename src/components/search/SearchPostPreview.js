@@ -8,13 +8,17 @@ import _ from 'lodash';
 import Tag from 'components/post/Tag';
 import Avatar from 'components/common/Avatar';
 import TimeAgo from 'components/common/TimeAgo';
+import { connect } from 'react-redux';
+import { getCustomTheme } from 'state/rootReducer';
+import tinycolor from 'tinycolor2';
 
 const Container = styled.View`
-  background-color: ${COLORS.WHITE.WHITE};
+  background-color: ${props => props.customTheme.primaryBackgroundColor};
   margin-top: 5px;
   margin-bottom: 5px;
-  border-color: ${COLORS.WHITE.WHITE_SMOKE};
-  border-width: 2px;
+  border-color: ${props => props.customTheme.primaryBorderColor};
+  border-top-width: 2px;
+  border-bottom-width: 2px;
   padding: 10px;
 `;
 
@@ -28,7 +32,7 @@ const AuthorContents = styled.View`
 
 const AuthorText = styled.Text`
   font-weight: 700;
-  color: ${COLORS.PRIMARY_COLOR};
+  color: ${props => props.customTheme.primaryColor};
 `;
 
 const PostTitle = styled.Text`
@@ -36,6 +40,10 @@ const PostTitle = styled.Text`
   padding-bottom: 10px;
   font-weight: 700;
   font-size: 20px;
+  color: ${props =>
+    tinycolor(props.customTheme.primaryBackgroundColor).isDark()
+      ? COLORS.LIGHT_TEXT_COLOR
+      : COLORS.DARK_TEXT_COLOR};
 `;
 
 const TagsContainer = styled.View`
@@ -47,13 +55,13 @@ const TagContainer = styled.TouchableOpacity`
   margin: 3px 5px;
 `;
 
-const PostCreated = styled.Text`
-  color: ${COLORS.BLUE.BOTICELLI};
-  font-size: 14px;
-`;
+const mapStateToProps = state => ({
+  customTheme: getCustomTheme(state),
+});
 
 class SearchPostPreview extends Component {
   static propTypes = {
+    customTheme: PropTypes.shape().isRequired,
     author: PropTypes.string,
     title: PropTypes.string,
     summary: PropTypes.string,
@@ -100,23 +108,23 @@ class SearchPostPreview extends Component {
   }
 
   render() {
-    const { author, title, summary, tags, created } = this.props;
+    const { author, title, summary, tags, created, customTheme } = this.props;
 
     return (
-      <Container>
+      <Container customTheme={customTheme}>
         <AuthorContainer>
           <TouchableOpacity onPress={this.handleNavigateToUserScreen}>
             <Avatar username={author} size={40} />
           </TouchableOpacity>
           <AuthorContents>
             <TouchableOpacity onPress={this.handleNavigateToUserScreen}>
-              <AuthorText>{`@${author}`}</AuthorText>
+              <AuthorText customTheme={customTheme}>{`@${author}`}</AuthorText>
             </TouchableOpacity>
             <TimeAgo created={created} />
           </AuthorContents>
         </AuthorContainer>
         <TouchableOpacity onPress={this.handleNavigateToPostScreen}>
-          <PostTitle>{title}</PostTitle>
+          <PostTitle customTheme={customTheme}>{title}</PostTitle>
         </TouchableOpacity>
         <TouchableOpacity onPress={this.handleNavigateToPostScreen}>
           <BodyShort content={summary} />
@@ -133,4 +141,4 @@ class SearchPostPreview extends Component {
   }
 }
 
-export default SearchPostPreview;
+export default connect(mapStateToProps)(SearchPostPreview);

@@ -220,6 +220,11 @@ class API {
     const requestQuery = API.createRequestQuery('get_reward_fund', ['post']);
     return sendPostRequest(API.BASE_URL, requestQuery);
   }
+
+  static async getReplies(username) {
+    const requestQuery = API.createRequestQuery('get_state', [`/@${username}/recent-replies`]);
+    return sendPostRequest(API.BASE_URL, requestQuery);
+  }
 }
 
 export const getAPIByFilter = filterId => {

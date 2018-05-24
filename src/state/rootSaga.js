@@ -22,6 +22,9 @@ const rootSaga = function*() {
     // Posts Sagas
     spawn(postsSaga.watchFetchComments),
     spawn(postsSaga.watchFetchPostDetails),
+    spawn(postsSaga.watchSavePostOffline),
+    spawn(postsSaga.watchFetchSavedOfflinePosts),
+    spawn(postsSaga.watchUnsavePostOffline),
 
     // User Sagas
     spawn(usersSaga.watchFetchUser),
@@ -58,7 +61,6 @@ const rootSaga = function*() {
     spawn(appSaga.watchFetchSteemGlobalProperties),
     spawn(appSaga.watchFetchSteemRate),
     spawn(appSaga.watchFetchNetworkConnection),
-    spawn(appSaga.watchSetTranslations),
     spawn(appSaga.watchAppOnboarding),
     spawn(appSaga.watchFetchCryptoPriceHistory),
     spawn(appSaga.watchFetchRewardFund),
@@ -84,6 +86,10 @@ const rootSaga = function*() {
 
     // Auth Sagas
     spawn(authSaga.watchAuthenticateUser),
+    spawn(authSaga.watchFetchSteemConnectAuthUserData),
+    spawn(authSaga.watchSaveNotificationsLastTimestamp),
+    spawn(authSaga.watchFetchBSteemNotifications),
+    spawn(authSaga.watchLogoutUser),
 
     // Settings Sagas
     spawn(settingsSaga.watchFetchUserSettings),
@@ -93,6 +99,11 @@ const rootSaga = function*() {
     spawn(settingsSaga.watchFetchReportedPosts),
     spawn(settingsSaga.watchUpdateVotingSliderSetting),
     spawn(settingsSaga.watchUpdateVotingPercentSetting),
+    spawn(settingsSaga.watchUpdateCustomTheme),
+    spawn(settingsSaga.watchSavePostPreviewSetting),
+    spawn(settingsSaga.watchUpdateUserLanguageSetting),
+    spawn(settingsSaga.watchUpdateUserSignature),
+    spawn(settingsSaga.watchUpdateEnableUserSignature),
 
     // Messages Sagas
     spawn(messagesSaga.watchFetchDisplayedMessages),

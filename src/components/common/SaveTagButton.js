@@ -6,13 +6,14 @@ import styled from 'styled-components/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { MATERIAL_COMMUNITY_ICONS, COLORS, ICON_SIZES } from '../../constants/styles';
 import { saveTag, unsaveTag } from '../../state/actions/firebaseActions';
-import { getPendingSavingTags, getSavedTags } from '../../state/rootReducer';
+import { getPendingSavingTags, getSavedTags, getCustomTheme } from '../../state/rootReducer';
 import SmallLoading from './SmallLoading';
 
 const Touchable = styled.TouchableOpacity``;
 
 @connect(
   state => ({
+    customTheme: getCustomTheme(state),
     pendingSavingTags: getPendingSavingTags(state),
     savedTags: getSavedTags(state),
   }),
@@ -26,6 +27,7 @@ class SaveTagButton extends Component {
     tag: PropTypes.string.isRequired,
     saveTag: PropTypes.func.isRequired,
     unsaveTag: PropTypes.func.isRequired,
+    customTheme: PropTypes.shape().isRequired,
   };
 
   constructor(props) {
@@ -46,7 +48,7 @@ class SaveTagButton extends Component {
   }
 
   render() {
-    const { tag, savedTags, pendingSavingTags } = this.props;
+    const { tag, savedTags, pendingSavingTags, customTheme } = this.props;
 
     if (_.includes(pendingSavingTags, tag)) {
       return <SmallLoading style={{ marginLeft: 5 }} />;
@@ -59,7 +61,7 @@ class SaveTagButton extends Component {
         <MaterialCommunityIcons
           name={MATERIAL_COMMUNITY_ICONS.savedTag}
           size={ICON_SIZES.menuIcon}
-          color={COLORS.PRIMARY_COLOR}
+          color={customTheme.primaryColor}
         />
       </Touchable>
     ) : (
@@ -67,7 +69,7 @@ class SaveTagButton extends Component {
         <MaterialCommunityIcons
           name={MATERIAL_COMMUNITY_ICONS.saveTag}
           size={ICON_SIZES.menuIcon}
-          color={COLORS.PRIMARY_COLOR}
+          color={customTheme.primaryColor}
         />
       </Touchable>
     );

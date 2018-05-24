@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components/native';
-import i18n from 'i18n/i18n';
 import { connect } from 'react-redux';
 import _ from 'lodash';
 import { COLORS, ICON_SIZES, MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
@@ -14,20 +13,16 @@ import {
   getLoadingMessagesSearchUserResults,
   getDisplayedMessages,
   getBlockedUsers,
+  getCustomTheme,
+  getIntl,
 } from 'state/rootReducer';
 import { SearchBar } from 'react-native-elements';
 import * as navigationConstants from 'constants/navigation';
 import * as firebaseActions from 'state/actions/firebaseActions';
 import UserMessagePreview from 'components/messages/UserMessagePreview';
-
-const Container = styled.View`
-  background-color: ${COLORS.PRIMARY_BACKGROUND_COLOR};
-`;
-
-const TitleText = styled.Text`
-  font-weight: bold;
-  color: ${COLORS.PRIMARY_COLOR};
-`;
+import TitleText from 'components/common/TitleText';
+import StyledViewPrimaryBackground from 'components/common/StyledViewPrimaryBackground';
+import tinycolor from 'tinycolor2';
 
 const ScrollView = styled.ScrollView`
   height: 100%;
@@ -38,11 +33,13 @@ const MenuIconContainer = styled.View`
 `;
 
 const mapStateToProps = state => ({
+  customTheme: getCustomTheme(state),
   blockedUsers: getBlockedUsers(state),
   displayedMessages: getDisplayedMessages(state),
   messagesSearchUserResults: getMessagesSearchUserResults(state),
   loadingFetchMessages: getLoadingFetchMessages(state),
   loadingMessagesSearchUserResults: getLoadingMessagesSearchUserResults(state),
+  intl: getIntl(state),
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -53,14 +50,18 @@ const mapDispatchToProps = dispatch => ({
 class MessagesScreen extends Component {
   static navigationOptions = {
     tabBarVisible: false,
+    drawerLabel: 'Messages',
+    drawerLockMode: 'locked-closed',
   };
 
   static propTypes = {
+    customTheme: PropTypes.shape().isRequired,
     messagesSearchUserResults: PropTypes.arrayOf(PropTypes.shape()).isRequired,
     searchUserMessages: PropTypes.func.isRequired,
     navigation: PropTypes.shape().isRequired,
     displayedMessages: PropTypes.arrayOf(PropTypes.shape()).isRequired,
     blockedUsers: PropTypes.shape().isRequired,
+    intl: PropTypes.shape().isRequired,
     fetchBlockedUsers: PropTypes.func.isRequired,
   };
 
@@ -143,13 +144,17 @@ class MessagesScreen extends Component {
   }
 
   render() {
+    const { customTheme, intl } = this.props;
     const { currentSearchValue } = this.state;
+    const color = tinycolor(customTheme.primaryBackgroundColor).isDark()
+      ? COLORS.LIGHT_TEXT_COLOR
+      : COLORS.DARK_TEXT_COLOR;
 
     return (
-      <Container>
+      <StyledViewPrimaryBackground>
         <Header>
           <BackButton navigateBack={this.handleNavigateBack} />
-          <TitleText>{i18n.titles.messages}</TitleText>
+          <TitleText>{intl.messages}</TitleText>
           <MenuIconContainer>
             <MaterialCommunityIcons
               size={ICON_SIZES.menuIcon}
@@ -164,18 +169,18 @@ class MessagesScreen extends Component {
           placeholder=""
           value={currentSearchValue}
           containerStyle={{
-            backgroundColor: COLORS.PRIMARY_BACKGROUND_COLOR,
+            backgroundColor: customTheme.primaryBackgroundColor,
             borderTopWidth: 0,
-            borderBottomColor: COLORS.PRIMARY_BORDER_COLOR,
+            borderBottomColor: customTheme.primaryBorderColor,
           }}
-          inputStyle={{ backgroundColor: COLORS.PRIMARY_BACKGROUND_COLOR }}
+          inputStyle={{ backgroundColor: customTheme.primaryBackgroundColor, color }}
           showLoadingIcon={false}
           autoCorrect={false}
           autoCapitalize="none"
           clearIcon
         />
         <ScrollView>{this.renderSearchResults()}</ScrollView>
-      </Container>
+      </StyledViewPrimaryBackground>
     );
   }
 }

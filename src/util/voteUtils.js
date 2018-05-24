@@ -9,7 +9,7 @@ export const isPostVoted = (postData, authUsername) => {
     return false;
   }
   const userVote = _.find(postData.active_votes, { voter: authUsername }) || {};
-  return userVote.percent > 0;
+  return _.get(userVote, 'percent', 0) > 0;
 };
 
 export const getRatio = postData => {

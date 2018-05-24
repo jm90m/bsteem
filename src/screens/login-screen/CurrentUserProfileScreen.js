@@ -24,23 +24,27 @@ import {
   getRefreshUserBlogLoading,
 } from 'state/rootReducer';
 import { logoutUser } from 'state/actions/authActions';
+import sc2 from 'api/sc2';
+import { AsyncStorage } from 'react-native';
+import { getCurrentUserSettings } from 'state/actions/settingsActions';
 import { currentUserFollowListFetch } from 'state/actions/currentUserActions';
-import { COLORS } from 'constants/styles';
 import * as userMenuConstants from 'constants/userMenu';
 import * as navigationConstants from 'constants/navigation';
+import { getUserDetailsHelper } from 'util/bsteemUtils';
+import {
+  AUTH_EXPIRATION,
+  AUTH_MAX_EXPIRATION_AGE,
+  AUTH_USERNAME,
+  STEEM_ACCESS_TOKEN,
+} from 'constants/asyncStorageKeys';
 import UserBlog from 'screens/user-screen/UserBlog';
 import UserComments from 'screens/user-screen/UserComments';
 import BSteemModal from 'components/common/BSteemModal';
 import CurrentUserHeader from './CurrentUserHeader';
 import CurrentUserMenu from './CurrentUserMenu';
-import LogoutScreen from './LogoutScreen';
 
 const Container = styled.View`
   flex: 1;
-`;
-
-const Loading = styled.ActivityIndicator`
-  margin-top: 10px;
 `;
 
 const mapStateToProps = state => ({
@@ -65,6 +69,7 @@ const mapDispatchToProps = dispatch => ({
   fetchUserFollowCount: username => dispatch(fetchUserFollowCount.action({ username })),
   fetchCurrentUserFollowList: () => dispatch(currentUserFollowListFetch.action()),
   refreshUserBlog: username => dispatch(refreshUserBlog.action({ username })),
+  getCurrentUserSettings: () => dispatch(getCurrentUserSettings.action()),
 });
 
 @connect(mapStateToProps, mapDispatchToProps)
@@ -76,9 +81,6 @@ class CurrentUserProfileScreen extends Component {
     fetchUserBlog: PropTypes.func.isRequired,
     fetchUserComments: PropTypes.func.isRequired,
     fetchUserFollowCount: PropTypes.func.isRequired,
-    loadingUsersBlog: PropTypes.bool.isRequired,
-    loadingUsersComments: PropTypes.bool.isRequired,
-    logoutUser: PropTypes.func.isRequired,
     refreshUserBlog: PropTypes.func.isRequired,
     refreshUserBlogLoading: PropTypes.bool,
     navigation: PropTypes.shape().isRequired,
@@ -87,6 +89,7 @@ class CurrentUserProfileScreen extends Component {
     usersComments: PropTypes.shape().isRequired,
     usersDetails: PropTypes.shape().isRequired,
     usersFollowCount: PropTypes.shape().isRequired,
+    getCurrentUserSettings: PropTypes.func.isRequired,
   };
 
   static defaultProps = {
@@ -99,7 +102,6 @@ class CurrentUserProfileScreen extends Component {
     this.state = {
       currentMenuOption: userMenuConstants.BLOG,
       menuVisible: false,
-      logoutVisible: false,
     };
 
     this.toggleCurrentUserMenu = this.toggleCurrentUserMenu.bind(this);
@@ -109,9 +111,7 @@ class CurrentUserProfileScreen extends Component {
     this.fetchMoreUserComments = this.fetchMoreUserComments.bind(this);
     this.fetchMoreUserPosts = this.fetchMoreUserPosts.bind(this);
     this.handleRefreshUserBlog = this.handleRefreshUserBlog.bind(this);
-    this.showLogoutScreen = this.showLogoutScreen.bind(this);
     this.handleNavigateToEditProfile = this.handleNavigateToEditProfile.bind(this);
-    this.hideLogoutScreen = this.hideLogoutScreen.bind(this);
   }
 
   componentDidMount() {
@@ -123,10 +123,10 @@ class CurrentUserProfileScreen extends Component {
       usersFollowCount,
       currentUserFollowList,
     } = this.props;
-    const userDetails = _.get(usersDetails, username, []);
-    const userComments = _.get(usersComments, username, []);
-    const userBlog = _.get(usersBlog, username, []);
-    const userFollowCount = _.get(usersFollowCount, username, {});
+    const userDetails = getUserDetailsHelper(usersDetails, username, []);
+    const userComments = getUserDetailsHelper(usersComments, username, []);
+    const userBlog = getUserDetailsHelper(usersBlog, username, []);
+    const userFollowCount = getUserDetailsHelper(usersFollowCount, username, {});
 
     if (_.isEmpty(userDetails)) {
       this.props.fetchUser(username);
@@ -177,17 +177,31 @@ class CurrentUserProfileScreen extends Component {
     this.props.refreshUserBlog(username);
   }
 
-  showLogoutScreen() {
-    this.setState({
-      logoutVisible: true,
-      menuVisible: false,
-    });
+  async resetAuthUserInAsyncStorage() {
+    try {
+      AsyncStorage.setItem(STEEM_ACCESS_TOKEN, '');
+      AsyncStorage.setItem(AUTH_EXPIRATION, '');
+      AsyncStorage.setItem(AUTH_USERNAME, '');
+      AsyncStorage.setItem(AUTH_MAX_EXPIRATION_AGE, '');
+    } catch (e) {
+      console.log('FAILED TO RESET ASYNC STORAGE FOR AUTH USER');
+    }
   }
 
-  hideLogoutScreen() {
-    this.setState({
-      logoutVisible: false,
-    });
+  handleLogout() {
+    sc2
+      .revokeToken()
+      .then(() => {
+        this.resetAuthUserInAsyncStorage();
+        this.props.logoutUser();
+        this.props.getCurrentUserSettings();
+      })
+      .catch(() => {
+        console.log('SC2 fail - but logout anyways');
+        // TODO errors out here, still need to fix why sc2 is breaking
+        this.resetAuthUserInAsyncStorage();
+        this.props.logoutUser();
+      });
   }
 
   handleChangeUserMenu(option) {
@@ -225,8 +239,16 @@ class CurrentUserProfileScreen extends Component {
           () => this.props.navigation.navigate(navigationConstants.USER_WALLET, { username }),
         );
         break;
+      case userMenuConstants.REPLIES.id:
+        this.setState(
+          {
+            menuVisible: false,
+          },
+          () => this.props.navigation.navigate(navigationConstants.USER_REPLIES, { username }),
+        );
+        break;
       case userMenuConstants.LOGOUT.id:
-        this.showLogoutScreen();
+        this.handleLogout();
         break;
       case userMenuConstants.SETTINGS.id:
         this.setState(
@@ -247,7 +269,7 @@ class CurrentUserProfileScreen extends Component {
 
   fetchMoreUserPosts() {
     const { username, usersBlog } = this.props;
-    const userBlog = _.get(usersBlog, username, []);
+    const userBlog = getUserDetailsHelper(usersBlog, username, []);
 
     if (_.isEmpty(userBlog)) {
       const query = { tag: username, limit: 10 };
@@ -266,7 +288,7 @@ class CurrentUserProfileScreen extends Component {
 
   fetchMoreUserComments() {
     const { usersComments, username } = this.props;
-    const userComments = _.get(usersComments, username, []);
+    const userComments = getUserDetailsHelper(usersComments, username, []);
 
     if (_.isEmpty(usersComments)) {
       const query = { start_author: username, limit: 10 };
@@ -285,8 +307,8 @@ class CurrentUserProfileScreen extends Component {
   renderUserContent() {
     const { currentMenuOption } = this.state;
     const { username, usersComments, usersBlog, refreshUserBlogLoading } = this.props;
-    const userComments = _.get(usersComments, username, []);
-    const userBlog = _.get(usersBlog, username, []);
+    const userComments = getUserDetailsHelper(usersComments, username, []);
+    const userBlog = getUserDetailsHelper(usersBlog, username, []);
 
     switch (currentMenuOption.id) {
       case userMenuConstants.COMMENTS.id:
@@ -316,20 +338,8 @@ class CurrentUserProfileScreen extends Component {
     }
   }
 
-  renderLoader() {
-    const { currentMenuOption } = this.state;
-    const { loadingUsersComments, loadingUsersBlog } = this.props;
-
-    switch (currentMenuOption.id) {
-      case userMenuConstants.COMMENTS.id:
-        return loadingUsersComments && <Loading color={COLORS.PRIMARY_COLOR} size="large" />;
-      default:
-        return null;
-    }
-  }
-
   render() {
-    const { currentMenuOption, menuVisible, logoutVisible } = this.state;
+    const { currentMenuOption, menuVisible } = this.state;
     return (
       <Container>
         <CurrentUserHeader
@@ -338,12 +348,6 @@ class CurrentUserProfileScreen extends Component {
           handleNavigateToEditProfile={this.handleNavigateToEditProfile}
         />
         {this.renderUserContent()}
-        {this.renderLoader()}
-        <LogoutScreen
-          visible={logoutVisible}
-          handleHide={this.hideLogoutScreen}
-          logoutUser={this.props.logoutUser}
-        />
         {menuVisible && (
           <BSteemModal visible={menuVisible} handleOnClose={this.hideCurrentUserMenu}>
             <CurrentUserMenu

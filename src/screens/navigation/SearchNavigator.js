@@ -21,6 +21,8 @@ import EditPostScreen from '../post-creation-screen/EditPostScreen';
 import EditProfileScreen from '../stack-screens/EditProfileScreen';
 import UserMessageScreen from '../stack-screens/UserMessageScreen';
 import TransferScreen from '../stack-screens/TransferScreen';
+import RepliesFeedScreen from '../stack-screens/RepliesFeedScreen';
+import BeneficiariesScreen from '../stack-screens/BeneficiariesScreen';
 
 const screenNavigationOptions = {
   tabBarIcon: ({ tintColor }) => (
@@ -99,6 +101,14 @@ const SearchNavigator = StackNavigator(
     },
     [navigationConstants.TRANSFERS]: {
       screen: TransferScreen,
+      navigationOptions: screenNavigationOptions,
+    },
+    [navigationConstants.USER_REPLIES]: {
+      screen: RepliesFeedScreen,
+      navigationOptions: screenNavigationOptions,
+    },
+    [navigationConstants.POST_BENEFICIARIES]: {
+      screen: BeneficiariesScreen,
       navigationOptions: screenNavigationOptions,
     },
   },

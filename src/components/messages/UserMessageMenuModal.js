@@ -10,6 +10,8 @@ const UserMessageMenuModal = ({
   handleBlockUser,
   isBlocked,
   handleHideUserMessage,
+  customTheme,
+  intl,
 }) => {
   if (!visible) return null;
 
@@ -21,6 +23,8 @@ const UserMessageMenuModal = ({
         handleBlockUser={handleBlockUser}
         isBlocked={isBlocked}
         handleHideUserMessage={handleHideUserMessage}
+        customTheme={customTheme}
+        intl={intl}
       />
     </BSteemModal>
   );
@@ -33,6 +37,8 @@ UserMessageMenuModal.propTypes = {
   handleNavigateToUser: PropTypes.func.isRequired,
   handleBlockUser: PropTypes.func.isRequired,
   handleHideUserMessage: PropTypes.func.isRequired,
+  customTheme: PropTypes.shape().isRequired,
+  intl: PropTypes.shape().isRequired,
 };
 
 export default UserMessageMenuModal;

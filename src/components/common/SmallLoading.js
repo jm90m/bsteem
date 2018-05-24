@@ -1,15 +1,21 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components/native';
-import { COLORS } from 'constants/styles';
+import { connect } from 'react-redux';
+import { getCustomTheme } from 'state/rootReducer';
 
 const Loading = styled.ActivityIndicator``;
 
-const SmallLoading = ({ style }) => (
-  <Loading color={COLORS.PRIMARY_COLOR} size="small" style={style} />
+const mapStateToProps = state => ({
+  customTheme: getCustomTheme(state),
+});
+
+const SmallLoading = ({ style, customTheme }) => (
+  <Loading color={customTheme.primaryColor} size="small" style={style} />
 );
 
 SmallLoading.propTypes = {
+  customTheme: PropTypes.shape().isRequired,
   style: PropTypes.shape(),
 };
 
@@ -17,4 +23,4 @@ SmallLoading.defaultProps = {
   style: {},
 };
 
-export default SmallLoading;
+export default connect(mapStateToProps)(SmallLoading);

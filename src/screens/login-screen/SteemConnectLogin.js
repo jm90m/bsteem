@@ -17,30 +17,27 @@ import {
   AUTH_USERNAME,
 } from 'constants/asyncStorageKeys';
 import * as authActions from 'state/actions/authActions';
-import i18n from 'i18n/i18n';
 import * as navigationConstants from 'constants/navigation';
 import Header from 'components/common/Header';
 import HeaderEmptyView from 'components/common/HeaderEmptyView';
-import BsteemIcon from '../../../assets/bsteem-name-logo.png';
-
-const mapDispatchToProps = dispatch => ({
-  authenticateUserSuccess: payload => dispatch(authActions.authenticateUser.success(payload)),
-  authenticateUserError: error => dispatch(authActions.authenticateUser.fail(error)),
-});
+import StyledViewPrimaryBackground from 'components/common/StyledViewPrimaryBackground';
+import StyledTextByBackground from 'components/common/StyledTextByBackground';
+import TitleText from 'components/common/TitleText';
+import { getCustomTheme, getIntl } from 'state/rootReducer';
+import tinycolor from 'tinycolor2';
 
 const Container = styled.View``;
 
-const ContentContainer = styled.View`
-  background-color: ${COLORS.PRIMARY_BACKGROUND_COLOR};
+const ContentContainer = styled(StyledViewPrimaryBackground)`
   align-items: center;
   height: 100%;
 `;
 
-const DebugText = styled.Text`
+const DebugText = styled(StyledTextByBackground)`
   padding: 20px;
 `;
 
-const Description = styled.Text`
+const Description = styled(StyledTextByBackground)`
   padding: 20px;
   text-align: center;
   font-weight: bold;
@@ -51,19 +48,24 @@ const ButtonContainer = styled.View`
   margin-top: 20px;
 `;
 
-const Logo = styled.Image``;
-
 const TouchableSettings = styled.TouchableOpacity``;
 
 const SettingsIconContainer = styled.View``;
 
-const Title = styled.Text`
-  font-weight: bold;
-  color: ${COLORS.PRIMARY_COLOR};
-`;
+const mapStateToProps = state => ({
+  customTheme: getCustomTheme(state),
+  intl: getIntl(state),
+});
+
+const mapDispatchToProps = dispatch => ({
+  authenticateUserSuccess: payload => dispatch(authActions.authenticateUser.success(payload)),
+  authenticateUserError: error => dispatch(authActions.authenticateUser.fail(error)),
+});
 
 class SteemConnectLogin extends Component {
   static propTypes = {
+    customTheme: PropTypes.shape().isRequired,
+    intl: PropTypes.shape().isRequired,
     authenticateUserSuccess: PropTypes.func.isRequired,
     authenticateUserError: PropTypes.func.isRequired,
     navigation: PropTypes.shape().isRequired,
@@ -147,17 +149,25 @@ class SteemConnectLogin extends Component {
   }
 
   render() {
+    const { customTheme, intl } = this.props;
+    const loginButtonTextColor = tinycolor(customTheme.primaryColor).isDark()
+      ? COLORS.LIGHT_TEXT_COLOR
+      : COLORS.DARK_TEXT_COLOR;
+    const signupButtonTextColor = tinycolor(customTheme.secondaryColor).isDark()
+      ? COLORS.LIGHT_TEXT_COLOR
+      : COLORS.DARK_TEXT_COLOR;
+
     return (
       <Container>
         <Header>
           <HeaderEmptyView />
-          <Title>{i18n.titles.login}</Title>
+          <TitleText>{intl.login}</TitleText>
           <TouchableSettings onPress={this.navigateToSettings}>
             <SettingsIconContainer>
               <MaterialIcons
                 name={MATERIAL_ICONS.settings}
                 size={24}
-                color={COLORS.PRIMARY_COLOR}
+                color={customTheme.primaryColor}
                 style={{ padding: 5 }}
               />
             </SettingsIconContainer>
@@ -165,22 +175,24 @@ class SteemConnectLogin extends Component {
         </Header>
         <ContentContainer>
           <TouchableWithoutFeedback onLongPress={this.displayDebugText}>
-            <Logo source={BsteemIcon} style={{ width: 200, height: 200 }} resizeMode="contain" />
+            <TitleText style={{ fontSize: 24, marginTop: 40 }}>bSteem</TitleText>
           </TouchableWithoutFeedback>
-          <Description>{i18n.login.description}</Description>
+          <Description>{intl.steemconnect_login_description}</Description>
           <ButtonContainer>
             <PrimaryButton
               onPress={this.handleSteemConnectLogin}
-              title={i18n.login.loginWithSC}
+              title={intl.login_with_steemconnect}
               fontWeight="bold"
-              backgroundColor={COLORS.PRIMARY_COLOR}
+              backgroundColor={customTheme.primaryColor}
+              color={loginButtonTextColor}
             />
           </ButtonContainer>
           <ButtonContainer>
             <SecondaryButton
               onPress={this.handleSignUp}
               fontWeight="bold"
-              title={i18n.login.signUp}
+              title={intl.signup}
+              color={signupButtonTextColor}
             />
           </ButtonContainer>
           {this.renderDebugText()}
@@ -190,4 +202,4 @@ class SteemConnectLogin extends Component {
   }
 }
 
-export default connect(null, mapDispatchToProps)(SteemConnectLogin);
+export default connect(mapStateToProps, mapDispatchToProps)(SteemConnectLogin);

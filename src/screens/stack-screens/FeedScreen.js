@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { RefreshControl } from 'react-native';
+import { RefreshControl, View } from 'react-native';
 import _ from 'lodash';
 import styled from 'styled-components/native';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { getAPIByFilter } from 'api/api';
-import { COLORS, MATERIAL_ICONS, MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
+import { ICON_SIZES, MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
 import { TRENDING } from 'constants/feedFilters';
 import Tag from 'components/post/Tag';
 import PostPreview from 'components/post-preview/PostPreview';
@@ -13,56 +13,53 @@ import FeedSort from 'components/feed-sort/FeedSort';
 import Header from 'components/common/Header';
 import SaveTagButton from 'components/common/SaveTagButton';
 import { connect } from 'react-redux';
-import { getCurrentUserFollowList } from 'state/rootReducer';
-import i18n from 'i18n/i18n';
-import BSteemModal from '../../components/common/BSteemModal';
+import { getCurrentUserFollowList, getCustomTheme, getIntl } from 'state/rootReducer';
+import BSteemModal from 'components/common/BSteemModal';
+import StyledFlatList from 'components/common/StyledFlatList';
+import StyledViewPrimaryBackground from 'components/common/StyledViewPrimaryBackground';
+import StyledTextByBackground from 'components/common/StyledTextByBackground';
+import LargeLoading from 'components/common/LargeLoading';
+import BackButton from 'components/common/BackButton';
+import CompactViewFeedHeaderSetting from 'components/common/CompactViewFeedHeaderSetting';
+import CryptoFeedChart from 'components/common/CryptoFeedChart';
 
 const Container = styled.View`
   flex: 1;
-`;
-
-const StyledFlatList = styled.FlatList`
-  background-color: ${COLORS.WHITE.WHITE_SMOKE};
-`;
-
-const BackTouchable = styled.TouchableOpacity`
-  justify-content: center;
-  padding: 10px;
 `;
 
 const TouchableMenu = styled.TouchableOpacity`
   flex-direction: row;
 `;
 
-const Loading = styled.ActivityIndicator`
-  padding: 10px;
-`;
-
 const TagContainer = styled.View`
   flex-direction: row;
 `;
 
-const EmptyFeedView = styled.View`
+const EmptyFeedView = styled(StyledViewPrimaryBackground)`
   padding: 20px;
-  background-color: ${COLORS.WHITE.WHITE};
 `;
 
-const EmptyFeedText = styled.Text`
+const EmptyFeedText = styled(StyledTextByBackground)`
   font-size: 18px;
 `;
 
 const mapStateToProps = state => ({
+  customTheme: getCustomTheme(state),
   currentUserFollowList: getCurrentUserFollowList(state),
+  intl: getIntl(state),
 });
 
 class FeedScreen extends Component {
   static navigationOptions = {
     headerMode: 'none',
     tabBarVisible: false,
+    drawerLockMode: 'locked-closed',
   };
 
   static propTypes = {
+    customTheme: PropTypes.shape().isRequired,
     currentUserFollowList: PropTypes.shape(),
+    intl: PropTypes.shape().isRequired,
   };
 
   static defaultProps = {
@@ -187,18 +184,19 @@ class FeedScreen extends Component {
 
   renderLoadingOrEmptyText(displayedPosts) {
     const { posts, loading } = this.state;
+    const { intl } = this.props;
     if (loading) {
-      return <Loading color={COLORS.PRIMARY_COLOR} size="large" />;
+      return <LargeLoading style={{ paddingTop: 10, paddingBottom: 10 }} />;
     } else if (_.isEmpty(posts)) {
       return (
         <EmptyFeedView>
-          <EmptyFeedText>{i18n.feed.emptyFeed}</EmptyFeedText>
+          <EmptyFeedText>{intl.feed_empty}</EmptyFeedText>
         </EmptyFeedView>
       );
     } else if (_.isEmpty(displayedPosts)) {
       return (
         <EmptyFeedView>
-          <EmptyFeedText>{i18n.feed.emptyFeedCheckFilters}</EmptyFeedText>
+          <EmptyFeedText>{intl.empty_feed_check_filters}</EmptyFeedText>
         </EmptyFeedView>
       );
     }
@@ -206,7 +204,7 @@ class FeedScreen extends Component {
   }
 
   render() {
-    const { currentUserFollowList } = this.props;
+    const { currentUserFollowList, customTheme } = this.props;
     const { tag } = this.props.navigation.state.params;
     const { currentFilter, menuVisible, posts, filterFeedByFollowers, loading } = this.state;
     const displayListView = _.size(posts) > 0;
@@ -217,16 +215,22 @@ class FeedScreen extends Component {
     return (
       <Container>
         <Header>
-          <BackTouchable onPress={this.navigateBack}>
-            <MaterialIcons size={24} name={MATERIAL_ICONS.back} />
-          </BackTouchable>
+          <BackButton navigateBack={this.navigateBack} />
           <TagContainer>
             <Tag tag={tag} />
             <SaveTagButton tag={tag} />
           </TagContainer>
           <TouchableMenu onPress={() => this.setMenuVisible(!menuVisible)}>
-            <MaterialIcons size={24} name={currentFilter.icon} color={COLORS.PRIMARY_COLOR} />
-            <MaterialCommunityIcons size={24} name={MATERIAL_COMMUNITY_ICONS.menuVertical} />
+            <MaterialIcons
+              size={ICON_SIZES.menuIcon}
+              name={currentFilter.icon}
+              color={customTheme.primaryColor}
+            />
+            <MaterialCommunityIcons
+              size={ICON_SIZES.menuIcon}
+              name={MATERIAL_COMMUNITY_ICONS.menuVertical}
+              color={customTheme.secondaryColor}
+            />
           </TouchableMenu>
         </Header>
         {menuVisible && (
@@ -242,6 +246,12 @@ class FeedScreen extends Component {
         {this.renderLoadingOrEmptyText(displayedPosts)}
         {displayListView && (
           <StyledFlatList
+            ListHeaderComponent={
+              <View>
+                <CompactViewFeedHeaderSetting />
+                <CryptoFeedChart tag={tag} />
+              </View>
+            }
             data={displayedPosts}
             renderItem={this.renderRow}
             enableEmptySections
@@ -252,8 +262,8 @@ class FeedScreen extends Component {
               <RefreshControl
                 refreshing={loading}
                 onRefresh={this.fetchInitialPostsForFilter}
-                tintColor={COLORS.PRIMARY_COLOR}
-                colors={[COLORS.PRIMARY_COLOR]}
+                tintColor={customTheme.primaryColor}
+                colors={[customTheme.primaryColor]}
               />
             }
           />

@@ -5,13 +5,11 @@ import { TouchableWithoutFeedback } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import _ from 'lodash';
 import styled from 'styled-components/native';
-import { COLORS } from 'constants/styles';
 import { FEED_FILTERS } from 'constants/feedFilters';
 import MenuModalButton from 'components/common/menu/MenuModalButton';
 import MenuWrapper from 'components/common/menu/MenuWrapper';
 import { CheckBox } from 'react-native-elements';
-import { getIsAuthenticated } from 'state/rootReducer';
-import i18n from '../../i18n/i18n';
+import { getIsAuthenticated, getCustomTheme, getIntl } from 'state/rootReducer';
 
 const Container = styled.View`
   flex: 1;
@@ -27,12 +25,14 @@ const MenuModalContents = styled.View`
 
 const MenuText = styled.Text`
   margin-left: 5px;
-  color: ${COLORS.PRIMARY_COLOR};
+  color: ${props => props.customTheme.primaryColor};
   font-weight: bold;
 `;
 
 const mapStateToProps = state => ({
   authenticated: getIsAuthenticated(state),
+  customTheme: getCustomTheme(state),
+  intl: getIntl(state),
 });
 
 class FeedSort extends Component {
@@ -42,12 +42,20 @@ class FeedSort extends Component {
     authenticated: PropTypes.bool.isRequired,
     handleFilterFeedByFollowers: PropTypes.func.isRequired,
     filterFeedByFollowers: PropTypes.bool.isRequired,
+    customTheme: PropTypes.shape().isRequired,
+    intl: PropTypes.shape().isRequired,
   };
 
   handleSortPost = filter => () => this.props.handleSortPost(filter);
 
   render() {
-    const { authenticated, filterFeedByFollowers, handleFilterFeedByFollowers } = this.props;
+    const {
+      authenticated,
+      filterFeedByFollowers,
+      handleFilterFeedByFollowers,
+      customTheme,
+      intl,
+    } = this.props;
     return (
       <TouchableWithoutFeedback onPress={this.props.hideMenu}>
         <Container>
@@ -55,8 +63,8 @@ class FeedSort extends Component {
             {_.map(FEED_FILTERS, filter => (
               <MenuModalButton onPress={this.handleSortPost(filter)} key={filter.label}>
                 <MenuModalContents>
-                  <MaterialIcons size={20} color={COLORS.PRIMARY_COLOR} name={filter.icon} />
-                  <MenuText>{filter.label}</MenuText>
+                  <MaterialIcons size={20} color={customTheme.primaryColor} name={filter.icon} />
+                  <MenuText customTheme={customTheme}>{intl[filter.label]}</MenuText>
                 </MenuModalContents>
               </MenuModalButton>
             ))}
@@ -64,7 +72,7 @@ class FeedSort extends Component {
               <MenuModalButton>
                 <MenuModalContents>
                   <CheckBox
-                    title={i18n.feed.filterCurrentFeedByFollowers}
+                    title={intl.filter_current_feed_by_followers}
                     checked={filterFeedByFollowers}
                     onPress={handleFilterFeedByFollowers}
                   />

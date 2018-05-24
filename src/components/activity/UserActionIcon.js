@@ -4,13 +4,15 @@ import _ from 'lodash';
 import * as accountHistoryConstants from 'constants/accountHistory';
 import styled from 'styled-components/native';
 import { MaterialIcons, MaterialCommunityIcons, Feather } from '@expo/vector-icons';
-import { COLORS, MATERIAL_ICONS, MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
+import { COLORS, MATERIAL_ICONS, MATERIAL_COMMUNITY_ICONS, FEATHER_ICONS } from 'constants/styles';
 import Avatar from 'components/common/Avatar';
-import { FEATHER_ICONS } from '../../constants/styles';
+import { connect } from 'react-redux';
+import { getCustomTheme } from 'state/rootReducer';
+import tinycolor from 'tinycolor2';
 
 const IconContainer = styled.View`
   align-items: center;
-  background-color: ${COLORS.BLUE.SOLITUDE};
+  background-color: ${props => props.customTheme.tertiaryColor};
   border-radius: 4px;
   display: flex;
   height: 40px;
@@ -19,24 +21,27 @@ const IconContainer = styled.View`
 `;
 
 const ICON_SIZE = 22;
-const ICON_COLOR = COLORS.BLUE.HEATHER;
 
 class UserActionIcon extends Component {
   static propTypes = {
+    customTheme: PropTypes.shape().isRequired,
     actionType: PropTypes.string.isRequired,
     actionDetails: PropTypes.shape().isRequired,
     currentUsername: PropTypes.string.isRequired,
   };
 
   getIcon() {
-    const { actionType, actionDetails, currentUsername } = this.props;
+    const { actionType, actionDetails, currentUsername, customTheme } = this.props;
+    const iconColor = tinycolor(customTheme.tertiaryColor).isDark()
+      ? COLORS.LIGHT_TEXT_COLOR
+      : COLORS.DARK_TEXT_COLOR;
     switch (actionType) {
       case accountHistoryConstants.ACCOUNT_CREATE_WITH_DELEGATION:
       case accountHistoryConstants.ACCOUNT_CREATE:
-        return <MaterialIcons name={MATERIAL_ICONS.person} size={ICON_SIZE} color={ICON_COLOR} />;
+        return <MaterialIcons name={MATERIAL_ICONS.person} size={ICON_SIZE} color={iconColor} />;
       case accountHistoryConstants.ACCOUNT_UPDATE:
         return (
-          <MaterialIcons name={MATERIAL_ICONS.businessCenter} size={ICON_SIZE} color={ICON_COLOR} />
+          <MaterialIcons name={MATERIAL_ICONS.businessCenter} size={ICON_SIZE} color={iconColor} />
         );
       case accountHistoryConstants.VOTE:
         if (currentUsername === actionDetails.voter) {
@@ -45,7 +50,7 @@ class UserActionIcon extends Component {
               <MaterialCommunityIcons
                 name={MATERIAL_COMMUNITY_ICONS.voteFill}
                 size={ICON_SIZE}
-                color={ICON_COLOR}
+                color={iconColor}
               />
             );
           } else if (actionDetails.weight < 0) {
@@ -53,7 +58,7 @@ class UserActionIcon extends Component {
               <MaterialCommunityIcons
                 name={MATERIAL_COMMUNITY_ICONS.unvoteFill}
                 size={ICON_SIZE}
-                color={ICON_COLOR}
+                color={iconColor}
               />
             );
           }
@@ -61,7 +66,7 @@ class UserActionIcon extends Component {
             <MaterialCommunityIcons
               name={MATERIAL_COMMUNITY_ICONS.voteOutline}
               size={ICON_SIZE}
-              color={ICON_COLOR}
+              color={iconColor}
             />
           );
         }
@@ -79,38 +84,36 @@ class UserActionIcon extends Component {
             <MaterialCommunityIcons
               name={MATERIAL_COMMUNITY_ICONS.reblog}
               size={ICON_SIZE}
-              color={ICON_COLOR}
+              color={iconColor}
             />
           );
         } else if (
           customActionType === accountHistoryConstants.FOLLOW &&
           currentUsername === customActionDetails.follower
         ) {
-          return _.isEmpty(customActionDetails.what)
-            ? <MaterialIcons
-                name={MATERIAL_ICONS.personOutline}
-                size={ICON_SIZE}
-                color={ICON_COLOR}
-              />
-            : <MaterialIcons name={MATERIAL_ICONS.personAdd} size={ICON_SIZE} color={ICON_COLOR} />;
+          return _.isEmpty(customActionDetails.what) ? (
+            <MaterialIcons name={MATERIAL_ICONS.personOutline} size={ICON_SIZE} color={iconColor} />
+          ) : (
+            <MaterialIcons name={MATERIAL_ICONS.personAdd} size={ICON_SIZE} color={iconColor} />
+          );
         }
 
         return null;
       }
       case accountHistoryConstants.AUTHOR_REWARD:
       case accountHistoryConstants.CURATION_REWARD:
-        return <Feather name={FEATHER_ICONS.award} size={ICON_SIZE} color={ICON_COLOR} />;
+        return <Feather name={FEATHER_ICONS.award} size={ICON_SIZE} color={iconColor} />;
       case accountHistoryConstants.COMMENT:
         if (currentUsername === actionDetails.author) {
           return (
-            <MaterialIcons name={MATERIAL_ICONS.modeComment} size={ICON_SIZE} color={ICON_COLOR} />
+            <MaterialIcons name={MATERIAL_ICONS.modeComment} size={ICON_SIZE} color={iconColor} />
           );
         }
         return null;
       case accountHistoryConstants.DELETE_COMMENT:
-        return <MaterialIcons name={MATERIAL_ICONS.comments} size={ICON_SIZE} color={ICON_COLOR} />;
+        return <MaterialIcons name={MATERIAL_ICONS.comments} size={ICON_SIZE} color={iconColor} />;
       case accountHistoryConstants.FILL_VESTING_WITHDRAW:
-        return <MaterialIcons name={MATERIAL_ICONS.flashOn} size={ICON_SIZE} color={ICON_COLOR} />;
+        return <MaterialIcons name={MATERIAL_ICONS.flashOn} size={ICON_SIZE} color={iconColor} />;
       default:
         return null;
     }
@@ -144,21 +147,21 @@ class UserActionIcon extends Component {
     }
   }
 
-  // <MaterialIcons name={iconName} size={22} color={COLORS.BLUE.HEATHER} />
   render() {
+    const { customTheme } = this.props;
     const icon = this.getIcon();
     const avatarUsername = this.getAvatarUsername();
 
     if (icon) {
-      return (
-        <IconContainer>
-          {icon}
-        </IconContainer>
-      );
+      return <IconContainer customTheme={customTheme}>{icon}</IconContainer>;
     }
 
     return <Avatar username={avatarUsername} size={40} />;
   }
 }
 
-export default UserActionIcon;
+const mapStateToProps = state => ({
+  customTheme: getCustomTheme(state),
+});
+
+export default connect(mapStateToProps)(UserActionIcon);

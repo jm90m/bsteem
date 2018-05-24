@@ -1,18 +1,19 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components/native';
-import { COLORS } from 'constants/styles';
 import Avatar from 'components/common/Avatar';
+import { getCustomTheme } from 'state/rootReducer';
+import { connect } from 'react-redux';
 
 const Container = styled.View`
   padding: 5px 10px;
   margin: 5px 0;
-  background-color: ${COLORS.WHITE.WHITE};
+  background-color: ${props => props.customTheme.primaryBackgroundColor};
 `;
 
 const Username = styled.Text`
   margin: 0 5px;
-  color: ${COLORS.PRIMARY_COLOR};
+  color: ${props => props.customTheme.primaryColor};
   font-size: 18px;
   font-weight: bold;
 `;
@@ -22,6 +23,10 @@ const TouchableOpacity = styled.TouchableOpacity`
   align-items: center;
 `;
 
+const mapStateToProps = state => ({
+  customTheme: getCustomTheme(state),
+});
+
 class SearchUserPreview extends Component {
   static navigationOptions = {
     headerMode: 'none',
@@ -29,6 +34,7 @@ class SearchUserPreview extends Component {
   };
 
   static propTypes = {
+    customTheme: PropTypes.shape().isRequired,
     username: PropTypes.string,
     handleNavigateToUserScreen: PropTypes.func,
   };
@@ -49,17 +55,17 @@ class SearchUserPreview extends Component {
   }
 
   render() {
-    const { username } = this.props;
+    const { username, customTheme } = this.props;
 
     return (
-      <Container>
+      <Container customTheme={customTheme}>
         <TouchableOpacity onPress={this.handleNavigateToUserScreen}>
           <Avatar username={username} size={40} />
-          <Username>{`@${username}`}</Username>
+          <Username customTheme={customTheme}>{`@${username}`}</Username>
         </TouchableOpacity>
       </Container>
     );
   }
 }
 
-export default SearchUserPreview;
+export default connect(mapStateToProps)(SearchUserPreview);

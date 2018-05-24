@@ -3,16 +3,16 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components/native';
 import { connect } from 'react-redux';
 import _ from 'lodash';
-import { getPendingSavingPosts, getSavedPosts } from 'state/rootReducer';
+import { getPendingSavingPosts, getSavedPosts, getCustomTheme } from 'state/rootReducer';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS, MATERIAL_COMMUNITY_ICONS, ICON_SIZES } from 'constants/styles';
+import { MATERIAL_COMMUNITY_ICONS, ICON_SIZES } from 'constants/styles';
 import { savePost, unsavePost } from '../../state/actions/firebaseActions';
 import MenuModalButton from '../common/menu/MenuModalButton';
 import SmallLoading from '../common/SmallLoading';
 
 const MenuText = styled.Text`
   margin-left: 5px;
-  color: ${COLORS.PRIMARY_COLOR};
+  color: ${props => props.customTheme.primaryColor};
   font-weight: bold;
 `;
 
@@ -22,17 +22,18 @@ const MenuModalContents = styled.View`
   align-items: center;
 `;
 
-@connect(
-  state => ({
-    pendingSavingPosts: getPendingSavingPosts(state),
-    savedPosts: getSavedPosts(state),
-  }),
-  dispatch => ({
-    savePost: (author, permlink, title, id, created) =>
-      dispatch(savePost.action({ author, permlink, title, id, created })),
-    unsavePost: id => dispatch(unsavePost.action({ id })),
-  }),
-)
+const mapStateToProps = state => ({
+  pendingSavingPosts: getPendingSavingPosts(state),
+  savedPosts: getSavedPosts(state),
+  customTheme: getCustomTheme(state),
+});
+
+const mapDispatchToProps = dispatch => ({
+  savePost: (author, permlink, title, id, created) =>
+    dispatch(savePost.action({ author, permlink, title, id, created })),
+  unsavePost: id => dispatch(unsavePost.action({ id })),
+});
+
 class SavePostMenuButton extends Component {
   static propTypes = {
     savePost: PropTypes.func.isRequired,
@@ -44,6 +45,17 @@ class SavePostMenuButton extends Component {
     created: PropTypes.string,
     pendingSavingPosts: PropTypes.arrayOf(PropTypes.number),
     savedPosts: PropTypes.arrayOf(PropTypes.shape()),
+    customTheme: PropTypes.shape().isRequired,
+  };
+
+  static defaultProps = {
+    title: '',
+    permlink: '',
+    author: '',
+    id: 0,
+    created: '',
+    pendingSavingPosts: [],
+    savedPosts: [],
   };
 
   constructor(props) {
@@ -64,7 +76,7 @@ class SavePostMenuButton extends Component {
   }
 
   render() {
-    const { id, pendingSavingPosts, savedPosts } = this.props;
+    const { id, pendingSavingPosts, savedPosts, customTheme } = this.props;
 
     const isLoading = _.includes(pendingSavingPosts, id);
     const isSaved = _.findIndex(savedPosts, post => post.id === id) > -1;
@@ -82,15 +94,15 @@ class SavePostMenuButton extends Component {
           ) : (
             <MaterialCommunityIcons
               size={ICON_SIZES.menuModalOptionIcon}
-              color={COLORS.PRIMARY_COLOR}
+              color={customTheme.primaryColor}
               name={menuIcon}
             />
           )}
-          <MenuText>{menuText}</MenuText>
+          <MenuText customTheme={customTheme}>{menuText}</MenuText>
         </MenuModalContents>
       </MenuModalButton>
     );
   }
 }
 
-export default SavePostMenuButton;
+export default connect(mapStateToProps, mapDispatchToProps)(SavePostMenuButton);

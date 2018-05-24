@@ -1,12 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components/native';
-import { COLORS } from 'constants/styles';
 import Avatar from 'components/common/Avatar';
 import * as navigationConstants from 'constants/navigation';
 import { numberWithCommas } from 'util/steemitFormatters';
-import i18n from 'i18n/i18n';
 import TimeAgo from 'components/common/TimeAgo';
+import { connect } from 'react-redux';
+import { getCustomTheme, getIntl } from 'state/rootReducer';
+import StyledTextByBackground from 'components/common/StyledTextByBackground';
 import WalletTransactionContainer from './WalletTransactionContainer';
 
 const TransferContent = styled.Text`
@@ -15,48 +16,41 @@ const TransferContent = styled.Text`
   width: 200px;
 `;
 
-const Label = styled.Text`
-  font-weight: bold;
-`;
-
 const Transfer = styled.Text`
   font-weight: bold;
   margin-left: auto;
-  color: ${COLORS.RED.VALENCIA};
+  color: ${props => props.customTheme.negativeColor};
 `;
 
 const TransferTextContainer = styled.Text`
   flex-direction: row;
 `;
 
-const Memo = styled.Text`
-  flex-wrap: wrap;
-  z-index: 1;
-`;
-
 const Username = styled.Text`
-  color: ${COLORS.PRIMARY_COLOR};
+  color: ${props => props.customTheme.primaryColor};
   font-weight: bold;
 `;
 
 const Touchable = styled.TouchableWithoutFeedback``;
 
-const TransferTransaction = ({ to, memo, amount, timestamp, navigation }) => (
+const TransferTransaction = ({ to, memo, amount, timestamp, navigation, customTheme, intl }) => (
   <WalletTransactionContainer>
     <Avatar username={to} size={40} />
     <TransferContent>
       <TransferTextContainer>
-        <Label>{`${i18n.activity.transferredTo} `}</Label>
+        <StyledTextByBackground style={{ fontWeight: 'bold' }}>{`${
+          intl.transferred_to
+        } `}</StyledTextByBackground>
         <Touchable onPress={() => navigation.navigate(navigationConstants.USER, { username: to })}>
-          <Username>{to}</Username>
+          <Username customTheme={customTheme}>{to}</Username>
         </Touchable>
       </TransferTextContainer>
       {'\n'}
       <TimeAgo created={timestamp} />
       {'\n'}
-      <Memo>{memo}</Memo>
+      <StyledTextByBackground>{memo}</StyledTextByBackground>
     </TransferContent>
-    <Transfer>
+    <Transfer customTheme={customTheme}>
       {'-'}
       {numberWithCommas(amount)}
     </Transfer>
@@ -64,6 +58,7 @@ const TransferTransaction = ({ to, memo, amount, timestamp, navigation }) => (
 );
 
 TransferTransaction.propTypes = {
+  customTheme: PropTypes.shape().isRequired,
   navigation: PropTypes.shape().isRequired,
   to: PropTypes.string,
   memo: PropTypes.string,
@@ -78,4 +73,9 @@ TransferTransaction.defaultProps = {
   timestamp: '',
 };
 
-export default TransferTransaction;
+const mapStateToProps = state => ({
+  customTheme: getCustomTheme(state),
+  intl: getIntl(state),
+});
+
+export default connect(mapStateToProps)(TransferTransaction);

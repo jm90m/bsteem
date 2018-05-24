@@ -3,25 +3,21 @@ import PropTypes from 'prop-types';
 import { vestToSteem } from 'util/steemitFormatters';
 import styled from 'styled-components/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS, MATERIAL_COMMUNITY_ICONS, ICON_COLORS, ICON_SIZES } from 'constants/styles';
+import { COLORS, MATERIAL_COMMUNITY_ICONS, ICON_SIZES } from 'constants/styles';
 import TimeAgo from 'components/common/TimeAgo';
-import WalletTransactionContainer from './WalletTransactionContainer';
+import StyledTextByBackground from 'components/common/StyledTextByBackground';
+import { connect } from 'react-redux';
+import tinycolor from 'tinycolor2';
 import IconContainer from './IconContainer';
+import WalletTransactionContainer from './WalletTransactionContainer';
+import { getCustomTheme, getIntl } from '../../state/rootReducer';
 
-const RewardsPayoutContainer = styled.Text`
-  flex-direction: row;
-  flex-wrap: wrap;
-  margin-left: auto;
+const RewardsPayoutContainer = styled(StyledTextByBackground)`
   font-weight: bold;
 `;
 
 const ClaimRewardContent = styled.View`
   padding: 0 10px;
-`;
-
-const ClaimRewardsText = styled.Text`
-  font-weight: bold;
-  color: ${COLORS.BLACK.BLACK};
 `;
 
 const getFormattedPayout = (
@@ -60,38 +56,53 @@ const ClaimReward = ({
   rewardVests,
   totalVestingShares,
   totalVestingFundSteem,
+  customTheme,
+  intl,
 }) => (
   <WalletTransactionContainer>
     <IconContainer>
       <MaterialCommunityIcons
         name={MATERIAL_COMMUNITY_ICONS.claimReward}
         size={ICON_SIZES.actionIcon}
-        color={ICON_COLORS.actionIcon}
+        color={
+          tinycolor(customTheme.tertiaryColor).isDark()
+            ? COLORS.LIGHT_TEXT_COLOR
+            : COLORS.DARK_TEXT_COLOR
+        }
       />
     </IconContainer>
     <ClaimRewardContent>
-      <ClaimRewardsText>{'Claim Rewards '}</ClaimRewardsText>
+      <StyledTextByBackground style={{ fontWeight: 'bold' }}>
+        {`${intl.claim_rewards} `}
+      </StyledTextByBackground>
+      <RewardsPayoutContainer>
+        {getFormattedPayout(
+          rewardSteem,
+          rewardSbd,
+          rewardVests,
+          totalVestingShares,
+          totalVestingFundSteem,
+        )}
+      </RewardsPayoutContainer>
       <TimeAgo created={timestamp} />
     </ClaimRewardContent>
-    <RewardsPayoutContainer>
-      {getFormattedPayout(
-        rewardSteem,
-        rewardSbd,
-        rewardVests,
-        totalVestingShares,
-        totalVestingFundSteem,
-      )}
-    </RewardsPayoutContainer>
   </WalletTransactionContainer>
 );
 
 ClaimReward.propTypes = {
+  customTheme: PropTypes.shape().isRequired,
   timestamp: PropTypes.string.isRequired,
   rewardSteem: PropTypes.string.isRequired,
   rewardSbd: PropTypes.string.isRequired,
   rewardVests: PropTypes.string.isRequired,
   totalVestingShares: PropTypes.string.isRequired,
   totalVestingFundSteem: PropTypes.string.isRequired,
+  intl: PropTypes.shape().isRequired,
 };
 
-export default ClaimReward;
+const mapStateToProps = state => ({
+  customTheme: getCustomTheme(state),
+  intl: getIntl(state),
+});
+
+export default connect(mapStateToProps)(ClaimReward);

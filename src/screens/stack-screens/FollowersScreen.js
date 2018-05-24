@@ -3,25 +3,22 @@ import PropTypes from 'prop-types';
 import _ from 'lodash';
 import { ListView, RefreshControl } from 'react-native';
 import styled from 'styled-components/native';
-import { MaterialIcons } from '@expo/vector-icons';
-import { COLORS, MATERIAL_ICONS } from 'constants/styles';
 import API from 'api/api';
 import * as navigationConstants from 'constants/navigation';
 import Header from 'components/common/Header';
 import HeaderEmptyView from 'components/common/HeaderEmptyView';
 import Avatar from 'components/common/Avatar';
-import LargeLoading from 'components/common/LargeLoading';
+import { connect } from 'react-redux';
+import { getCustomTheme } from 'state/rootReducer';
 import FollowButton from 'components/common/FollowButton';
+import BackButton from 'components/common/BackButton';
+import TitleText from 'components/common/TitleText';
+import StyledTextByBackground from 'components/common/StyledTextByBackground';
 
 const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
 
 const Container = styled.View`
   flex: 1;
-`;
-
-const BackTouchable = styled.TouchableOpacity`
-  justify-content: center;
-  padding: 10px;
 `;
 
 const UserContainer = styled.View`
@@ -30,21 +27,16 @@ const UserContainer = styled.View`
   align-items: center;
   padding: 5px 10px;
   margin: 3px 0;
-  background-color: ${COLORS.WHITE.WHITE};
-  border-bottom-color: ${COLORS.WHITE.GAINSBORO};
+  background-color: ${props => props.customTheme.primaryBackgroundColor};
+  border-bottom-color: ${props => props.customTheme.primaryBorderColor};
   border-bottom-width: 1px;
-  border-top-color: ${COLORS.WHITE.GAINSBORO};
+  border-top-color: ${props => props.customTheme.primaryBorderColor};
   border-top-width: 1px;
 `;
 
-const UserText = styled.Text`
+const UserText = styled(StyledTextByBackground)`
   margin-left: 5px;
   font-weight: bold;
-`;
-
-const TitleText = styled.Text`
-  font-weight: bold;
-  color: ${COLORS.PRIMARY_COLOR};
 `;
 
 const UserTouchable = styled.TouchableOpacity`
@@ -54,13 +46,19 @@ const UserTouchable = styled.TouchableOpacity`
 
 const StyledListView = styled.ListView``;
 
+const mapStateToProps = state => ({
+  customTheme: getCustomTheme(state),
+});
+
 class FollowersScreen extends Component {
   static navigationOptions = {
     tabBarVisible: false,
+    drawerLockMode: 'locked-closed',
   };
 
   static propTypes = {
     navigation: PropTypes.shape().isRequired,
+    customTheme: PropTypes.shape().isRequired,
   };
 
   static LIMIT = 50;
@@ -139,8 +137,10 @@ class FollowersScreen extends Component {
 
   renderRow(rowData) {
     const { follower } = rowData;
+    const { customTheme } = this.props;
+
     return (
-      <UserContainer>
+      <UserContainer customTheme={customTheme}>
         <UserTouchable onPress={() => this.handleNavigateToUser(follower)}>
           <Avatar username={follower} />
           <UserText>{follower}</UserText>
@@ -150,18 +150,16 @@ class FollowersScreen extends Component {
     );
   }
   render() {
-    const { followers, isLoading, isRefreshing } = this.state;
+    const { customTheme } = this.props;
+    const { followers, isRefreshing } = this.state;
     const { username } = this.props.navigation.state.params;
     return (
       <Container>
         <Header>
-          <BackTouchable onPress={this.navigateBack}>
-            <MaterialIcons size={24} name={MATERIAL_ICONS.back} />
-          </BackTouchable>
+          <BackButton navigateBack={this.navigateBack} />
           <TitleText>{`${username} followers`}</TitleText>
           <HeaderEmptyView />
         </Header>
-        {isLoading && <LargeLoading />}
         <StyledListView
           dataSource={ds.cloneWithRows(followers)}
           renderRow={this.renderRow}
@@ -171,7 +169,7 @@ class FollowersScreen extends Component {
             <RefreshControl
               refreshing={isRefreshing}
               onRefresh={this.refreshFollowers}
-              colors={[COLORS.PRIMARY_COLOR]}
+              colors={[customTheme.primaryColor]}
             />
           }
         />
@@ -180,4 +178,4 @@ class FollowersScreen extends Component {
   }
 }
 
-export default FollowersScreen;
+export default connect(mapStateToProps)(FollowersScreen);
