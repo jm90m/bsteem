@@ -10,7 +10,7 @@ import { TRENDING } from 'constants/feedFilters';
 import StyledViewPrimaryBackground from 'components/common/StyledViewPrimaryBackground';
 import StyledTextByBackground from 'components/common/StyledTextByBackground';
 import { getIntl, getSavedTags, getCustomTheme } from 'state/rootReducer';
-import { OCTICONS_ICONS, ICON_SIZES } from 'constants/styles';
+import { OCTICONS_ICONS } from 'constants/styles';
 
 const Container = styled.View``;
 
