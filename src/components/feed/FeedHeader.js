@@ -8,9 +8,9 @@ import _ from 'lodash';
 import { EvilIcons } from '@expo/vector-icons';
 import { TRENDING } from 'constants/feedFilters';
 import StyledViewPrimaryBackground from 'components/common/StyledViewPrimaryBackground';
+import { OCTICONS_ICONS } from 'constants/styles';
 import StyledTextByBackground from 'components/common/StyledTextByBackground';
 import { getIntl, getSavedTags, getCustomTheme } from 'state/rootReducer';
-import { OCTICONS_ICONS } from 'constants/styles';
 
 const Container = styled.View``;
 
