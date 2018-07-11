@@ -6,7 +6,7 @@ import _ from 'lodash';
 import { MaterialIcons } from '@expo/vector-icons';
 import Tag from 'components/post/Tag';
 import { FormInput, FormLabel, FormValidationMessage } from 'react-native-elements';
-import { MATERIAL_ICONS, ICON_SIZES, COLORS } from 'constants/styles';
+import { MATERIAL_ICONS, ICON_SIZES, COLORS, FONTS } from 'constants/styles';
 import StyledTextByBackground from 'components/common/StyledTextByBackground';
 import { connect } from 'react-redux';
 import { getCustomTheme, getIntl } from 'state/rootReducer';
@@ -37,19 +37,21 @@ const mapStateToProps = state => ({
 
 class TagsInput extends Component {
   static propTypes = {
-    tags: PropTypes.arrayOf(PropTypes.string),
-    tagsInput: PropTypes.string,
-    onChangeTags: PropTypes.func,
-    removeTag: PropTypes.func,
-    tagError: PropTypes.string,
     customTheme: PropTypes.shape().isRequired,
     intl: PropTypes.shape().isRequired,
+    tags: PropTypes.arrayOf(PropTypes.string),
+    onChangeTags: PropTypes.func,
+    removeTag: PropTypes.func,
+    tagsInputWidth: PropTypes.string,
+    tagsInput: PropTypes.string,
+    tagError: PropTypes.string,
   };
 
   static defaultProps = {
     tags: [],
     tagsInput: '',
     tagError: '',
+    tagsInputWidth: '100%',
     onChangeTags: () => {},
     removeTag: () => {},
   };
@@ -64,7 +66,15 @@ class TagsInput extends Component {
   }
 
   render() {
-    const { tags, tagsInput, onChangeTags, removeTag, customTheme, intl } = this.props;
+    const {
+      tags,
+      tagsInput,
+      onChangeTags,
+      removeTag,
+      customTheme,
+      intl,
+      tagsInputWidth,
+    } = this.props;
     const inputTextColor = tinycolor(customTheme.primaryBackgroundColor).isDark()
       ? COLORS.LIGHT_TEXT_COLOR
       : COLORS.DARK_TEXT_COLOR;
@@ -78,8 +88,8 @@ class TagsInput extends Component {
           placeholder={intl.topics_error_empty}
           value={tagsInput}
           autoCapitalize="none"
-          maxLength={20}
-          inputStyle={{ color: inputTextColor }}
+          maxLength={255}
+          inputStyle={{ color: inputTextColor, fontFamily: FONTS.PRIMARY, width: tagsInputWidth }}
           placeholderTextColor={inputTextColor}
         />
         {this.renderTagError()}

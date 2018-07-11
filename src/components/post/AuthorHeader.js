@@ -4,12 +4,12 @@ import PropTypes from 'prop-types';
 import { View } from 'react-native';
 import { getReputation } from 'util/steemitFormatters';
 import TimeAgo from 'components/common/TimeAgo';
+import PrimaryText from 'components/common/text/PrimaryText';
 import { connect } from 'react-redux';
 import { getCustomTheme } from 'state/rootReducer';
 import ReputationScore from './ReputationScore';
 
-const AuthorText = styled.Text`
-  font-weight: 700;
+const AuthorText = styled(PrimaryText)`
   color: ${props => props.customTheme.primaryColor};
 `;
 

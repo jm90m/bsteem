@@ -1,10 +1,13 @@
 import React from 'react';
 import _ from 'lodash';
+import { Dimensions } from 'react-native';
+import sanitizeHtml from 'sanitize-html';
 import Remarkable from 'remarkable';
 import htmlReady from '../util/steemitHtmlReady';
-import sanitizeHtml from 'sanitize-html';
 import sanitizeConfig from './sanitizeConfig';
 import SteemEmbed from './steemEmbed';
+
+const { width: deviceWidth } = Dimensions.get('screen');
 
 export const imageRegex = /https?:\/\/(?:[-a-zA-Z0-9._]*[-a-zA-Z0-9])(?::\d{2,5})?(?:[/?#](?:[^\s"'<>\][()]*[^\s"'<>\][().,])?(?:(?:\.(?:tiff?|jpe?g|gif|png|svg|ico)|ipfs\/[a-z\d]{40,})))/gi;
 
@@ -16,8 +19,15 @@ const remarkable = new Remarkable({
   quotes: '“”‘’',
 });
 
-export function getHtml(body, parsedJsonMetadata, returnType = 'Object') {
+export function getHtml(body, parsedJsonMetadata, returnType = 'Object', embedOptions = {}) {
   try {
+    const currentEmbedOptions = {
+      width: deviceWidth,
+      height: 400,
+      autoplay: false,
+      ...embedOptions,
+    };
+
     parsedJsonMetadata.image = _.get(parsedJsonMetadata, 'image', []);
     let parsedBody = body.replace(/<!--([\s\S]+?)(-->|$)/g, '(html comment removed: $1)');
 
@@ -44,7 +54,7 @@ export function getHtml(body, parsedJsonMetadata, returnType = 'Object') {
         const id = match[1];
         const type = match[2];
         const link = match[3];
-        const embed = SteemEmbed.get(link, { width: '100%', height: 400, autoplay: false });
+        const embed = SteemEmbed.get(link, currentEmbedOptions);
         sections.push(`<div>${embed.embed}</div>`);
         section = section.substring(`${id} ${type} ${link} ~~~`.length);
       }

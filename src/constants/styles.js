@@ -34,7 +34,7 @@ const colorsMap = {
 
   GREY: {
     GONDOLA: '#353535',
-    CHARCOAL: '#454545',
+    CHARCOAL: '#3E3E3E',
     NERO: '#2A2A2A',
     NIGHT_RIDER: '#323232',
     GREY: '#7C7C7C',
@@ -58,7 +58,7 @@ const colorsMap = {
 };
 
 const appColors = {
-  PRIMARY_COLOR: colorsMap.VIOLET.HAN_PURPLE,
+  PRIMARY_COLOR: colorsMap.BLUE.DODGER_BLUE,
   BORDER_COLOR: colorsMap.WHITE.GAINSBORO,
   LIST_VIEW_BACKGROUND: colorsMap.WHITE.WHITE_SMOKE,
   PRIMARY_BACKGROUND_COLOR: colorsMap.WHITE.WHITE,
@@ -69,7 +69,7 @@ const appColors = {
   NEGATIVE_COLOR: colorsMap.RED.VALENCIA,
   SPLASH_SCREEN_BACKGROUND: '#FCFCFC',
   LIGHT_TEXT_COLOR: colorsMap.WHITE.WHITE,
-  DARK_TEXT_COLOR: colorsMap.GREY.NERO,
+  DARK_TEXT_COLOR: colorsMap.GREY.GONDOLA,
 };
 
 // add utopian colors, dtube colors, busy colors, steemit colors,
@@ -291,6 +291,9 @@ export const MATERIAL_COMMUNITY_ICONS = {
   approval: 'approval',
   logout: 'logout',
   eraser: 'eraser',
+
+  alertCircleOutline: 'alert-circle-outline',
+  alertCircle: 'alert-circle',
 };
 
 export const FEATHER_ICONS = {
@@ -316,10 +319,8 @@ export const ICON_SIZES = {
   footerActionIcon: 20,
 };
 
-export const ICON_COLORS = {
-  actionIcon: COLORS.BLUE.HEATHER,
-};
-
-export const OCTICONS_ICONS = {
-  chevronDown: 'chevron-down',
+export const FONTS = {
+  PRIMARY: 'linetoCircularMedium',
+  SECONDARY: 'linetoCircularBook',
+  TITLE: 'linetoCircularBold',
 };

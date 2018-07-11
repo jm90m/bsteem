@@ -4,11 +4,13 @@ export const getUpvotes = activeVotes => activeVotes.filter(vote => vote.percent
 
 export const getDownvotes = activeVotes => activeVotes.filter(vote => vote.percent < 0);
 
-export const isPostVoted = (postData, authUsername) => {
+export const isPostVoted = (postDetails, authUsername) => {
   if (_.isEmpty(authUsername)) {
     return false;
   }
-  const userVote = _.find(postData.active_votes, { voter: authUsername }) || {};
+  const activeVotes = _.get(postDetails, 'active_votes', []);
+  // get from postData.active_votes
+  const userVote = _.find(activeVotes, { voter: authUsername }) || {};
   return _.get(userVote, 'percent', 0) > 0;
 };
 

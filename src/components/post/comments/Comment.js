@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components/native';
-import { Dimensions } from 'react-native';
+import { Dimensions, View, StyleSheet } from 'react-native';
 import { SORT_COMMENTS } from 'constants/comments';
 import { getReputation } from 'util/steemitFormatters';
 import { sortComments } from 'util/sortUtils';
@@ -18,24 +17,23 @@ const { width: deviceWidth } = Dimensions.get('screen');
 
 const COMMENT_PADDING = 10;
 
-const Container = styled.View`
-  background-color: ${props => props.customTheme.primaryBackgroundColor};
-  margin-top: 2px;
-  margin-bottom: 2px;
-`;
-
-const CommentContentContainer = styled.View`
-  margin-top: 10px;
-  flex-direction: row;
-`;
-
-const AvatarContainer = styled.View`
-  padding: 5px 10px;
-`;
-
-const CommentChildrenContainer = styled.View`
-  margin-left: ${COMMENT_PADDING}px;
-`;
+const styles = StyleSheet.create({
+  container: {
+    marginTop: 2,
+    marginBottom: 2,
+  },
+  commentContentContainer: {
+    marginTop: 10,
+    flexDirection: 'row',
+  },
+  avatarContainer: {
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+  },
+  commentsChildrenContainer: {
+    marginLeft: COMMENT_PADDING,
+  },
+});
 
 @withAuthActions
 class Comment extends Component {
@@ -311,7 +309,7 @@ class Comment extends Component {
 
   replyComment() {
     const { comment } = this.props;
-    this.props.navigation.navigate(navigationConstants.REPLY, {
+    this.props.navigation.push(navigationConstants.REPLY, {
       comment,
       parentPost: comment,
       successCreateReply: this.setNewReplyComment,
@@ -336,7 +334,7 @@ class Comment extends Component {
       return;
     }
 
-    this.props.navigation.navigate(navigationConstants.EDIT_REPLY, {
+    this.props.navigation.push(navigationConstants.EDIT_REPLY, {
       parentPost: parent,
       originalComment,
       successEditReply: this.setCurrentCommentBody,
@@ -345,7 +343,7 @@ class Comment extends Component {
 
   handlePayout() {
     const { comment } = this.props;
-    this.props.navigation.navigate(navigationConstants.VOTES, {
+    this.props.navigation.push(navigationConstants.VOTES, {
       postData: comment,
     });
   }
@@ -464,13 +462,17 @@ class Comment extends Component {
     const avatarSize = comment.depth === 1 ? 40 : 32;
     const displayedBody = editable ? currentCommentBody : comment.body;
     const payout = calculatePayout(comment);
+    const containerStyles = [
+      styles.container,
+      { backgroundColor: customTheme.primaryBackgroundColor },
+    ];
 
     return (
-      <Container customTheme={customTheme}>
-        <CommentContentContainer>
-          <AvatarContainer>
+      <View style={containerStyles}>
+        <View style={styles.commentContentContainer}>
+          <View style={styles.avatarContainer}>
             <Avatar size={avatarSize} username={comment.author} />
-          </AvatarContainer>
+          </View>
           <CommentContent
             username={comment.author}
             reputation={commentAuthorReputation}
@@ -481,7 +483,7 @@ class Comment extends Component {
             navigation={navigation}
             customTheme={customTheme}
           />
-        </CommentContentContainer>
+        </View>
         {displayVoteSlider ? (
           <PostVoteSlider
             postData={comment}
@@ -505,11 +507,11 @@ class Comment extends Component {
           />
         )}
 
-        <CommentChildrenContainer>
+        <View style={styles.commentsChildrenContainer}>
           {this.renderReplyComment()}
           {this.renderCommentsChildren()}
-        </CommentChildrenContainer>
-      </Container>
+        </View>
+      </View>
     );
   }
 }

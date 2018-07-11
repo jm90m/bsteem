@@ -25,7 +25,6 @@ import {
 
 const Description = styled(StyledTextByBackground)`
   padding: 20px;
-  font-weight: bold;
 `;
 
 const Container = styled(StyledViewPrimaryBackground)`

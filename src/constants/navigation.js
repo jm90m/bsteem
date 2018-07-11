@@ -9,7 +9,6 @@ export const POST = 'POST';
 export const CURRENT_USER = 'CURRENT_USER';
 export const LOGOUT = 'LOGOUT';
 export const POST_CREATION = 'POST_CREATION';
-export const FETCH_POST = 'FETCH_POST';
 export const VOTES = 'VOTES';
 export const REPLY = 'REPLY';
 export const EDIT_REPLY = 'EDIT_REPLY';
@@ -23,12 +22,17 @@ export const CUSTOM_THEME = 'CUSTOM_THEME';
 export const NOTIFICATIONS = 'NOTIFICATIONS';
 export const POST_BENEFICIARIES = 'POST_BENEFICIARIES';
 export const SIGNATURE_EDITOR = 'SIGNATURE_EDITOR';
+export const PLATFORM_APPS = 'PLATFORM_APPS';
 
 // user navigations
-export const USER_BLOG = 'USER_BLOG';
-export const USER_COMMENTS = 'USER_COMMENTS';
 export const USER_FOLLOWERS = 'USER_FOLLOWERS';
 export const USER_FOLLOWING = 'USER_FOLLOWING';
 export const USER_WALLET = 'USER_WALLET';
 export const USER_ACTIVITY = 'USER_ACTIVITY';
 export const USER_REPLIES = 'USER_REPLIES';
+
+export const SEARCH_MENU = {
+  USERS: 'USERS',
+  TAGS: 'TAGS',
+  POSTS: 'POSTS',
+};

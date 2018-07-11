@@ -1,41 +1,40 @@
 import React from 'react';
-import { StackNavigator } from 'react-navigation';
-import { MaterialIcons } from '@expo/vector-icons';
-import { MATERIAL_ICONS, ICON_SIZES } from 'constants/styles';
+import { createStackNavigator } from 'react-navigation';
+import { FontAwesome } from '@expo/vector-icons';
+import { FONT_AWESOME_ICONS, ICON_SIZES } from 'constants/styles';
 import * as navigationConstants from 'constants/navigation';
-import LoginScreen from 'screens/login-screen/LoginScreen';
+import HomeScreen from 'screens/HomeScreen';
 import UserScreen from 'screens/user-screen/UserScreen';
 import PostScreen from 'screens/stack-screens/PostScreen';
 import FeedScreen from 'screens/stack-screens/FeedScreen';
 import CommentsScreen from 'screens/stack-screens/CommentsScreen';
-import LogoutScreen from 'screens/login-screen/LogoutScreen';
 import FollowersScreen from 'screens/stack-screens/FollowersScreen';
 import FollowingScreen from 'screens/stack-screens/FollowingScreen';
 import UserActivityScreen from 'screens/stack-screens/UserActivityScreen';
 import UserWalletScreen from 'screens/stack-screens/UserWalletScreen';
-import VotesScreen from '../stack-screens/VotesScreen';
-import FetchPostScreen from '../stack-screens/FetchPostScreen';
-import ReplyScreen from '../stack-screens/ReplyScreen';
-import EditReplyScreen from '../stack-screens/EditReplyScreen';
-import SettingsScreen from '../stack-screens/SettingsScreen';
-import EditPostScreen from '../post-creation-screen/EditPostScreen';
-import EditProfileScreen from '../stack-screens/EditProfileScreen';
-import UserMessageScreen from '../stack-screens/UserMessageScreen';
-import TransferScreen from '../stack-screens/TransferScreen';
-import CustomThemeScreen from '../stack-screens/CustomThemeScreen';
-import RepliesFeedScreen from '../stack-screens/RepliesFeedScreen';
-import BeneficiariesScreen from '../stack-screens/BeneficiariesScreen';
+import SavedContentScreen from 'screens/SavedContentScreen';
+import VotesScreen from 'screens/stack-screens/VotesScreen';
+import ReplyScreen from 'screens/stack-screens/ReplyScreen';
+import EditReplyScreen from 'screens/stack-screens/EditReplyScreen';
+import EditPostScreen from 'screens/post-creation-screen/EditPostScreen';
+import EditProfileScreen from 'screens/stack-screens/EditProfileScreen';
+import UserMessageScreen from 'screens/stack-screens/UserMessageScreen';
+import TransferScreen from 'screens/stack-screens/TransferScreen';
+import RepliesFeedScreen from 'screens/stack-screens/RepliesFeedScreen';
+import BeneficiariesScreen from 'screens/stack-screens/BeneficiariesScreen';
 
 const screenNavigationOptions = {
   tabBarIcon: ({ tintColor }) => (
-    <MaterialIcons name={MATERIAL_ICONS.login} size={ICON_SIZES.tabBarIcon} color={tintColor} />
+    <FontAwesome name={FONT_AWESOME_ICONS.news} size={ICON_SIZES.tabBarIcon} color={tintColor} />
   ),
+  headerMode: 'none',
 };
 
-const LoginNavigator = StackNavigator(
+const HomeNavigator = createStackNavigator(
   {
-    [navigationConstants.LOGIN]: {
-      screen: LoginScreen,
+    [navigationConstants.HOME]: {
+      screen: HomeScreen,
+      navigationOptions: screenNavigationOptions,
     },
     [navigationConstants.POST]: {
       screen: PostScreen,
@@ -45,16 +44,12 @@ const LoginNavigator = StackNavigator(
       screen: FeedScreen,
       navigationOptions: screenNavigationOptions,
     },
-    [navigationConstants.USER]: {
-      screen: UserScreen,
-      navigationOptions: screenNavigationOptions,
-    },
     [navigationConstants.COMMENTS]: {
       screen: CommentsScreen,
       navigationOptions: screenNavigationOptions,
     },
-    [navigationConstants.LOGOUT]: {
-      screen: LogoutScreen,
+    [navigationConstants.USER]: {
+      screen: UserScreen,
       navigationOptions: screenNavigationOptions,
     },
     [navigationConstants.USER_FOLLOWERS]: {
@@ -73,8 +68,8 @@ const LoginNavigator = StackNavigator(
       screen: UserWalletScreen,
       navigationOptions: screenNavigationOptions,
     },
-    [navigationConstants.FETCH_POST]: {
-      screen: FetchPostScreen,
+    [navigationConstants.SAVED_CONTENT]: {
+      screen: SavedContentScreen,
       navigationOptions: screenNavigationOptions,
     },
     [navigationConstants.VOTES]: {
@@ -87,10 +82,6 @@ const LoginNavigator = StackNavigator(
     },
     [navigationConstants.EDIT_REPLY]: {
       screen: EditReplyScreen,
-      navigationOptions: screenNavigationOptions,
-    },
-    [navigationConstants.SETTINGS]: {
-      screen: SettingsScreen,
       navigationOptions: screenNavigationOptions,
     },
     [navigationConstants.EDIT_POST]: {
@@ -109,10 +100,6 @@ const LoginNavigator = StackNavigator(
       screen: TransferScreen,
       navigationOptions: screenNavigationOptions,
     },
-    [navigationConstants.CUSTOM_THEME]: {
-      screen: CustomThemeScreen,
-      navigationOptions: screenNavigationOptions,
-    },
     [navigationConstants.USER_REPLIES]: {
       screen: RepliesFeedScreen,
       navigationOptions: screenNavigationOptions,
@@ -127,4 +114,4 @@ const LoginNavigator = StackNavigator(
   },
 );
 
-export default LoginNavigator;
+export default HomeNavigator;

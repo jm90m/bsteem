@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { TouchableOpacity } from 'react-native';
-import styled from 'styled-components/native';
+import { Text, StyleSheet, View } from 'react-native';
 import { COLORS } from 'constants/styles';
+import commonStyles from 'styles/common';
 import BodyShort from 'components/post-preview/BodyShort';
+import Touchable from 'components/common/Touchable';
 import _ from 'lodash';
 import Tag from 'components/post/Tag';
 import Avatar from 'components/common/Avatar';
@@ -12,48 +13,23 @@ import { connect } from 'react-redux';
 import { getCustomTheme } from 'state/rootReducer';
 import tinycolor from 'tinycolor2';
 
-const Container = styled.View`
-  background-color: ${props => props.customTheme.primaryBackgroundColor};
-  margin-top: 5px;
-  margin-bottom: 5px;
-  border-color: ${props => props.customTheme.primaryBorderColor};
-  border-top-width: 2px;
-  border-bottom-width: 2px;
-  padding: 10px;
-`;
-
-const AuthorContainer = styled.View`
-  flex-direction: row;
-`;
-
-const AuthorContents = styled.View`
-  margin-left: 5px;
-`;
-
-const AuthorText = styled.Text`
-  font-weight: 700;
-  color: ${props => props.customTheme.primaryColor};
-`;
-
-const PostTitle = styled.Text`
-  padding-left: 5px;
-  padding-bottom: 10px;
-  font-weight: 700;
-  font-size: 20px;
-  color: ${props =>
-    tinycolor(props.customTheme.primaryBackgroundColor).isDark()
-      ? COLORS.LIGHT_TEXT_COLOR
-      : COLORS.DARK_TEXT_COLOR};
-`;
-
-const TagsContainer = styled.View`
-  flex-direction: row;
-  flex-wrap: wrap;
-`;
-
-const TagContainer = styled.TouchableOpacity`
-  margin: 3px 5px;
-`;
+const styles = StyleSheet.create({
+  searchPostPreviewContainer: {
+    borderBottomWidth: 1,
+    padding: 10,
+  },
+  authorContents: {
+    marginLeft: 5,
+  },
+  tagsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+  },
+  tag: {
+    marginVertical: 3,
+    marginHorizontal: 5,
+  },
+});
 
 const mapStateToProps = state => ({
   customTheme: getCustomTheme(state),
@@ -71,9 +47,11 @@ class SearchPostPreview extends Component {
     handleNavigateToUserScreen: PropTypes.func,
     handleNavigateToFeedScreen: PropTypes.func,
     handleNavigateToPostScreen: PropTypes.func,
+    isFirstElement: PropTypes.bool,
   };
 
   static defaultProps = {
+    isFirstElement: false,
     author: '',
     title: '',
     summary: '',
@@ -89,7 +67,6 @@ class SearchPostPreview extends Component {
     super(props);
 
     this.handleNavigateToUserScreen = this.handleNavigateToUserScreen.bind(this);
-    this.handleNavigateToFeedScreen = this.handleNavigateToFeedScreen.bind(this);
     this.handleNavigateToPostScreen = this.handleNavigateToPostScreen.bind(this);
   }
 
@@ -98,9 +75,9 @@ class SearchPostPreview extends Component {
     this.props.handleNavigateToUserScreen(author);
   }
 
-  handleNavigateToFeedScreen(tag) {
+  handleNavigateToFeedScreen = tag => () => {
     this.props.handleNavigateToFeedScreen(tag);
-  }
+  };
 
   handleNavigateToPostScreen() {
     const { author, permlink } = this.props;
@@ -108,35 +85,62 @@ class SearchPostPreview extends Component {
   }
 
   render() {
-    const { author, title, summary, tags, created, customTheme } = this.props;
+    const { author, title, summary, tags, created, customTheme, isFirstElement } = this.props;
+    const textColorStyle = {
+      color: tinycolor(customTheme.primaryBackgroundColor).isDark()
+        ? COLORS.LIGHT_TEXT_COLOR
+        : COLORS.DARK_TEXT_COLOR,
+    };
+    const containerStyles = [
+      styles.searchPostPreviewContainer,
+      {
+        backgroundColor: customTheme.primaryBackgroundColor,
+        borderColor: customTheme.primaryBorderColor,
+        borderTopWidth: isFirstElement ? 1 : 0,
+      },
+    ];
+    const postTitleStyles = [commonStyles.postTitle, textColorStyle];
+    const postAuthorStyle = {
+      color: customTheme.primaryColor,
+    };
 
     return (
-      <Container customTheme={customTheme}>
-        <AuthorContainer>
-          <TouchableOpacity onPress={this.handleNavigateToUserScreen}>
-            <Avatar username={author} size={40} />
-          </TouchableOpacity>
-          <AuthorContents>
-            <TouchableOpacity onPress={this.handleNavigateToUserScreen}>
-              <AuthorText customTheme={customTheme}>{`@${author}`}</AuthorText>
-            </TouchableOpacity>
+      <View style={containerStyles}>
+        <View style={commonStyles.rowContainer}>
+          <Touchable onPress={this.handleNavigateToUserScreen}>
+            <View>
+              <Avatar username={author} size={40} />
+            </View>
+          </Touchable>
+          <View style={styles.authorContents}>
+            <Touchable onPress={this.handleNavigateToUserScreen}>
+              <View>
+                <Text style={postAuthorStyle}>{`${author}`}</Text>
+              </View>
+            </Touchable>
             <TimeAgo created={created} />
-          </AuthorContents>
-        </AuthorContainer>
-        <TouchableOpacity onPress={this.handleNavigateToPostScreen}>
-          <PostTitle customTheme={customTheme}>{title}</PostTitle>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={this.handleNavigateToPostScreen}>
-          <BodyShort content={summary} />
-        </TouchableOpacity>
-        <TagsContainer>
+          </View>
+        </View>
+        <Touchable onPress={this.handleNavigateToPostScreen}>
+          <View>
+            <Text style={postTitleStyles}>{title}</Text>
+          </View>
+        </Touchable>
+        <Touchable onPress={this.handleNavigateToPostScreen}>
+          <View>
+            <BodyShort content={summary} />
+          </View>
+        </Touchable>
+        <View style={styles.tagsContainer}>
           {_.map(_.uniq(tags), tag => (
-            <TagContainer onPress={() => this.handleNavigateToFeedScreen(tag)} key={tag}>
-              <Tag tag={tag} />
-            </TagContainer>
+            <Touchable onPress={this.handleNavigateToFeedScreen(tag)} key={tag}>
+              <View style={styles.tag}>
+                <Tag tag={tag} />
+              </View>
+            </Touchable>
           ))}
-        </TagsContainer>
-      </Container>
+        </View>
+      </View>
     );
   }
 }

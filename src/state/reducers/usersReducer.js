@@ -72,7 +72,6 @@ export default (state = INITIAL_STATE, action) => {
       };
     case FETCH_USER_BLOG.SUCCESS: {
       const { username, result, refreshUser } = action.payload;
-      console.log('FETCH_USER_BLOG_SUCCESS', action.payload);
       const userBlog = getUserDetailsHelper(state.usersBlog, username, []);
       const newUserBlog = refreshUser ? result : _.uniqBy(_.concat(userBlog, result), 'id');
       return {
@@ -126,6 +125,7 @@ export default (state = INITIAL_STATE, action) => {
 };
 
 export const getUsersDetails = state => state.usersDetails;
+export const getSingleUserDetails = (state, username) => _.get(state.usersDetails, username, {});
 export const getUsersComments = state => state.usersComments;
 export const getUsersBlog = state => state.usersBlog;
 export const getUsersFollowCount = state => state.usersFollowCount;

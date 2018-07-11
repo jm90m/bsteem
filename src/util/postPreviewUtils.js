@@ -102,6 +102,7 @@ export const getEmbeds = (postData, embedOptions = {}) => {
       provider_name: 'DTube',
       embed: dTubeIFrame,
       thumbnail: getProxyImageURL(`https://ipfs.io/ipfs/${video.info.snaphash}`, 'preview'),
+      source: dTubeEmbedUrl,
     };
   }
 

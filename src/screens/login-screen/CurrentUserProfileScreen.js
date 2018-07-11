@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { View } from 'react-native';
 import { connect } from 'react-redux';
 import _ from 'lodash';
-import styled from 'styled-components/native';
 import {
   fetchUser,
   fetchUserComments,
@@ -42,10 +42,7 @@ import UserComments from 'screens/user-screen/UserComments';
 import BSteemModal from 'components/common/BSteemModal';
 import CurrentUserHeader from './CurrentUserHeader';
 import CurrentUserMenu from './CurrentUserMenu';
-
-const Container = styled.View`
-  flex: 1;
-`;
+import commonStyles from 'styles/common';
 
 const mapStateToProps = state => ({
   usersDetails: getUsersDetails(state),
@@ -90,6 +87,7 @@ class CurrentUserProfileScreen extends Component {
     usersDetails: PropTypes.shape().isRequired,
     usersFollowCount: PropTypes.shape().isRequired,
     getCurrentUserSettings: PropTypes.func.isRequired,
+    loadingUsersBlog: PropTypes.bool.isRequired,
   };
 
   static defaultProps = {
@@ -212,7 +210,7 @@ class CurrentUserProfileScreen extends Component {
           {
             menuVisible: false,
           },
-          () => this.props.navigation.navigate(navigationConstants.USER_FOLLOWERS, { username }),
+          () => this.props.navigation.push(navigationConstants.USER_FOLLOWERS, { username }),
         );
         break;
       case userMenuConstants.FOLLOWING.id:
@@ -220,7 +218,7 @@ class CurrentUserProfileScreen extends Component {
           {
             menuVisible: false,
           },
-          () => this.props.navigation.navigate(navigationConstants.USER_FOLLOWING, { username }),
+          () => this.props.navigation.push(navigationConstants.USER_FOLLOWING, { username }),
         );
         break;
       case userMenuConstants.ACTIVITY.id:
@@ -228,7 +226,7 @@ class CurrentUserProfileScreen extends Component {
           {
             menuVisible: false,
           },
-          () => this.props.navigation.navigate(navigationConstants.USER_ACTIVITY, { username }),
+          () => this.props.navigation.push(navigationConstants.USER_ACTIVITY, { username }),
         );
         break;
       case userMenuConstants.WALLET.id:
@@ -236,7 +234,7 @@ class CurrentUserProfileScreen extends Component {
           {
             menuVisible: false,
           },
-          () => this.props.navigation.navigate(navigationConstants.USER_WALLET, { username }),
+          () => this.props.navigation.push(navigationConstants.USER_WALLET, { username }),
         );
         break;
       case userMenuConstants.REPLIES.id:
@@ -244,7 +242,7 @@ class CurrentUserProfileScreen extends Component {
           {
             menuVisible: false,
           },
-          () => this.props.navigation.navigate(navigationConstants.USER_REPLIES, { username }),
+          () => this.props.navigation.push(navigationConstants.USER_REPLIES, { username }),
         );
         break;
       case userMenuConstants.LOGOUT.id:
@@ -306,7 +304,13 @@ class CurrentUserProfileScreen extends Component {
 
   renderUserContent() {
     const { currentMenuOption } = this.state;
-    const { username, usersComments, usersBlog, refreshUserBlogLoading } = this.props;
+    const {
+      username,
+      usersComments,
+      usersBlog,
+      refreshUserBlogLoading,
+      loadingUsersBlog,
+    } = this.props;
     const userComments = getUserDetailsHelper(usersComments, username, []);
     const userBlog = getUserDetailsHelper(usersBlog, username, []);
 
@@ -330,7 +334,8 @@ class CurrentUserProfileScreen extends Component {
             fetchMoreUserPosts={this.fetchMoreUserPosts}
             isCurrentUser
             refreshUserBlog={this.handleRefreshUserBlog}
-            loadingUserBlog={refreshUserBlogLoading}
+            loadingUserBlog={loadingUsersBlog}
+            refreshUserBlogLoading={refreshUserBlogLoading}
           />
         );
       default:
@@ -341,7 +346,7 @@ class CurrentUserProfileScreen extends Component {
   render() {
     const { currentMenuOption, menuVisible } = this.state;
     return (
-      <Container>
+      <View style={commonStyles.container}>
         <CurrentUserHeader
           currentMenuOption={currentMenuOption}
           toggleCurrentUserMenu={this.toggleCurrentUserMenu}
@@ -356,7 +361,7 @@ class CurrentUserProfileScreen extends Component {
             />
           </BSteemModal>
         )}
-      </Container>
+      </View>
     );
   }
 }

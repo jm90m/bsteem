@@ -7,6 +7,7 @@ import {
   FETCH_SAVED_OFFLINE_POSTS,
   ADD_POST_TO_SAVED_OFFLINE,
   REMOVE_POST_SAVED_OFFLINE,
+  ADD_POSTS_TO_POST_MAP,
 } from './actionTypes';
 
 export const fetchComments = (category, author, permlink, postId) => ({
@@ -44,5 +45,10 @@ export const addPostToSavedOffline = postDataString => ({
 });
 export const removePostSavedOffline = payload => ({
   type: REMOVE_POST_SAVED_OFFLINE,
+  payload,
+});
+
+export const addPostsToPostMap = payload => ({
+  type: ADD_POSTS_TO_POST_MAP,
   payload,
 });

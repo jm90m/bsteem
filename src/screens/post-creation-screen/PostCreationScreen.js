@@ -18,7 +18,13 @@ import { ImagePicker } from 'expo';
 import * as navigationConstants from 'constants/navigation';
 import { FormLabel, FormInput, Icon, FormValidationMessage } from 'react-native-elements';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS, MATERIAL_ICONS, ICON_SIZES, MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
+import {
+  COLORS,
+  MATERIAL_ICONS,
+  ICON_SIZES,
+  MATERIAL_COMMUNITY_ICONS,
+  FONTS,
+} from 'constants/styles';
 import {
   getAuthUsername,
   getCreatePostLoading,
@@ -38,10 +44,12 @@ import StyledViewPrimaryBackground from 'components/common/StyledViewPrimaryBack
 import tinycolor from 'tinycolor2';
 import * as postConstants from 'constants/postConstants';
 import TitleText from 'components/common/TitleText';
+import PrimaryText from 'components/common/text/PrimaryText';
 import PostCreationPreviewModal from './PostCreationPreviewModal';
 import DisclaimerText from './DisclaimerText';
-import DraftsModal from './DraftsModal';
-import PostCreationMenu from './PostCreationMenu';
+
+let PostCreationMenu = null;
+let DraftsModal = null;
 
 const { width: deviceWidth } = Dimensions.get('screen');
 
@@ -54,7 +62,6 @@ const StyledScrollView = styled.ScrollView`
 `;
 
 const CreatePostText = styled(TitleText)`
-  font-weight: bold;
   margin-left: 3px;
 `;
 
@@ -97,7 +104,7 @@ const StatusContent = styled.View`
   align-items: center;
 `;
 
-const StatusText = styled.Text`
+const StatusText = styled(PrimaryText)`
   color: ${props => props.customTheme.primaryColor};
 `;
 
@@ -173,6 +180,7 @@ class PostCreationScreen extends Component {
     savePostSuccess: false,
     keyboardDisplayed: false,
     draftID: null,
+    inputWidth: '99%',
   };
 
   constructor(props) {
@@ -218,6 +226,12 @@ class PostCreationScreen extends Component {
     );
   }
 
+  componentDidMount() {
+    setTimeout(() => {
+      this.setState({ inputWidth: '100%' });
+    }, 100);
+  }
+
   componentWillUnmount() {
     this.keyboardDidShowListener.remove();
     this.keyboardDidHideListener.remove();
@@ -253,7 +267,20 @@ class PostCreationScreen extends Component {
       return;
     }
 
-    if (_.includes(value, ' ') || _.includes(value, ',')) {
+    if (_.includes(value, ',')) {
+      const newTags = _.split(value, ',');
+      const tags = _.chain(newTags)
+        .map(tag => _.replace(_.trim(tag), new RegExp(' ', 'g'), ''))
+        .compact()
+        .uniq()
+        .value();
+      const mergedTags = _.union(tags, this.state.tags);
+      this.setState({
+        tagsInput: '',
+        tagError: '',
+        tags: mergedTags,
+      });
+    } else if (_.includes(value, ' ')) {
       const newTag = _.replace(_.replace(value, ' ', ''), ',', '');
       if (_.includes(this.state.tags, newTag)) {
         this.setState({ tagsInput: '' });
@@ -392,9 +419,21 @@ class PostCreationScreen extends Component {
     });
   }
 
-  toggleMenu = menuVisible => () => this.setState({ menuVisible });
+  toggleMenu = menuVisible => () => {
+    if (menuVisible && PostCreationMenu === null) {
+      PostCreationMenu = require('./PostCreationMenu').default;
+    }
 
-  toggleDrafts = draftsVisible => () => this.setState({ draftsVisible });
+    this.setState({ menuVisible });
+  };
+
+  toggleDrafts = draftsVisible => () => {
+    if (draftsVisible && DraftsModal === null) {
+      DraftsModal = require('./DraftsModal').default;
+    }
+
+    this.setState({ draftsVisible });
+  };
 
   removeTag(tag) {
     const { tags } = this.state;
@@ -423,7 +462,7 @@ class PostCreationScreen extends Component {
     this.setState(PostCreationScreen.INITIAL_STATE);
     this.additionalContents = {};
 
-    this.props.navigation.navigate(navigationConstants.FETCH_POST, {
+    this.props.navigation.navigate(navigationConstants.POST, {
       permlink,
       author,
     });
@@ -566,7 +605,11 @@ class PostCreationScreen extends Component {
               ref={input => (this.additionalContents[ref] = input)}
               placeholder={intl.body_placeholder}
               multiline
-              inputStyle={{ width: '100%', color: inputTextColor }}
+              inputStyle={{
+                width: '100%',
+                color: inputTextColor,
+                fontFamily: FONTS.PRIMARY,
+              }}
               placeholderTextColor={inputTextColor}
             />
             <TouchableOpacity
@@ -668,6 +711,7 @@ class PostCreationScreen extends Component {
       savePostSuccess,
       keyboardDisplayed,
       createPostDisplayInPreview,
+      inputWidth,
     } = this.state;
     const displayTitleError = !_.isEmpty(titleError);
     const inputTextColor = tinycolor(customTheme.primaryBackgroundColor).isDark()
@@ -713,7 +757,11 @@ class PostCreationScreen extends Component {
             placeholder={intl.title_placeholder}
             value={titleInput}
             maxLength={255}
-            inputStyle={{ width: '100%', color: inputTextColor }}
+            inputStyle={{
+              width: inputWidth,
+              color: inputTextColor,
+              fontFamily: FONTS.PRIMARY,
+            }}
             placeholderTextColor={inputTextColor}
           />
           {displayTitleError && <FormValidationMessage>{titleError}</FormValidationMessage>}
@@ -723,6 +771,7 @@ class PostCreationScreen extends Component {
             onChangeTags={this.onChangeTags}
             removeTag={this.removeTag}
             tagError={tagError}
+            tagsInputWidth={inputWidth}
           />
           <FormLabel>{intl.body}</FormLabel>
           <FormInput
@@ -730,7 +779,11 @@ class PostCreationScreen extends Component {
             placeholder={intl.body_placeholder}
             multiline
             value={bodyInput}
-            inputStyle={{ width: '100%', color: inputTextColor }}
+            inputStyle={{
+              width: inputWidth,
+              color: inputTextColor,
+              fontFamily: FONTS.PRIMARY,
+            }}
             placeholderTextColor={inputTextColor}
           />
           {this.renderAdditionalContents()}
@@ -740,7 +793,7 @@ class PostCreationScreen extends Component {
             <Picker
               selectedValue={rewards}
               onValueChange={this.onChangeRewards}
-              itemStyle={{ color: inputTextColor }}
+              itemStyle={{ color: inputTextColor, fontFamily: FONTS.PRIMARY }}
             >
               <Picker.Item label={intl.reward_option_50} value={postConstants.REWARDS.HALF} />
               <Picker.Item label={intl.reward_option_100} value={postConstants.REWARDS.ALL} />
@@ -815,11 +868,13 @@ class PostCreationScreen extends Component {
           createPostDisplayInPreview={createPostDisplayInPreview}
           handlePostPreviewSubmit={this.handlePostPreviewSubmit}
         />
-        <DraftsModal
-          handleHideDrafts={this.toggleDrafts(false)}
-          draftsVisible={draftsVisible}
-          handleSelectDraft={this.handleSelectDraft}
-        />
+        {draftsVisible && (
+          <DraftsModal
+            handleHideDrafts={this.toggleDrafts(false)}
+            draftsVisible={draftsVisible}
+            handleSelectDraft={this.handleSelectDraft}
+          />
+        )}
         {menuVisible && (
           <PostCreationMenu
             hideMenu={this.toggleMenu(false)}

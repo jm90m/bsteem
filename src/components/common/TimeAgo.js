@@ -4,8 +4,9 @@ import styled from 'styled-components/native';
 import moment from 'moment-timezone';
 import { connect } from 'react-redux';
 import { getCustomTheme } from 'state/rootReducer';
+import PrimaryText from 'components/common/text/PrimaryText';
 
-const Container = styled.Text`
+const Container = styled(PrimaryText)`
   color: ${props => props.customTheme.tertiaryColor};
   font-size: 14px;
 `;

@@ -1,9 +1,10 @@
-import React, { Component } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 import styled from 'styled-components/native';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { ICON_SIZES, MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
+import PrimaryText from 'components/common/text/PrimaryText';
 import { connect } from 'react-redux';
 import Header from 'components/common/Header';
 import { getCustomTheme, getIntl } from 'state/rootReducer';
@@ -13,7 +14,7 @@ const CurrentMenuDisplay = styled.View`
   align-items: center;
 `;
 
-const CurrentMenuText = styled.Text`
+const CurrentMenuText = styled(PrimaryText)`
   margin-left: 5px;
   color: ${props => props.customTheme.primaryColor};
 `;
@@ -24,7 +25,7 @@ const MenuIconContainer = styled.View`
 
 const Touchable = styled.TouchableOpacity``;
 
-class CurrentUserHeader extends Component {
+class CurrentUserHeader extends React.PureComponent {
   static propTypes = {
     customTheme: PropTypes.shape().isRequired,
     currentMenuOption: PropTypes.shape().isRequired,

@@ -10,6 +10,7 @@ import styled from 'styled-components/native';
 import Avatar from 'components/common/Avatar';
 import { connect } from 'react-redux';
 import { getCustomTheme } from 'state/rootReducer';
+import PrimaryText from 'components/common/text/PrimaryText';
 
 const { width: deviceWidth } = Dimensions.get('screen');
 
@@ -20,14 +21,13 @@ const Container = styled.View`
 
 const PreviewTextContainer = styled.View``;
 
-const Username = styled.Text`
+const Username = styled(PrimaryText)`
   margin: 0 5px;
   color: ${props => props.customTheme.primaryColor};
   font-size: 18px;
-  font-weight: bold;
 `;
 
-const PreviewText = styled.Text`
+const PreviewText = styled(PrimaryText)`
   margin: 0 5px;
   color: ${props => props.customTheme.tertiaryColor};
   width: ${deviceWidth - 55};

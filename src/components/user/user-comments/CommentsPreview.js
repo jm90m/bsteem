@@ -6,9 +6,10 @@ import * as navigationConstants from 'constants/navigation';
 import { COLORS } from 'constants/styles';
 import { currentUserVotePost } from 'state/actions/currentUserActions';
 import _ from 'lodash';
+import PrimaryText from 'components/common/text/PrimaryText';
 import { getCustomTheme } from 'state/rootReducer';
 import tinycolor from 'tinycolor2';
-import Header from '../../post-preview/Header';
+import Header from '../../post-common/header/Header';
 import CommentFooter from './CommentsFooter';
 import * as postConstants from '../../../constants/postConstants';
 import BodyShort from '../../post-preview/BodyShort';
@@ -16,17 +17,13 @@ import { isPostVoted } from '../../../util/voteUtils';
 
 const Container = styled.View`
   background-color: ${props => props.customTheme.primaryBackgroundColor};
-  margin-top: 5px;
-  margin-bottom: 5px;
   border-top-color: ${props => props.customTheme.primaryBorderColor};
-  border-top-width: 2px;
   border-bottom-color: ${props => props.customTheme.primaryBorderColor};
-  border-bottom-width: 2px;
+  border-bottom-width: 1px;
 `;
 
-const Title = styled.Text`
+const Title = styled(PrimaryText)`
   padding-bottom: 10px;
-  font-weight: 700;
   font-size: 20px;
   align-items: center;
   flex-wrap: wrap;
@@ -54,7 +51,7 @@ const CommentTag = styled.View`
   margin-right: 5px;
 `;
 
-const CommentTagText = styled.Text`
+const CommentTagText = styled(PrimaryText)`
   color: ${props =>
     tinycolor(props.customTheme.secondaryColor).isDark()
       ? COLORS.LIGHT_TEXT_COLOR
@@ -144,7 +141,7 @@ class CommentsPreview extends Component {
 
   handleNavigateToVotes() {
     const { commentData } = this.props;
-    this.props.navigation.navigate(navigationConstants.VOTES, {
+    this.props.navigation.push(navigationConstants.VOTES, {
       postData: commentData,
     });
   }
@@ -152,7 +149,7 @@ class CommentsPreview extends Component {
   handleNavigateToComments() {
     const { commentData } = this.props;
     const { category, author, permlink, id } = commentData;
-    this.props.navigation.navigate(navigationConstants.COMMENTS, {
+    this.props.navigation.push(navigationConstants.COMMENTS, {
       author,
       category,
       permlink,
@@ -200,7 +197,7 @@ class CommentsPreview extends Component {
     const { commentData } = this.props;
     const { parent_author, parent_permlink } = commentData;
 
-    this.props.navigation.navigate(navigationConstants.FETCH_POST, {
+    this.props.navigation.push(navigationConstants.POST, {
       author: parent_author,
       permlink: parent_permlink,
     });
@@ -209,7 +206,7 @@ class CommentsPreview extends Component {
   navigateToFullComment() {
     const { commentData } = this.props;
     const { author, permlink } = commentData;
-    this.props.navigation.navigate(navigationConstants.FETCH_POST, {
+    this.props.navigation.push(navigationConstants.POST, {
       author,
       permlink,
     });

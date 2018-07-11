@@ -1,27 +1,25 @@
 import React, { Component } from 'react';
+import { StyleSheet, View, Text } from 'react-native';
 import PropTypes from 'prop-types';
-import styled from 'styled-components/native';
 import Avatar from 'components/common/Avatar';
 import { getCustomTheme } from 'state/rootReducer';
+import Touchable from 'components/common/Touchable';
+import commonStyles from 'styles/common';
 import { connect } from 'react-redux';
+import { FONTS } from '../../constants/styles';
 
-const Container = styled.View`
-  padding: 5px 10px;
-  margin: 5px 0;
-  background-color: ${props => props.customTheme.primaryBackgroundColor};
-`;
-
-const Username = styled.Text`
-  margin: 0 5px;
-  color: ${props => props.customTheme.primaryColor};
-  font-size: 18px;
-  font-weight: bold;
-`;
-
-const TouchableOpacity = styled.TouchableOpacity`
-  flex-direction: row;
-  align-items: center;
-`;
+const styles = StyleSheet.create({
+  userPreviewContainer: {
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    borderBottomWidth: 1,
+  },
+  username: {
+    fontSize: 18,
+    fontFamily: FONTS.PRIMARY,
+    marginLeft: 5,
+  },
+});
 
 const mapStateToProps = state => ({
   customTheme: getCustomTheme(state),
@@ -37,11 +35,13 @@ class SearchUserPreview extends Component {
     customTheme: PropTypes.shape().isRequired,
     username: PropTypes.string,
     handleNavigateToUserScreen: PropTypes.func,
+    isFirstElement: PropTypes.bool,
   };
 
   static defaultProps = {
     username: '',
     handleNavigateToUserScreen: () => {},
+    isFirstElement: false,
   };
 
   constructor(props) {
@@ -55,15 +55,31 @@ class SearchUserPreview extends Component {
   }
 
   render() {
-    const { username, customTheme } = this.props;
+    const { username, customTheme, isFirstElement } = this.props;
+    const userPreviewContainerStyles = [
+      styles.userPreviewContainer,
+      {
+        backgroundColor: customTheme.primaryBackgroundColor,
+        borderColor: customTheme.primaryBorderColor,
+        borderTopWidth: isFirstElement ? 1 : 0,
+      },
+    ];
+    const usernameStyles = [
+      styles.username,
+      {
+        color: customTheme.primaryColor,
+      },
+    ];
 
     return (
-      <Container customTheme={customTheme}>
-        <TouchableOpacity onPress={this.handleNavigateToUserScreen}>
-          <Avatar username={username} size={40} />
-          <Username customTheme={customTheme}>{`@${username}`}</Username>
-        </TouchableOpacity>
-      </Container>
+      <View style={userPreviewContainerStyles}>
+        <Touchable onPress={this.handleNavigateToUserScreen}>
+          <View style={commonStyles.rowAlignedCenterContainer}>
+            <Avatar username={username} size={40} />
+            <Text style={usernameStyles}>{username}</Text>
+          </View>
+        </Touchable>
+      </View>
     );
   }
 }

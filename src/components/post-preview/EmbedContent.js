@@ -4,10 +4,30 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { MATERIAL_ICONS } from 'constants/styles';
 import { MaterialIcons } from '@expo/vector-icons';
-import { WebView, Dimensions, View, Image, TouchableWithoutFeedback } from 'react-native';
+import {
+  WebView,
+  Dimensions,
+  View,
+  Image,
+  TouchableWithoutFeedback,
+  Platform,
+  StyleSheet,
+} from 'react-native';
 import LargeLoading from 'components/common/LargeLoading';
 
 const { width: deviceWidth } = Dimensions.get('screen');
+const isAndroid = Platform !== 'ios';
+
+const styles = StyleSheet.create({
+  imagePreview: {
+    position: 'absolute',
+    zIndex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 340,
+    backgroundColor: 'transparent',
+  },
+});
 
 class EmbedContent extends Component {
   static propTypes = {
@@ -46,19 +66,30 @@ class EmbedContent extends Component {
 
   renderIframe() {
     const { height, width, embedContent } = this.props;
+    const html = `<html><body style="padding: 0; margin: 0;">${embedContent.embed}</body></html>`;
+    let webViewSource = { html };
+
+    if (embedContent.provider_name === 'DTube') {
+      webViewSource = { uri: embedContent.source };
+    }
+
     return (
-      <WebView
-        source={{ html: embedContent.embed }}
-        style={{
-          width,
-          height,
-        }}
-        mediaPlaybackRequiresUserAction
-        renderLoading={this.renderLoading}
-        scrollEnabled={false}
-        allowsInlineMediaPlayback
-        scalesPageToFit={false}
-      />
+      <View style={{ width, height }}>
+        <WebView
+          source={webViewSource}
+          style={{
+            width,
+            height,
+            flex: 1,
+          }}
+          mediaPlaybackRequiresUserAction
+          renderLoading={this.renderLoading}
+          scrollEnabled={false}
+          allowsInlineMediaPlayback
+          scalesPageToFit={isAndroid}
+          automaticallyAdjustContentInsets={false}
+        />
+      </View>
     );
   }
 
@@ -67,21 +98,21 @@ class EmbedContent extends Component {
     const { hideIframe } = this.state;
 
     if (hideIframe && embedContent.provider_name === 'DTube') {
+      const imagePreviewStyles = [
+        styles.imagePreview,
+        {
+          width,
+        },
+      ];
+      const imageStyles = {
+        width,
+        height: 340,
+      };
       return (
         <TouchableWithoutFeedback onPress={this.handleThumbClick}>
-          <View style={{ width, height: 340 }}>
-            <Image source={{ uri: embedContent.thumbnail }} style={{ width, height: 340 }} />
-            <View
-              style={{
-                position: 'absolute',
-                zIndex: 1,
-                alignItems: 'center',
-                justifyContent: 'center',
-                height: 340,
-                width,
-                backgroundColor: 'transparent',
-              }}
-            >
+          <View style={imageStyles}>
+            <Image source={{ uri: embedContent.thumbnail }} style={imageStyles} />
+            <View style={imagePreviewStyles}>
               <MaterialIcons
                 name={MATERIAL_ICONS.playCirlceOutline}
                 size={240}

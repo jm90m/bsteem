@@ -4,6 +4,7 @@ import styled from 'styled-components/native';
 import { connect } from 'react-redux';
 import _ from 'lodash';
 import { MaterialIcons } from '@expo/vector-icons';
+import { View } from 'react-native';
 import { fetchComments } from 'state/actions/postsActions';
 import CommentsContainer from 'components/post/comments/CommentsContainer';
 import { ICON_SIZES, MATERIAL_ICONS } from 'constants/styles';
@@ -17,13 +18,13 @@ import Header from 'components/common/Header';
 import * as editorActions from 'state/actions/editorActions';
 import * as navigationConstants from 'constants/navigation';
 import { SORT_COMMENTS } from 'constants/comments';
-import BSteemModal from 'components/common/BSteemModal';
-import CommentsMenu from 'components/post/comments/CommentsMenu';
 import HeaderEmptyView from 'components/common/HeaderEmptyView';
+import commonStyles from 'styles/common';
 import TitleText from 'components/common/TitleText';
 import BackButton from 'components/common/BackButton';
 
-const Container = styled.View``;
+let CommentsMenu = null;
+let BSteemModal = null;
 
 const TouchableIcon = styled.TouchableOpacity`
   justify-content: center;
@@ -41,6 +42,7 @@ const mapStateToProps = state => ({
   customTheme: getCustomTheme(state),
   intl: getIntl(state),
 });
+
 const mapDispatchToProps = dispatch => ({
   fetchComments: (category, author, permlink, postId) =>
     dispatch(fetchComments(category, author, permlink, postId)),
@@ -119,13 +121,21 @@ class CommentScreen extends Component {
 
   navigateToReplyScreen() {
     const { postData } = this.props.navigation.state.params;
-    this.props.navigation.navigate(navigationConstants.REPLY, {
+    this.props.navigation.push(navigationConstants.REPLY, {
       parentPost: postData,
       successCreateReply: this.successCreateReply,
     });
   }
 
-  handleSetDisplayMenu = displayMenu => () => this.setState({ displayMenu });
+  handleSetDisplayMenu = displayMenu => () => {
+    if (displayMenu && BSteemModal === null) {
+      BSteemModal = require('components/common/BSteemModal').default;
+    }
+    if (displayMenu && CommentsMenu === null) {
+      CommentsMenu = require('components/post/comments/CommentsMenu').default;
+    }
+    this.setState({ displayMenu });
+  };
 
   handleSortComments = sort => () =>
     this.setState({
@@ -142,7 +152,7 @@ class CommentScreen extends Component {
     const { displayMenu, sort } = this.state;
     const { postId, postData } = navigation.state.params;
     return (
-      <Container>
+      <View style={commonStyles.container}>
         <Header>
           <BackButton navigateBack={this.navigateBack} />
           <TitleContainer>
@@ -182,7 +192,7 @@ class CommentScreen extends Component {
             />
           </BSteemModal>
         )}
-      </Container>
+      </View>
     );
   }
 }

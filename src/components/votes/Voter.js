@@ -11,20 +11,19 @@ import ReputationScore from 'components/post/ReputationScore';
 import { connect } from 'react-redux';
 import { getCustomTheme } from 'state/rootReducer';
 import tinycolor from 'tinycolor2';
+import PrimaryText from 'components/common/text/PrimaryText';
 import FollowButton from '../common/FollowButton';
 
 const Container = styled.View`
   flex-direction: row;
   align-items: center;
-  margin: 2px 0;
   padding: 5px 10px;
   background: ${props => props.customTheme.primaryBackgroundColor};
-  border-top-width: 1px;
   border-bottom-width: 1px;
-  border-color: ${props => props.customTheme.primaryBorderColor};
+  border-bottom-color: ${props => props.customTheme.primaryBorderColor};
 `;
 
-const Username = styled.Text`
+const Username = styled(PrimaryText)`
   color: ${props => props.customTheme.primaryColor};
 `;
 
@@ -41,7 +40,7 @@ const FollowButtonContainer = styled.View`
   margin-left: auto;
 `;
 
-const VotePercent = styled.Text`
+const VotePercent = styled(PrimaryText)`
   margin: 0 5px;
   font-size: 12px;
   color: ${props =>
@@ -54,7 +53,7 @@ const UsernameContainer = styled.View`
   margin: 0 5px;
 `;
 
-class Voter extends Component {
+class Voter extends React.PureComponent {
   static propTypes = {
     customTheme: PropTypes.shape().isRequired,
     voter: PropTypes.string,
@@ -72,6 +71,7 @@ class Voter extends Component {
     reputation: '',
     handleNavigateToUser: () => {},
   };
+
   render() {
     const {
       voter,
@@ -83,6 +83,7 @@ class Voter extends Component {
       customTheme,
     } = this.props;
     const formattedReputation = getReputation(reputation);
+    const usdValueStyles = { marginLeft: 5 };
 
     return (
       <Container customTheme={customTheme}>
@@ -92,7 +93,7 @@ class Voter extends Component {
             <InlineContainer>
               <Username customTheme={customTheme}>{voter}</Username>
               <ReputationScore reputation={formattedReputation} />
-              <USDValue value={voteValue} style={{ marginLeft: 5 }} />
+              <USDValue value={voteValue} style={usdValueStyles} />
               <VotePercent customTheme={customTheme}>{votePercent}%</VotePercent>
             </InlineContainer>
             {!_.isEmpty(time) && <TimeAgo created={time} />}

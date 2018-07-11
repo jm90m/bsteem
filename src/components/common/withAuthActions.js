@@ -4,7 +4,8 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { getIsAuthenticated, getCustomTheme, getIntl } from 'state/rootReducer';
 import * as authActions from 'state/actions/authActions';
-import LoginModal from './LoginModal';
+
+let LoginModal = null;
 
 function getDisplayName(WrappedComponent) {
   return WrappedComponent.displayName || WrappedComponent.name || 'Component';
@@ -54,6 +55,10 @@ export default function withAuthActions(WrappedComponent) {
     }
 
     displayLoginModal() {
+      if (LoginModal === null) {
+        LoginModal = require('./LoginModal').default;
+      }
+
       this.setState({
         displayLoginModal: true,
       });

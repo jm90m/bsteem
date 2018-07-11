@@ -40,7 +40,6 @@ const DebugText = styled(StyledTextByBackground)`
 const Description = styled(StyledTextByBackground)`
   padding: 20px;
   text-align: center;
-  font-weight: bold;
   font-size: 22px;
 `;
 

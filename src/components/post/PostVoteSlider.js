@@ -20,6 +20,7 @@ import { getVoteValue } from 'util/userUtils';
 import { calculatePayout } from 'util/steemitUtils';
 import { DEFAULT_VOTE_WEIGHT } from 'constants/postConstants';
 import StyledTextByBackground from 'components/common/StyledTextByBackground';
+import PrimaryText from 'components/common/text/PrimaryText';
 
 const Container = styled.View`
   padding: 10px 16px;
@@ -31,7 +32,7 @@ const ActionContainer = styled.View`
   margin-right: 10px;
 `;
 
-const ActionText = styled.Text`
+const ActionText = styled(PrimaryText)`
   color: ${props => props.color};
   margin-left: 3px;
 `;
@@ -40,10 +41,9 @@ const HeaderContent = styled.View`
   flex-direction: row;
 `;
 
-const Payout = styled.Text`
+const Payout = styled(PrimaryText)`
   margin-left: auto;
   font-size: 14px;
-  font-weight: 700;
   color: ${props => props.customTheme.tertiaryColor};
   align-self: center;
   ${props => (props.payoutIsDeclined ? 'text-decoration-line: line-through' : '')};
@@ -59,7 +59,6 @@ const SliderContainer = styled.View`
 const VoteWorth = styled(StyledTextByBackground)`
   justify-content: center;
   text-align: center;
-  font-weight: bold;
   padding-top: 5px;
 `;
 

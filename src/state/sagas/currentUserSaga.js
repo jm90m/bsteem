@@ -3,6 +3,7 @@ import _ from 'lodash';
 import { takeLatest, all, call, put, select, takeEvery } from 'redux-saga/effects';
 import API, { getAPIByFilter } from 'api/api';
 import sc2 from 'api/sc2';
+import * as segmentEvents from 'constants/segmentEvents';
 import {
   getFirebaseValueOnce,
   getUserRebloggedPostsRef,
@@ -36,6 +37,7 @@ import * as currentUserActions from '../actions/currentUserActions';
 import { displayNotifyModal } from '../actions/appActions';
 import { refreshUserBlog } from '../actions/usersActions';
 import { logoutUser } from '../actions/authActions';
+import { addPostsToPostMap } from '../actions/postsActions';
 import {
   AUTH_EXPIRATION,
   AUTH_MAX_EXPIRATION_AGE,
@@ -55,6 +57,7 @@ const fetchCurrentUserFeed = function*() {
       yield put(currentUserActions.currentUserFeedFetch.fail(result.error));
     } else {
       yield put(currentUserActions.currentUserFeedFetch.success(result.result));
+      yield put(addPostsToPostMap(result.result));
     }
   } catch (error) {
     yield put(currentUserActions.currentUserFeedFetch.fail(error));
@@ -90,6 +93,7 @@ const fetchMoreCurrentUserFeed = function*() {
       yield put(currentUserActions.currentUserFeedFetchMore.fail(result.error));
     } else {
       yield put(currentUserActions.currentUserFeedFetchMore.success(result.result));
+      yield put(addPostsToPostMap(result.result));
     }
   } catch (error) {
     yield put(currentUserActions.currentUserFeedFetchMore.fail(error));
@@ -164,7 +168,7 @@ const votePost = function*(action) {
     const roundedVoteWeight = Math.round(voteWeight);
     const currentUsername = yield select(getAuthUsername);
     const result = yield call(
-      sc2.vote,
+      sc2.vote.bind(sc2),
       currentUsername,
       postAuthor,
       postPermlink,
@@ -172,6 +176,14 @@ const votePost = function*(action) {
     );
     voteSuccessCallback(voteWeight);
     yield put(currentUserActions.currentUserVotePost.success(result));
+
+    Expo.Segment.trackWithProperties(segmentEvents.VOTE, {
+      voter: currentUsername,
+      postPermlink,
+      postAuthor,
+      type: 'post',
+      voteWeight: roundedVoteWeight,
+    });
   } catch (error) {
     const errorDescription = _.get(error, 'error_description', '');
     const errorDetails = _.find(VOTE_ERRORS, voteError =>
@@ -211,10 +223,17 @@ const voteComment = function*(action) {
     const postCommentsDetails = _.get(commentsByPostId, postId, {});
     const comment = _.get(postCommentsDetails, `comments.${commentId}`, commentData);
     const { author, permlink } = comment;
-    const result = yield call(sc2.vote, currentUsername, author, permlink, weight);
+    const result = yield call(sc2.vote.bind(sc2), currentUsername, author, permlink, weight);
 
     voteSuccessCallback();
     yield put(currentUserActions.currentUserVoteComment.success(result));
+
+    Expo.Segment.trackWithProperties(segmentEvents.VOTE, {
+      voter: currentUsername,
+      permlink,
+      weight,
+      type: 'comment',
+    });
   } catch (error) {
     const errorDescription = _.get(error, 'error_description', '');
     const errorDetails = _.find(VOTE_ERRORS, voteError =>
@@ -265,7 +284,7 @@ const reblogPost = function*(action) {
   try {
     const { postId, postAuthor, postPermlink, reblogSuccessCallback } = action.payload;
     const currentUsername = yield select(getAuthUsername);
-    const result = yield call(sc2.reblog, currentUsername, postAuthor, postPermlink);
+    const result = yield call(sc2.reblog.bind(sc2), currentUsername, postAuthor, postPermlink);
     reblogSuccessCallback();
     const payload = {
       postId,
@@ -274,6 +293,12 @@ const reblogPost = function*(action) {
     yield call(addRebloggedPostToFirebase, postId);
     yield put(currentUserActions.currentUserReblogPost.success(payload));
     yield put(refreshUserBlog.action({ username: currentUsername }));
+
+    Expo.Segment.trackWithProperties(segmentEvents.REBLOG, {
+      currentUsername,
+      postPermlink,
+      postAuthor,
+    });
   } catch (error) {
     const { reblogFailCallback } = action.payload;
     console.log('REBLOG FAIL', error.message);
@@ -316,7 +341,7 @@ const followUser = function*(action) {
   try {
     const { username, followSuccessCallback } = action.payload;
     const currentUsername = yield select(getAuthUsername);
-    const result = yield call(sc2.follow, currentUsername, username);
+    const result = yield call(sc2.follow.bind(sc2), currentUsername, username);
     const payload = {
       username,
     };
@@ -335,7 +360,7 @@ const unfollowUser = function*(action) {
   try {
     const { username, unfollowSuccessCallback } = action.payload;
     const currentUsername = yield select(getAuthUsername);
-    const result = yield call(sc2.unfollow, currentUsername, username);
+    const result = yield call(sc2.unfollow.bind(sc2), currentUsername, username);
     const payload = {
       username,
     };

@@ -5,6 +5,7 @@ import { COLORS } from 'constants/styles';
 import { connect } from 'react-redux';
 import { getCustomTheme } from 'state/rootReducer';
 import tinycolor from 'tinycolor2';
+import PrimaryText from 'components/common/text/PrimaryText';
 
 const Container = styled.View`
   flex-direction: row;
@@ -12,7 +13,7 @@ const Container = styled.View`
   background-color: ${props => props.customTheme.primaryBackgroundColor};
 `;
 
-const About = styled.Text`
+const About = styled(PrimaryText)`
   color: ${props =>
     tinycolor(props.customTheme.primaryBackgroundColor).isDark()
       ? COLORS.LIGHT_TEXT_COLOR

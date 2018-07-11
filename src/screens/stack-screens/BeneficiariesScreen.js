@@ -34,24 +34,22 @@ const DescriptionText = styled(StyledTextByBackground)``;
 
 const ValueContainer = styled.View`
   padding: 10px;
+  border-bottom-color: ${props => props.customTheme.primaryBorderColor};
+  border-bottom-width: 1px;
 `;
 
 const UserContainer = styled.View`
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  padding: 5px 10px;
-  margin: 3px 0;
+  padding: 10px;
   background-color: ${props => props.customTheme.primaryBackgroundColor};
   border-bottom-color: ${props => props.customTheme.primaryBorderColor};
   border-bottom-width: 1px;
-  border-top-color: ${props => props.customTheme.primaryBorderColor};
-  border-top-width: 1px;
 `;
 
 const UserText = styled(StyledTextByBackground)`
   margin-left: 5px;
-  font-weight: bold;
 `;
 
 const UserTouchable = styled.TouchableOpacity`
@@ -97,13 +95,12 @@ class BeneficiariesScreen extends Component {
   }
 
   handleNavigateToUser = username => () => {
-    this.props.navigation.navigate(navigationConstants.USER, { username });
+    this.props.navigation.push(navigationConstants.USER, { username });
   };
 
   renderBeneficiaries() {
     const { customTheme } = this.props;
-    const { postData } = this.props.navigation.state.params;
-    const beneficiaries = _.get(postData, 'beneficiaries', []);
+    const { beneficiaries } = this.props.navigation.state.params;
 
     return _.map(beneficiaries, (user, i) => (
       <UserContainer key={`${user.account}${i}`} customTheme={customTheme}>
@@ -140,7 +137,7 @@ class BeneficiariesScreen extends Component {
           </RightMenuIconContainer>
         </Header>
         <StyledScrollView>
-          <ValueContainer>
+          <ValueContainer customTheme={customTheme}>
             <DescriptionText>{intl.beneficiaries_description}</DescriptionText>
           </ValueContainer>
           {this.renderBeneficiaries()}

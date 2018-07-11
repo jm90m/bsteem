@@ -5,11 +5,11 @@ import StyledTextByBackground from 'components/common/StyledTextByBackground';
 import _ from 'lodash';
 import { connect } from 'react-redux';
 import { vestToSteem } from 'util/steemitFormatters';
+import PrimaryText from 'components/common/text/PrimaryText';
 import styled from 'styled-components/native';
 
-const LinkText = styled.Text`
+const LinkText = styled(PrimaryText)`
   color: ${props => props.customTheme.primaryColor}
-  font-weight: bold;
   margin-right: 5px;
 `;
 

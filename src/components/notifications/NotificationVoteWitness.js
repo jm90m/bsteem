@@ -2,15 +2,16 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Avatar from 'components/common/Avatar';
 import { getIntl } from 'state/rootReducer';
-import { View, TouchableWithoutFeedback } from 'react-native';
+import { View } from 'react-native';
+import Touchable from 'components/common/Touchable';
 import { connect } from 'react-redux';
 import TitleText from 'components/common/TitleText';
 import NotificationContainer from './NotificationContainer';
 import NotificationTimeAgo from './NotificationTimeAgo';
 import NotificationText from './NotificationText';
 
-const NotificationVoteWitness = ({ notification, read, handleNavigateToUser, intl, timestamp }) => (
-  <TouchableWithoutFeedback onPress={handleNavigateToUser(notification.account)}>
+const NotificationVoteWitness = ({ notification, read, handleNavigateToUser, intl }) => (
+  <Touchable onPress={handleNavigateToUser(notification.account)}>
     <NotificationContainer read={read}>
       <Avatar username={notification.account} />
       <View>
@@ -22,27 +23,24 @@ const NotificationVoteWitness = ({ notification, read, handleNavigateToUser, int
               : intl.notification_unapproved_witness
           }`}
         </NotificationText>
-        <NotificationTimeAgo created={timestamp} />
+        <NotificationTimeAgo created={notification.timestamp} />
       </View>
     </NotificationContainer>
-  </TouchableWithoutFeedback>
+  </Touchable>
 );
 
 NotificationVoteWitness.propTypes = {
   read: PropTypes.bool,
   notification: PropTypes.shape({
-    account: PropTypes.string,
-    timestamp: PropTypes.number,
-  }),
+    account: PropTypes.string.isRequired,
+    timestamp: PropTypes.number.isRequired,
+  }).isRequired,
   handleNavigateToUser: PropTypes.func.isRequired,
   intl: PropTypes.shape().isRequired,
-  timestamp: PropTypes.string,
 };
 
 NotificationVoteWitness.defaultProps = {
   read: false,
-  notification: {},
-  timestamp: '',
 };
 
 const mapStateToProps = state => ({

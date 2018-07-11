@@ -12,7 +12,7 @@ import * as authSaga from './sagas/authSaga';
 import * as settingsSaga from './sagas/settingsSaga';
 import * as messagesSaga from './sagas/messagesSaga';
 
-const rootSaga = function*() {
+const rootSaga = function*(busyAPI) {
   yield all([
     // Home Sagas
     spawn(homeSaga.watchFetchDiscussions),
@@ -85,10 +85,10 @@ const rootSaga = function*() {
     spawn(firebaseSaga.watchFetchDrafts),
 
     // Auth Sagas
-    spawn(authSaga.watchAuthenticateUser),
+    spawn(authSaga.watchAuthenticateUser, busyAPI),
     spawn(authSaga.watchFetchSteemConnectAuthUserData),
     spawn(authSaga.watchSaveNotificationsLastTimestamp),
-    spawn(authSaga.watchFetchBSteemNotifications),
+    spawn(authSaga.watchFetchNotifications, busyAPI),
     spawn(authSaga.watchLogoutUser),
 
     // Settings Sagas

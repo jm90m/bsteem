@@ -1,5 +1,7 @@
 import sc2 from 'api/sc2';
-import { takeLatest, call, all, put, select } from 'redux-saga/effects';
+import { takeLatest, call, put, select } from 'redux-saga/effects';
+import { Segment } from 'expo';
+import * as segmentEvents from 'constants/segmentEvents';
 import _ from 'lodash';
 import { createPermlink, createCommentPermlink } from 'util/steemitUtils';
 import ERRORS from 'constants/errors';
@@ -129,6 +131,8 @@ const createPost = function*(action) {
 
     yield put(editorActions.createPost.success(payload));
     yield put(refreshUserBlog.action({ username: author }));
+
+    Segment.trackWithProperties(segmentEvents.POST, { author, permlink });
   } catch (error) {
     console.log('POST CREATION ERROR - description', error.description);
     console.log('POST CREATION ERROR - fingerprint', error.fingerprint);
@@ -167,7 +171,7 @@ const createComment = function*(action) {
       ? getBodyPatchIfSmaller(originalComment.body, commentBody)
       : commentBody;
     const sc2Comment = yield call(
-      sc2.comment,
+      sc2.comment.bind(sc2),
       parentAuthor,
       parentPermlink,
       author,
@@ -196,13 +200,15 @@ const createComment = function*(action) {
     };
 
     successCallback(commentDetailsPayload);
-
-    console.log('SUCCESS COMMENT REPLY - ORIGINAL COMMENT', originalComment);
-    console.log('SUCCESS COMMENT REPLY - NEW COMMENT DATA', commentData);
-    console.log('SUCCESS COMMENT REPLY - NEW COMMENT DETAILS', commentDetails);
-    console.log('SUCCESS COMMENT REPLY - COMMENT DETAILS PAYLOAD', commentDetailsPayload);
-
     yield put(editorActions.createComment.success(payload));
+
+    Segment.trackWithProperties(segmentEvents.COMMENT, {
+      author,
+      body: newBody,
+      permlink,
+      parentPermlink,
+      parentAuthor,
+    });
   } catch (error) {
     console.log('FAIL COMMENT REPLY - message', error.description);
     console.log('FAIL COMMENT REPLY - fingerprint', error.fingerprint);

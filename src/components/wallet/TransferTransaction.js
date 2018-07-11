@@ -8,6 +8,7 @@ import TimeAgo from 'components/common/TimeAgo';
 import { connect } from 'react-redux';
 import { getCustomTheme, getIntl } from 'state/rootReducer';
 import StyledTextByBackground from 'components/common/StyledTextByBackground';
+import PrimaryText from 'components/common/text/PrimaryText';
 import WalletTransactionContainer from './WalletTransactionContainer';
 
 const TransferContent = styled.Text`
@@ -16,19 +17,17 @@ const TransferContent = styled.Text`
   width: 200px;
 `;
 
-const Transfer = styled.Text`
-  font-weight: bold;
+const Transfer = styled(PrimaryText)`
   margin-left: auto;
   color: ${props => props.customTheme.negativeColor};
 `;
 
-const TransferTextContainer = styled.Text`
+const TransferTextContainer = styled(PrimaryText)`
   flex-direction: row;
 `;
 
-const Username = styled.Text`
+const Username = styled(PrimaryText)`
   color: ${props => props.customTheme.primaryColor};
-  font-weight: bold;
 `;
 
 const Touchable = styled.TouchableWithoutFeedback``;
@@ -41,7 +40,7 @@ const TransferTransaction = ({ to, memo, amount, timestamp, navigation, customTh
         <StyledTextByBackground style={{ fontWeight: 'bold' }}>{`${
           intl.transferred_to
         } `}</StyledTextByBackground>
-        <Touchable onPress={() => navigation.navigate(navigationConstants.USER, { username: to })}>
+        <Touchable onPress={() => navigation.push(navigationConstants.USER, { username: to })}>
           <Username customTheme={customTheme}>{to}</Username>
         </Touchable>
       </TransferTextContainer>

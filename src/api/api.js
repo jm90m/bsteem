@@ -164,7 +164,7 @@ class API {
         }, []);
         resolve(list);
       } catch (error) {
-        console.warn(error);
+        console.log(error);
       }
     });
   }

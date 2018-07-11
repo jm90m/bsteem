@@ -6,11 +6,7 @@ import { getCustomTheme } from 'state/rootReducer';
 const WalletTransactionContainer = styled.View`
   flex-direction: row;
   background-color: ${props => props.customTheme.primaryBackgroundColor};
-  margin-top: 2px;
-  margin-bottom: 2px;
   border-bottom-color: ${props => props.customTheme.primaryBorderColor};
-  border-top-color: ${props => props.customTheme.primaryBorderColor};
-  border-top-width: 1px;
   border-bottom-width: 1px;
   padding: 5px;
 `;

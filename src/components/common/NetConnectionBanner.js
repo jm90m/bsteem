@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { MaterialIcons } from '@expo/vector-icons';
-
+import PrimaryText from 'components/common/text/PrimaryText';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { getHasNetworkConnection } from 'state/rootReducer';
@@ -21,7 +21,7 @@ const Container = styled.View`
   width: 100%;
 `;
 
-const WarningText = styled.Text`
+const WarningText = styled(PrimaryText)`
   color: white;
 `;
 

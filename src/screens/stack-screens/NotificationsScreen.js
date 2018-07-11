@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components/native';
-import { TouchableWithoutFeedback, RefreshControl } from 'react-native';
+import { TouchableWithoutFeedback, RefreshControl, View } from 'react-native';
 import { connect } from 'react-redux';
 import _ from 'lodash';
 import { ICON_SIZES, MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
@@ -13,18 +12,16 @@ import {
   getCustomTheme,
   getIntl,
   getLoadingNotifications,
-  getAuthUsername,
   getAuthenticatedUserSCMetaData,
 } from 'state/rootReducer';
 import * as navigationConstants from 'constants/navigation';
 import * as firebaseActions from 'state/actions/firebaseActions';
+import commonStyles from 'styles/common';
 import * as notificationConstants from 'constants/notifications';
 import TitleText from 'components/common/TitleText';
 import StyledViewPrimaryBackground from 'components/common/StyledViewPrimaryBackground';
-import {
-  saveNotificationsLastTimestamp,
-  fetchBSteemNotifications,
-} from 'state/actions/authActions';
+import { saveNotificationsLastTimestamp } from 'state/actions/authActions';
+import { getNotifications } from 'state/actions/currentUserActions';
 import StyledTextByBackground from 'components/common/StyledTextByBackground';
 import StyledFlatList from 'components/common/StyledFlatList';
 import NotificationMention from 'components/notifications/NotificationMention';
@@ -35,16 +32,11 @@ import NotificationTransfer from 'components/notifications/NotificationTransfer'
 import NotificationReblog from 'components/notifications/NotificationReblog';
 import NotificationReply from 'components/notifications/NotificationReply';
 
-const MenuIconContainer = styled.View`
-  padding: 5px;
-`;
-
 const mapStateToProps = state => ({
   customTheme: getCustomTheme(state),
   intl: getIntl(state),
   notifications: getNotificationsState(state),
   loadingNotifications: getLoadingNotifications(state),
-  authUsername: getAuthUsername(state),
   userSCMetaData: getAuthenticatedUserSCMetaData(state),
 });
 
@@ -53,7 +45,7 @@ const mapDispatchToProps = dispatch => ({
   fetchBlockedUsers: () => dispatch(firebaseActions.fetchBlockedUsers.action()),
   saveNotificationsLastTimestamp: timestamp =>
     dispatch(saveNotificationsLastTimestamp.action({ timestamp })),
-  fetchBSteemNotifications: () => dispatch(fetchBSteemNotifications.action()),
+  getNotifications: () => dispatch(getNotifications.action()),
 });
 
 class NotificationsScreen extends Component {
@@ -70,7 +62,7 @@ class NotificationsScreen extends Component {
     userSCMetaData: PropTypes.shape().isRequired,
     intl: PropTypes.shape().isRequired,
     notifications: PropTypes.arrayOf(PropTypes.shape()).isRequired,
-    fetchBSteemNotifications: PropTypes.func.isRequired,
+    getNotifications: PropTypes.func.isRequired,
     saveNotificationsLastTimestamp: PropTypes.func.isRequired,
   };
 
@@ -95,7 +87,7 @@ class NotificationsScreen extends Component {
   }
 
   refreshNotifications() {
-    this.props.fetchBSteemNotifications();
+    this.props.getNotifications();
   }
 
   handleNavigateBack() {
@@ -103,44 +95,38 @@ class NotificationsScreen extends Component {
   }
 
   handleNavigateToUser = username => () => {
-    this.props.navigation.navigate(navigationConstants.USER, { username });
+    this.props.navigation.push(navigationConstants.USER, { username });
   };
 
   handleNavigateToPost = (author, permlink) => () => {
-    this.props.navigation.navigate(navigationConstants.FETCH_POST, {
+    this.props.navigation.push(navigationConstants.POST, {
       author,
       permlink,
     });
   };
 
   renderNotification(rowData) {
-    const rowItem = rowData.item;
-    const notification = rowItem.data;
-    const { created_at: timestamp } = rowItem;
-
-    switch (rowItem.kind) {
-      case notificationConstants.TYPE_MENTION:
+    const notification = rowData.item;
+    switch (notification.type) {
+      case notificationConstants.MENTION:
         return (
           <NotificationMention
             notification={notification}
             handleNavigateToPost={this.handleNavigateToPost}
-            timestamp={timestamp}
           />
         );
-      case notificationConstants.TYPE_FOLLOW:
+      case notificationConstants.FOLLOW:
         return (
           <NotificationFollowing
             notification={notification}
             handleNavigateToUser={this.handleNavigateToUser}
-            timestamp={timestamp}
           />
         );
-      case notificationConstants.TYPE_VOTE:
+      case notificationConstants.VOTE:
         return (
           <NotificationVote
             notification={notification}
-            handleNavigateToPost={this.handleNavigateToPost}
-            timestamp={timestamp}
+            handleNavigateToUser={this.handleNavigateToUser}
           />
         );
       case notificationConstants.WITNESS_VOTE:
@@ -148,15 +134,13 @@ class NotificationsScreen extends Component {
           <NotificationVoteWitness
             notification={notification}
             handleNavigateToUser={this.handleNavigateToUser}
-            timestamp={timestamp}
           />
         );
-      case notificationConstants.TYPE_TRANSFER_IN:
+      case notificationConstants.TRANSFER:
         return (
           <NotificationTransfer
             notification={notification}
             handleNavigateToUser={this.handleNavigateToUser}
-            timestamp={timestamp}
           />
         );
       case notificationConstants.REBLOG:
@@ -164,15 +148,13 @@ class NotificationsScreen extends Component {
           <NotificationReblog
             notification={notification}
             handleNavigateToPost={this.handleNavigateToPost}
-            timestamp={timestamp}
           />
         );
-      case notificationConstants.TYPE_REPLY:
+      case notificationConstants.REPLY:
         return (
           <NotificationReply
             notification={notification}
             handleNavigateToPost={this.handleNavigateToPost}
-            timestamp={timestamp}
           />
         );
       default:
@@ -193,18 +175,18 @@ class NotificationsScreen extends Component {
     const { customTheme, intl, notifications, loadingNotifications } = this.props;
 
     return (
-      <StyledViewPrimaryBackground style={{ flex: 1 }}>
+      <StyledViewPrimaryBackground style={commonStyles.container}>
         <Header>
           <BackButton navigateBack={this.handleNavigateBack} />
           <TitleText>{intl.notifications}</TitleText>
           <TouchableWithoutFeedback>
-            <MenuIconContainer>
+            <View style={commonStyles.headerMenuIconContainer}>
               <MaterialCommunityIcons
                 size={ICON_SIZES.menuIcon}
                 name={MATERIAL_COMMUNITY_ICONS.messageText}
                 color="transparent"
               />
-            </MenuIconContainer>
+            </View>
           </TouchableWithoutFeedback>
         </Header>
         <StyledFlatList

@@ -1,5 +1,7 @@
 import firebase from 'firebase';
+import CryptoJS from 'crypto-js';
 import _ from 'lodash';
+import { encryptionSecretKey } from '../constants/config';
 
 export const getFirebaseValueOnce = (ref, key) =>
   firebase
@@ -14,40 +16,50 @@ export const setFirebaseData = (ref, values = {}) => {
     .set(values);
 };
 
+const getEncryptedUsername = username =>
+  CryptoJS.AES.encrypt(username, encryptionSecretKey).toString();
+
 export const baseUserSettingsRef = 'user-settings';
-export const getUserSettings = username => `${baseUserSettingsRef}/${username}/settings`;
+export const getUserSettings = username =>
+  `${baseUserSettingsRef}/${getEncryptedUsername(username)}/settings`;
 export const getNSFWDisplaySettingsRef = username =>
-  `${getUserSettings(username)}/display-nsfw-setting`;
+  `${getUserSettings(getEncryptedUsername(username))}/display-nsfw-setting`;
 export const getPostPreviewCompactModeSettingRef = username =>
-  `${getUserSettings(username)}/post-preview-compact-mode`;
-export const getUserSavedTagsRef = username => `${baseUserSettingsRef}/${username}/saved-tags`;
-export const getSaveTagRef = (username, tag) => `${getUserSavedTagsRef(username)}/${tag}`;
+  `${getUserSettings(getEncryptedUsername(username))}/post-preview-compact-mode`;
+export const getUserSavedTagsRef = username =>
+  `${baseUserSettingsRef}/${getEncryptedUsername(username)}/saved-tags`;
+export const getSaveTagRef = (username, tag) =>
+  `${getUserSavedTagsRef(getEncryptedUsername(username))}/${tag}`;
 
-export const getUserSavedPostsRef = username => `${baseUserSettingsRef}/${username}/saved-posts`;
-export const getSavePostRef = (username, postID) => `${getUserSavedPostsRef(username)}/${postID}`;
+export const getUserSavedPostsRef = username =>
+  `${baseUserSettingsRef}/${getEncryptedUsername(username)}/saved-posts`;
+export const getSavePostRef = (username, postID) =>
+  `${getUserSavedPostsRef(getEncryptedUsername(username))}/${postID}`;
 
-export const getUserSavedUsersRef = username => `${baseUserSettingsRef}/${username}/saved-users`;
+export const getUserSavedUsersRef = username =>
+  `${baseUserSettingsRef}/${getEncryptedUsername(username)}/saved-users`;
 export const getSaveUserRef = (username, saveUser) =>
-  `${getUserSavedUsersRef(username)}/${saveUser}`;
+  `${getUserSavedUsersRef(getEncryptedUsername(username))}/${getEncryptedUsername(saveUser)}`;
 
 export const getUserReportedPostsRef = username =>
-  `${baseUserSettingsRef}/${username}/reported-posts`;
+  `${baseUserSettingsRef}/${getEncryptedUsername(username)}/reported-posts`;
 export const getReportPostRef = (username, postID) =>
-  `${getUserReportedPostsRef(username)}/${postID}`;
+  `${getUserReportedPostsRef(getEncryptedUsername(username))}/${postID}`;
 
 export const getUserRebloggedPostsRef = username =>
   `${baseUserSettingsRef}/${username}/reblogged-posts`;
 export const getRebloggedPostRef = (username, postID) =>
-  `${getUserRebloggedPostsRef(username)}/${postID}`;
+  `${getUserRebloggedPostsRef(getEncryptedUsername(username))}/${postID}`;
 
-export const getUserPostDraftsRef = username => `${baseUserSettingsRef}/${username}/post-drafts`;
+export const getUserPostDraftsRef = username =>
+  `${baseUserSettingsRef}/${getEncryptedUsername(username)}/post-drafts`;
 export const getSavedDraftRef = (username, draftID) =>
-  `${getUserPostDraftsRef(username)}/${draftID}`;
+  `${getUserPostDraftsRef(getEncryptedUsername(username))}/${draftID}`;
 
 export const getUserAllPrivateMessagesRef = username =>
-  `${baseUserSettingsRef}/${username}/private-messages`;
+  `${baseUserSettingsRef}/${getEncryptedUsername(username)}/private-messages`;
 export const getUserDisplayedPrivateMessagesRef = (username, toUser) =>
-  `${baseUserSettingsRef}/${username}/private-messages/${toUser}`;
+  `${baseUserSettingsRef}/${getEncryptedUsername(username)}/private-messages/${toUser}`;
 
 export const baseMessagesRef = 'user-messages';
 export const getUsersMessagesRef = (firstUser = '', secondUser = '') => {
@@ -61,9 +73,9 @@ export const getSendUserMessagesRef = (firstUser, secondUser, timestamp) => {
 };
 
 export const getUserBlockedUsersRef = username =>
-  `${baseUserSettingsRef}/${username}/blocked-users`;
+  `${baseUserSettingsRef}/${getEncryptedUsername(username)}/blocked-users`;
 export const getBlockedUserRef = (username, blockUsername) =>
-  `${getUserBlockedUsersRef(username)}/${blockUsername}`;
+  `${getUserBlockedUsersRef(getEncryptedUsername(username))}/${blockUsername}`;
 
 export const getUserEnableVoteSliderRef = username => `${getUserSettings(username)}/vote-slider`;
 export const getUserVotePercentRef = username => `${getUserSettings(username)}/vote-percent`;

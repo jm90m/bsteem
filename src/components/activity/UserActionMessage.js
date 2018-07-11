@@ -20,9 +20,7 @@ const Container = styled.View`
 
 const Touchable = styled.TouchableWithoutFeedback``;
 
-const BoldText = styled(StyledTextByBackground)`
-  font-weight: bold;
-`;
+const BoldText = styled(StyledTextByBackground)``;
 
 const mapStateToProps = state => ({
   intl: getIntl(state),
@@ -40,11 +38,11 @@ class UserActionMessage extends Component {
   };
 
   handleNavigateToUser = username => () => {
-    this.props.navigation.navigate(navigationConstants.USER, { username });
+    this.props.navigation.push(navigationConstants.USER, { username });
   };
 
   handleNavigateToPost = (author, permlink) => () => {
-    this.props.navigation.navigate(navigationConstants.FETCH_POST, { author, permlink });
+    this.props.navigation.push(navigationConstants.POST, { author, permlink });
   };
 
   renderFormattedMessage() {

@@ -1,7 +1,7 @@
-import React, { Component } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { getAvatarImageUrl } from 'util/busyImageUtils';
-import { Image as ExpoImage } from 'react-native-expo-image-cache';
+import { Image } from 'react-native';
 import { connect } from 'react-redux';
 import { getCustomTheme } from 'state/rootReducer';
 
@@ -12,7 +12,7 @@ const mapStateToProps = state => ({
   customTheme: getCustomTheme(state),
 });
 
-class Avatar extends Component {
+class Avatar extends React.PureComponent {
   static propTypes = {
     customTheme: PropTypes.shape().isRequired,
     username: PropTypes.string,
@@ -40,6 +40,7 @@ class Avatar extends Component {
       this.setImageUrl(nextProps.username, nextProps.size);
     }
   }
+
   setImageUrl(username, size) {
     this.setState({
       imageUrl: getAvatarImageUrl(username, size),
@@ -63,9 +64,7 @@ class Avatar extends Component {
       borderColor: customTheme.primaryBorderColor,
     };
 
-    return (
-      <ExpoImage size={size} onError={this.handleOnError} uri={imageUrl} style={avatarStyle} />
-    );
+    return <Image onError={this.handleOnError} source={{ uri: imageUrl }} style={avatarStyle} />;
   }
 }
 

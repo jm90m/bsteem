@@ -23,15 +23,15 @@ import { COLORS, MATERIAL_ICONS, FONT_AWESOME_ICONS, ICON_SIZES } from 'constant
 import SaveUserButton from 'components/common/SaveUserButton';
 import { getUserDetailsHelper } from 'util/bsteemUtils';
 import { MaterialIcons, FontAwesome } from '@expo/vector-icons';
+import PrimaryText from 'components/common/text/PrimaryText';
 import tinycolor from 'tinycolor2';
 import UserStats from './UserStats';
 import UserCover from './UserCover';
 import UserFollowButton from './UserFollowButton';
 
 const Container = styled.View`
-  margin-bottom: 5px;
-  border-width: 1px;
   border-top-color: ${props => props.customTheme.primaryBorderColor};
+  border-bottom-width: 1px;
   border-bottom-color: ${props => props.customTheme.primaryBorderColor};
 `;
 const SaveUserButtonContainer = styled.View`
@@ -46,7 +46,7 @@ const ActionButtonsContainer = styled.View`
   align-items: center;
 `;
 
-const VoteText = styled.Text`
+const VoteText = styled(PrimaryText)`
   color: ${props =>
     tinycolor(props.customTheme.primaryBackgroundColor).isDark()
       ? COLORS.LIGHT_TEXT_COLOR
@@ -71,7 +71,7 @@ const SendMessageContainer = styled.View`
   flex-direction: row;
 `;
 
-const SendMessageText = styled.Text`
+const SendMessageText = styled(PrimaryText)`
   color: ${props => props.customTheme.primaryColor};
   margin-left: 5px;
 `;
@@ -116,17 +116,17 @@ class UserHeader extends Component {
 
   handleOnPressFollowers() {
     const { username } = this.props;
-    this.props.navigation.navigate(navigationConstants.USER_FOLLOWERS, { username });
+    this.props.navigation.push(navigationConstants.USER_FOLLOWERS, { username });
   }
 
   handleOnPressFollowing() {
     const { username } = this.props;
-    this.props.navigation.navigate(navigationConstants.USER_FOLLOWING, { username });
+    this.props.navigation.push(navigationConstants.USER_FOLLOWING, { username });
   }
 
   handleNavigateToUserMessage() {
     const { username } = this.props;
-    this.props.navigation.navigate(navigationConstants.USER_MESSAGE, { username });
+    this.props.navigation.push(navigationConstants.USER_MESSAGE, { username });
   }
 
   renderActionButtons() {
@@ -180,7 +180,6 @@ class UserHeader extends Component {
     const userDetails = getUserDetailsHelper(usersDetails, username, {});
     const userJsonMetaData = _.attempt(JSON.parse, userDetails.json_metadata);
     const userProfile = _.isError(userJsonMetaData) ? {} : userJsonMetaData.profile;
-    const hasCover = _.has(userProfile, 'cover_image');
     const userReputation = _.has(userDetails, 'reputation')
       ? getReputation(userDetails.reputation)
       : 0;
@@ -204,15 +203,13 @@ class UserHeader extends Component {
       _.isNaN(voteWorth) ? 0 : parseFloat(voteWorth).toFixed(2)
     }`;
     const votePowerText = `${intl.voting_power}: ${formattedVotingPower}%`;
+    const iconColor = tinycolor(customTheme.primaryBackgroundColor).isDark()
+      ? COLORS.LIGHT_TEXT_COLOR
+      : COLORS.DARK_TEXT_COLOR;
 
     return (
       <Container customTheme={customTheme}>
-        <UserCover
-          username={username}
-          hasCover={hasCover}
-          userReputation={userReputation}
-          userProfile={userProfile}
-        />
+        <UserCover username={username} userReputation={userReputation} userProfile={userProfile} />
         {this.renderActionButtons()}
         <UserProfile userProfile={userProfile} userDetails={userDetails} />
         <VoteContainer customTheme={customTheme}>
@@ -220,11 +217,7 @@ class UserHeader extends Component {
             <MaterialIcons
               name={MATERIAL_ICONS.money}
               size={ICON_SIZES.userHeaderIcon}
-              color={
-                tinycolor(customTheme.primaryBackgroundColor).isDark()
-                  ? COLORS.LIGHT_TEXT_COLOR
-                  : COLORS.DARK_TEXT_COLOR
-              }
+              color={iconColor}
             />
             <VoteText customTheme={customTheme}>{voteWorthText}</VoteText>
           </VoteContentContainer>
@@ -232,11 +225,7 @@ class UserHeader extends Component {
             <MaterialIcons
               name={MATERIAL_ICONS.flashOn}
               size={ICON_SIZES.userHeaderIcon}
-              color={
-                tinycolor(customTheme.primaryBackgroundColor).isDark()
-                  ? COLORS.LIGHT_TEXT_COLOR
-                  : COLORS.DARK_TEXT_COLOR
-              }
+              color={iconColor}
             />
             <VoteText customTheme={customTheme}>{votePowerText}</VoteText>
           </VoteContentContainer>

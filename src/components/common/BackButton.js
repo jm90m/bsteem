@@ -1,20 +1,23 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { MaterialIcons } from '@expo/vector-icons';
-import styled from 'styled-components/native';
+import { View } from 'react-native';
 import { connect } from 'react-redux';
 import { getCustomTheme } from 'state/rootReducer';
 import { ICON_SIZES, MATERIAL_ICONS } from 'constants/styles';
-
-const BackTouchable = styled.TouchableOpacity`
-  justify-content: center;
-  padding: 10px;
-`;
+import Touchable from 'components/common/Touchable';
+import commonStyles from 'styles/common';
 
 const BackButton = ({ navigateBack, iconName, customTheme }) => (
-  <BackTouchable onPress={navigateBack}>
-    <MaterialIcons size={ICON_SIZES.menuIcon} name={iconName} color={customTheme.secondaryColor} />
-  </BackTouchable>
+  <Touchable onPress={navigateBack}>
+    <View style={commonStyles.backButton}>
+      <MaterialIcons
+        size={ICON_SIZES.menuIcon}
+        name={iconName}
+        color={customTheme.secondaryColor}
+      />
+    </View>
+  </Touchable>
 );
 
 BackButton.propTypes = {

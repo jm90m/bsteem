@@ -5,6 +5,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { COLORS, MATERIAL_ICONS, ICON_SIZES } from 'constants/styles';
 import { connect } from 'react-redux';
 import { getCustomTheme } from 'state/rootReducer';
+import PrimaryText from 'components/common/text/PrimaryText';
 import tinycolor from 'tinycolor2';
 
 const Container = styled.View`
@@ -14,7 +15,7 @@ const Container = styled.View`
   background-color: ${props => props.customTheme.primaryBackgroundColor};
 `;
 
-const Location = styled.Text`
+const Location = styled(PrimaryText)`
   margin-left: 5px;
   color: ${props =>
     tinycolor(props.customTheme.primaryBackgroundColor).isDark()

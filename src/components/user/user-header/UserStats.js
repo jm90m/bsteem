@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components/native';
 import { COLORS } from 'constants/styles';
 import { abbreviateLargeNumber } from 'util/numberFormatter';
+import PrimaryText from 'components/common/text/PrimaryText';
 import tinycolor from 'tinycolor2';
 
 const Container = styled.View`
@@ -16,15 +17,14 @@ const ValueLabelContainer = styled.View`
   align-items: center;
 `;
 
-const Value = styled.Text`
-  font-weight: bold;
+const Value = styled(PrimaryText)`
   color: ${props =>
     tinycolor(props.customTheme.primaryBackgroundColor).isDark()
       ? COLORS.LIGHT_TEXT_COLOR
       : COLORS.DARK_TEXT_COLOR};
 `;
 
-const Label = styled.Text`
+const Label = styled(PrimaryText)`
   font-size: 12px;
   color: ${props =>
     tinycolor(props.customTheme.primaryBackgroundColor).isDark()

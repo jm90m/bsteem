@@ -1,12 +1,18 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components/native';
-import { Keyboard, TouchableWithoutFeedback, KeyboardAvoidingView } from 'react-native';
+import { Keyboard, TouchableWithoutFeedback, KeyboardAvoidingView, Platform } from 'react-native';
 import sc2 from 'api/sc2';
 import { connect } from 'react-redux';
 import _ from 'lodash';
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
-import { COLORS, MATERIAL_COMMUNITY_ICONS, ICON_SIZES, MATERIAL_ICONS } from 'constants/styles';
+import {
+  COLORS,
+  MATERIAL_COMMUNITY_ICONS,
+  ICON_SIZES,
+  MATERIAL_ICONS,
+  FONTS,
+} from 'constants/styles';
 import Header from 'components/common/Header';
 import BackButton from 'components/common/BackButton';
 import { FormLabel, FormInput } from 'react-native-elements';
@@ -257,6 +263,7 @@ class EditProfileScreen extends Component {
     const color = tinycolor(customTheme.primaryBackgroundColor).isDark()
       ? COLORS.LIGHT_TEXT_COLOR
       : COLORS.DARK_TEXT_COLOR;
+
     return (
       <Container>
         <Header>
@@ -279,7 +286,7 @@ class EditProfileScreen extends Component {
             </KeyboardIconContainer>
           </TouchableWithoutFeedback>
         </Header>
-        <StyledScrollView customTheme={customTheme}>
+        <StyledScrollView customTheme={customTheme} removeClippedSubviews={Platform.OS === 'ios'}>
           <KeyboardAvoidingView behavior="padding">
             <FormLabel>{intl.profile_name}</FormLabel>
             <FormInput
@@ -287,7 +294,7 @@ class EditProfileScreen extends Component {
               placeholder=""
               value={nameInput}
               maxLength={255}
-              inputStyle={{ width: '100%', color }}
+              inputStyle={{ width: '100%', color, fontFamily: FONTS.PRIMARY }}
             />
             <FormLabel>{intl.profile_about}</FormLabel>
             <FormInput
@@ -295,35 +302,35 @@ class EditProfileScreen extends Component {
               placeholder=""
               value={aboutInput}
               multiline
-              inputStyle={{ width: '100%', color }}
+              inputStyle={{ width: '100%', color, fontFamily: FONTS.PRIMARY }}
             />
             <FormLabel>{intl.profile_location}</FormLabel>
             <FormInput
               onChangeText={this.onChangeLocation}
               placeholder=""
               value={locationInput}
-              inputStyle={{ width: '100%', color }}
+              inputStyle={{ width: '100%', color, fontFamily: FONTS.PRIMARY }}
             />
             <FormLabel>{intl.profile_website}</FormLabel>
             <FormInput
               onChangeText={this.onChangeWebsite}
               placeholder=""
               value={websiteInput}
-              inputStyle={{ width: '100%', color }}
+              inputStyle={{ width: '100%', color, fontFamily: FONTS.PRIMARY }}
             />
             <FormLabel>{intl.profile_picture}</FormLabel>
             <FormInput
               onChangeText={this.onChangeProfilePicture}
               placeholder=""
               value={profilePictureInput}
-              inputStyle={{ width: '100%', color }}
+              inputStyle={{ width: '100%', color, fontFamily: FONTS.PRIMARY }}
             />
             <FormLabel>{intl.profile_cover}</FormLabel>
             <FormInput
               onChangeText={this.onChangeCoverPicture}
               placeholder=""
               value={coverPictureInput}
-              inputStyle={{ width: '100%', color }}
+              inputStyle={{ width: '100%', color, fontFamily: FONTS.PRIMARY }}
             />
             <ActionButtonsContainer>
               <PrimaryButton

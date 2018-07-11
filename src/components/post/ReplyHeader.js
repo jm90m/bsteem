@@ -1,16 +1,17 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { TouchableWithoutFeedback } from 'react-native';
+import { View } from 'react-native';
+import Touchable from 'components/common/Touchable';
 import styled from 'styled-components/native';
 import { connect } from 'react-redux';
 import * as navigationConstants from 'constants/navigation';
 import _ from 'lodash';
 import { getCustomTheme, getIntl } from 'state/rootReducer';
+import PrimaryText from 'components/common/text/PrimaryText';
 import StyledTextByBackground from '../common/StyledTextByBackground';
 
 const ReplyText = styled(StyledTextByBackground)`
   font-size: 14px;
-  font-weight: bold;
 `;
 
 const ReplyContainer = styled.View`
@@ -19,9 +20,8 @@ const ReplyContainer = styled.View`
   border-color: ${props => props.customTheme.primaryBorderColor};
 `;
 
-const LinkText = styled.Text`
+const LinkText = styled(PrimaryText)`
   color: ${props => props.customTheme.primaryColor};
-  font-weight: bold;
 `;
 
 const mapStateToProps = state => ({
@@ -51,7 +51,7 @@ class ReplyHeader extends Component {
     const { navigation, postData } = this.props;
     const author = _.get(postData, 'parent_author');
     const permlink = _.get(postData, 'parent_permlink');
-    navigation.navigate(navigationConstants.FETCH_POST, { author, permlink });
+    navigation.push(navigationConstants.POST, { author, permlink });
   }
 
   render() {
@@ -63,9 +63,11 @@ class ReplyHeader extends Component {
       return (
         <ReplyContainer customTheme={customTheme}>
           <ReplyText>{`${intl.post_reply_to_header}: ${rootTitle}`}</ReplyText>
-          <TouchableWithoutFeedback onPress={this.handlePostNavigation}>
-            <LinkText customTheme={customTheme}>{intl.show_original_post}</LinkText>
-          </TouchableWithoutFeedback>
+          <Touchable onPress={this.handlePostNavigation}>
+            <View>
+              <LinkText customTheme={customTheme}>{intl.show_original_post}</LinkText>
+            </View>
+          </Touchable>
         </ReplyContainer>
       );
     }

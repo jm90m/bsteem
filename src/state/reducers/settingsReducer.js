@@ -153,12 +153,13 @@ export default (state = INITIAL_STATE, action) => {
         loadingUpdateCompactViewEnabled: true,
       };
     case UPDATE_POST_PREVIEW_COMPACT_MODE_SETTINGS.SUCCESS:
-    case UPDATE_POST_PREVIEW_COMPACT_MODE_SETTINGS.ERROR:
-    case UPDATE_POST_PREVIEW_COMPACT_MODE_SETTINGS.LOADING_END:
       return {
         ...state,
+        compactViewEnabled: action.payload,
         loadingUpdateCompactViewEnabled: false,
       };
+    case UPDATE_POST_PREVIEW_COMPACT_MODE_SETTINGS.ERROR:
+    case UPDATE_POST_PREVIEW_COMPACT_MODE_SETTINGS.LOADING_END:
 
     case UPDATE_USER_SIGNATURE.ACTION:
       return {

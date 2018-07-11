@@ -29,7 +29,6 @@ const TitleText = styled(StyledTitleText)`
 
 const DraftContainer = styled(StyledViewPrimaryBackground)`
   padding: 5px 10px;
-  margin: 5px 0;
   border-bottom-width: 1px;
   border-top-width: 1px;
   border-color: ${props => props.customTheme.primaryBorderColor};
@@ -38,7 +37,6 @@ const DraftContainer = styled(StyledViewPrimaryBackground)`
 const DraftTitle = styled(StyledTextByBackground)`
   margin-left: 5px;
   padding-bottom: 10px;
-  font-weight: 700;
   font-size: 20px;
 `;
 
@@ -50,7 +48,7 @@ const DeleteDraftContainer = styled.View`
 
 const StyledScrollView = styled.ScrollView`
   height: 100%;
-  background-color: ${props => props.customTheme.listBackgroundColor};
+  background-color: ${props => props.customTheme.primaryBackgroundColor};
 `;
 
 const DraftPreview = ({ postData, handleSelectDraft, handleDeleteDraft, customTheme }) => (

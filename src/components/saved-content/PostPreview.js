@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { TouchableOpacity } from 'react-native';
 import styled from 'styled-components/native';
@@ -7,14 +7,12 @@ import Avatar from 'components/common/Avatar';
 import TimeAgo from 'components/common/TimeAgo';
 import { connect } from 'react-redux';
 import tinycolor from 'tinycolor2';
+import PrimaryText from 'components/common/text/PrimaryText';
 import { getCustomTheme } from 'state/rootReducer';
 
 const Container = styled.View`
   background-color: ${props => props.customTheme.primaryBackgroundColor};
-  margin-top: 5px;
-  margin-bottom: 5px;
   border-color: ${props => props.customTheme.primaryBorderColor};
-  border-top-width: 1px;
   border-bottom-width: 1px;
   padding: 10px;
 `;
@@ -27,15 +25,13 @@ const AuthorContents = styled.View`
   margin-left: 5px;
 `;
 
-const AuthorText = styled.Text`
-  font-weight: 700;
+const AuthorText = styled(PrimaryText)`
   color: ${props => props.customTheme.primaryColor};
 `;
 
-const PostTitle = styled.Text`
+const PostTitle = styled(PrimaryText)`
   padding-left: 5px;
   padding-bottom: 10px;
-  font-weight: 700;
   font-size: 20px;
   color: ${props =>
     tinycolor(props.customTheme.primaryBackgroundColor).isDark()
@@ -51,7 +47,7 @@ const mapStateToProps = state => ({
   customTheme: getCustomTheme(state),
 });
 
-class PostPreview extends Component {
+class PostPreview extends React.PureComponent {
   static propTypes = {
     customTheme: PropTypes.shape().isRequired,
     author: PropTypes.string,

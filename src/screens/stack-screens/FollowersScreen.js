@@ -26,17 +26,13 @@ const UserContainer = styled.View`
   justify-content: space-between;
   align-items: center;
   padding: 5px 10px;
-  margin: 3px 0;
   background-color: ${props => props.customTheme.primaryBackgroundColor};
   border-bottom-color: ${props => props.customTheme.primaryBorderColor};
   border-bottom-width: 1px;
-  border-top-color: ${props => props.customTheme.primaryBorderColor};
-  border-top-width: 1px;
 `;
 
 const UserText = styled(StyledTextByBackground)`
   margin-left: 5px;
-  font-weight: bold;
 `;
 
 const UserTouchable = styled.TouchableOpacity`
@@ -132,7 +128,7 @@ class FollowersScreen extends Component {
   }
 
   handleNavigateToUser(username) {
-    this.props.navigation.navigate(navigationConstants.USER, { username });
+    this.props.navigation.push(navigationConstants.USER, { username });
   }
 
   renderRow(rowData) {

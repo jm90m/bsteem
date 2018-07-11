@@ -18,6 +18,8 @@ import * as postConstants from 'constants/postConstants';
 import StyledTextByBackground from 'components/common/StyledTextByBackground';
 import PrimaryButton from 'components/common/PrimaryButton';
 import SmallLoading from 'components/common/SmallLoading';
+import PrimaryText from 'components/common/text/PrimaryText';
+
 const { width: deviceWidth } = Dimensions.get('screen');
 
 const Container = styled.View`
@@ -31,7 +33,6 @@ const SubmitPostButtonContainer = styled.View`
 `;
 
 const PostTitle = styled(StyledTextByBackground)`
-  font-weight: 700;
   font-size: 20px;
 `;
 
@@ -46,10 +47,9 @@ const EmptyView = styled.View`
   height: 100px;
 `;
 
-const ErrorText = styled.Text`
+const ErrorText = styled(PrimaryText)`
   padding: 10px;
   color: ${props => props.customTheme.negativeColor};
-  font-weight: bold;
 `;
 
 class PostCreationPreview extends Component {

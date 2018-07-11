@@ -35,6 +35,7 @@ import * as navigationConstants from 'constants/navigation';
 import UserMessageMenuModal from 'components/messages/UserMessageMenuModal';
 import UserMessage from 'components/messages/UserMessage';
 import TitleText from 'components/common/TitleText';
+import PrimaryText from 'components/common/text/PrimaryText';
 import tinycolor from 'tinycolor2';
 
 const { width: deviceWidth } = Dimensions.get('screen');
@@ -66,7 +67,7 @@ const MenuIconContainer = styled.View`
 
 const Touchable = styled.TouchableOpacity``;
 
-const BlockedText = styled.Text`
+const BlockedText = styled(PrimaryText)`
   padding: 10px;
   color: ${props => props.customTheme.tertiaryColor};
 `;
@@ -236,7 +237,7 @@ class UserMessageScreen extends Component {
     this.setState({
       displayMenu: false,
     });
-    this.props.navigation.navigate(navigationConstants.USER, { username });
+    this.props.navigation.push(navigationConstants.USER, { username });
   }
 
   handleNavigateBack() {

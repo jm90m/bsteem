@@ -1,44 +1,33 @@
-import React, { Component } from 'react';
-import styled from 'styled-components/native';
-import { TouchableWithoutFeedback } from 'react-native';
+import React from 'react';
+import { TouchableWithoutFeedback, StyleSheet, View } from 'react-native';
 import PropTypes from 'prop-types';
-import {
-  getCompactViewEnabled,
-  getCustomTheme,
-  getLoadingUpdateCompactViewEnabled,
-} from 'state/rootReducer';
+import { getCompactViewEnabled, getCustomTheme } from 'state/rootReducer';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { updatePostPreviewCompactModeSettings } from 'state/actions/settingsActions';
 import { connect } from 'react-redux';
 import { ICON_SIZES, MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
-import SmallLoading from 'components/common/SmallLoading';
 
-const Container = styled.View`
-  flex-direction: row;
-  align-items: center;
-  justify-content: flex-end;
-  padding-right: 10px;
-  height: 31.3px;
-  background-color: ${props => props.customTheme.primaryBackgroundColor};
-  width: 100%;
-`;
+const styles = StyleSheet.create({
+  container: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    paddingTop: 5,
+    paddingRight: 10,
+    borderBottomWidth: 1,
+    width: '100%',
+  },
+  filter: {
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+  },
+});
 
-const FilterContainer = styled.View`
-  flex-direction: row;
-  align-items: center;
-  justify-content: flex-end;
-  padding-top: 5px;
-  padding-right: 10px;
-  background-color: ${props => props.customTheme.primaryBackgroundColor};
-  width: 100%;
-`;
-
-class CompactViewFeedHeaderSetting extends Component {
+class CompactViewFeedHeaderSetting extends React.PureComponent {
   static propTypes = {
+    updatePostPreviewCompactModeSettings: PropTypes.func.isRequired,
     customTheme: PropTypes.shape().isRequired,
     compactViewEnabled: PropTypes.bool.isRequired,
-    loadingUpdateCompactViewEnabled: PropTypes.bool.isRequired,
-    updatePostPreviewCompactModeSettings: PropTypes.func.isRequired,
   };
 
   constructor(props) {
@@ -53,28 +42,28 @@ class CompactViewFeedHeaderSetting extends Component {
   }
 
   render() {
-    const { customTheme, compactViewEnabled, loadingUpdateCompactViewEnabled } = this.props;
-
-    if (loadingUpdateCompactViewEnabled) {
-      return (
-        <Container customTheme={customTheme}>
-          <SmallLoading />
-        </Container>
-      );
-    }
+    const { customTheme, compactViewEnabled } = this.props;
+    const containerStyles = {
+      backgroundColor: customTheme.primaryBackgroundColor,
+      borderBottomColor: customTheme.primaryBorderColor,
+    };
 
     return (
-      <TouchableWithoutFeedback onPress={this.handleSetCompactView}>
-        <FilterContainer customTheme={customTheme}>
-          <MaterialCommunityIcons
-            name={
-              compactViewEnabled ? MATERIAL_COMMUNITY_ICONS.card : MATERIAL_COMMUNITY_ICONS.compact
-            }
-            size={ICON_SIZES.menuIcon}
-            color={customTheme.primaryColor}
-          />
-        </FilterContainer>
-      </TouchableWithoutFeedback>
+      <View style={[styles.container, containerStyles]}>
+        <TouchableWithoutFeedback onPress={this.handleSetCompactView}>
+          <View style={styles.filter}>
+            <MaterialCommunityIcons
+              name={
+                compactViewEnabled
+                  ? MATERIAL_COMMUNITY_ICONS.card
+                  : MATERIAL_COMMUNITY_ICONS.compact
+              }
+              size={ICON_SIZES.menuIcon}
+              color={customTheme.primaryColor}
+            />
+          </View>
+        </TouchableWithoutFeedback>
+      </View>
     );
   }
 }
@@ -82,7 +71,6 @@ class CompactViewFeedHeaderSetting extends Component {
 const mapStateToProps = state => ({
   compactViewEnabled: getCompactViewEnabled(state),
   customTheme: getCustomTheme(state),
-  loadingUpdateCompactViewEnabled: getLoadingUpdateCompactViewEnabled(state),
 });
 
 const mapDispatchToProps = dispatch => ({

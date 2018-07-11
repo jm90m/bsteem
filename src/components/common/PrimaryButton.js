@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Button } from 'react-native-elements';
 import { connect } from 'react-redux';
 import { getCustomTheme } from 'state/rootReducer';
-import { COLORS } from 'constants/styles';
+import { COLORS, FONTS } from 'constants/styles';
 import tinycolor from 'tinycolor2';
 
 const PrimaryButton = props => (
@@ -15,6 +15,7 @@ const PrimaryButton = props => (
         : COLORS.DARK_TEXT_COLOR
     }
     backgroundColor={props.customTheme.primaryColor}
+    fontFamily={FONTS.PRIMARY}
     {...props}
   />
 );

@@ -1,9 +1,10 @@
-import React, { Component } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { Modal } from 'react-native';
+import SafeAreaView from 'components/common/SafeAreaView';
 import PostCreationPreview from './PostCreationPreview';
 
-class PostCreationPreviewModal extends Component {
+class PostCreationPreviewModal extends React.PureComponent {
   static propTypes = {
     handleHidePreview: PropTypes.func.isRequired,
     previewVisible: PropTypes.bool.isRequired,
@@ -32,12 +33,14 @@ class PostCreationPreviewModal extends Component {
 
     return (
       <Modal animationType="slide" visible={previewVisible} onRequestClose={handleHidePreview}>
-        <PostCreationPreview
-          handleHidePreview={handleHidePreview}
-          postData={postData}
-          createPostDisplayInPreview={createPostDisplayInPreview}
-          handlePostPreviewSubmit={handlePostPreviewSubmit}
-        />
+        <SafeAreaView>
+          <PostCreationPreview
+            handleHidePreview={handleHidePreview}
+            postData={postData}
+            createPostDisplayInPreview={createPostDisplayInPreview}
+            handlePostPreviewSubmit={handlePostPreviewSubmit}
+          />
+        </SafeAreaView>
       </Modal>
     );
   }

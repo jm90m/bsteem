@@ -4,11 +4,12 @@ import {
   ADD_POST_TO_SAVED_OFFLINE,
   SAVE_POST_OFFLINE,
   UNSAVE_POST_OFFLINE,
-  REMOVE_POST_SAVED_OFFLINE
+  REMOVE_POST_SAVED_OFFLINE,
+  ADD_POSTS_TO_POST_MAP,
 } from 'state/actions/actionTypes';
 
 const INITIAL_STATE = {
-  postsDetails: {}, //postID -> postDetails
+  postsDetails: {}, //postKey (author/permlink) -> postDetails
   postLoading: false,
   savedOfflinePosts: {},
   pendingSavingPostsOffline: [],
@@ -38,6 +39,30 @@ export default function(state = INITIAL_STATE, action) {
         ...state,
         postLoading: false,
       };
+    case ADD_POSTS_TO_POST_MAP: {
+      const newPostsDetails = _.reduce(
+        action.payload,
+        (acc, post) => {
+          const author = _.get(post, 'author', null);
+          const permlink = _.get(post, 'permlink', null);
+
+          if (author !== null && permlink !== null) {
+            const postKey = `${author}/${permlink}`;
+            acc[postKey] = post;
+          }
+
+          return acc;
+        },
+        {},
+      );
+      return {
+        ...state,
+        postsDetails: {
+          ...state.postsDetails,
+          ...newPostsDetails,
+        },
+      };
+    }
     case UNSAVE_POST_OFFLINE.ACTION:
     case SAVE_POST_OFFLINE.ACTION: {
       const id = _.get(action, 'payload.postData.id');
@@ -91,6 +116,7 @@ export default function(state = INITIAL_STATE, action) {
 }
 
 export const getPostsDetails = state => state.postsDetails;
+export const getSinglePostDetails = (state, postKey) => _.get(state.postsDetails, postKey, {});
 export const getPostLoading = state => state.postLoading;
 export const getSavedOfflinePosts = state => state.savedOfflinePosts;
 export const getPendingSavingPostsOffline = state => state.pendingSavingPostsOffline;

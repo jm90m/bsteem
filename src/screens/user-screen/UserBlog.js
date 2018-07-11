@@ -64,7 +64,7 @@ class UserBlog extends Component {
   }
 
   renderEmptyComponent() {
-    const { loadingUserBlog, intl } = this.props;
+    const { loadingUserBlog, intl, userBlog } = this.props;
 
     if (loadingUserBlog) {
       return (
@@ -74,18 +74,22 @@ class UserBlog extends Component {
       );
     }
 
-    return (
-      <EmptyContainer>
-        <EmptyText>{intl.empty_user_profile}</EmptyText>
-      </EmptyContainer>
-    );
+    if (_.isEmpty(userBlog)) {
+      return (
+        <EmptyContainer>
+          <EmptyText>{intl.empty_user_profile}</EmptyText>
+        </EmptyContainer>
+      );
+    }
+
+    return null;
   }
 
   renderUserPostRow(rowData) {
     const postData = rowData.item;
-    const { username, navigation } = this.props;
+    const { username } = this.props;
 
-    return <PostPreview postData={postData} navigation={navigation} currentUsername={username} />;
+    return <PostPreview postData={postData} currentUsername={username} />;
   }
 
   render() {

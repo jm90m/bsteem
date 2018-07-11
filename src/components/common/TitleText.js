@@ -3,10 +3,11 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import styled from 'styled-components/native';
 import { getCustomTheme } from 'state/rootReducer';
+import { FONTS } from 'constants/styles';
 
 const TitleText = styled.Text`
   color: ${props => props.customTheme.primaryColor};
-  font-weight: bold;
+  font-family: ${FONTS.TITLE};
 `;
 
 TitleText.propTypes = {

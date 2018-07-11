@@ -8,6 +8,7 @@ import { connect } from 'react-redux';
 import { getCustomTheme } from 'state/rootReducer';
 import tinycolor from 'tinycolor2';
 import { MATERIAL_COMMUNITY_ICONS, COLORS, ICON_SIZES } from 'constants/styles';
+import PrimaryText from 'components/common/text/PrimaryText';
 
 const Container = styled.View`
   flex-direction: row;
@@ -15,7 +16,7 @@ const Container = styled.View`
   padding-bottom: 5px;
 `;
 
-const Website = styled.Text`
+const Website = styled(PrimaryText)`
   margin-left: 5px;
   color: ${props => props.customTheme.primaryColor};
 `;

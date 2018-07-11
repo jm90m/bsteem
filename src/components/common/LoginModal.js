@@ -28,7 +28,6 @@ const Container = styled.View`
 const TitleTextContainer = styled(TitleText)`
   padding: 20px;
   text-align: center;
-  font-weight: bold;
   font-size: 22px;
 `;
 

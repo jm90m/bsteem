@@ -13,7 +13,6 @@ import WalletTransactionContainer from './WalletTransactionContainer';
 import { getCustomTheme, getIntl } from '../../state/rootReducer';
 
 const RewardsPayoutContainer = styled(StyledTextByBackground)`
-  font-weight: bold;
 `;
 
 const ClaimRewardContent = styled.View`

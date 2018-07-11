@@ -12,13 +12,13 @@ import {
   getCustomTheme,
   getIntl,
 } from 'state/rootReducer';
+import PrimaryText from 'components/common/text/PrimaryText';
 import SmallLoading from './SmallLoading';
 
 const Touchable = styled.TouchableOpacity``;
 
-const ActionLink = styled.Text`
+const ActionLink = styled(PrimaryText)`
   color: ${props => props.customTheme.primaryColor};
-  font-weight: bold;
 `;
 
 @connect(

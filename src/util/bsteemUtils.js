@@ -16,6 +16,15 @@ export const jsonParse = jsonStr => {
   }
 };
 
+export const jsonStringify = obj => {
+  try {
+    const jsonStringified = _.attempt(JSON.stringify, obj);
+    return _.isError(jsonStringified) ? '' : jsonStringified;
+  } catch (error) {
+    return '';
+  }
+};
+
 export const epochToUTC = epochTimestamp => new Date(0).setUTCSeconds(epochTimestamp);
 
 export const getUserDetailsKey = username => `user-${username}`;

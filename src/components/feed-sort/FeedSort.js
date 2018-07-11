@@ -4,29 +4,21 @@ import { connect } from 'react-redux';
 import { TouchableWithoutFeedback } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import _ from 'lodash';
+import tinycolor from 'tinycolor2';
 import styled from 'styled-components/native';
 import { FEED_FILTERS } from 'constants/feedFilters';
 import MenuModalButton from 'components/common/menu/MenuModalButton';
 import MenuWrapper from 'components/common/menu/MenuWrapper';
+import MenuText from 'components/common/menu/MenuText';
+import MenuModalContents from 'components/common/menu/MenuModalContents';
 import { CheckBox } from 'react-native-elements';
 import { getIsAuthenticated, getCustomTheme, getIntl } from 'state/rootReducer';
+import { ICON_SIZES, COLORS } from 'constants/styles';
 
 const Container = styled.View`
   flex: 1;
   flex-direction: column-reverse;
   align-items: center;
-`;
-
-const MenuModalContents = styled.View`
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-`;
-
-const MenuText = styled.Text`
-  margin-left: 5px;
-  color: ${props => props.customTheme.primaryColor};
-  font-weight: bold;
 `;
 
 const mapStateToProps = state => ({
@@ -60,16 +52,28 @@ class FeedSort extends Component {
       <TouchableWithoutFeedback onPress={this.props.hideMenu}>
         <Container>
           <MenuWrapper>
-            {_.map(FEED_FILTERS, filter => (
-              <MenuModalButton onPress={this.handleSortPost(filter)} key={filter.label}>
+            {_.map(FEED_FILTERS, (filter, index) => (
+              <MenuModalButton
+                onPress={this.handleSortPost(filter)}
+                key={filter.label}
+                isLastElement={_.isEqual(index, _.size(FEED_FILTERS) - 1) && !authenticated}
+              >
                 <MenuModalContents>
-                  <MaterialIcons size={20} color={customTheme.primaryColor} name={filter.icon} />
+                  <MaterialIcons
+                    size={ICON_SIZES.menuModalOptionIcon}
+                    color={
+                      tinycolor(customTheme.primaryBackgroundColor).isDark()
+                        ? COLORS.LIGHT_TEXT_COLOR
+                        : COLORS.DARK_TEXT_COLOR
+                    }
+                    name={filter.icon}
+                  />
                   <MenuText customTheme={customTheme}>{intl[filter.label]}</MenuText>
                 </MenuModalContents>
               </MenuModalButton>
             ))}
             {authenticated && (
-              <MenuModalButton>
+              <MenuModalButton onPress={handleFilterFeedByFollowers} isLastElement>
                 <MenuModalContents>
                   <CheckBox
                     title={intl.filter_current_feed_by_followers}

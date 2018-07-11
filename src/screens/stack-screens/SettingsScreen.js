@@ -1,17 +1,15 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components/native';
-import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { MATERIAL_ICONS, MATERIAL_COMMUNITY_ICONS, ICON_SIZES, COLORS } from 'constants/styles';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { MATERIAL_COMMUNITY_ICONS, ICON_SIZES, COLORS, FONTS } from 'constants/styles';
 import _ from 'lodash';
-import { Modal, Picker } from 'react-native';
+import { Picker, ScrollView, Slider, View } from 'react-native';
 import { connect } from 'react-redux';
 import Header from 'components/common/Header';
-import HeaderEmptyView from 'components/common/HeaderEmptyView';
 import { CheckBox, ButtonGroup } from 'react-native-elements';
 import {
   getDisplayNSFWContent,
-  getReportedPosts,
   getEnableVotingSlider,
   getIsAuthenticated,
   getVotingPercent,
@@ -26,35 +24,22 @@ import {
 import { LANGUAGE_CHOICES } from 'state/reducers/intlReducer';
 import * as settingsActions from 'state/actions/settingsActions';
 import PrimaryButton from 'components/common/PrimaryButton';
-import PostPreview from 'components/saved-content/PostPreview';
 import * as navigationConstants from 'constants/navigation';
 import tinycolor from 'tinycolor2';
 import StyledViewPrimaryBackground from 'components/common/StyledViewPrimaryBackground';
-import StyledTextByBackground from 'components/common/StyledTextByBackground';
 import TitleText from 'components/common/TitleText';
-import ReportPostButton from 'components/common/ReportPostButton';
 import BackButton from 'components/common/BackButton';
 import SmallLoading from 'components/common/SmallLoading';
+import PrimaryText from 'components/common/text/PrimaryText';
+
+let ReportedPostsModal = null;
 
 const MenuIconContainer = styled.View`
   padding: 5px;
 `;
 
-const EmptyContent = styled(StyledViewPrimaryBackground)`
-  padding: 20px;
-`;
-
-const EmptyText = styled(StyledTextByBackground)`
-  font-size: 18px;
-`;
-
 const Container = styled(StyledViewPrimaryBackground)`
   flex: 1;
-`;
-
-const BackTouchable = styled.TouchableOpacity`
-  justify-content: center;
-  padding: 10px;
 `;
 
 const ButtonContainer = styled.View`
@@ -62,13 +47,7 @@ const ButtonContainer = styled.View`
   flex-direction: row;
 `;
 
-const ScrollView = styled.ScrollView``;
-
-const Slider = styled.Slider``;
-
-const SettingContainer = styled.View``;
-
-const SettingDescription = styled.Text`
+const SettingDescription = styled(PrimaryText)`
   color: ${props => props.customTheme.tertiaryColor};
   padding: 0 20px;
 `;
@@ -79,13 +58,12 @@ const LoadingCheckboxContainer = styled.View`
   justify-content: center;
 `;
 
-const SettingTitle = styled.Text`
+const SettingTitle = styled(PrimaryText)`
   color: ${props => props.customTheme.secondaryColor};
-  font-weight: bold;
   padding: 15px 20px;
 `;
 
-const SettingValue = styled.Text`'
+const SettingValue = styled(PrimaryText)`
   color: ${props => props.customTheme.primaryColor};
 `;
 
@@ -105,7 +83,6 @@ const mapStateToProps = state => ({
   authenticated: getIsAuthenticated(state),
   displayNSFWContent: getDisplayNSFWContent(state),
   compactViewEnabled: getCompactViewEnabled(state),
-  reportedPosts: getReportedPosts(state),
   enableVotingSlider: getEnableVotingSlider(state),
   votingPercent: getVotingPercent(state),
   loadingUpdateCompactViewEnabled: getLoadingUpdateCompactViewEnabled(state),
@@ -150,17 +127,12 @@ class SettingsScreen extends Component {
     updateVotingSliderSetting: PropTypes.func.isRequired,
     updateVotingPercentSetting: PropTypes.func.isRequired,
     updatePostPreviewCompactModeSettings: PropTypes.func.isRequired,
-    reportedPosts: PropTypes.arrayOf(PropTypes.shape()),
     votingPercent: PropTypes.number.isRequired,
     loadingUpdateCompactViewEnabled: PropTypes.bool.isRequired,
     loadingUpdateNSFWDisplaySetting: PropTypes.bool.isRequired,
     loadingUpdateVotingSliderSetting: PropTypes.bool.isRequired,
     languageSetting: PropTypes.string.isRequired,
     updateUserLanguageSetting: PropTypes.func.isRequired,
-  };
-
-  static defaultProps = {
-    reportedPosts: [],
   };
 
   constructor(props) {
@@ -217,7 +189,7 @@ class SettingsScreen extends Component {
 
   handleNavigatePost(author, permlink) {
     this.hideReportedPostsModal();
-    this.props.navigation.navigate(navigationConstants.FETCH_POST, {
+    this.props.navigation.push(navigationConstants.POST, {
       author,
       permlink,
     });
@@ -230,6 +202,10 @@ class SettingsScreen extends Component {
   }
 
   showReportedPostsModal() {
+    if (ReportedPostsModal === null) {
+      ReportedPostsModal = require('components/settings/ReportedPostsModal').default;
+    }
+
     this.setState({
       displayReportedPostsModal: true,
     });
@@ -260,7 +236,7 @@ class SettingsScreen extends Component {
 
   handleNavigateUser(username) {
     this.hideReportedPostsModal();
-    this.props.navigation.navigate(navigationConstants.USER, { username });
+    this.props.navigation.push(navigationConstants.USER, { username });
   }
 
   handleUpdateNSFWDisplay() {
@@ -276,36 +252,6 @@ class SettingsScreen extends Component {
   handleUpdateVotingSliderSetting() {
     const { enableVotingSlider } = this.props;
     this.props.updateVotingSliderSetting(!enableVotingSlider);
-  }
-
-  renderReportedPosts() {
-    const { reportedPosts, intl } = this.props;
-    const reportedPostsPreview = _.map(reportedPosts, post => (
-      <PostPreview
-        key={post.id}
-        handleNavigatePost={() => this.handleNavigatePost(post.author, post.permlink)}
-        handleNavigateUser={() => this.handleNavigateUser(post.author)}
-        author={post.author}
-        created={post.created}
-        title={post.title}
-        actionComponent={
-          <ReportPostButton
-            title={post.title}
-            permlink={post.permlink}
-            author={post.author}
-            id={post.id}
-            created={post.created}
-          />
-        }
-      />
-    ));
-    return _.isEmpty(reportedPostsPreview) ? (
-      <EmptyContent>
-        <EmptyText>{intl.noReportedPosts}</EmptyText>
-      </EmptyContent>
-    ) : (
-      reportedPostsPreview
-    );
   }
 
   render() {
@@ -347,7 +293,7 @@ class SettingsScreen extends Component {
           </MenuIconContainer>
         </Header>
         <ScrollView>
-          <SettingContainer>
+          <View>
             <SettingTitle customTheme={customTheme}>{intl.nsfw_posts}</SettingTitle>
             {loadingUpdateNSFWDisplaySetting ? (
               <LoadingCheckboxContainer>
@@ -360,9 +306,9 @@ class SettingsScreen extends Component {
                 onPress={this.handleUpdateNSFWDisplay}
               />
             )}
-          </SettingContainer>
+          </View>
 
-          <SettingContainer>
+          <View>
             <SettingTitle customTheme={customTheme}>{intl.post_preview_setting_title}</SettingTitle>
             {loadingUpdateCompactViewEnabled ? (
               <LoadingCheckboxContainer>
@@ -375,10 +321,10 @@ class SettingsScreen extends Component {
                 onPress={this.handleUpdatePostPreviewCompactView}
               />
             )}
-          </SettingContainer>
+          </View>
 
           {authenticated && (
-            <SettingContainer>
+            <View>
               <SettingTitle customTheme={customTheme}>{intl.voting_power}</SettingTitle>
               <SettingDescription customTheme={customTheme}>
                 {intl.voting_power_description}
@@ -394,10 +340,10 @@ class SettingsScreen extends Component {
                   onPress={this.handleUpdateVotingSliderSetting}
                 />
               )}
-            </SettingContainer>
+            </View>
           )}
           {authenticated && (
-            <SettingContainer>
+            <View>
               <SettingTitle customTheme={customTheme}>
                 {`${intl.defaultVotePercent} - `}
                 <SettingValue customTheme={customTheme}>{`${votingSliderValue}%`}</SettingValue>
@@ -422,9 +368,9 @@ class SettingsScreen extends Component {
                 selectedButtonStyle={selectedButtonStyle}
                 selectedTextStyle={selectedTextStyle}
               />
-            </SettingContainer>
+            </View>
           )}
-          <SettingContainer>
+          <View>
             <SettingTitle customTheme={customTheme}>{intl.reportedPosts}</SettingTitle>
             <ButtonContainer>
               <PrimaryButton
@@ -432,8 +378,8 @@ class SettingsScreen extends Component {
                 onPress={this.showReportedPostsModal}
               />
             </ButtonContainer>
-          </SettingContainer>
-          <SettingContainer>
+          </View>
+          <View>
             <SettingTitle customTheme={customTheme}>{intl.set_color_theme}</SettingTitle>
             <ButtonContainer>
               <PrimaryButton
@@ -441,46 +387,31 @@ class SettingsScreen extends Component {
                 onPress={this.navigateToCustomTheme}
               />
             </ButtonContainer>
-          </SettingContainer>
+          </View>
 
-          <SettingContainer>
+          <View>
             <SettingTitle customTheme={customTheme}>{intl.set_language}</SettingTitle>
             <PickerContainer>
               <Picker
                 selectedValue={languageSetting}
                 onValueChange={this.onChangeLanguage}
-                itemStyle={{ color: inputTextColor }}
+                itemStyle={{ color: inputTextColor, fontFamily: FONTS.PRIMARY }}
               >
                 {_.map(LANGUAGE_CHOICES, (label, key) => (
                   <Picker.Item label={label} value={key} key={key} />
                 ))}
               </Picker>
             </PickerContainer>
-          </SettingContainer>
+          </View>
           <EmptyView />
         </ScrollView>
         {displayReportedPostsModal && (
-          <Modal
-            animationType="slide"
-            visible={displayReportedPostsModal}
-            onRequestClose={this.hideReportedPostsModal}
-          >
-            <Header>
-              <HeaderEmptyView />
-              <TitleText>{intl.reportedPosts}</TitleText>
-              <BackTouchable onPress={this.hideReportedPostsModal}>
-                <MaterialIcons
-                  size={24}
-                  name={MATERIAL_ICONS.close}
-                  color={customTheme.primaryColor}
-                />
-              </BackTouchable>
-            </Header>
-            <ScrollView>
-              {this.renderReportedPosts()}
-              <EmptyView />
-            </ScrollView>
-          </Modal>
+          <ReportedPostsModal
+            displayReportedPostsModal={displayReportedPostsModal}
+            handleNavigatePost={this.handleNavigatePost}
+            handleNavigateUser={this.handleNavigateUser}
+            hideReportedPostsModal={this.hideReportedPostsModal}
+          />
         )}
       </Container>
     );

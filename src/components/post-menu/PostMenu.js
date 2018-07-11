@@ -1,46 +1,35 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { TouchableWithoutFeedback, Share, Clipboard } from 'react-native';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import styled from 'styled-components/native';
+import { TouchableWithoutFeedback, Share, Clipboard, View } from 'react-native';
 import { connect } from 'react-redux';
 import _ from 'lodash';
 import { bsteemShareText, getBusyUrl, getSteemitURL } from 'util/bsteemUtils';
+import { withNavigation } from 'react-navigation';
+import commonStyles from 'styles/common';
 import ReportPostMenuButton from './ReportPostMenuButton';
-import { MATERIAL_COMMUNITY_ICONS, ICON_SIZES } from '../../constants/styles';
+import { MATERIAL_COMMUNITY_ICONS, MATERIAL_ICONS } from '../../constants/styles';
 import MenuModalButton from '../common/menu/MenuModalButton';
 import MenuWrapper from '../common/menu/MenuWrapper';
+import MenuText from '../common/menu/MenuText';
+import MenuModalContents from '../common/menu/MenuModalContents';
+import MenuIcon from '../common/menu/MenuIcon';
 import SavePostMenuButton from './SavePostMenuButton';
 import SavePostOfflineMenuButton from './SavePostOfflineMenuButton';
-import {
-  getAuthUsername,
-  getCurrentUserFollowList,
-  getCustomTheme,
-  getIntl,
-} from '../../state/rootReducer';
+import { getAuthUsername, getCustomTheme, getIntl } from '../../state/rootReducer';
+import * as navigationConstants from '../../constants/navigation';
 
-const Container = styled.View`
-  align-items: center;
-  flex-direction: column-reverse;
-  flex: 1;
-`;
-
-const MenuText = styled.Text`
-  margin-left: 5px;
-  color: ${props => props.customTheme.primaryColor};
-  font-weight: bold;
-`;
-
-const MenuModalContents = styled.View`
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-`;
+const mapStateToProps = state => ({
+  customTheme: getCustomTheme(state),
+  authUsername: getAuthUsername(state),
+  intl: getIntl(state),
+});
 
 class PostMenu extends Component {
   static propTypes = {
-    handleNavigateToComments: PropTypes.func,
-    handleReblog: PropTypes.func,
+    navigation: PropTypes.shape().isRequired,
+    authUsername: PropTypes.string.isRequired,
+    customTheme: PropTypes.shape().isRequired,
+    intl: PropTypes.shape().isRequired,
     hideMenu: PropTypes.func,
     postData: PropTypes.shape({
       author: PropTypes.string,
@@ -48,26 +37,15 @@ class PostMenu extends Component {
       permlink: PropTypes.string,
       id: PropTypes.number,
     }),
-    authUsername: PropTypes.string.isRequired,
-    customTheme: PropTypes.shape().isRequired,
-    intl: PropTypes.shape().isRequired,
-    rebloggedList: PropTypes.arrayOf(PropTypes.string),
-    hideReblogMenu: PropTypes.bool,
     displayPhotoBrowserMenu: PropTypes.bool,
     handleDisplayPhotoBrowser: PropTypes.func,
-    handleEditPost: PropTypes.func,
   };
 
   static defaultProps = {
     postData: {},
-    rebloggedList: [],
-    hideReblogMenu: false,
     displayPhotoBrowserMenu: false,
     hideMenu: () => {},
-    handleNavigateToComments: () => {},
-    handleReblog: () => {},
     handleDisplayPhotoBrowser: () => {},
-    handleEditPost: () => {},
   };
 
   constructor(props) {
@@ -76,6 +54,9 @@ class PostMenu extends Component {
     this.handleShare = this.handleShare.bind(this);
     this.handleSetBusyURLClipboard = this.handleSetBusyURLClipboard.bind(this);
     this.handleSetSteemitRLClipboard = this.handleSetSteemitRLClipboard.bind(this);
+    this.handleNavigateToComments = this.handleNavigateToComments.bind(this);
+    this.handleEditPost = this.handleEditPost.bind(this);
+    this.handleBeneficiariesNavigation = this.handleBeneficiariesNavigation.bind(this);
   }
 
   handleShare() {
@@ -112,31 +93,62 @@ class PostMenu extends Component {
     this.props.hideMenu();
   }
 
+  handleNavigateToComments() {
+    this.props.hideMenu();
+    const { postData } = this.props;
+    const { category, author, permlink, id } = postData;
+    this.props.navigation.push(navigationConstants.COMMENTS, {
+      author,
+      category,
+      permlink,
+      postId: id,
+      postData,
+    });
+  }
+
+  handleEditPost() {
+    const { postData } = this.props;
+    this.props.hideMenu();
+    this.props.navigation.navigate(navigationConstants.EDIT_POST, {
+      postData,
+    });
+  }
+
+  handleBeneficiariesNavigation() {
+    const { postData } = this.props;
+    const { beneficiaries } = postData;
+
+    this.props.navigation.push(navigationConstants.POST_BENEFICIARIES, { beneficiaries });
+    this.props.hideMenu();
+  }
+
   render() {
     const {
       hideMenu,
-      handleNavigateToComments,
-      handleReblog,
-      handleEditPost,
       postData,
       authUsername,
-      rebloggedList,
-      hideReblogMenu,
       displayPhotoBrowserMenu,
       handleDisplayPhotoBrowser,
       customTheme,
       intl,
     } = this.props;
-    const { title, permlink, author, id, created, cashout_time } = postData;
-    const displayMenuButton = authUsername !== author && !_.isEmpty(authUsername);
-    const isReblogged = _.includes(rebloggedList, `${id}`);
-    const hideReblog = !(displayMenuButton && !isReblogged) || hideReblogMenu;
+    const {
+      title,
+      permlink,
+      author,
+      id,
+      created,
+      cashout_time: cashoutTime,
+      beneficiaries,
+    } = postData;
     const displayReportButton = authUsername !== author;
-    const displayEditPostButton = authUsername === author && cashout_time !== '1969-12-31T23:59:59';
+    const displayEditPostButton = authUsername === author && cashoutTime !== '1969-12-31T23:59:59';
+    const displayBeneficiaries = !_.isEmpty(beneficiaries);
+    const isLastElement = !(displayEditPostButton || displayBeneficiaries);
 
     return (
       <TouchableWithoutFeedback onPress={hideMenu}>
-        <Container>
+        <View style={commonStyles.menuModalContainer}>
           <MenuWrapper>
             <SavePostMenuButton
               title={title}
@@ -146,37 +158,17 @@ class PostMenu extends Component {
               created={created}
             />
             <SavePostOfflineMenuButton postData={postData} />
-            <MenuModalButton onPress={handleNavigateToComments}>
+            <MenuModalButton onPress={this.handleNavigateToComments}>
               <MenuModalContents>
-                <MaterialCommunityIcons
-                  size={ICON_SIZES.menuModalOptionIcon}
-                  color={customTheme.primaryColor}
-                  name={MATERIAL_COMMUNITY_ICONS.comment}
-                />
+                <MenuIcon name={MATERIAL_COMMUNITY_ICONS.comment} />
                 <MenuText customTheme={customTheme}>{intl.comments}</MenuText>
               </MenuModalContents>
             </MenuModalButton>
-            {!hideReblog && (
-              <MenuModalButton onPress={handleReblog}>
-                <MenuModalContents>
-                  <MaterialCommunityIcons
-                    size={ICON_SIZES.menuModalOptionIcon}
-                    color={customTheme.primaryColor}
-                    name={MATERIAL_COMMUNITY_ICONS.reblog}
-                  />
-                  <MenuText customTheme={customTheme}>{intl.reblog}</MenuText>
-                </MenuModalContents>
-              </MenuModalButton>
-            )}
             {displayPhotoBrowserMenu && (
               <MenuModalButton onPress={handleDisplayPhotoBrowser}>
                 <MenuModalContents>
-                  <MaterialCommunityIcons
-                    size={ICON_SIZES.menuModalOptionIcon}
-                    color={customTheme.primaryColor}
-                    name={MATERIAL_COMMUNITY_ICONS.image}
-                  />
-                  <MenuText customTheme={customTheme}>{intl.post_images}</MenuText>
+                  <MenuIcon name={MATERIAL_COMMUNITY_ICONS.image} />
+                  <MenuText>{intl.post_images}</MenuText>
                 </MenuModalContents>
               </MenuModalButton>
             )}
@@ -191,58 +183,43 @@ class PostMenu extends Component {
             )}
             <MenuModalButton onPress={this.handleShare}>
               <MenuModalContents>
-                <MaterialCommunityIcons
-                  size={ICON_SIZES.menuModalOptionIcon}
-                  color={customTheme.primaryColor}
-                  name={MATERIAL_COMMUNITY_ICONS.shareVariant}
-                />
+                <MenuIcon name={MATERIAL_COMMUNITY_ICONS.shareVariant} />
                 <MenuText customTheme={customTheme}>{intl.share_post}</MenuText>
               </MenuModalContents>
             </MenuModalButton>
             <MenuModalButton onPress={this.handleSetSteemitRLClipboard}>
               <MenuModalContents>
-                <MaterialCommunityIcons
-                  size={ICON_SIZES.menuModalOptionIcon}
-                  color={customTheme.primaryColor}
-                  name={MATERIAL_COMMUNITY_ICONS.contentCopy}
-                />
+                <MenuIcon name={MATERIAL_COMMUNITY_ICONS.contentCopy} />
                 <MenuText customTheme={customTheme}>{intl.copy_steemit_url}</MenuText>
               </MenuModalContents>
             </MenuModalButton>
-            <MenuModalButton onPress={this.handleSetBusyURLClipboard}>
+            <MenuModalButton onPress={this.handleSetBusyURLClipboard} isLastElement={isLastElement}>
               <MenuModalContents>
-                <MaterialCommunityIcons
-                  size={ICON_SIZES.menuModalOptionIcon}
-                  color={customTheme.primaryColor}
-                  name={MATERIAL_COMMUNITY_ICONS.contentCopy}
-                />
+                <MenuIcon name={MATERIAL_COMMUNITY_ICONS.contentCopy} />
                 <MenuText customTheme={customTheme}>{intl.copy_busy_url}</MenuText>
               </MenuModalContents>
             </MenuModalButton>
             {displayEditPostButton && (
-              <MenuModalButton onPress={handleEditPost}>
+              <MenuModalButton onPress={this.handleEditPost}>
                 <MenuModalContents>
-                  <MaterialCommunityIcons
-                    size={ICON_SIZES.menuModalOptionIcon}
-                    color={customTheme.primaryColor}
-                    name={MATERIAL_COMMUNITY_ICONS.pencil}
-                  />
+                  <MenuIcon name={MATERIAL_COMMUNITY_ICONS.pencil} />
                   <MenuText customTheme={customTheme}>{intl.edit_post}</MenuText>
                 </MenuModalContents>
               </MenuModalButton>
             )}
+            {displayBeneficiaries && (
+              <MenuModalButton onPress={this.handleBeneficiariesNavigation} isLastElement>
+                <MenuModalContents>
+                  <MenuIcon isMaterialIcon name={MATERIAL_ICONS.moneyOff} />
+                  <MenuText customTheme={customTheme}>{intl.view_beneficiaries}</MenuText>
+                </MenuModalContents>
+              </MenuModalButton>
+            )}
           </MenuWrapper>
-        </Container>
+        </View>
       </TouchableWithoutFeedback>
     );
   }
 }
 
-const mapStateToProps = state => ({
-  customTheme: getCustomTheme(state),
-  authUsername: getAuthUsername(state),
-  followingList: getCurrentUserFollowList(state),
-  intl: getIntl(state),
-});
-
-export default connect(mapStateToProps)(PostMenu);
+export default connect(mapStateToProps)(withNavigation(PostMenu));

@@ -7,9 +7,11 @@ import { COLORS } from 'constants/styles';
 import { connect } from 'react-redux';
 import { getCustomTheme, getIntl } from 'state/rootReducer';
 import tinycolor from 'tinycolor2';
+import PrimaryText from 'components/common/text/PrimaryText';
 
 const TouchableContainer = styled.TouchableOpacity`
   flex: 1;
+  justify-content: center;
 `;
 
 const Container = styled.View`
@@ -24,7 +26,7 @@ const ModalContent = styled.View`
   background-color: ${props => props.customTheme.primaryBackgroundColor};
 `;
 
-const ModalContentText = styled.Text`
+const ModalContentText = styled(PrimaryText)`
   color: ${props =>
     tinycolor(props.customTheme.primaryBackgroundColor).isDark()
       ? COLORS.LIGHT_TEXT_COLOR

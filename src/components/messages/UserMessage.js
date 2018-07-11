@@ -9,6 +9,7 @@ import moment from 'moment-timezone';
 import { connect } from 'react-redux';
 import { getCustomTheme } from 'state/rootReducer';
 import StyledTextByBackground from 'components/common/StyledTextByBackground';
+import PrimaryText from 'components/common/text/PrimaryText';
 
 const { width: deviceWidth } = Dimensions.get('screen');
 
@@ -17,11 +18,10 @@ const Container = styled.View`
   padding: 10px;
 `;
 
-const Username = styled.Text`
+const Username = styled(PrimaryText)`
   margin: 0 5px;
   color: ${props => props.customTheme.primaryColor};
   font-size: 18px;
-  font-weight: bold;
 `;
 
 const Text = styled(StyledTextByBackground)`
@@ -36,7 +36,7 @@ const TimeStampContainer = styled.View`
   align-items: center;
 `;
 
-const TimeStamp = styled.Text`
+const TimeStamp = styled(PrimaryText)`
   margin-left: 5px;
   color: ${props => props.customTheme.tertiaryColor};
   font-size: 12px;

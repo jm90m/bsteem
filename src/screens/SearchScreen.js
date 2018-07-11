@@ -1,17 +1,15 @@
 import React, { Component } from 'react';
-import { ListView } from 'react-native';
+import { ListView, StyleSheet, View } from 'react-native';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
-import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { SearchBar } from 'react-native-elements';
 import { connect } from 'react-redux';
 import * as navigationConstants from 'constants/navigation';
-import styled from 'styled-components/native';
 import { fetchTags } from 'state/actions/homeActions';
 import * as searchActions from 'state/actions/searchActions';
-import { COLORS, MATERIAL_ICONS, MATERIAL_COMMUNITY_ICONS, ICON_SIZES } from 'constants/styles';
+import { COLORS } from 'constants/styles';
+import commonStyles from 'styles/common';
 import LargeLoading from 'components/common/LargeLoading';
-import { abbreviateLargeNumber } from 'util/numberFormatter';
 import {
   getHomeTags,
   getAllTrendingTags,
@@ -28,66 +26,25 @@ import {
 import SearchPostPreview from 'components/search/SearchPostPreview';
 import SearchUserPreview from 'components/search/SearchUserPreview';
 import SearchDefaultView from 'components/search/SearchDefaultView';
-import Tag from 'components/post/Tag';
-import SaveTagButton from 'components/common/SaveTagButton';
+import SearchTagPreview from 'components/search/SearchTagPreview';
+import SearchMenu from 'components/search/SearchMenu';
 import StyledListView from 'components/common/StyledListView';
-import StyledViewPrimaryBackground from 'components/common/StyledViewPrimaryBackground';
+import PrimaryBackgroundView from 'components/common/StyledViewPrimaryBackground';
 import StyledTextByBackground from 'components/common/StyledTextByBackground';
 import tinycolor from 'tinycolor2';
 
-const Container = styled(StyledViewPrimaryBackground)`
-  flex: 1;
-  padding-top: 10px;
-`;
-
-const NoResultsFoundText = styled(StyledTextByBackground)`
-  padding: 20px;
-  justify-content: center;
-  font-size: 18px;
-`;
-
-const Menu = styled.View`
-  justify-content: space-around;
-  flex-direction: row;
-`;
-
-const MenuContent = styled.View`
-  flex-direction: row;
-  padding: 10px 0;
-  border-bottom-width: 2px;
-  border-bottom-color: ${props =>
-    props.selected ? props.customTheme.primaryColor : 'transparent'};
-  width: 50px;
-  justify-content: center;
-`;
-
-const LoadingContainer = styled.View`
-  padding: 20px;
-  justify-content: center;
-  align-items: center;
-`;
-
-const Count = styled.Text`
-  margin-left: 5px;
-  color: ${props =>
-    props.selected ? props.customTheme.primaryColor : props.customTheme.secondaryColor};
-  font-size: 18px;
-`;
-
-const TouchableMenu = styled.TouchableOpacity`
-  justify-content: center;
-  align-items: center;
-`;
-
-const TagOption = styled.View`
-  flex-direction: row;
-  justify-content: space-between;
-  padding: 10px;
-  margin: 5px 0;
-  background-color: ${props => props.customTheme.primaryBackgroundColor};
-`;
-
-const TagTouchble = styled.TouchableOpacity``;
+const styles = StyleSheet.create({
+  noResultsFoundText: {
+    padding: 20,
+    justifyContent: 'center',
+    fontSize: 18,
+  },
+  loadingContainer: {
+    padding: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+});
 
 const mapStateToProps = state => ({
   customTheme: getCustomTheme(state),
@@ -112,12 +69,6 @@ const mapDispatchToProps = dispatch => ({
 
 const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
 
-const MENU = {
-  USERS: 'USERS',
-  TAGS: 'TAGS',
-  POSTS: 'POSTS',
-};
-
 class SearchScreen extends Component {
   static propTypes = {
     navigation: PropTypes.shape().isRequired,
@@ -141,17 +92,12 @@ class SearchScreen extends Component {
     tags: [],
   };
 
-  static navigationOptions = {
-    tabBarIcon: ({ tintColor }) => (
-      <MaterialIcons name={MATERIAL_ICONS.search} size={20} color={tintColor} />
-    ),
-  };
-
   constructor(props) {
     super(props);
+
     this.state = {
       currentSearchValue: '',
-      currentMenu: MENU.USERS,
+      currentMenu: navigationConstants.SEARCH_MENU.USERS,
     };
 
     this.handleSearchOnChangeText = this.handleSearchOnChangeText.bind(this);
@@ -159,7 +105,6 @@ class SearchScreen extends Component {
     this.handleNavigateToUserScreen = this.handleNavigateToUserScreen.bind(this);
     this.handleNavigateToPostScreen = this.handleNavigateToPostScreen.bind(this);
     this.renderSearchResultRow = this.renderSearchResultRow.bind(this);
-    this.setCurrentMenu = this.setCurrentMenu.bind(this);
   }
 
   componentDidMount() {
@@ -180,31 +125,36 @@ class SearchScreen extends Component {
   }
 
   handleNavigateToUserScreen(username) {
-    this.props.navigation.navigate(navigationConstants.USER, { username });
+    this.props.navigation.push(navigationConstants.USER, { username });
   }
 
   handleNavigateToPostScreen(author, permlink) {
-    this.props.navigation.navigate(navigationConstants.FETCH_POST, { author, permlink });
+    this.props.navigation.push(navigationConstants.POST, { author, permlink });
   }
 
-  setCurrentMenu(currentMenu) {
+  handleSetCurrentMenu = currentMenu => () => {
     this.setState({
       currentMenu,
     });
-  }
+  };
 
   handleNavigateToFeed(tag) {
-    this.props.navigation.navigate(navigationConstants.FEED, { tag });
+    this.props.navigation.push(navigationConstants.FEED, { tag });
   }
 
-  renderSearchResultRow(rowData) {
-    const { customTheme } = this.props;
+  handleNavigateToFeedScreenForTagPreview = tag => () => {
+    this.props.navigation.push(navigationConstants.FEED, { tag });
+  };
+
+  renderSearchResultRow(rowData, key, index) {
+    const isFirstElement = index === '0' || index === 0;
     switch (rowData.type) {
       case 'user': {
         return (
           <SearchUserPreview
             username={rowData.name}
             handleNavigateToUserScreen={this.handleNavigateToUserScreen}
+            isFirstElement={isFirstElement}
           />
         );
       }
@@ -220,18 +170,18 @@ class SearchScreen extends Component {
             handleNavigateToUserScreen={this.handleNavigateToUserScreen}
             handleNavigateToFeedScreen={this.handleNavigateToFeed}
             handleNavigateToPostScreen={this.handleNavigateToPostScreen}
+            isFirstElement={isFirstElement}
           />
         );
       }
       case 'tag': {
         const tag = rowData.name;
         return (
-          <TagOption customTheme={customTheme}>
-            <TagTouchble onPress={() => this.handleNavigateToFeed(tag)}>
-              <Tag tag={tag} />
-            </TagTouchble>
-            <SaveTagButton tag={tag} />
-          </TagOption>
+          <SearchTagPreview
+            tag={tag}
+            isFirstElement={isFirstElement}
+            handleNavigateToFeed={this.handleNavigateToFeedScreenForTagPreview}
+          />
         );
       }
       default:
@@ -253,7 +203,11 @@ class SearchScreen extends Component {
         />
       );
     } else if (hasNoSearchResults) {
-      return <NoResultsFoundText>{intl.no_search_results_found}</NoResultsFoundText>;
+      return (
+        <StyledTextByBackground style={styles.noResultsFoundText}>
+          {intl.no_search_results_found}
+        </StyledTextByBackground>
+      );
     }
     return null;
   }
@@ -272,13 +226,13 @@ class SearchScreen extends Component {
     let hasNoSearchResult;
 
     switch (currentMenu) {
-      case MENU.TAGS:
+      case navigationConstants.SEARCH_MENU.TAGS:
         hasNoSearchResult = _.isEmpty(searchTagsResults);
         return this.renderDefaultsViews(loadingSearchTag, hasNoSearchValue, hasNoSearchResult);
-      case MENU.POSTS:
+      case navigationConstants.SEARCH_MENU.POSTS:
         hasNoSearchResult = _.isEmpty(searchPostResults);
         return this.renderDefaultsViews(loadingSearchPost, hasNoSearchValue, hasNoSearchResult);
-      case MENU.USERS:
+      case navigationConstants.SEARCH_MENU.USERS:
       default:
         hasNoSearchResult = _.isEmpty(searchUserResults);
         return this.renderDefaultsViews(loadingSearchUser, hasNoSearchValue, hasNoSearchResult);
@@ -286,51 +240,18 @@ class SearchScreen extends Component {
   }
 
   renderMenu() {
-    const { searchUserResults, searchPostResults, searchTagsResults, customTheme } = this.props;
     const { currentMenu } = this.state;
-    const selectedUsers = _.isEqual(currentMenu, MENU.USERS);
-    const selectedTags = _.isEqual(currentMenu, MENU.TAGS);
-    const selectedPosts = _.isEqual(currentMenu, MENU.POSTS);
+    const selectedUsers = _.isEqual(currentMenu, navigationConstants.SEARCH_MENU.USERS);
+    const selectedTags = _.isEqual(currentMenu, navigationConstants.SEARCH_MENU.TAGS);
+    const selectedPosts = _.isEqual(currentMenu, navigationConstants.SEARCH_MENU.POSTS);
 
     return (
-      <Menu>
-        <TouchableMenu onPress={() => this.setCurrentMenu(MENU.TAGS)}>
-          <MenuContent selected={selectedTags} customTheme={customTheme}>
-            <MaterialCommunityIcons
-              name={MATERIAL_COMMUNITY_ICONS.tag}
-              size={ICON_SIZES.menuIcon}
-              color={selectedTags ? customTheme.primaryColor : customTheme.secondaryColor}
-            />
-            <Count selected={selectedTags} customTheme={customTheme}>
-              {abbreviateLargeNumber(_.size(searchTagsResults))}
-            </Count>
-          </MenuContent>
-        </TouchableMenu>
-        <TouchableMenu onPress={() => this.setCurrentMenu(MENU.USERS)}>
-          <MenuContent selected={selectedUsers} customTheme={customTheme}>
-            <MaterialCommunityIcons
-              name={MATERIAL_COMMUNITY_ICONS.account}
-              size={ICON_SIZES.menuIcon}
-              color={selectedUsers ? customTheme.primaryColor : customTheme.secondaryColor}
-            />
-            <Count selected={selectedUsers} customTheme={customTheme}>
-              {abbreviateLargeNumber(_.size(searchUserResults))}
-            </Count>
-          </MenuContent>
-        </TouchableMenu>
-        <TouchableMenu onPress={() => this.setCurrentMenu(MENU.POSTS)}>
-          <MenuContent selected={selectedPosts} customTheme={customTheme}>
-            <MaterialCommunityIcons
-              name={MATERIAL_COMMUNITY_ICONS.posts}
-              size={ICON_SIZES.menuIcon}
-              color={selectedPosts ? customTheme.primaryColor : customTheme.secondaryColor}
-            />
-            <Count selected={selectedPosts} customTheme={customTheme}>
-              {abbreviateLargeNumber(_.size(searchPostResults))}
-            </Count>
-          </MenuContent>
-        </TouchableMenu>
-      </Menu>
+      <SearchMenu
+        handleSetCurrentMenu={this.handleSetCurrentMenu}
+        selectedUsers={selectedUsers}
+        selectedTags={selectedTags}
+        selectedPosts={selectedPosts}
+      />
     );
   }
 
@@ -338,29 +259,29 @@ class SearchScreen extends Component {
     const { loadingSearchUser, loadingSearchPost, loadingSearchTag } = this.props;
     const { currentMenu } = this.state;
     switch (currentMenu) {
-      case MENU.TAGS:
+      case navigationConstants.SEARCH_MENU.TAGS:
         return (
           loadingSearchTag && (
-            <LoadingContainer>
+            <View style={styles.loadingContainer}>
               <LargeLoading />
-            </LoadingContainer>
+            </View>
           )
         );
-      case MENU.POSTS:
+      case navigationConstants.SEARCH_MENU.POSTS:
         return (
           loadingSearchPost && (
-            <LoadingContainer>
+            <View style={styles.loadingContainer}>
               <LargeLoading />
-            </LoadingContainer>
+            </View>
           )
         );
-      case MENU.USERS:
+      case navigationConstants.SEARCH_MENU.USERS:
       default:
         return (
           loadingSearchUser && (
-            <LoadingContainer>
+            <View style={styles.loadingContainer}>
               <LargeLoading />
-            </LoadingContainer>
+            </View>
           )
         );
     }
@@ -371,7 +292,7 @@ class SearchScreen extends Component {
     const { currentMenu, currentSearchValue } = this.state;
 
     switch (currentMenu) {
-      case MENU.TAGS: {
+      case navigationConstants.SEARCH_MENU.TAGS: {
         const hasSearchResults = !_.isEmpty(searchTagsResults) && !_.isEmpty(currentSearchValue);
         return (
           hasSearchResults && (
@@ -383,7 +304,7 @@ class SearchScreen extends Component {
           )
         );
       }
-      case MENU.POSTS: {
+      case navigationConstants.SEARCH_MENU.POSTS: {
         const hasSearchResults = !_.isEmpty(searchPostResults) && !_.isEmpty(currentSearchValue);
         return (
           hasSearchResults && (
@@ -395,7 +316,7 @@ class SearchScreen extends Component {
           )
         );
       }
-      case MENU.USERS:
+      case navigationConstants.SEARCH_MENU.USERS:
       default: {
         const hasSearchResults = !_.isEmpty(searchUserResults) && !_.isEmpty(currentSearchValue);
         return (
@@ -412,13 +333,7 @@ class SearchScreen extends Component {
   }
 
   render() {
-    const {
-      searchLoading,
-      searchUserResults,
-      searchPostResults,
-      searchTagsResults,
-      customTheme,
-    } = this.props;
+    const { searchUserResults, searchPostResults, searchTagsResults, customTheme } = this.props;
     const { currentSearchValue } = this.state;
     const hasSearchResults =
       !_.isEmpty(searchUserResults) ||
@@ -428,16 +343,28 @@ class SearchScreen extends Component {
     const color = tinycolor(customTheme.primaryBackgroundColor).isDark()
       ? COLORS.LIGHT_TEXT_COLOR
       : COLORS.DARK_TEXT_COLOR;
+    const containerStyles = [
+      commonStyles.container,
+      { paddingTop: 10, backgroundColor: customTheme.primaryBackgroundColor },
+    ];
+    const searchContainerStyles = {
+      backgroundColor: customTheme.primaryBackgroundColor,
+      marginTop: 10,
+    };
+    const searchInputStyle = {
+      backgroundColor: customTheme.primaryBackgroundColor,
+      color,
+    };
+
     return (
-      <Container>
+      <PrimaryBackgroundView style={containerStyles}>
         <SearchBar
           lightTheme
           onChangeText={this.handleSearchOnChangeText}
           placeholder=""
           value={currentSearchValue}
-          containerStyle={{ backgroundColor: customTheme.primaryBackgroundColor, marginTop: 10 }}
-          inputStyle={{ backgroundColor: customTheme.primaryBackgroundColor, color }}
-          showLoadingIcon={searchLoading}
+          containerStyle={searchContainerStyles}
+          inputStyle={searchInputStyle}
           autoCorrect={false}
           autoCapitalize="none"
           clearIcon
@@ -445,7 +372,7 @@ class SearchScreen extends Component {
         {displayMenu && this.renderMenu()}
         {this.renderSearchResults()}
         {this.renderSearchDefaultView()}
-      </Container>
+      </PrimaryBackgroundView>
     );
   }
 }

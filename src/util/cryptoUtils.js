@@ -63,6 +63,7 @@ export function getCryptoPriceIncreaseDetails(usdCryptoPriceHistory, btcCryptoPr
 
   return {
     currentUSDPrice,
+    previousUSDPrice,
     currentBTCPrice,
     cryptoUSDIncrease,
     cryptoBTCIncrease,

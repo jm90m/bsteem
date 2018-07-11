@@ -7,27 +7,26 @@ import { numberWithCommas } from 'util/steemitFormatters';
 import { getCustomTheme, getIntl } from 'state/rootReducer';
 import { connect } from 'react-redux';
 import * as navigationConstants from 'constants/navigation';
+import PrimaryText from 'components/common/text/PrimaryText';
 import StyledTextByBackground from 'components/common/StyledTextByBackground';
 import WalletTransactionContainer from './WalletTransactionContainer';
 
-const ReceiveContent = styled.Text`
+const ReceiveContent = styled(PrimaryText)`
   padding-left: 10px;
   flex-wrap: wrap;
   width: 200px;
 `;
 
-const Received = styled.Text`
-  font-weight: bold;
+const Received = styled(PrimaryText)`
   margin-left: auto;
   color: ${props => props.customTheme.positiveColor};
 `;
 
-const Username = styled.Text`
+const Username = styled(PrimaryText)`
   color: ${props => props.customTheme.primaryColor};
-  font-weight: bold;
 `;
 
-const ReceivedTextContainer = styled.Text`
+const ReceivedTextContainer = styled(PrimaryText)`
   flex-direction: row;
 `;
 
@@ -39,9 +38,7 @@ const ReceiveTransaction = ({ from, memo, amount, timestamp, navigation, customT
     <ReceiveContent>
       <ReceivedTextContainer>
         <StyledTextByBackground>{`${intl.received_from} `}</StyledTextByBackground>
-        <Touchable
-          onPress={() => navigation.navigate(navigationConstants.USER, { username: from })}
-        >
+        <Touchable onPress={() => navigation.push(navigationConstants.USER, { username: from })}>
           <Username customTheme={customTheme}>{from}</Username>
         </Touchable>
       </ReceivedTextContainer>

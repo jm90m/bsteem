@@ -5,6 +5,7 @@ import * as accountHistoryConstants from 'constants/accountHistory';
 import * as navigationConstants from 'constants/navigation';
 import styled from 'styled-components/native';
 import StyledTextByBackground from 'components/common/StyledTextByBackground';
+import PrimaryText from 'components/common/text/PrimaryText';
 import { connect } from 'react-redux';
 import { getCustomTheme, getIntl } from 'state/rootReducer';
 
@@ -18,9 +19,8 @@ const Touchable = styled.TouchableWithoutFeedback`
   padding-right: 10px;
 `;
 
-const LinkText = styled.Text`
+const LinkText = styled(PrimaryText)`
   color: ${props => props.customTheme.primaryColor}
-  font-weight: bold;
   margin-right: 5px;
 `;
 
@@ -39,7 +39,7 @@ const CustomJSONMessage = ({ actionDetails, currentUsername, navigation, customT
           <StyledTextByBackground>{`${followAction} `}</StyledTextByBackground>
           <Touchable
             onPress={() =>
-              navigation.navigate(navigationConstants.USER, {
+              navigation.push(navigationConstants.USER, {
                 username: following,
               })
             }
@@ -54,7 +54,7 @@ const CustomJSONMessage = ({ actionDetails, currentUsername, navigation, customT
       <Container>
         <Touchable
           onPress={() =>
-            navigation.navigate(navigationConstants.USER, {
+            navigation.push(navigationConstants.USER, {
               username: customActionDetails.follower,
             })
           }
@@ -64,7 +64,7 @@ const CustomJSONMessage = ({ actionDetails, currentUsername, navigation, customT
         <StyledTextByBackground>{` ${followAction} `}</StyledTextByBackground>
         <Touchable
           onPress={() =>
-            navigation.navigate(navigationConstants.USER, {
+            navigation.push(navigationConstants.USER, {
               username: customActionDetails.following,
             })
           }
@@ -79,7 +79,7 @@ const CustomJSONMessage = ({ actionDetails, currentUsername, navigation, customT
         <StyledTextByBackground>{`${intl.reblogged} `}</StyledTextByBackground>
         <Touchable
           onPress={() =>
-            navigation.navigate(navigationConstants.FETCH_POST, {
+            navigation.push(navigationConstants.POST, {
               author: customActionDetails.author,
               permlink: customActionDetails.permlink,
             })

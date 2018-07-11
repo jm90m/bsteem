@@ -1,5 +1,5 @@
 import React from 'react';
-import { StackNavigator } from 'react-navigation';
+import { createStackNavigator } from 'react-navigation';
 import { MaterialIcons } from '@expo/vector-icons';
 import { MATERIAL_ICONS, ICON_SIZES } from 'constants/styles';
 import * as navigationConstants from 'constants/navigation';
@@ -12,7 +12,7 @@ const screenNavigationOptions = {
   ),
 };
 
-const HomeNavigator = StackNavigator(
+const HomeNavigator = createStackNavigator(
   {
     [navigationConstants.POST_CREATION]: {
       screen: PostCreationScreen,

@@ -85,7 +85,6 @@ const UserContainer = styled(StyledViewPrimaryBackground)`
 const Username = styled(TitleText)`
   margin: 0 5px;
   font-size: 18px;
-  font-weight: bold;
 `;
 
 const EmptyContent = styled(StyledViewPrimaryBackground)`
@@ -192,13 +191,13 @@ class SavedContentScreen extends Component {
   }
 
   handleNavigateTag(tag) {
-    this.props.navigation.navigate(navigationConstants.FEED, {
+    this.props.navigation.push(navigationConstants.FEED, {
       tag,
     });
   }
 
   handleNavigatePost(author, permlink) {
-    this.props.navigation.navigate(navigationConstants.FETCH_POST, {
+    this.props.navigation.push(navigationConstants.POST, {
       author,
       permlink,
     });
@@ -207,7 +206,7 @@ class SavedContentScreen extends Component {
   handleNavigateToOfflinePost(postData) {
     const { title, category, author, json_metadata, body, permlink, id } = postData;
     const parsedJsonMetadata = jsonParse(json_metadata);
-    this.props.navigation.navigate(navigationConstants.POST, {
+    this.props.navigation.push(navigationConstants.POST, {
       title,
       body,
       permlink,
@@ -220,7 +219,7 @@ class SavedContentScreen extends Component {
   }
 
   handleNavigateUser(username) {
-    this.props.navigation.navigate(navigationConstants.USER, { username });
+    this.props.navigation.push(navigationConstants.USER, { username });
   }
 
   handleShowTags() {
@@ -294,7 +293,7 @@ class SavedContentScreen extends Component {
   }
 
   renderSavedPosts() {
-    const { loadingSavedPosts, intl, savedOfflinePosts, customTheme } = this.props;
+    const { intl, savedOfflinePosts, customTheme } = this.props;
     if (_.isEqual(this.state.menu, MENU.POSTS)) {
       const savedOfflinePostsComponents = _.compact(
         _.map(savedOfflinePosts, post => {

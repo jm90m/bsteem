@@ -5,6 +5,7 @@ import * as navigationConstants from 'constants/navigation';
 import StyledTextByBackground from 'components/common/StyledTextByBackground';
 import { connect } from 'react-redux';
 import { getCustomTheme } from 'state/rootReducer';
+import PrimaryText from 'components/common/text/PrimaryText';
 
 const Container = styled(StyledTextByBackground)`
   flex-direction: row;
@@ -12,23 +13,20 @@ const Container = styled(StyledTextByBackground)`
   flex-wrap: wrap;
 `;
 
-const LinkText = styled.Text`
+const LinkText = styled(PrimaryText)`
   color: ${props => props.customTheme.primaryColor}
-  font-weight: bold;
   margin-right: 5px;
 `;
 
 const VoteWeight = styled(StyledTextByBackground)`
-  font-weight: bold;
   margin-right: 5px;
 `;
 
 const CurrentUserVote = styled(StyledTextByBackground)`
-  font-weight: bold;
   margin-right: 5px;
 `;
 
-const VoteMessageContainer = styled.Text`
+const VoteMessageContainer = styled(PrimaryText)`
   flex-direction: row;
 `;
 
@@ -54,7 +52,7 @@ const VoteActionMessage = ({ actionDetails, currentUsername, navigation, customT
         <VoteMessageContainer>
           <Touchable
             onPress={() =>
-              navigation.navigate(navigationConstants.USER, {
+              navigation.push(navigationConstants.USER, {
                 username: actionDetails.voter,
               })
             }
@@ -65,14 +63,12 @@ const VoteActionMessage = ({ actionDetails, currentUsername, navigation, customT
         </VoteMessageContainer>
       )}
       {actionDetails.weight === 0 ? null : voteWeight}
-      <Touchable
-        onPress={() => navigation.navigate(navigationConstants.USER, { username: author })}
-      >
+      <Touchable onPress={() => navigation.push(navigationConstants.USER, { username: author })}>
         <LinkText customTheme={customTheme}>{` ${author} `}</LinkText>
       </Touchable>
       <Touchable
         onPress={() =>
-          navigation.navigate(navigationConstants.FETCH_POST, {
+          navigation.push(navigationConstants.POST, {
             author,
             permlink,
           })

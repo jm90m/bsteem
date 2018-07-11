@@ -9,7 +9,8 @@ import {
   TouchableWithoutFeedback,
   AsyncStorage,
 } from 'react-native';
-import { SafeAreaView } from 'react-navigation';
+import { DrawerActions } from 'react-navigation';
+import SafeAreaView from 'components/common/SafeAreaView';
 import _ from 'lodash';
 import {
   AUTH_EXPIRATION,
@@ -21,7 +22,7 @@ import sc2 from 'api/sc2';
 import { logoutUser } from 'state/actions/authActions';
 import { getCurrentUserSettings } from 'state/actions/settingsActions';
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
-import { MATERIAL_COMMUNITY_ICONS, MATERIAL_ICONS, ICON_SIZES } from 'constants/styles';
+import { MATERIAL_COMMUNITY_ICONS, MATERIAL_ICONS, ICON_SIZES, FONTS } from 'constants/styles';
 import { getCustomTheme, getIntl, getAuthUsername, getUsersDetails } from 'state/rootReducer';
 import * as navigationConstants from 'constants/navigation';
 import { getReputation } from 'util/steemitFormatters';
@@ -42,6 +43,7 @@ const styles = StyleSheet.create({
   drawerText: {
     marginLeft: 5,
     fontSize: 18,
+    fontFamily: FONTS.PRIMARY,
   },
   drawerHeader: {
     flexDirection: 'row',
@@ -75,6 +77,7 @@ class CurrentUserDrawer extends Component {
     this.handleNavigateToCustomTheme = this.handleNavigateToCustomTheme.bind(this);
     this.handleNavigateToActivity = this.handleNavigateToActivity.bind(this);
     this.handleNavigateToTransfers = this.handleNavigateToTransfers.bind(this);
+    this.handleNavigateToApps = this.handleNavigateToApps.bind(this);
     this.handleLogout = this.handleLogout.bind(this);
     this.resetAuthUserInAsyncStorage = this.resetAuthUserInAsyncStorage.bind(this);
   }
@@ -82,35 +85,48 @@ class CurrentUserDrawer extends Component {
   handleNavigateToWallet() {
     const { authUsername } = this.props;
     this.props.navigation.navigate(navigationConstants.USER_WALLET, { username: authUsername });
+    this.props.navigation.dispatch(DrawerActions.closeDrawer());
   }
 
   handleNavigateToNotifications() {
     this.props.navigation.navigate(navigationConstants.NOTIFICATIONS);
+    this.props.navigation.dispatch(DrawerActions.closeDrawer());
   }
 
   handleNavigateToMessages() {
     this.props.navigation.navigate(navigationConstants.MESSAGES);
+    this.props.navigation.dispatch(DrawerActions.closeDrawer());
   }
 
   handleNavigateToSettings() {
     this.props.navigation.navigate(navigationConstants.SETTINGS);
+    this.props.navigation.dispatch(DrawerActions.closeDrawer());
   }
 
   handleNavigateToSaved() {
     this.props.navigation.navigate(navigationConstants.SAVED_CONTENT);
+    this.props.navigation.dispatch(DrawerActions.closeDrawer());
   }
 
   handleNavigateToCustomTheme() {
     this.props.navigation.navigate(navigationConstants.CUSTOM_THEME);
+    this.props.navigation.dispatch(DrawerActions.closeDrawer());
   }
 
   handleNavigateToActivity() {
     const { authUsername } = this.props;
     this.props.navigation.navigate(navigationConstants.USER_ACTIVITY, { username: authUsername });
+    this.props.navigation.dispatch(DrawerActions.closeDrawer());
   }
 
   handleNavigateToTransfers() {
     this.props.navigation.navigate(navigationConstants.TRANSFERS);
+    this.props.navigation.dispatch(DrawerActions.closeDrawer());
+  }
+
+  handleNavigateToApps() {
+    this.props.navigation.navigate(navigationConstants.PLATFORM_APPS);
+    this.props.navigation.dispatch(DrawerActions.closeDrawer());
   }
 
   async resetAuthUserInAsyncStorage() {
@@ -148,10 +164,7 @@ class CurrentUserDrawer extends Component {
       <ScrollView
         style={[styles.container, { backgroundColor: customTheme.primaryBackgroundColor }]}
       >
-        <SafeAreaView
-          style={[styles.container, { backgroundColor: customTheme.primaryBackgroundColor }]}
-          forceInset={{ top: 'always', horizontal: 'never' }}
-        >
+        <SafeAreaView forceInset={{ top: 'always', horizontal: 'never' }}>
           <View style={styles.drawerHeader}>
             <Avatar username={authUsername} size={60} />
             <View style={styles.usernameContainer}>
@@ -161,6 +174,7 @@ class CurrentUserDrawer extends Component {
                   fontSize: 20,
                   marginLeft: 5,
                   fontWeight: 'bold',
+                  fontFamily: FONTS.PRIMARY,
                 }}
               >
                 {authUsername}
@@ -170,6 +184,18 @@ class CurrentUserDrawer extends Component {
               </View>
             </View>
           </View>
+          <TouchableWithoutFeedback onPress={this.handleNavigateToApps}>
+            <View style={styles.menuItem}>
+              <MaterialIcons
+                name={MATERIAL_ICONS.notifications}
+                size={ICON_SIZES.actionIcon}
+                color={customTheme.primaryColor}
+              />
+              <Text style={[styles.drawerText, { color: customTheme.primaryColor }]}>
+                {intl.platform_apps}
+              </Text>
+            </View>
+          </TouchableWithoutFeedback>
           <TouchableWithoutFeedback onPress={this.handleNavigateToNotifications}>
             <View style={[styles.menuItem, { marginTop: 15 }]}>
               <MaterialIcons

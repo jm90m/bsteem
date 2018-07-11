@@ -7,6 +7,7 @@ import Header from 'components/common/Header';
 import _ from 'lodash';
 import { ICON_SIZES, MATERIAL_COMMUNITY_ICONS, MATERIAL_ICONS, COLORS } from 'constants/styles';
 import * as navigationConstants from 'constants/navigation';
+import { BASE_NOTIFICATIONS_URL } from 'constants/notifications';
 import {
   getAuthUsername,
   getCustomTheme,
@@ -16,6 +17,7 @@ import {
   getAuthenticatedUserSCMetaData,
 } from 'state/rootReducer';
 import firebase from 'firebase';
+import PrimaryText from 'components/common/text/PrimaryText';
 import { PARSED_NOTIFICATIONS } from 'constants/notifications';
 import { fetchDisplayedMessages } from 'state/actions/firebaseActions';
 import { getCurrentUserSettings } from 'state/actions/settingsActions';
@@ -23,9 +25,10 @@ import { getUserAllPrivateMessagesRef } from 'util/firebaseUtils';
 import tinycolor from 'tinycolor2';
 import { Permissions, Notifications } from 'expo';
 import { getNotifications } from 'state/actions/currentUserActions';
-import { setCurrentUserNavigation, fetchBSteemNotifications } from 'state/actions/authActions';
-import CurrentUserBSteemFeed from './CurrentUserBSteemFeed';
+import { setCurrentUserNavigation } from 'state/actions/authActions';
 import CurrentUserFeed from './CurrentUserFeed';
+
+let CurrentUserBSteemFeed = null;
 
 const Container = styled.View`
   flex: 1;
@@ -33,11 +36,10 @@ const Container = styled.View`
 
 const Touchable = styled.TouchableOpacity``;
 
-const HeaderText = styled.Text`
+const HeaderText = styled(PrimaryText)`
   color: ${props =>
     props.selected ? props.customTheme.primaryColor : props.customTheme.secondaryColor};
   align-self: center;
-  font-weight: bold;
 `;
 
 const MiddleMenu = styled.View`
@@ -62,7 +64,7 @@ const NumberCircle = styled.View`
   margin: 5px;
 `;
 
-const NotificationsText = styled.Text`
+const NotificationsText = styled(PrimaryText)`
   color: ${props =>
     tinycolor(props.customTheme.primaryColor).isDark()
       ? COLORS.LIGHT_TEXT_COLOR
@@ -81,9 +83,8 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
   fetchDisplayedMessagesSuccess: messages => dispatch(fetchDisplayedMessages.success(messages)),
   getCurrentUserSettings: () => dispatch(getCurrentUserSettings.action()),
-  getNotifications: notifications => dispatch(getNotifications.success(notifications)),
+  getNotifications: () => dispatch(getNotifications.action()),
   setCurrentUserNavigation: navigation => dispatch(setCurrentUserNavigation(navigation)),
-  fetchBSteemNotifications: () => dispatch(fetchBSteemNotifications.action()),
 });
 
 class CurrentUserScreen extends Component {
@@ -97,8 +98,8 @@ class CurrentUserScreen extends Component {
     fetchDisplayedMessagesSuccess: PropTypes.func.isRequired,
     getCurrentUserSettings: PropTypes.func.isRequired,
     setCurrentUserNavigation: PropTypes.func.isRequired,
+    getNotifications: PropTypes.func.isRequired,
     notifications: PropTypes.arrayOf(PropTypes.shape()).isRequired,
-    fetchBSteemNotifications: PropTypes.func.isRequired,
   };
 
   static MENU = {
@@ -132,12 +133,12 @@ class CurrentUserScreen extends Component {
   componentDidMount() {
     this.props.setCurrentUserNavigation(this.props.navigation);
     this.props.getCurrentUserSettings();
-    this.props.fetchBSteemNotifications();
+    this.props.getNotifications();
   }
 
   async registerForPushNotificationsAsync() {
     const { accessToken, authUsername } = this.props;
-    const PUSH_ENDPOINT = 'https://bsteem-notifications.herokuapp.com/notifications/register';
+    const PUSH_ENDPOINT = `${BASE_NOTIFICATIONS_URL}/notifications/register`;
     const { status: existingStatus } = await Permissions.getAsync(Permissions.NOTIFICATIONS);
     let finalStatus = existingStatus;
 
@@ -170,10 +171,15 @@ class CurrentUserScreen extends Component {
     });
   }
 
-  setSelectedMenu = selectedMenu => () =>
+  setSelectedMenu = selectedMenu => () => {
+    if (selectedMenu === CurrentUserScreen.MENU.bSteem && CurrentUserBSteemFeed === null) {
+      CurrentUserBSteemFeed = require('./CurrentUserBSteemFeed').default;
+    }
+
     this.setState({
       selectedMenu,
     });
+  };
 
   handleSuccessFetchDisplayedMessages(snapshot) {
     const messages = snapshot.val() || {};
@@ -181,7 +187,7 @@ class CurrentUserScreen extends Component {
   }
 
   handleNavigateToNotifications() {
-    this.props.navigation.navigate('DrawerOpen');
+    this.props.navigation.openDrawer();
   }
 
   handleNavigateToSavedTags() {
@@ -258,7 +264,7 @@ class CurrentUserScreen extends Component {
           </Touchable>
         </Header>
         <CurrentUserFeed navigation={navigation} hideFeed={!selectedHome} />
-        <CurrentUserBSteemFeed navigation={navigation} hideFeed={selectedHome} />
+        {!selectedHome && <CurrentUserBSteemFeed navigation={navigation} hideFeed={selectedHome} />}
       </Container>
     );
   }

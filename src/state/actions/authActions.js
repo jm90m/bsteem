@@ -5,7 +5,6 @@ import {
   GET_AUTH_USER_SC_DATA,
   SAVE_NOTIFICATIONS_LAST_TIMESTAMP,
   SET_CURRENT_USER_NAVIGATION,
-  FETCH_BSTEEM_NOTIFICATIONS,
 } from './actionTypes';
 
 export const authenticateUser = createAsyncSagaAction(AUTHENTICATE_USER);
@@ -22,4 +21,3 @@ export const setCurrentUserNavigation = payload => ({
   type: SET_CURRENT_USER_NAVIGATION,
   payload,
 });
-export const fetchBSteemNotifications = createAsyncSagaAction(FETCH_BSTEEM_NOTIFICATIONS);

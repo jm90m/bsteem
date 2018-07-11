@@ -13,8 +13,8 @@ const Header = styled.View`
   border-bottom-color: ${props => props.customTheme.primaryBorderColor};
   border-bottom-width: 1px;
   width: 100%;
-  padding-top: ${Platform.OS === 'ios' ? '20px' : '35px'};
-  min-height: ${Platform.OS === 'ios' ? '45px' : `${StatusBar.currentHeight + 45}px`};
+  padding-top: ${Platform.OS === 'ios' ? '20px' : '30px'};
+  min-height: ${Platform.OS === 'ios' ? '45px' : `${StatusBar.currentHeight + 30}px`};
 `;
 
 const HeaderContainer = ({ customTheme, children }) => (

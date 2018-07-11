@@ -2,21 +2,15 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Avatar from 'components/common/Avatar';
 import { getIntl, getAuthUsername } from 'state/rootReducer';
-import { View, TouchableWithoutFeedback } from 'react-native';
+import { View } from 'react-native';
+import Touchable from 'components/common/Touchable';
 import { connect } from 'react-redux';
 import TitleText from 'components/common/TitleText';
 import NotificationContainer from './NotificationContainer';
 import NotificationTimeAgo from './NotificationTimeAgo';
 import NotificationText from './NotificationText';
 
-const NotificationVote = ({
-  notification,
-  read,
-  handleNavigateToPost,
-  intl,
-  authUsername,
-  timestamp,
-}) => {
+const NotificationVote = ({ notification, read, handleNavigateToPost, intl, authUsername }) => {
   let voteMessage = intl.notification_unvoted_post;
 
   if (notification.weight > 0) {
@@ -26,7 +20,7 @@ const NotificationVote = ({
   }
 
   return (
-    <TouchableWithoutFeedback onPress={handleNavigateToPost(authUsername, notification.permlink)}>
+    <Touchable onPress={handleNavigateToPost(authUsername, notification.permlink)}>
       <NotificationContainer read={read}>
         <Avatar username={notification.voter} />
         <View>
@@ -34,29 +28,26 @@ const NotificationVote = ({
             <TitleText>{notification.voter}</TitleText>
             {` ${voteMessage}`}
           </NotificationText>
-          <NotificationTimeAgo created={timestamp} />
+          <NotificationTimeAgo created={notification.timestamp} />
         </View>
       </NotificationContainer>
-    </TouchableWithoutFeedback>
+    </Touchable>
   );
 };
 
 NotificationVote.propTypes = {
   read: PropTypes.bool,
   notification: PropTypes.shape({
-    voter: PropTypes.string,
-    timestamp: PropTypes.number,
-  }),
+    voter: PropTypes.string.isRequired,
+    timestamp: PropTypes.number.isRequired,
+  }).isRequired,
   handleNavigateToPost: PropTypes.func.isRequired,
   intl: PropTypes.shape().isRequired,
   authUsername: PropTypes.string.isRequired,
-  timestamp: PropTypes.string,
 };
 
 NotificationVote.defaultProps = {
   read: false,
-  notification: {},
-  timestamp: '',
 };
 
 const mapStateToProps = state => ({

@@ -2,15 +2,16 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Avatar from 'components/common/Avatar';
 import { getIntl } from 'state/rootReducer';
-import { View, TouchableWithoutFeedback } from 'react-native';
+import { View } from 'react-native';
 import { connect } from 'react-redux';
+import Touchable from 'components/common/Touchable';
 import TitleText from 'components/common/TitleText';
 import NotificationContainer from './NotificationContainer';
 import NotificationTimeAgo from './NotificationTimeAgo';
 import NotificationText from './NotificationText';
 
-const NotificationFollowing = ({ notification, read, handleNavigateToUser, intl, timestamp }) => (
-  <TouchableWithoutFeedback onPress={handleNavigateToUser(notification.follower)}>
+const NotificationFollowing = ({ notification, read, handleNavigateToUser, intl }) => (
+  <Touchable onPress={handleNavigateToUser(notification.follower)}>
     <NotificationContainer read={read}>
       <Avatar username={notification.follower} />
       <View>
@@ -18,26 +19,24 @@ const NotificationFollowing = ({ notification, read, handleNavigateToUser, intl,
           <TitleText>{notification.follower}</TitleText>
           {` ${intl.notification_following}`}
         </NotificationText>
-        <NotificationTimeAgo created={timestamp} />
+        <NotificationTimeAgo created={notification.timestamp} />
       </View>
     </NotificationContainer>
-  </TouchableWithoutFeedback>
+  </Touchable>
 );
 
 NotificationFollowing.propTypes = {
   read: PropTypes.bool,
   notification: PropTypes.shape({
-    follower: PropTypes.string,
-  }),
+    follower: PropTypes.string.isRequired,
+    timestamp: PropTypes.number.isRequired,
+  }).isRequired,
   handleNavigateToUser: PropTypes.func.isRequired,
   intl: PropTypes.shape().isRequired,
-  timestamp: PropTypes.string,
 };
 
 NotificationFollowing.defaultProps = {
   read: false,
-  notification: {},
-  timestamp: '',
 };
 
 const mapStateToProps = state => ({

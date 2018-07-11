@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components/native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { COLORS, MATERIAL_ICONS, ICON_SIZES } from 'constants/styles';
+import PrimaryText from 'components/common/text/PrimaryText';
 import { connect } from 'react-redux';
 import tinycolor from 'tinycolor2';
 import { getCustomTheme } from 'state/rootReducer';
@@ -15,12 +16,11 @@ const Container = styled.View`
   border-bottom-color: ${props => props.customTheme.primaryBorderColor};
 `;
 
-const TitleText = styled.Text`
+const TitleText = styled(PrimaryText)`
   color: ${props =>
     tinycolor(props.customTheme.primaryBackgroundColor).isDark()
       ? COLORS.LIGHT_TEXT_COLOR
       : COLORS.DARK_TEXT_COLOR};
-  font-weight: bold;
   font-size: 16px;
 `;
 

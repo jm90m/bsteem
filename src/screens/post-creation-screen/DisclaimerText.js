@@ -3,17 +3,18 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components/native';
 import Expo from 'expo';
 import { connect } from 'react-redux';
+import PrimaryText from 'components/common/text/PrimaryText';
 import { getCustomTheme, getIntl } from 'state/rootReducer';
 
 const Container = styled.View`
   padding: 20px;
 `;
 
-const Text = styled.Text`
+const Text = styled(PrimaryText)`
   color: ${props => props.customTheme.tertiaryColor};
 `;
 
-const LinkText = styled.Text`
+const LinkText = styled(PrimaryText)`
   color: ${props => props.customTheme.primaryColor};
 `;
 

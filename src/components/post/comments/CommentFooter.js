@@ -3,7 +3,8 @@ import PropTypes from 'prop-types';
 import _ from 'lodash';
 import styled from 'styled-components/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS, ICON_SIZES, MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
+import PrimaryText from 'components/common/text/PrimaryText';
+import { ICON_SIZES, MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
 import SmallLoading from '../../common/SmallLoading';
 
 const Container = styled.View`
@@ -19,7 +20,7 @@ const LoadingContainer = styled.View`
   padding-right: 10px;
 `;
 
-const Payout = styled.Text`
+const Payout = styled(PrimaryText)`
   color: ${props => props.customTheme.tertiaryColor};
   margin-right: 10px;
   ${props => (props.payoutIsDeclined ? 'text-decoration-line: line-through' : '')};

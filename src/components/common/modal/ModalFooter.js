@@ -4,12 +4,11 @@ import styled from 'styled-components/native';
 import { COLORS } from 'constants/styles';
 import { connect } from 'react-redux';
 import { getCustomTheme } from 'state/rootReducer';
+import PrimaryText from 'components/common/text/PrimaryText';
 import tinycolor from 'tinycolor2';
 
 const Container = styled.View`
   flex-direction: row-reverse;
-  border-bottom-color: ${props => props.customTheme.primaryBorderColor};
-  border-bottom-width: 1px;
   padding: 10px 16px 10px 10px;
 `;
 
@@ -21,7 +20,7 @@ const Button = styled.TouchableOpacity`
   margin: 0 5px;
 `;
 
-const ButtonText = styled.Text`
+const ButtonText = styled(PrimaryText)`
   color: ${props => props.color};
 `;
 

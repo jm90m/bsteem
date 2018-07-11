@@ -7,6 +7,7 @@ import { COLORS, MATERIAL_ICONS, ICON_SIZES } from 'constants/styles';
 import moment from 'moment-timezone';
 import { connect } from 'react-redux';
 import { getCustomTheme, getIntl } from 'state/rootReducer';
+import PrimaryText from 'components/common/text/PrimaryText';
 import tinycolor from 'tinycolor2';
 import UserAbout from './UserAbout';
 import UserLocation from './UserLocation';
@@ -24,7 +25,7 @@ const ContentContainer = styled.View`
   padding-bottom: 5px;
 `;
 
-const ContentText = styled.Text`
+const ContentText = styled(PrimaryText)`
   margin-left: 5px;
   color: ${props =>
     tinycolor(props.customTheme.primaryBackgroundColor).isDark()

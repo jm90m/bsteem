@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
-import styled from 'styled-components/native';
 import { connect } from 'react-redux';
 import {
   getAuthUsername,
@@ -15,9 +14,9 @@ import {
 import { currentUserVoteComment } from 'state/actions/currentUserActions';
 import { fetchComments } from 'state/actions/postsActions';
 import * as editorActions from 'state/actions/editorActions';
+import PrimaryBackgroundView from 'components/common/StyledViewPrimaryBackground';
+import commonStyles from 'styles/common';
 import CommentsList from './CommentsList';
-
-const Container = styled.View``;
 
 const mapStateToProps = state => ({
   authUsername: getAuthUsername(state),
@@ -131,7 +130,7 @@ class CommentsContainer extends Component {
     }
 
     return (
-      <Container>
+      <PrimaryBackgroundView style={commonStyles.container}>
         <CommentsList
           authUsername={authUsername}
           comments={fetchedCommentsList}
@@ -149,7 +148,7 @@ class CommentsContainer extends Component {
           customTheme={customTheme}
           intl={intl}
         />
-      </Container>
+      </PrimaryBackgroundView>
     );
   }
 }

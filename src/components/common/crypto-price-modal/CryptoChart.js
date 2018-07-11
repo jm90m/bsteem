@@ -12,6 +12,7 @@ import * as appActions from 'state/actions/appActions';
 import tinycolor from 'tinycolor2';
 import LargeLoading from 'components/common/LargeLoading';
 import { LineChart, XAxis } from 'react-native-svg-charts';
+import PrimaryText from 'components/common/text/PrimaryText';
 import StyledTextByBackground from 'components/common/StyledTextByBackground';
 import { Text } from 'react-native-svg';
 
@@ -19,16 +20,14 @@ const Container = styled.View`
   padding: 20px;
 `;
 
-const USDPriceDisplay = styled.Text`
+const USDPriceDisplay = styled(PrimaryText)`
   color: ${props => props.customTheme.primaryColor};
   font-size: 24px;
-  font-weight: bold;
 `;
 
-const BTCPriceDisplay = styled.Text`
+const BTCPriceDisplay = styled(PrimaryText)`
   color: ${props => props.customTheme.tertiaryColor};
   font-size: 22px;
-  font-weight: bold;
 `;
 
 const PriceDisplayContainer = styled.View`
@@ -40,10 +39,9 @@ const CryptoName = styled(StyledTextByBackground)`
   font-size: 20px;
 `;
 
-const Percent = styled.Text`
+const Percent = styled(PrimaryText)`
   color: ${props =>
     props.increase ? props.customTheme.positiveColor : props.customTheme.negativeColor};
-  font-weight: bold;
   margin: 0 5px;
 `;
 

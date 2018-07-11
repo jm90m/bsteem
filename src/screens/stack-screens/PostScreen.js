@@ -1,102 +1,48 @@
-import React, { Component } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
-import { ScrollView, Dimensions, Share } from 'react-native';
+import { ScrollView, Dimensions, Share, View, InteractionManager } from 'react-native';
 import { connect } from 'react-redux';
-import Expo from 'expo';
-import styled from 'styled-components/native';
 import _ from 'lodash';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { getHtml } from 'util/postUtils';
-import { COLORS, MATERIAL_COMMUNITY_ICONS, ICON_SIZES } from 'constants/styles';
-import { POST_HTML_BODY_TAG, POST_HTML_BODY_USER } from 'constants/postConstants';
 import * as navigationConstants from 'constants/navigation';
-import {
-  getIsAuthenticated,
-  getPostLoading,
-  getPostsDetails,
-  getAuthUsername,
-  getEnableVotingSlider,
-  getCustomTheme,
-  getIntl,
-} from 'state/rootReducer';
-import PostPhotoBrowser from 'components/post/PostPhotoBrowser';
-import PostMenu from 'components/post-menu/PostMenu';
-import HTML from 'react-native-render-html';
+import { getPostLoading, getSinglePostDetails, getCustomTheme, getIntl } from 'state/rootReducer';
 import FooterTags from 'components/post/FooterTags';
-import Footer from 'components/post/Footer';
-import PostHeader from 'components/post-preview/Header';
-import Header from 'components/common/Header';
-import BSteemModal from 'components/common/BSteemModal';
-import EmbedContent from 'components/post-preview/EmbedContent';
-import PostVoteSlider from 'components/post/PostVoteSlider';
-import PostComments from 'components/post/PostComments';
-import BackButton from 'components/common/BackButton';
+import PostFooter from 'components/post-common/footer/PostFooter';
+import PostHeader from 'components/post-common/header/Header';
 import PrimaryButton from 'components/common/PrimaryButton';
-import TitleText from 'components/common/TitleText';
 import StyledTextByBackground from 'components/common/StyledTextByBackground';
-import tinycolor from 'tinycolor2';
+import LargeLoading from 'components/common/LargeLoading';
+import PostBody from 'components/post/PostBody';
 import StyledViewPrimaryBackground from 'components/common/StyledViewPrimaryBackground';
-import { currentUserVotePost } from '../../state/actions/currentUserActions';
-import * as postConstants from '../../constants/postConstants';
-import { isPostVoted } from '../../util/voteUtils';
-import { fetchPostDetails } from '../../state/actions/postsActions';
-import { getProxyImageURL } from '../../util/imageUtils';
+import { fetchPostDetails } from 'state/actions/postsActions';
+import commonStyles from 'styles/common';
+import { getProxyImageURL } from 'util/imageUtils';
+import PostNavigationHeader from 'components/post/PostNavigationHeader';
+import PostNavigationLoadingHeaderContainer from 'components/post/PostNavigationLoadingHeaderContainer';
+
+let BSteemModal = null;
+let PostPhotoBrowser = null;
+let PostMenu = null;
+let PostComments = null;
+let EmbedContent = null;
 
 const { width: deviceWidth } = Dimensions.get('screen');
 
-const Container = styled(StyledViewPrimaryBackground)`
-  flex: 1;
-`;
-
-const Touchable = styled.TouchableOpacity``;
-
-const Menu = styled.View`
-  justify-content: center;
-  padding: 10px;
-`;
-
-const PostTitle = styled(StyledTextByBackground)`
-  font-weight: 700;
-  font-size: 20px;
-`;
-
-const EmptyView = styled.View`
-  width: 100%;
-  height: 100px;
-`;
-
-const mapStateToProps = state => ({
-  customTheme: getCustomTheme(state),
-  authenticated: getIsAuthenticated(state),
-  authUsername: getAuthUsername(state),
-  postsDetails: getPostsDetails(state),
-  postLoading: getPostLoading(state),
-  enableVotingSlider: getEnableVotingSlider(state),
-  intl: getIntl(state),
-});
+const mapStateToProps = (state, ownProps) => {
+  const { author, permlink } = ownProps.navigation.state.params;
+  const postKey = `${author}/${permlink}`;
+  return {
+    customTheme: getCustomTheme(state),
+    postDetails: getSinglePostDetails(state, postKey),
+    postLoading: getPostLoading(state),
+    intl: getIntl(state),
+  };
+};
 
 const mapDispatchToProps = dispatch => ({
-  currentUserVotePost: (
-    postAuthor,
-    postPermlink,
-    voteWeight,
-    voteSuccessCallback,
-    voteFailCallback,
-  ) =>
-    dispatch(
-      currentUserVotePost.action({
-        postAuthor,
-        postPermlink,
-        voteWeight,
-        voteSuccessCallback,
-        voteFailCallback,
-      }),
-    ),
   fetchPostDetails: (author, permlink) => dispatch(fetchPostDetails.action({ author, permlink })),
 });
 
-@connect(mapStateToProps, mapDispatchToProps)
-class PostScreen extends Component {
+class PostScreen extends React.PureComponent {
   static navigationOptions = {
     headerMode: 'none',
     tabBarVisible: false,
@@ -104,192 +50,99 @@ class PostScreen extends Component {
   };
 
   static propTypes = {
-    authenticated: PropTypes.bool.isRequired,
-    navigation: PropTypes.shape().isRequired,
+    navigation: PropTypes.shape({
+      state: PropTypes.shape({
+        params: PropTypes.shape({
+          author: PropTypes.string.isRequired,
+          permlink: PropTypes.string.isRequired,
+          body: PropTypes.string,
+          postData: PropTypes.shape(),
+          parsedJsonMetadata: PropTypes.shape(),
+        }),
+      }),
+      goBack: PropTypes.func.isRequired,
+    }).isRequired,
     intl: PropTypes.shape().isRequired,
     customTheme: PropTypes.shape().isRequired,
-    enableVotingSlider: PropTypes.bool,
-    currentUserVotePost: PropTypes.func.isRequired,
     fetchPostDetails: PropTypes.func.isRequired,
     authUsername: PropTypes.string,
-    postsDetails: PropTypes.shape(),
+    postDetails: PropTypes.shape(),
   };
 
   static defaultProps = {
     authUsername: '',
-    postsDetails: {},
+    postDetails: {},
     enableVotingSlider: false,
   };
 
   constructor(props) {
     super(props);
-    const postData = _.get(props.navigation.state.params, 'postData', {});
 
     this.state = {
       menuVisible: false,
       displayPhotoBrowser: false,
-      loadingVote: false,
-      likedPost: isPostVoted(postData, props.authUsername),
-      postDetails: postData,
-      displayVoteSlider: false,
+      displayComments: false,
     };
 
-    this.setModalVisible = this.setModalVisible.bind(this);
     this.handleHideMenu = this.handleHideMenu.bind(this);
+    this.handleDisplayMenu = this.handleDisplayMenu.bind(this);
     this.handleHidePhotoBrowser = this.handleHidePhotoBrowser.bind(this);
     this.handleDisplayPhotoBrowser = this.handleDisplayPhotoBrowser.bind(this);
     this.handlePhotoBrowserShare = this.handlePhotoBrowserShare.bind(this);
 
     this.navigateBack = this.navigateBack.bind(this);
     this.navigateToComments = this.navigateToComments.bind(this);
-    this.navigateToLoginTab = this.navigateToLoginTab.bind(this);
-    this.navigateToUser = this.navigateToUser.bind(this);
-    this.navigateToVotes = this.navigateToVotes.bind(this);
     this.navigateToFeed = this.navigateToFeed.bind(this);
 
-    this.handleLikePost = this.handleLikePost.bind(this);
-    this.handlePostLinkPress = this.handlePostLinkPress.bind(this);
     this.handleEditPost = this.handleEditPost.bind(this);
 
-    this.loadingVote = this.loadingVote.bind(this);
-    this.likedVoteSuccess = this.likedVoteSuccess.bind(this);
-    this.unlikedVoteSuccess = this.unlikedVoteSuccess.bind(this);
     this.fetchCurrentPostDetails = this.fetchCurrentPostDetails.bind(this);
-
-    this.handleVoteSliderSendVote = this.handleVoteSliderSendVote.bind(this);
-    this.sendVote = this.sendVote.bind(this);
   }
 
   componentDidMount() {
-    this.fetchCurrentPostDetails();
-  }
+    InteractionManager.runAfterInteractions(() => {
+      const { postData } = this.props.navigation.state.params;
+      const needsPostDetails = _.isEmpty(postData);
 
-  componentWillReceiveProps(nextProps) {
-    const { postData } = this.props.navigation.state.params;
-    const { author, permlink } = postData;
-    const postKey = `${author}/${permlink}`;
-    const currentPostDetails = _.get(this.props.postsDetails, postKey, {});
-    const nextPostDetails = _.get(nextProps.postsDetails, postKey, {});
-
-    if (!_.isEqual(currentPostDetails, nextPostDetails)) {
-      this.setState({
-        postDetails: nextPostDetails,
-      });
-    }
-  }
-
-  setModalVisible(visible) {
-    this.setState({ menuVisible: visible });
+      if (needsPostDetails) {
+        this.fetchCurrentPostDetails();
+      }
+      _.delay(() => {
+        PostComments = require('components/post/PostComments').default;
+        this.setState({
+          displayComments: true,
+        });
+      }, 3000);
+    });
   }
 
   handleHideMenu() {
-    this.setModalVisible(false);
-  }
-
-  loadingVote() {
     this.setState({
-      loadingVote: true,
+      menuVisible: false,
     });
   }
 
-  likedVoteSuccess() {
-    this.setState(
-      {
-        likedPost: true,
-        loadingVote: false,
-      },
-      () => this.fetchCurrentPostDetails(),
-    );
-  }
+  handleDisplayMenu() {
+    if (BSteemModal === null) {
+      BSteemModal = require('components/common/BSteemModal').default;
+    }
 
-  unlikedVoteSuccess() {
-    this.setState(
-      {
-        likedPost: false,
-        loadingVote: false,
-      },
-      () => this.fetchCurrentPostDetails(),
-    );
+    if (PostMenu === null) {
+      PostMenu = require('components/post-menu/PostMenu').default;
+    }
+
+    this.setState({
+      menuVisible: true,
+    });
   }
 
   fetchCurrentPostDetails() {
-    const { postData } = this.props.navigation.state.params;
-    const { author, permlink } = postData;
+    const { author, permlink } = this.props.navigation.state.params;
     this.props.fetchPostDetails(author, permlink);
   }
 
-  handleVoteSliderDisplay = displayVoteSlider => () => this.setState({ displayVoteSlider });
-
-  handleVoteSliderSendVote(voteWeight) {
-    this.setState({
-      displayVoteSlider: false,
-    });
-    this.sendVote(voteWeight);
-  }
-
-  sendVote(voteWeight) {
-    this.loadingVote();
-    const { enableVotingSlider } = this.props;
-    const { postData } = this.props.navigation.state.params;
-    const { author, permlink } = postData;
-    const { likedPost } = this.state;
-
-    if (likedPost && !enableVotingSlider) {
-      const voteSuccessCallback = this.unlikedVoteSuccess;
-      const voteFailCalback = this.likedVoteSuccess;
-      this.props.currentUserVotePost(
-        author,
-        permlink,
-        postConstants.DEFAULT_UNVOTE_WEIGHT,
-        voteSuccessCallback,
-        voteFailCalback,
-      );
-    } else {
-      const voteSuccessCallback = this.likedVoteSuccess;
-      const voteFailCallback = this.unlikedVoteSuccess;
-      this.props.currentUserVotePost(
-        author,
-        permlink,
-        voteWeight,
-        voteSuccessCallback,
-        voteFailCallback,
-      );
-    }
-  }
-
-  handleLikePost() {
-    const { authenticated, enableVotingSlider } = this.props;
-    if (authenticated) {
-      if (enableVotingSlider) {
-        this.setState({
-          displayVoteSlider: true,
-        });
-      } else {
-        this.sendVote(postConstants.DEFAULT_VOTE_WEIGHT);
-      }
-    } else {
-      this.navigateToLoginTab();
-      this.handleHideMenu();
-    }
-  }
-
-  navigateToUser(username) {
-    this.props.navigation.navigate(navigationConstants.USER, { username });
-  }
-
   navigateToFeed(tag) {
-    this.props.navigation.navigate(navigationConstants.FEED, { tag });
-  }
-
-  navigateToVotes() {
-    const { postData } = this.props.navigation.state.params;
-    this.props.navigation.navigate(navigationConstants.VOTES, {
-      postData,
-    });
-  }
-
-  navigateToLoginTab() {
-    this.props.navigation.navigate(navigationConstants.LOGIN);
+    this.props.navigation.push(navigationConstants.FEED, { tag });
   }
 
   navigateBack() {
@@ -297,13 +150,16 @@ class PostScreen extends Component {
   }
 
   navigateToComments() {
-    const { author, category, permlink, postId, postData } = this.props.navigation.state.params;
-    this.props.navigation.navigate(navigationConstants.COMMENTS, {
+    const { postDetails } = this.props;
+    const { author, permlink } = this.props.navigation.state.params;
+    const { id: postId, category } = postDetails;
+
+    this.props.navigation.push(navigationConstants.COMMENTS, {
       author,
       category,
       permlink,
       postId,
-      postData,
+      postData: postDetails,
     });
     this.handleHideMenu();
   }
@@ -319,29 +175,11 @@ class PostScreen extends Component {
   }
 
   handleEditPost() {
-    const { postData } = this.props.navigation.state.params;
+    const { postDetails } = this.props;
     this.handleHideMenu();
     this.props.navigation.navigate(navigationConstants.EDIT_POST, {
-      postData,
+      postData: postDetails,
     });
-  }
-
-  handlePostLinkPress(e, url) {
-    console.log('clicked link: ', url);
-    const isTag = _.includes(url, POST_HTML_BODY_TAG);
-    const isUser = _.includes(url, POST_HTML_BODY_USER);
-
-    if (isUser) {
-      const user = _.get(_.split(url, POST_HTML_BODY_USER), 1, 'bsteem');
-      this.navigateToUser(user);
-    } else if (isTag) {
-      const tag = _.get(_.split(url, POST_HTML_BODY_TAG), 1, 'bsteem');
-      this.navigateToFeed(tag);
-    } else {
-      Expo.WebBrowser.openBrowserAsync(url).catch(error => {
-        console.log('invalid url', error, url);
-      });
-    }
   }
 
   handleHidePhotoBrowser() {
@@ -351,6 +189,9 @@ class PostScreen extends Component {
   }
 
   handleDisplayPhotoBrowser() {
+    if (PostPhotoBrowser === null) {
+      PostPhotoBrowser = require('components/post/PostPhotoBrowser').default;
+    }
     this.setState({
       displayPhotoBrowser: true,
       menuVisible: false,
@@ -362,6 +203,7 @@ class PostScreen extends Component {
     const video = _.get(parsedJsonMetadata, 'video', {});
 
     if (_.has(video, 'content.videohash') && _.has(video, 'info.snaphash')) {
+      EmbedContent = require('components/post-preview/EmbedContent').default;
       const author = _.get(video, 'info.author', '');
       const permlink = _.get(video, 'info.permlink', '');
       const dTubeEmbedUrl = `https://emb.d.tube/#!/${author}/${permlink}`;
@@ -372,6 +214,7 @@ class PostScreen extends Component {
         provider_name: 'DTube',
         embed: dTubeIFrame,
         thumbnail: getProxyImageURL(`https://ipfs.io/ipfs/${snaphash}`, 'preview'),
+        source: dTubeEmbedUrl,
       };
       const widthOffset = 20;
       const width = deviceWidth - widthOffset;
@@ -382,18 +225,17 @@ class PostScreen extends Component {
   }
 
   render() {
-    const { authUsername, customTheme, intl } = this.props;
-    const { body, parsedJsonMetadata, author } = this.props.navigation.state.params;
-    const {
-      displayPhotoBrowser,
-      menuVisible,
-      likedPost,
-      loadingVote,
-      postDetails,
-      displayVoteSlider,
-    } = this.state;
+    const { authUsername, customTheme, intl, postDetails } = this.props;
+    const { body, parsedJsonMetadata, author, postData } = this.props.navigation.state.params;
+
+    if (_.isEmpty(postDetails) && _.isEmpty(postData)) {
+      return (
+        <PostNavigationLoadingHeaderContainer author={author} navigateBack={this.navigateBack} />
+      );
+    }
+
+    const { displayPhotoBrowser, menuVisible, displayComments } = this.state;
     const title = _.get(postDetails, 'title', '');
-    const parsedHtmlBody = getHtml(body, parsedJsonMetadata);
     const images = _.get(parsedJsonMetadata, 'image', []);
     const formattedImages = _.map(images, image => ({
       photo: image,
@@ -402,74 +244,67 @@ class PostScreen extends Component {
     const tags = _.uniq(_.compact(_.get(parsedJsonMetadata, 'tags', [])));
     const widthOffset = 20;
     const displayPhotoBrowserMenu = !_.isEmpty(formattedImages);
+    const scrollViewStyles = {
+      padding: 10,
+      backgroundColor: customTheme.primaryBackgroundColor,
+    };
+    const postBody = _.get(postDetails, 'body', body);
+
+    let currentPostDetails = null;
+
+    if (_.isEmpty(postDetails) && !_.isEmpty(postData)) {
+      currentPostDetails = postData;
+    } else {
+      currentPostDetails = postDetails;
+    }
 
     return (
-      <Container>
-        <Header>
-          <BackButton navigateBack={this.navigateBack} />
-          <StyledTextByBackground>{author}</StyledTextByBackground>
-          <Menu>
-            <Touchable onPress={() => this.setModalVisible(!this.state.menuVisible)}>
-              <MaterialCommunityIcons
-                size={ICON_SIZES.menuIcon}
-                name={MATERIAL_COMMUNITY_ICONS.menuVertical}
-                color={customTheme.secondaryColor}
-              />
-            </Touchable>
-          </Menu>
-        </Header>
-        <ScrollView style={{ padding: 10, backgroundColor: customTheme.primaryBackgroundColor }}>
-          <PostHeader
-            navigation={this.props.navigation}
-            postData={postDetails}
-            currentUsername={authUsername}
-            hideMenuButton
-          />
-          <PostTitle>{title}</PostTitle>
-          {this.renderEmbed()}
-          <HTML
-            html={parsedHtmlBody}
-            imagesMaxWidth={deviceWidth - widthOffset}
-            onLinkPress={this.handlePostLinkPress}
-            staticContentMaxWidth={deviceWidth - widthOffset}
-            baseFontStyle={{
-              color: tinycolor(customTheme.primaryBackgroundColor).isDark()
-                ? COLORS.LIGHT_TEXT_COLOR
-                : COLORS.DARK_TEXT_COLOR,
-            }}
-            textSelectable
-          />
-          <FooterTags tags={tags} handleFeedNavigation={this.navigateToFeed} />
-          {displayVoteSlider ? (
-            <PostVoteSlider
-              postData={postDetails}
-              hideVoteSlider={this.handleVoteSliderDisplay(false)}
-              handleVoteSliderSendVote={this.handleVoteSliderSendVote}
+      <StyledViewPrimaryBackground style={commonStyles.container}>
+        <PostNavigationHeader
+          author={author}
+          displayMenu={this.handleDisplayMenu}
+          navigateBack={this.navigateBack}
+        />
+        {_.isEmpty(currentPostDetails) ? (
+          <View style={commonStyles.screenLoader}>
+            <LargeLoading />
+          </View>
+        ) : (
+          <ScrollView style={scrollViewStyles}>
+            <PostHeader
+              postData={currentPostDetails}
+              currentUsername={authUsername}
+              hideMenuButton
             />
-          ) : (
-            <Footer
-              postData={postDetails}
-              navigation={this.props.navigation}
-              loadingVote={loadingVote}
-              likedPost={likedPost}
-              handleLikePost={this.handleLikePost}
-              handleNavigateToVotes={this.navigateToVotes}
+            <StyledTextByBackground style={commonStyles.singlePostTitle}>
+              {title}
+            </StyledTextByBackground>
+            {this.renderEmbed()}
+            <PostBody
+              body={postBody}
+              parsedJsonMetadata={parsedJsonMetadata}
+              widthOffset={widthOffset}
             />
-          )}
-          <PostComments postData={postDetails} navigation={this.props.navigation} />
-          <PrimaryButton
-            onPress={this.navigateToComments}
-            title={intl.see_all_comments}
-            style={{ marginTop: 20 }}
-          />
-          <EmptyView />
-        </ScrollView>
+            <FooterTags tags={tags} handleFeedNavigation={this.navigateToFeed} />
+            <PostFooter postDetails={currentPostDetails} />
+            {displayComments ? (
+              <PostComments postData={currentPostDetails} navigation={this.props.navigation} />
+            ) : (
+              <View style={commonStyles.postSeeAllCommentsButtonStyle}>
+                <LargeLoading />
+              </View>
+            )}
+            <View style={commonStyles.postSeeAllCommentsButtonStyle}>
+              <PrimaryButton onPress={this.navigateToComments} title={intl.see_all_comments} />
+            </View>
+            <View style={commonStyles.emptyView} />
+          </ScrollView>
+        )}
         {menuVisible && (
           <BSteemModal visible={menuVisible} handleOnClose={this.handleHideMenu}>
             <PostMenu
               hideMenu={this.handleHideMenu}
-              handleNavigateToComments={this.navigateToComments}
-              postData={postDetails}
+              postData={currentPostDetails}
               displayPhotoBrowserMenu={displayPhotoBrowserMenu}
               handleDisplayPhotoBrowser={this.handleDisplayPhotoBrowser}
               handleEditPost={this.handleEditPost}
@@ -486,9 +321,9 @@ class PostScreen extends Component {
             handleAction={this.handlePhotoBrowserShare}
           />
         )}
-      </Container>
+      </StyledViewPrimaryBackground>
     );
   }
 }
 
-export default PostScreen;
+export default connect(mapStateToProps, mapDispatchToProps)(PostScreen);

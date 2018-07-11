@@ -18,6 +18,7 @@ import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import PostPreview from 'components/post-preview/PostPreview';
 import { TRENDING } from 'constants/feedFilters';
 import FeedSort from 'components/feed-sort/FeedSort';
+import PrimaryText from 'components/common/text/PrimaryText';
 import BSteemModal from 'components/common/BSteemModal';
 import StyledFlatList from 'components/common/StyledFlatList';
 import StyledTextByBackground from 'components/common/StyledTextByBackground';
@@ -40,15 +41,16 @@ const TouchableFilter = styled.TouchableOpacity`
   padding-top: 5px;
   background-color: ${props => props.customTheme.primaryBackgroundColor};
   width: 100%;
+  border-bottom-width: 1px;
+  border-bottom-color: ${props => props.customTheme.primaryBorderColor};
 `;
 
 const FilterMenuIcon = styled.View`
   margin-top: 3px;
 `;
 
-const FilterText = styled.Text`
+const FilterText = styled(PrimaryText)`
   color: ${props => props.customTheme.primaryColor};
-  font-weight: bold;
   margin-left: 3px;
 `;
 

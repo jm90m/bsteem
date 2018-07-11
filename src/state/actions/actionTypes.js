@@ -30,7 +30,6 @@ export const SAVE_NOTIFICATIONS_LAST_TIMESTAMP = createAsyncActionType(
   '@auth/save-notifications-last-timestamp',
 );
 export const SET_CURRENT_USER_NAVIGATION = 'set-current-user-navigation';
-export const FETCH_BSTEEM_NOTIFICATIONS = createAsyncActionType('@auth/fetch-bsteem-notifications');
 
 // Current User Actions
 export const FETCH_CURRENT_USER_FEED = createAsyncActionType(
@@ -125,6 +124,7 @@ export const FETCH_SAVED_OFFLINE_POSTS = createAsyncActionType('@posts/fetch-sav
 export const ADD_POST_TO_SAVED_OFFLINE = '@post/add-post-to-saved-offline';
 export const UNSAVE_POST_OFFLINE = createAsyncActionType('@posts/unsave-post-offline');
 export const REMOVE_POST_SAVED_OFFLINE = '@post/remove-post-saved-offline';
+export const ADD_POSTS_TO_POST_MAP = '@post/add-posts-to-post-map';
 
 // Settings Actions
 export const UPDATE_NSFW_DISPLAY_SETTING = createAsyncActionType(

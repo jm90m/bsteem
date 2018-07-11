@@ -1,28 +1,18 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { TouchableWithoutFeedback } from 'react-native';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 import styled from 'styled-components/native';
-import { MATERIAL_COMMUNITY_ICONS, ICON_SIZES } from 'constants/styles';
+import { MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
 import MenuModalButton from 'components/common/menu/MenuModalButton';
 import MenuWrapper from 'components/common/menu/MenuWrapper';
+import MenuIcon from 'components/common/menu/MenuIcon';
+import MenuModalContents from 'components/common/menu/MenuModalContents';
+import MenuText from 'components/common/menu/MenuText';
 
 const Container = styled.View`
   flex: 1;
   flex-direction: column-reverse;
   align-items: center;
-`;
-
-const MenuModalContents = styled.View`
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-`;
-
-const MenuText = styled.Text`
-  margin-left: 5px;
-  color: ${props => props.customTheme.primaryColor};
-  font-weight: bold;
 `;
 
 class UserMessageMenu extends Component {
@@ -32,12 +22,11 @@ class UserMessageMenu extends Component {
     handleBlockUser: PropTypes.func.isRequired,
     isBlocked: PropTypes.bool.isRequired,
     handleHideUserMessage: PropTypes.func.isRequired,
-    customTheme: PropTypes.shape().isRequired,
     intl: PropTypes.shape().isRequired,
   };
 
   render() {
-    const { isBlocked, customTheme, intl } = this.props;
+    const { isBlocked, intl } = this.props;
     const blockedText = isBlocked ? intl.unblock_user : intl.block_user;
     return (
       <TouchableWithoutFeedback onPress={this.props.hideMenu}>
@@ -45,32 +34,20 @@ class UserMessageMenu extends Component {
           <MenuWrapper>
             <MenuModalButton onPress={this.props.handleNavigateToUser}>
               <MenuModalContents>
-                <MaterialCommunityIcons
-                  size={ICON_SIZES.menuModalOptionIcon}
-                  color={customTheme.primaryColor}
-                  name={MATERIAL_COMMUNITY_ICONS.account}
-                />
-                <MenuText customTheme={customTheme}>{intl.view_profile}</MenuText>
+                <MenuIcon name={MATERIAL_COMMUNITY_ICONS.account} />
+                <MenuText>{intl.view_profile}</MenuText>
               </MenuModalContents>
             </MenuModalButton>
             <MenuModalButton onPress={this.props.handleBlockUser}>
               <MenuModalContents>
-                <MaterialCommunityIcons
-                  size={ICON_SIZES.menuModalOptionIcon}
-                  color={customTheme.primaryColor}
-                  name={MATERIAL_COMMUNITY_ICONS.block}
-                />
-                <MenuText customTheme={customTheme}>{blockedText}</MenuText>
+                <MenuIcon name={MATERIAL_COMMUNITY_ICONS.block} />
+                <MenuText>{blockedText}</MenuText>
               </MenuModalContents>
             </MenuModalButton>
-            <MenuModalButton onPress={this.props.handleHideUserMessage}>
+            <MenuModalButton onPress={this.props.handleHideUserMessage} isLastElement>
               <MenuModalContents>
-                <MaterialCommunityIcons
-                  size={ICON_SIZES.menuModalOptionIcon}
-                  color={customTheme.primaryColor}
-                  name={MATERIAL_COMMUNITY_ICONS.hide}
-                />
-                <MenuText customTheme={customTheme}>{intl.hide_messages}</MenuText>
+                <MenuIcon name={MATERIAL_COMMUNITY_ICONS.hide} />
+                <MenuText>{intl.hide_messages}</MenuText>
               </MenuModalContents>
             </MenuModalButton>
           </MenuWrapper>

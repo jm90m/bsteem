@@ -1,14 +1,14 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components/native';
-import { Modal } from 'react-native';
 import ModalHeader from 'components/common/modal/ModalHeader';
 import ModalFooter from 'components/common/modal/ModalFooter';
 import StyledTextByBackground from 'components/common/StyledTextByBackground';
+import BSteemModal from 'components/common/BSteemModal';
 
 const TouchableContainer = styled.TouchableOpacity`
   flex: 1;
-  background-color: rgba(0, 0, 0, 0.5);
+  justify-content: center;
 `;
 
 const Container = styled.View`
@@ -42,12 +42,7 @@ class Notify extends Component {
       intl,
     } = this.props;
     return (
-      <Modal
-        animationType="slide"
-        visible={displayNotifyModal}
-        transparent
-        onRequestClose={hideNotifyModal}
-      >
+      <BSteemModal visible={displayNotifyModal} handleOnClose={hideNotifyModal}>
         <TouchableContainer onPress={hideNotifyModal}>
           <Container customTheme={customTheme}>
             <ModalHeader title={title} closeModal={hideNotifyModal} />
@@ -61,7 +56,7 @@ class Notify extends Component {
             />
           </Container>
         </TouchableContainer>
-      </Modal>
+      </BSteemModal>
     );
   }
 }

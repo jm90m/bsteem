@@ -1,37 +1,26 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components/native';
-import { TouchableOpacity } from 'react-native';
+import { TouchableOpacity, View, StyleSheet } from 'react-native';
 import _ from 'lodash';
 import Expo from 'expo';
 import { COLORS } from 'constants/styles';
 import TimeAgo from 'components/common/TimeAgo';
+import SecondaryText from 'components/common/text/SecondaryText';
 import HTML from 'react-native-render-html';
 import { POST_HTML_BODY_TAG, POST_HTML_BODY_USER } from 'constants/postConstants';
 import * as navigationConstants from 'constants/navigation';
 import tinycolor from 'tinycolor2';
+import commonStyles from 'styles/common';
 import ReputationScore from '../ReputationScore';
 import { getHtml } from '../../../util/postUtils';
 
-const Container = styled.View``;
-
-const Header = styled.View``;
-
-const HeaderContent = styled.View`
-  flex-direction: row;
-`;
-
-const Username = styled.Text`
-  font-weight: 700;
-  color: ${props => props.customTheme.primaryColor};
-`;
-
-const CommentBody = styled.View`
-  flex-wrap: wrap;
-  max-width: ${props => props.maxWidth}
-  margin-left: 3px;
-  padding: 5px 0;
-`;
+const styles = StyleSheet.create({
+  commentBody: {
+    flexWrap: 'wrap',
+    marginLeft: 3,
+    paddingVertical: 5,
+  },
+});
 
 class CommentContent extends Component {
   static propTypes = {
@@ -55,17 +44,23 @@ class CommentContent extends Component {
   constructor(props) {
     super(props);
 
+    this.handleNavigateToAuthor = this.handleNavigateToAuthor.bind(this);
     this.navigateToUser = this.navigateToUser.bind(this);
     this.navigateToFeed = this.navigateToFeed.bind(this);
     this.handleLinkPress = this.handleLinkPress.bind(this);
   }
 
+  handleNavigateToAuthor() {
+    const { username } = this.props;
+    this.navigateToUser(username);
+  }
+
   navigateToUser(username) {
-    this.props.navigation.navigate(navigationConstants.USER, { username });
+    this.props.navigation.push(navigationConstants.USER, { username });
   }
 
   navigateToFeed(tag) {
-    this.props.navigation.navigate(navigationConstants.FEED, { tag });
+    this.props.navigation.push(navigationConstants.FEED, { tag });
   }
 
   handleLinkPress(e, url) {
@@ -91,19 +86,28 @@ class CommentContent extends Component {
     const bodyWidthPadding = depth === 1 ? 70 : 100;
     const maxWidth = currentWidth - bodyWidthPadding;
     const parsedHtmlBody = getHtml(body, {});
+    const usernameStyles = {
+      color: customTheme.primaryColor,
+    };
+    const commentBodyStyles = [
+      styles.commentBody,
+      {
+        maxWidth,
+      },
+    ];
 
     return (
-      <Container>
-        <HeaderContent>
-          <Header>
-            <TouchableOpacity onPress={() => this.navigateToUser(username)}>
-              <Username customTheme={customTheme}>{username}</Username>
+      <View>
+        <View style={commonStyles.rowContainer}>
+          <View>
+            <TouchableOpacity onPress={this.handleNavigateToAuthor}>
+              <SecondaryText style={usernameStyles}>{username}</SecondaryText>
             </TouchableOpacity>
             <TimeAgo created={created} />
-          </Header>
+          </View>
           <ReputationScore reputation={reputation} />
-        </HeaderContent>
-        <CommentBody maxWidth={maxWidth}>
+        </View>
+        <View style={commentBodyStyles}>
           <HTML
             html={parsedHtmlBody}
             imagesMaxWidth={maxWidth}
@@ -115,8 +119,8 @@ class CommentContent extends Component {
                 : COLORS.DARK_TEXT_COLOR,
             }}
           />
-        </CommentBody>
-      </Container>
+        </View>
+      </View>
     );
   }
 }

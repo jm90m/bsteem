@@ -5,7 +5,7 @@ import { getCustomTheme } from 'state/rootReducer';
 
 const StyledFlatList = styled.FlatList`
   flex: 1;
-  background-color: ${props => props.customTheme.listBackgroundColor};
+  background-color: ${props => props.customTheme.primaryBackgroundColor};
 `;
 
 StyledFlatList.propTypes = {

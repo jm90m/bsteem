@@ -9,12 +9,10 @@ import { ICON_SIZES, MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
 import { TRENDING } from 'constants/feedFilters';
 import Tag from 'components/post/Tag';
 import PostPreview from 'components/post-preview/PostPreview';
-import FeedSort from 'components/feed-sort/FeedSort';
 import Header from 'components/common/Header';
 import SaveTagButton from 'components/common/SaveTagButton';
 import { connect } from 'react-redux';
 import { getCurrentUserFollowList, getCustomTheme, getIntl } from 'state/rootReducer';
-import BSteemModal from 'components/common/BSteemModal';
 import StyledFlatList from 'components/common/StyledFlatList';
 import StyledViewPrimaryBackground from 'components/common/StyledViewPrimaryBackground';
 import StyledTextByBackground from 'components/common/StyledTextByBackground';
@@ -22,6 +20,9 @@ import LargeLoading from 'components/common/LargeLoading';
 import BackButton from 'components/common/BackButton';
 import CompactViewFeedHeaderSetting from 'components/common/CompactViewFeedHeaderSetting';
 import CryptoFeedChart from 'components/common/CryptoFeedChart';
+
+let BSteemModal = null;
+let FeedSort = null;
 
 const Container = styled.View`
   flex: 1;
@@ -80,8 +81,8 @@ class FeedScreen extends Component {
     this.fetchInitialPostsForFilter = this.fetchInitialPostsForFilter.bind(this);
     this.fetchMorePosts = this.fetchMorePosts.bind(this);
     this.navigateBack = this.navigateBack.bind(this);
-    this.setMenuVisible = this.setMenuVisible.bind(this);
     this.handleHideMenu = this.handleHideMenu.bind(this);
+    this.handleShowMenu = this.handleShowMenu.bind(this);
     this.renderRow = this.renderRow.bind(this);
     this.handleSortPost = this.handleSortPost.bind(this);
     this.renderLoadingOrEmptyText = this.renderLoadingOrEmptyText.bind(this);
@@ -90,9 +91,34 @@ class FeedScreen extends Component {
     this.toggleFilterFeedByFollowers = this.toggleFilterFeedByFollowers.bind(this);
   }
 
-  fetchInitialPostsForFilter() {
+  componentWillReceiveProps(nextProps) {
     const { tag } = this.props.navigation.state.params;
-    const query = { tag, limit: 10 };
+    const { tag: nextTag } = nextProps.navigation.state.params;
+
+    if (tag !== nextTag) {
+      this.fetchInitialPostsForFilter(nextTag);
+    }
+  }
+
+  componentDidMount() {
+    try {
+      const { tag } = this.props.navigation.state.params;
+      this.fetchInitialPostsForFilter(tag);
+    } catch (error) {
+      console.log(error);
+      this.setState({
+        loading: false,
+      });
+    }
+  }
+
+  navigateBack() {
+    this.props.navigation.goBack();
+  }
+
+  fetchInitialPostsForFilter(tag) {
+    const queryTag = tag || this.props.navigation.state.params.tag;
+    const query = { tag: queryTag, limit: 10 };
     const api = getAPIByFilter(this.state.currentFilter.id);
     api(query).then(response => {
       this.setState({
@@ -100,17 +126,6 @@ class FeedScreen extends Component {
         posts: response.result,
       });
     });
-  }
-
-  componentDidMount() {
-    try {
-      this.fetchInitialPostsForFilter();
-    } catch (error) {
-      console.log(error);
-      this.setState({
-        loading: false,
-      });
-    }
   }
 
   fetchMorePosts() {
@@ -135,20 +150,19 @@ class FeedScreen extends Component {
     });
   }
 
-  navigateBack() {
-    this.props.navigation.goBack();
-  }
-
-  setMenuVisible(menuVisible) {
-    this.setState({ menuVisible });
-  }
-
   handleHideMenu() {
-    this.setMenuVisible(false);
+    this.setState({ menuVisible: false });
   }
 
-  renderRow(rowData) {
-    return <PostPreview postData={rowData.item} navigation={this.props.navigation} />;
+  handleShowMenu() {
+    if (FeedSort === null) {
+      FeedSort = require('components/feed-sort/FeedSort').default;
+    }
+
+    if (BSteemModal === null) {
+      BSteemModal = require('components/common/BSteemModal').default;
+    }
+    this.setState({ menuVisible: true });
   }
 
   handleSortPost(filter) {
@@ -180,6 +194,10 @@ class FeedScreen extends Component {
     } else {
       this.enableFilterFeedByFollowers();
     }
+  }
+
+  renderRow(rowData) {
+    return <PostPreview postData={rowData.item} />;
   }
 
   renderLoadingOrEmptyText(displayedPosts) {
@@ -220,7 +238,7 @@ class FeedScreen extends Component {
             <Tag tag={tag} />
             <SaveTagButton tag={tag} />
           </TagContainer>
-          <TouchableMenu onPress={() => this.setMenuVisible(!menuVisible)}>
+          <TouchableMenu onPress={this.handleShowMenu}>
             <MaterialIcons
               size={ICON_SIZES.menuIcon}
               name={currentFilter.icon}

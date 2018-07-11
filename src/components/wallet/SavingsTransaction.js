@@ -5,10 +5,11 @@ import Avatar from 'components/common/Avatar';
 import * as accountHistoryConstants from 'constants/accountHistory';
 import * as navigationConstants from 'constants/navigation';
 import TimeAgo from 'components/common/TimeAgo';
+import { connect } from 'react-redux';
 import StyledTextByBackground from 'components/common/StyledTextByBackground';
+import PrimaryText from 'components/common/text/PrimaryText';
 import WalletTransactionContainer from './WalletTransactionContainer';
 import { getCustomTheme } from '../../state/rootReducer';
-import { connect } from 'react-redux';
 
 const SavingsMessageContainer = styled.View`
   flex-direction: row;
@@ -16,9 +17,8 @@ const SavingsMessageContainer = styled.View`
 
 const Touchable = styled.TouchableOpacity``;
 
-const Username = styled.Text`
+const Username = styled(PrimaryText)`
   color: ${props => props.customTheme.primaryColor};
-  font-weight: bold;
 `;
 
 const SavingsContentContainer = styled.View`
@@ -52,13 +52,13 @@ class SavingsTransaction extends Component {
   handleToUserNavigate() {
     const { transactionDetails } = this.props;
 
-    this.props.navigation.navigate(navigationConstants.USER, { username: transactionDetails.to });
+    this.props.navigation.push(navigationConstants.USER, { username: transactionDetails.to });
   }
 
   handleFromUserNavigate() {
     const { transactionDetails } = this.props;
 
-    this.props.navigation.navigate(navigationConstants.USER, { username: transactionDetails.from });
+    this.props.navigation.push(navigationConstants.USER, { username: transactionDetails.from });
   }
 
   renderAvatar() {

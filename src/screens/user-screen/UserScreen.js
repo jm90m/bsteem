@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components/native';
+import { View } from 'react-native';
 import { connect } from 'react-redux';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import _ from 'lodash';
@@ -29,29 +30,17 @@ import {
   getIntl,
 } from 'state/rootReducer';
 import { getUserDetailsHelper } from 'util/bsteemUtils';
-import UserMenu from 'components/user/UserMenu';
 import Header from 'components/common/Header';
+import Touchable from 'components/common/Touchable';
 import BackButton from 'components/common/BackButton';
-import Modal from 'react-native-modal';
+import PrimaryText from 'components/common/text/PrimaryText';
+import commonStyles from 'styles/common';
 import UserBlog from './UserBlog';
 import UserComments from './UserComments';
 
-const Container = styled.View`
-  flex: 1;
-`;
+let UserMenu = null;
 
-const TouchableMenu = styled.TouchableOpacity``;
-
-const TouchableMenuContainer = styled.View`
-  padding: 5px;
-`;
-
-const CurrentUserDisplay = styled.View`
-  flex-direction: row;
-  align-items: center;
-`;
-
-const CurrentUserDisplayText = styled.Text`
+const CurrentUserDisplayText = styled(PrimaryText)`
   margin-left: 5px;
   color: ${props => props.customTheme.primaryColor};
 `;
@@ -120,7 +109,7 @@ class UserScreen extends Component {
     };
 
     this.fetchMoreUserPosts = this.fetchMoreUserPosts.bind(this);
-    this.setMenuVisible = this.setMenuVisible.bind(this);
+    this.handleDisplayMenu = this.handleDisplayMenu.bind(this);
     this.handleHideMenu = this.handleHideMenu.bind(this);
     this.handleChangeUserMenu = this.handleChangeUserMenu.bind(this);
     this.navigateBack = this.navigateBack.bind(this);
@@ -155,12 +144,15 @@ class UserScreen extends Component {
     }
   }
 
-  setMenuVisible(menuVisible) {
-    this.setState({ menuVisible });
+  handleDisplayMenu() {
+    if (UserMenu === null) {
+      UserMenu = require('components/user/UserMenu').default;
+    }
+    this.setState({ menuVisible: true });
   }
 
   handleHideMenu() {
-    this.setMenuVisible(false);
+    this.setState({ menuVisible: false });
   }
 
   handleUserBlogRefresh() {
@@ -211,7 +203,7 @@ class UserScreen extends Component {
           {
             menuVisible: false,
           },
-          () => this.props.navigation.navigate(navigationConstants.USER_FOLLOWERS, { username }),
+          () => this.props.navigation.push(navigationConstants.USER_FOLLOWERS, { username }),
         );
         break;
       case userMenuConstants.FOLLOWING.id:
@@ -219,7 +211,7 @@ class UserScreen extends Component {
           {
             menuVisible: false,
           },
-          () => this.props.navigation.navigate(navigationConstants.USER_FOLLOWING, { username }),
+          () => this.props.navigation.push(navigationConstants.USER_FOLLOWING, { username }),
         );
         break;
       case userMenuConstants.ACTIVITY.id:
@@ -227,7 +219,7 @@ class UserScreen extends Component {
           {
             menuVisible: false,
           },
-          () => this.props.navigation.navigate(navigationConstants.USER_ACTIVITY, { username }),
+          () => this.props.navigation.push(navigationConstants.USER_ACTIVITY, { username }),
         );
         break;
       case userMenuConstants.WALLET.id:
@@ -235,7 +227,7 @@ class UserScreen extends Component {
           {
             menuVisible: false,
           },
-          () => this.props.navigation.navigate(navigationConstants.USER_WALLET, { username }),
+          () => this.props.navigation.push(navigationConstants.USER_WALLET, { username }),
         );
         break;
       case userMenuConstants.REPLIES.id:
@@ -243,7 +235,7 @@ class UserScreen extends Component {
           {
             menuVisible: false,
           },
-          () => this.props.navigation.navigate(navigationConstants.USER_REPLIES, { username }),
+          () => this.props.navigation.push(navigationConstants.USER_REPLIES, { username }),
         );
         break;
       default:
@@ -306,45 +298,41 @@ class UserScreen extends Component {
   render() {
     const { customTheme, intl } = this.props;
     const { menuVisible, currentMenuOption } = this.state;
+    const currentOption = _.capitalize(intl[currentMenuOption.label]);
 
     return (
-      <Container>
+      <View style={commonStyles.container}>
         <Header>
           <BackButton navigateBack={this.navigateBack} />
-          <CurrentUserDisplay>
+          <View style={commonStyles.rowAlignedCenterContainer}>
             <MaterialIcons
               size={ICON_SIZES.menuIcon}
               name={currentMenuOption.icon}
               color={customTheme.primaryColor}
             />
             <CurrentUserDisplayText customTheme={customTheme}>
-              {_.capitalize(intl[currentMenuOption.label])}
+              {currentOption}
             </CurrentUserDisplayText>
-          </CurrentUserDisplay>
-          <TouchableMenu onPress={() => this.setMenuVisible(!menuVisible)}>
-            <TouchableMenuContainer>
+          </View>
+          <Touchable onPress={this.handleDisplayMenu}>
+            <View style={commonStyles.headerMenuIconContainer}>
               <MaterialCommunityIcons
                 size={ICON_SIZES.menuIcon}
                 name={MATERIAL_COMMUNITY_ICONS.menuVertical}
                 color={customTheme.secondaryColor}
               />
-            </TouchableMenuContainer>
-          </TouchableMenu>
+            </View>
+          </Touchable>
         </Header>
         {menuVisible && (
-          <Modal
-            isVisible={menuVisible}
-            onBackdropPress={this.handleHideMenu}
-            onBackButtonPress={this.handleHideMenu}
-          >
-            <UserMenu
-              hideMenu={this.handleHideMenu}
-              handleChangeUserMenu={this.handleChangeUserMenu}
-            />
-          </Modal>
+          <UserMenu
+            hideMenu={this.handleHideMenu}
+            handleChangeUserMenu={this.handleChangeUserMenu}
+            menuVisible={menuVisible}
+          />
         )}
         {this.renderUserContent()}
-      </Container>
+      </View>
     );
   }
 }

@@ -6,7 +6,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { connect } from 'react-redux';
 import styled from 'styled-components/native';
 import { getAuthAccessToken } from 'state/rootReducer';
-import SteemConnectLogin from './SteemConnectLogin';
+import BsteemLoginScreen from 'screens/login-screen/BsteemLoginScreen';
 import CurrentUserProfileScreen from './CurrentUserProfileScreen';
 
 const Container = styled.View`
@@ -38,7 +38,7 @@ class LoginScreen extends Component {
   renderLoginButton() {
     const { accessToken, navigation } = this.props;
     if (_.isEmpty(accessToken)) {
-      return <SteemConnectLogin navigation={navigation} />;
+      return <BsteemLoginScreen navigation={navigation} />;
     }
     return null;
   }

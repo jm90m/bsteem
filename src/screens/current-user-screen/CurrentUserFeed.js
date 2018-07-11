@@ -98,7 +98,7 @@ class CurrentUserFeed extends Component {
   }
 
   renderRow(rowData) {
-    return <PostPreview postData={rowData.item} navigation={this.props.navigation} />;
+    return <PostPreview postData={rowData.item} />;
   }
 
   renderLoader() {

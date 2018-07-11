@@ -141,6 +141,7 @@ class EditPostScreen extends Component {
       additionalPostContents: [],
       additionalInputCounter: 0,
       keyboardDisplayed: false,
+      inputWidth: '99%',
     };
 
     this.navigateBack = this.navigateBack.bind(this);
@@ -181,8 +182,11 @@ class EditPostScreen extends Component {
   componentDidMount() {
     const { postData } = this.props.navigation.state.params;
     const { author, permlink } = postData;
-    console.log(permlink);
     this.props.fetchPostDetails(author, permlink);
+
+    setTimeout(() => {
+      this.setState({ inputWidth: '100%' });
+    }, 100);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -251,7 +255,19 @@ class EditPostScreen extends Component {
       return;
     }
 
-    if (_.includes(value, ' ') || _.includes(value, ',')) {
+    if (_.includes(value, ',')) {
+      const newTags = _.split(value, ',');
+      const tags = _.chain(newTags)
+        .map(tag => _.replace(_.trim(tag), new RegExp(' ', 'g'), ''))
+        .compact()
+        .uniq();
+      const mergedTags = _.union(tags, this.state.tags);
+      this.setState({
+        tagsInput: '',
+        tagError: '',
+        tags: mergedTags,
+      });
+    } else if (_.includes(value, ' ')) {
       const newTag = _.replace(_.replace(value, ' ', ''), ',', '');
       if (_.includes(this.state.tags, newTag)) {
         this.setState({ tagsInput: '' });
@@ -443,7 +459,7 @@ class EditPostScreen extends Component {
   }
 
   handleCreatePostSuccess(author, permlink) {
-    this.props.navigation.navigate(navigationConstants.FETCH_POST, {
+    this.props.navigation.navigate(navigationConstants.POST, {
       permlink,
       author,
     });
@@ -533,6 +549,7 @@ class EditPostScreen extends Component {
       currentPostData,
       imageLoading,
       keyboardDisplayed,
+      inputWidth,
     } = this.state;
     const { createPostLoading, postLoading, customTheme, intl } = this.props;
     const displayTitleError = !_.isEmpty(titleError);
@@ -569,14 +586,14 @@ class EditPostScreen extends Component {
             <LargeLoading />
           </LoadingContainer>
         ) : (
-          <StyledScrollView customTheme={customTheme}>
+          <StyledScrollView customTheme={customTheme} removeClippedSubviews={Platform.OS === 'ios'}>
             <FormLabel>{intl.title}</FormLabel>
             <FormInput
               onChangeText={this.onChangeTitle}
               placeholder={intl.title_placeholder}
               value={titleInput}
               maxLength={255}
-              inputStyle={{ width: '100%', color }}
+              inputStyle={{ width: inputWidth, color }}
               placeholderTextColor={color}
             />
             {displayTitleError && <FormValidationMessage>{titleError}</FormValidationMessage>}
@@ -586,6 +603,7 @@ class EditPostScreen extends Component {
               onChangeTags={this.onChangeTags}
               removeTag={this.removeTag}
               tagError={tagError}
+              tagsInputWidth={inputWidth}
             />
             <FormLabel>{intl.body}</FormLabel>
             <FormInput
@@ -593,7 +611,7 @@ class EditPostScreen extends Component {
               placeholder=""
               multiline
               value={bodyInput}
-              inputStyle={{ width: '100%', color }}
+              inputStyle={{ width: inputWidth, color }}
               placeholderTextColor={color}
             />
             {this.renderAdditionalContents()}

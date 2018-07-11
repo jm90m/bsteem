@@ -8,7 +8,7 @@ import {
   FETCH_CURRENT_USER_BSTEEM_FEED,
   FETCH_MORE_CURRENT_USER_BSTEEM_FEED,
   ADD_NEW_NOTIFICATION,
-  FETCH_BSTEEM_NOTIFICATIONS,
+  GET_NOTIFICATIONS,
 } from '../actions/actionTypes';
 
 const INITIAL_STATE = {
@@ -118,21 +118,15 @@ export default (state = INITIAL_STATE, action) => {
         ...state,
         loadingFetchMoreCurrentBSteemUserFeed: false,
       };
-    case FETCH_BSTEEM_NOTIFICATIONS.ACTION:
+    case GET_NOTIFICATIONS.ACTION:
       return {
         ...state,
         loadingNotifications: true,
       };
-    case FETCH_BSTEEM_NOTIFICATIONS.SUCCESS:
+    case GET_NOTIFICATIONS.SUCCESS:
       return {
         ...state,
-        notifications: _.reverse(action.payload),
-        loadingNotifications: false,
-      };
-    case FETCH_BSTEEM_NOTIFICATIONS.ERROR:
-    case FETCH_BSTEEM_NOTIFICATIONS.LOADING_END:
-      return {
-        ...state,
+        notifications: action.payload,
         loadingNotifications: false,
       };
     case ADD_NEW_NOTIFICATION:

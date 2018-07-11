@@ -5,10 +5,11 @@ import styled from 'styled-components/native';
 import { striptags } from 'util/stripTags';
 import { connect } from 'react-redux';
 import tinycolor from 'tinycolor2';
+import PrimaryText from 'components/common/text/PrimaryText';
 import { COLORS } from 'constants/styles';
 import { getCustomTheme } from 'state/rootReducer';
 
-const Body = styled.Text`
+const Body = styled(PrimaryText)`
   padding: 5px;
   color: ${props =>
     tinycolor(props.customTheme.primaryBackgroundColor).isDark()

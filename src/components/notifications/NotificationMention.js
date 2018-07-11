@@ -1,18 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Avatar from 'components/common/Avatar';
-import { View, TouchableWithoutFeedback } from 'react-native';
+import { View } from 'react-native';
 import { getIntl } from 'state/rootReducer';
 import { connect } from 'react-redux';
+import Touchable from 'components/common/Touchable';
 import TitleText from 'components/common/TitleText';
 import NotificationContainer from './NotificationContainer';
 import NotificationTimeAgo from './NotificationTimeAgo';
 import NotificationText from './NotificationText';
 
-const NotificationMention = ({ notification, read, handleNavigateToPost, intl, timestamp }) => (
-  <TouchableWithoutFeedback
-    onPress={handleNavigateToPost(notification.author, notification.permlink)}
-  >
+const NotificationMention = ({ notification, read, handleNavigateToPost, intl }) => (
+  <Touchable onPress={handleNavigateToPost(notification.author, notification.permlink)}>
     <NotificationContainer read={read}>
       <Avatar username={notification.author} />
       <View>
@@ -27,26 +26,24 @@ const NotificationMention = ({ notification, read, handleNavigateToPost, intl, t
             {` ${intl.notification_reply_comment}`}
           </NotificationText>
         )}
-        <NotificationTimeAgo created={timestamp} />
+        <NotificationTimeAgo created={notification.timestamp} />
       </View>
     </NotificationContainer>
-  </TouchableWithoutFeedback>
+  </Touchable>
 );
 
 NotificationMention.propTypes = {
   read: PropTypes.bool,
   notification: PropTypes.shape({
-    author: PropTypes.string,
-  }),
+    author: PropTypes.string.isRequired,
+    timestamp: PropTypes.number.isRequired,
+  }).isRequired,
   handleNavigateToPost: PropTypes.func.isRequired,
   intl: PropTypes.shape().isRequired,
-  timestamp: PropTypes.string,
 };
 
 NotificationMention.defaultProps = {
   read: false,
-  notification: {},
-  timestamp: '',
 };
 
 const mapStateToProps = state => ({

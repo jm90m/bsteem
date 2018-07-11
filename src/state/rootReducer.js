@@ -42,6 +42,8 @@ export const getTagsLoading = state => fromHome.getTagsLoading(state.home);
 
 // User Selectors
 export const getUsersDetails = state => fromUsers.getUsersDetails(state.users);
+export const getSingleUserDetails = (state, username) =>
+  fromUsers.getSingleUserDetails(state.users, username);
 export const getUsersComments = state => fromUsers.getUsersComments(state.users);
 export const getUsersBlog = state => fromUsers.getUsersBlog(state.users);
 export const getUsersFollowCount = state => fromUsers.getUsersFollowCount(state.users);
@@ -146,6 +148,8 @@ export const getLoadingSavingDraft = state => fromFirebase.getLoadingSavingDraft
 
 // Posts Selectors
 export const getPostsDetails = state => fromPosts.getPostsDetails(state.posts);
+export const getSinglePostDetails = (state, postKey) =>
+  fromPosts.getSinglePostDetails(state.posts, postKey);
 export const getPostLoading = state => fromPosts.getPostLoading(state.posts);
 export const getSavedOfflinePosts = state => fromPosts.getSavedOfflinePosts(state.posts);
 export const getPendingSavingPostsOffline = state =>

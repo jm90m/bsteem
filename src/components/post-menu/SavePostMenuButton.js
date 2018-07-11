@@ -1,31 +1,19 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components/native';
 import { connect } from 'react-redux';
 import _ from 'lodash';
-import { getPendingSavingPosts, getSavedPosts, getCustomTheme } from 'state/rootReducer';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { MATERIAL_COMMUNITY_ICONS, ICON_SIZES } from 'constants/styles';
+import { getPendingSavingPosts, getSavedPosts } from 'state/rootReducer';
+import MenuText from 'components/common/menu/MenuText';
+import MenuModalContents from 'components/common/menu/MenuModalContents';
+import { MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
+import MenuIcon from 'components/common/menu/MenuIcon';
 import { savePost, unsavePost } from '../../state/actions/firebaseActions';
 import MenuModalButton from '../common/menu/MenuModalButton';
 import SmallLoading from '../common/SmallLoading';
 
-const MenuText = styled.Text`
-  margin-left: 5px;
-  color: ${props => props.customTheme.primaryColor};
-  font-weight: bold;
-`;
-
-const MenuModalContents = styled.View`
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-`;
-
 const mapStateToProps = state => ({
   pendingSavingPosts: getPendingSavingPosts(state),
   savedPosts: getSavedPosts(state),
-  customTheme: getCustomTheme(state),
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -45,7 +33,6 @@ class SavePostMenuButton extends Component {
     created: PropTypes.string,
     pendingSavingPosts: PropTypes.arrayOf(PropTypes.number),
     savedPosts: PropTypes.arrayOf(PropTypes.shape()),
-    customTheme: PropTypes.shape().isRequired,
   };
 
   static defaultProps = {
@@ -76,7 +63,7 @@ class SavePostMenuButton extends Component {
   }
 
   render() {
-    const { id, pendingSavingPosts, savedPosts, customTheme } = this.props;
+    const { id, pendingSavingPosts, savedPosts } = this.props;
 
     const isLoading = _.includes(pendingSavingPosts, id);
     const isSaved = _.findIndex(savedPosts, post => post.id === id) > -1;
@@ -89,16 +76,8 @@ class SavePostMenuButton extends Component {
     return (
       <MenuModalButton onPress={onPress}>
         <MenuModalContents>
-          {isLoading ? (
-            <SmallLoading style={{ marginRight: 5 }} />
-          ) : (
-            <MaterialCommunityIcons
-              size={ICON_SIZES.menuModalOptionIcon}
-              color={customTheme.primaryColor}
-              name={menuIcon}
-            />
-          )}
-          <MenuText customTheme={customTheme}>{menuText}</MenuText>
+          {isLoading ? <SmallLoading style={{ marginRight: 5 }} /> : <MenuIcon name={menuIcon} />}
+          <MenuText>{menuText}</MenuText>
         </MenuModalContents>
       </MenuModalButton>
     );

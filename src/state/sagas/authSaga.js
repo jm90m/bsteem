@@ -2,19 +2,19 @@ import { takeLatest, call, put, select } from 'redux-saga/effects';
 import sc2 from 'api/sc2';
 import * as authActions from 'state/actions/authActions';
 import * as currentUserActions from 'state/actions/currentUserActions';
-import _ from 'lodash';
+import { BASE_NOTIFICATIONS_URL } from 'constants/notifications';
 import * as settingsActions from 'state/actions/settingsActions';
 import { Notifications } from 'expo';
 import {
   AUTHENTICATE_USER,
-  FETCH_BSTEEM_NOTIFICATIONS,
+  GET_NOTIFICATIONS,
   GET_AUTH_USER_SC_DATA,
   SAVE_NOTIFICATIONS_LAST_TIMESTAMP,
   LOGOUT_USER,
 } from '../actions/actionTypes';
 import { getAuthAccessToken, getAuthUsername } from '../rootReducer';
 
-const authenticateUser = function*(action) {
+const authenticateUser = function*(busyAPI, action) {
   try {
     const { accessToken, expiresIn, username, maxAge } = action.payload;
     const payload = {
@@ -26,6 +26,7 @@ const authenticateUser = function*(action) {
     yield put(authActions.authenticateUser.success(payload));
     yield put(currentUserActions.currentUserFollowListFetch.action());
     yield put(settingsActions.getCurrentUserSettings.action());
+    yield call(busyAPI.sendAsync.bind(busyAPI), 'login', [accessToken]);
   } catch (error) {
     yield put(authActions.authenticateUser.fail(error));
   }
@@ -35,8 +36,8 @@ export const fetchSteemConnectAuthUserData = function*() {
   try {
     const accessToken = yield select(getAuthAccessToken);
     sc2.setAccessToken(accessToken);
-    const response = yield call(sc2.me);
-    console.log(response);
+    const response = yield call(sc2.me.bind(sc2));
+    console.log('SC2 RESPONSME', response);
     yield put(authActions.getSteemConnectUserData.success(response));
   } catch (error) {
     console.log(error);
@@ -56,7 +57,7 @@ export const saveNotificationsLastTimestamp = function*(action) {
       ...userMetaData,
       notifications_last_timestamp: timestamp,
     };
-    const result = yield call(sc2.updateUserMetadata, updatedUserMetaData);
+    const result = yield call(sc2.updateUserMetadata.bind(sc2), updatedUserMetaData);
     yield put(authActions.saveNotificationsLastTimestamp.success(updatedUserMetaData));
   } catch (error) {
     console.log('ERROR SAVING NOTIFICATIONS TIMESTAMP', error.message);
@@ -64,32 +65,18 @@ export const saveNotificationsLastTimestamp = function*(action) {
   }
 };
 
-async function fetchNotifications(accessToken, limit) {
-  const url = `https://bsteem-notifications.herokuapp.com/notifications?limit=${limit}`;
-  return fetch(url, {
-    method: 'get',
-    headers: {
-      'Content-Type': 'application/json',
-      authorization: accessToken,
-    },
-  }).then(response => response.json());
-}
-
-export const fetchBSteemNotifications = function*(action) {
+export const fetchNotifications = function*(busyAPI) {
   try {
-    const limit = 50;
-    const accessToken = yield select(getAuthAccessToken);
-    const response = yield call(fetchNotifications, accessToken, limit);
-    console.log('NOTIFICATIONS SUCCESS BSTEEM', response);
-    yield put(authActions.fetchBSteemNotifications.success(_.reverse(response)));
+    const authUsername = yield select(getAuthUsername);
+    const result = yield call(busyAPI.sendAsync.bind(busyAPI), 'get_notifications', [authUsername]);
+    yield put(currentUserActions.getNotifications.success(result));
   } catch (error) {
-    console.log(error);
-    yield put(authActions.fetchBSteemNotifications.fail(error));
+    yield put(currentUserActions.getNotifications.fail(error));
   }
 };
 
 async function unregisterPushNotification(accessToken, authUsername) {
-  const url = 'https://bsteem-notifications.herokuapp.com/notifications/unregister';
+  const url = `${BASE_NOTIFICATIONS_URL}/notifications/unregister`;
   const token = await Notifications.getExpoPushTokenAsync();
 
   return fetch(url, {
@@ -116,8 +103,8 @@ const logoutUser = function*() {
   }
 };
 
-export const watchAuthenticateUser = function*() {
-  yield takeLatest(AUTHENTICATE_USER.ACTION, authenticateUser);
+export const watchAuthenticateUser = function*(busyAPI) {
+  yield takeLatest(AUTHENTICATE_USER.ACTION, authenticateUser, busyAPI);
 };
 
 export const watchFetchSteemConnectAuthUserData = function*() {
@@ -128,8 +115,8 @@ export const watchSaveNotificationsLastTimestamp = function*() {
   yield takeLatest(SAVE_NOTIFICATIONS_LAST_TIMESTAMP.ACTION, saveNotificationsLastTimestamp);
 };
 
-export const watchFetchBSteemNotifications = function*() {
-  yield takeLatest(FETCH_BSTEEM_NOTIFICATIONS.ACTION, fetchBSteemNotifications);
+export const watchFetchNotifications = function*(busyAPI) {
+  yield takeLatest(GET_NOTIFICATIONS.ACTION, fetchNotifications, busyAPI);
 };
 
 export const watchLogoutUser = function*() {

@@ -5,6 +5,7 @@ import { COLORS } from 'constants/styles';
 import tinycolor from 'tinycolor2';
 import { connect } from 'react-redux';
 import { getCustomTheme } from 'state/rootReducer';
+import PrimaryText from 'components/common/text/PrimaryText';
 
 const Container = styled.View`
   align-items: center;
@@ -17,7 +18,7 @@ const Container = styled.View`
   padding: 0 8px;
 `;
 
-const Text = styled.Text`
+const Text = styled(PrimaryText)`
   font-size: 12px;
   text-align: center;
   color: ${props =>

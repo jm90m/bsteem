@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components/native';
 import Tag from 'components/post/Tag';
 import { connect } from 'react-redux';
+import PrimaryText from 'components/common/text/PrimaryText';
 import { getCustomTheme, getIntl } from 'state/rootReducer';
 
 const Container = styled.View`
@@ -18,8 +19,7 @@ const TouchableTag = styled.TouchableOpacity`
   margin: 10px;
 `;
 
-const TrendingTagsTitle = styled.Text`
-  font-weight: bold;
+const TrendingTagsTitle = styled(PrimaryText)`
   font-size: 20px;
   width: 100%;
   color: ${props => props.customTheme.tertiaryColor};

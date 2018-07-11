@@ -1,60 +1,37 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Modal, ScrollView, RefreshControl } from 'react-native';
-import styled from 'styled-components/native';
-import { getCryptoDetails } from 'util/cryptoUtils';
+import { Modal, ScrollView, RefreshControl, View } from 'react-native';
+import SafeAreaView from 'components/common/SafeAreaView';
 import { connect } from 'react-redux';
 import _ from 'lodash';
 import {
-  getCryptosPriceHistory,
   getDisplayPriceModal,
   getDisplayedCryptos,
-  getLoadingSteemGlobalProperties,
-  getTotalVestingFundSteem,
-  getTotalVestingShares,
   getUsersDetails,
   getAuthUsername,
   getIsAuthenticated,
-  getSteemRate,
-  getLoadingUsersDetails,
   getCustomTheme,
   getIntl,
 } from 'state/rootReducer';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { MATERIAL_ICONS, ICON_SIZES, MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
+import commonStyles from 'styles/common';
 import BackButton from 'components/common/BackButton';
 import { hidePriceModal } from 'state/actions/appActions';
 import { fetchUser } from 'state/actions/usersActions';
-import UserWalletSummary from 'components/wallet/UserWalletSummary';
+import WalletSummary from 'components/wallet/wallet-summary/WalletSummary';
 import TitleText from 'components/common/TitleText';
 import StyledViewPrimaryBackground from 'components/common/StyledViewPrimaryBackground';
 import Header from '../Header';
 import ClaimRewardsBlock from '../ClaimRewardsBlock';
 import CryptoChart from './CryptoChart';
 
-const EmptyView = styled.View`
-  height: 200;
-  width: 100;
-`;
-
-const UserWalletContainer = styled.View``;
-
-const MenuIconContainer = styled.View`
-  padding: 5px;
-`;
-
 const mapStateToProps = state => ({
-  cryptosPriceHistory: getCryptosPriceHistory(state),
   displayPriceModal: getDisplayPriceModal(state),
   displayedCryptos: getDisplayedCryptos(state),
   usersDetails: getUsersDetails(state),
-  loadingSteemGlobalProperties: getLoadingSteemGlobalProperties(state),
-  totalVestingFundSteem: getTotalVestingFundSteem(state),
-  totalVestingShares: getTotalVestingShares(state),
   currentAuthUsername: getAuthUsername(state),
   authenticated: getIsAuthenticated(state),
-  loadingUsersDetails: getLoadingUsersDetails(state),
-  steemRate: getSteemRate(state),
   customTheme: getCustomTheme(state),
   intl: getIntl(state),
 });
@@ -67,17 +44,11 @@ const mapDispatchToProps = dispatch => ({
 class CryptoPriceModal extends Component {
   static propTypes = {
     displayedCryptos: PropTypes.arrayOf(PropTypes.string),
-    cryptosPriceHistory: PropTypes.shape().isRequired,
     customTheme: PropTypes.shape().isRequired,
     displayPriceModal: PropTypes.bool.isRequired,
     authenticated: PropTypes.bool.isRequired,
     hidePriceModal: PropTypes.func.isRequired,
-    totalVestingFundSteem: PropTypes.string.isRequired,
-    totalVestingShares: PropTypes.string.isRequired,
-    loadingSteemGlobalProperties: PropTypes.bool.isRequired,
-    loadingUsersDetails: PropTypes.bool.isRequired,
     currentAuthUsername: PropTypes.string.isRequired,
-    steemRate: PropTypes.string.isRequired,
     usersDetails: PropTypes.shape().isRequired,
     intl: PropTypes.shape().isRequired,
     fetchUser: PropTypes.func.isRequired,
@@ -93,29 +64,6 @@ class CryptoPriceModal extends Component {
       refreshCharts: false,
     };
     this.handleRefresh = this.handleRefresh.bind(this);
-  }
-
-  hasAPIError() {
-    const { cryptosPriceHistory, displayedCryptos } = this.props;
-    const apiErrors = [];
-
-    if (_.isEmpty(cryptosPriceHistory)) {
-      return false;
-    }
-
-    _.each(displayedCryptos, crypto => {
-      const cryptoDetails = getCryptoDetails(crypto);
-      const cryptoSymbol = _.get(cryptoDetails, 'symbol', null);
-      const cryptoAPIDetails = _.get(cryptosPriceHistory, _.upperCase(cryptoSymbol), null);
-      const hasAPIError =
-        !(_.isUndefined(cryptoAPIDetails) || _.isNull(cryptoAPIDetails)) &&
-        (cryptoAPIDetails.usdAPIError || _.isEmpty(cryptoAPIDetails.usdPriceHistory));
-      if (hasAPIError) {
-        apiErrors.push(cryptoDetails);
-      }
-    });
-
-    return displayedCryptos.length === apiErrors.length;
   }
 
   handleRefresh() {
@@ -148,36 +96,19 @@ class CryptoPriceModal extends Component {
   }
 
   renderUserWallet() {
-    const {
-      loadingUsersDetails,
-      steemRate,
-      loadingSteemGlobalProperties,
-      totalVestingFundSteem,
-      totalVestingShares,
-      currentAuthUsername,
-      authenticated,
-      usersDetails,
-      intl,
-    } = this.props;
+    const { currentAuthUsername, authenticated, usersDetails, intl } = this.props;
 
     if (!authenticated) return null;
 
     const user = _.get(usersDetails, currentAuthUsername, {});
 
     return (
-      <UserWalletContainer>
-        <TitleText
-          style={{ paddingTop: 10, paddingBottom: 10, paddingLeft: 15 }}
-        >{`${currentAuthUsername} ${intl.wallet}`}</TitleText>
-        <UserWalletSummary
-          user={user}
-          loading={loadingUsersDetails}
-          steemRate={steemRate}
-          loadingSteemGlobalProperties={loadingSteemGlobalProperties}
-          totalVestingFundSteem={totalVestingFundSteem}
-          totalVestingShares={totalVestingShares}
-        />
-      </UserWalletContainer>
+      <View>
+        <TitleText style={{ paddingTop: 10, paddingBottom: 10, paddingLeft: 15 }}>
+          {`${currentAuthUsername} ${intl.wallet}`}
+        </TitleText>
+        <WalletSummary user={user} />
+      </View>
     );
   }
 
@@ -186,43 +117,46 @@ class CryptoPriceModal extends Component {
 
     if (!displayPriceModal) return null;
 
-    // if (this.hasAPIError()) return <View />;
-
     return (
       <Modal
         visible={displayPriceModal}
         animationType="slide"
         onRequestClose={this.props.hidePriceModal}
       >
-        <StyledViewPrimaryBackground style={{ flex: 1 }}>
-          <Header>
-            <MenuIconContainer>
-              <MaterialCommunityIcons
-                size={ICON_SIZES.menuIcon}
-                name={MATERIAL_COMMUNITY_ICONS.menuVertical}
-                color="transparent"
+        <SafeAreaView>
+          <StyledViewPrimaryBackground style={commonStyles.container}>
+            <Header>
+              <View style={commonStyles.headerMenuIconContainer}>
+                <MaterialCommunityIcons
+                  size={ICON_SIZES.menuIcon}
+                  name={MATERIAL_COMMUNITY_ICONS.menuVertical}
+                  color="transparent"
+                />
+              </View>
+              <TitleText>{intl.market}</TitleText>
+              <BackButton
+                navigateBack={this.props.hidePriceModal}
+                iconName={MATERIAL_ICONS.close}
               />
-            </MenuIconContainer>
-            <TitleText>{intl.market}</TitleText>
-            <BackButton navigateBack={this.props.hidePriceModal} iconName={MATERIAL_ICONS.close} />
-          </Header>
-          <ScrollView
-            style={{ paddingBottom: 200 }}
-            refreshControl={
-              <RefreshControl
-                refreshing={this.state.refreshCharts}
-                onRefresh={this.handleRefresh}
-                colors={[customTheme.primaryColor]}
-                tintColor={customTheme.primaryColor}
-              />
-            }
-          >
-            {this.renderUserWallet()}
-            {authenticated && <ClaimRewardsBlock />}
-            {this.renderCryptoCharts()}
-            <EmptyView />
-          </ScrollView>
-        </StyledViewPrimaryBackground>
+            </Header>
+            <ScrollView
+              style={commonStyles.scrollViewEndPadding}
+              refreshControl={
+                <RefreshControl
+                  refreshing={this.state.refreshCharts}
+                  onRefresh={this.handleRefresh}
+                  colors={[customTheme.primaryColor]}
+                  tintColor={customTheme.primaryColor}
+                />
+              }
+            >
+              {this.renderUserWallet()}
+              {authenticated && <ClaimRewardsBlock />}
+              {this.renderCryptoCharts()}
+              <View style={commonStyles.emptyView} />
+            </ScrollView>
+          </StyledViewPrimaryBackground>
+        </SafeAreaView>
       </Modal>
     );
   }

@@ -297,5 +297,14 @@
   "payout_potential_payout": "Potential payout",
   "payout_total_past": "Total past payouts",
   "payout_author": "Author payout",
-  "payout_curator": "Curators payout"
+  "payout_curator": "Curators payout",
+  "coin": "Coin",
+  "holding": "Holding",
+  "price": "Price",
+  "total_portfolio_value": "Total portfolio value",
+  "24h_change": "24h change",
+  "view_beneficiaries": "View beneficiaries",
+  "log_in_with_facebook": "Login with Facebook",
+  "log_in_with_google": "Login with Google",
+  "platform_apps": "Platform Apps"
 }

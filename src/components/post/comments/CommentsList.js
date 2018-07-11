@@ -6,6 +6,7 @@ import PropTypes from 'prop-types';
 import { sortComments } from 'util/sortUtils';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS, ICON_SIZES, MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
+import PrimaryText from 'components/common/text/PrimaryText';
 import LargeLoading from 'components/common/LargeLoading';
 import tinycolor from 'tinycolor2';
 import Comment from './Comment';
@@ -21,13 +22,15 @@ const LoadingContainer = styled.View`
   width: 100%;
   justify-content: center;
   align-items: center;
+  flex: 1;
+  height: 100%;
 `;
 
 const EmptyCommentsTextContainer = styled.View`
   padding: 20px;
   background-color: ${props => props.customTheme.primaryBackgroundColor};
 `;
-const EmptyCommentsText = styled.Text`
+const EmptyCommentsText = styled(PrimaryText)`
   color: ${props =>
     tinycolor(props.customTheme.primaryBackgroundColor).isDark()
       ? COLORS.LIGHT_TEXT_COLOR
@@ -46,14 +49,12 @@ const FilterMenuIcon = styled.View`
   margin-top: 3px;
 `;
 
-const FilterText = styled.Text`
+const FilterText = styled(PrimaryText)`
   color: ${props => props.customTheme.primaryColor};
   margin-left: 3px;
 `;
 
-const BoldText = styled.Text`
-  font-weight: bold;
-`;
+const BoldText = styled(PrimaryText)``;
 
 class CommentsList extends Component {
   static propTypes = {
@@ -138,9 +139,19 @@ class CommentsList extends Component {
   }
 
   renderHeaderComponent() {
-    const { handleDisplayMenu, sort, loadingComments, customTheme, intl } = this.props;
+    const { handleDisplayMenu, sort, loadingComments, customTheme, intl, comments } = this.props;
 
     if (loadingComments) return null;
+
+    if (_.isNull(comments) || _.isEmpty(comments)) {
+      return (
+        <EmptyCommentsTextContainer customTheme={customTheme}>
+          <EmptyCommentsText customTheme={customTheme}>
+            {intl.no_comments_to_show}
+          </EmptyCommentsText>
+        </EmptyCommentsTextContainer>
+      );
+    }
 
     return (
       <TouchableFilter onPress={handleDisplayMenu} customTheme={customTheme}>
@@ -189,10 +200,14 @@ class CommentsList extends Component {
     const { comments, loadingComments, sort, customTheme } = this.props;
     const sortedComments = sortComments(comments, sort.id);
     const displayComments = _.concat(sortedComments, { bsteemEmptyView: true });
+    const flatListStyle = {
+      marginBottom: 30,
+      backgroundColor: customTheme.primaryBackgroundColor,
+    };
 
     return (
       <FlatList
-        style={{ marginBottom: 30 }}
+        style={flatListStyle}
         data={displayComments}
         enableEmptySections
         renderItem={this.renderComment}

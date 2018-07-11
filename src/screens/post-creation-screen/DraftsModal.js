@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Modal } from 'react-native';
+import SafeAreaView from 'components/common/SafeAreaView';
 import DraftsScreen from './DraftsScreen';
 
 const DraftsModal = ({ handleHideDrafts, draftsVisible, handleSelectDraft }) => {
@@ -10,7 +11,9 @@ const DraftsModal = ({ handleHideDrafts, draftsVisible, handleSelectDraft }) => 
 
   return (
     <Modal animationType="slide" visible={draftsVisible} onRequestClose={handleHideDrafts}>
-      <DraftsScreen handleHideDrafts={handleHideDrafts} handleSelectDraft={handleSelectDraft} />
+      <SafeAreaView>
+        <DraftsScreen handleHideDrafts={handleHideDrafts} handleSelectDraft={handleSelectDraft} />
+      </SafeAreaView>
     </Modal>
   );
 };

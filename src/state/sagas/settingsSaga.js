@@ -87,9 +87,8 @@ const savePostPreviewSetting = function*(action) {
     } else {
       userID = authUsername;
     }
-    yield call(setFirebaseData, getPostPreviewCompactModeSettingRef(userID), compactMode);
-    yield call(fetchUserSettings);
     yield put(settingsActions.updatePostPreviewCompactModeSettings.success(compactMode));
+    yield call(setFirebaseData, getPostPreviewCompactModeSettingRef(userID), compactMode);
   } catch (error) {
     console.log(error);
     yield put(settingsActions.updatePostPreviewCompactModeSettings.fail({ error }));

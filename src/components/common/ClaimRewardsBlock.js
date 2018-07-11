@@ -11,6 +11,7 @@ import { getUsersDetails, getAuthUsername, getCustomTheme, getIntl } from 'state
 import { fetchUserTransferHistory } from 'state/actions/userActivityActions';
 import { fetchUser } from 'state/actions/usersActions';
 import TitleText from 'components/common/TitleText';
+import PrimaryText from 'components/common/text/PrimaryText';
 
 const Container = styled.View`
   padding: 10px;
@@ -44,13 +45,11 @@ const Reward = styled.View`
   justify-content: space-between;
 `;
 
-const RewardField = styled.Text`
-  font-weight: bold;
+const RewardField = styled(PrimaryText)`
   color: ${props => props.customTheme.secondaryColor};
 `;
 
-const RewardValue = styled.Text`
-  font-weight: bold;
+const RewardValue = styled(PrimaryText)`
   color: ${props => props.customTheme.primaryColor};
 `;
 

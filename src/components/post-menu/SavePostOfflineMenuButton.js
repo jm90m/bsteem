@@ -1,35 +1,18 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import styled from 'styled-components/native';
 import { connect } from 'react-redux';
 import _ from 'lodash';
-import {
-  getSavedOfflinePosts,
-  getCustomTheme,
-  getIntl,
-  getPendingSavingPostsOffline,
-} from 'state/rootReducer';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { MATERIAL_COMMUNITY_ICONS, ICON_SIZES } from 'constants/styles';
+import { getSavedOfflinePosts, getIntl, getPendingSavingPostsOffline } from 'state/rootReducer';
+import { MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
 import { savePostOffline, unsavePostOffline } from 'state/actions/postsActions';
+import MenuText from 'components/common/menu/MenuText';
+import MenuModalContents from 'components/common/menu/MenuModalContents';
+import MenuIcon from 'components/common/menu/MenuIcon';
 import MenuModalButton from '../common/menu/MenuModalButton';
 import SmallLoading from '../common/SmallLoading';
 
-const MenuText = styled.Text`
-  margin-left: 5px;
-  color: ${props => props.color};
-  font-weight: bold;
-`;
-
-const MenuModalContents = styled.View`
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-`;
-
 const mapStateToProps = state => ({
   savedOfflinePosts: getSavedOfflinePosts(state),
-  customTheme: getCustomTheme(state),
   intl: getIntl(state),
   pendingSavingPostsOffline: getPendingSavingPostsOffline(state),
 });
@@ -44,7 +27,6 @@ class SavePostOfflineMenuButton extends Component {
     postData: PropTypes.shape(),
     savePostOffline: PropTypes.func.isRequired,
     unsavePostOffline: PropTypes.func.isRequired,
-    customTheme: PropTypes.shape().isRequired,
     intl: PropTypes.shape().isRequired,
     savedOfflinePosts: PropTypes.shape().isRequired,
     pendingSavingPostsOffline: PropTypes.arrayOf(
@@ -74,19 +56,12 @@ class SavePostOfflineMenuButton extends Component {
   }
 
   render() {
-    const {
-      postData,
-      pendingSavingPostsOffline,
-      customTheme,
-      savedOfflinePosts,
-      intl,
-    } = this.props;
+    const { postData, pendingSavingPostsOffline, savedOfflinePosts, intl } = this.props;
     const { id } = postData;
     const isLoading = _.includes(pendingSavingPostsOffline, id);
     const isSaved = !_.isNull(_.get(savedOfflinePosts, id, null));
     const menuText = isSaved ? intl.saved_offline : intl.save_offline;
     const onPress = isSaved ? this.handleUnsavePost : this.handleSavePost;
-    const color = isSaved ? customTheme.tertiaryColor : customTheme.primaryColor;
 
     return (
       <MenuModalButton onPress={onPress}>
@@ -94,13 +69,9 @@ class SavePostOfflineMenuButton extends Component {
           {isLoading ? (
             <SmallLoading style={{ marginRight: 5 }} />
           ) : (
-            <MaterialCommunityIcons
-              size={ICON_SIZES.menuModalOptionIcon}
-              color={color}
-              name={MATERIAL_COMMUNITY_ICONS.contentSave}
-            />
+            <MenuIcon name={MATERIAL_COMMUNITY_ICONS.contentSave} />
           )}
-          <MenuText color={color}>{menuText}</MenuText>
+          <MenuText>{menuText}</MenuText>
         </MenuModalContents>
       </MenuModalButton>
     );

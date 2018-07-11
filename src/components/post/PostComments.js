@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { TouchableWithoutFeedback } from 'react-native';
 import styled from 'styled-components/native';
@@ -20,13 +20,13 @@ import {
 } from 'state/rootReducer';
 import { COLORS, MATERIAL_ICONS, ICON_SIZES } from 'constants/styles';
 import Comment from 'components/post/comments/Comment';
+import PrimaryText from 'components/common/text/PrimaryText';
 import tinycolor from 'tinycolor2';
 import * as navigationConstants from '../../constants/navigation';
 
 const Container = styled.View``;
 
-const CommentsTitle = styled.Text`
-  font-weight: bold;
+const CommentsTitle = styled(PrimaryText)`
   font-size: 20px;
   color: ${props =>
     tinycolor(props.customTheme.primaryBackgroundColor).isDark()
@@ -45,7 +45,7 @@ const ReplyIconContainer = styled.View`
   flex-direction: row;
 `;
 
-const ReplyText = styled.Text`
+const ReplyText = styled(PrimaryText)`
   color: ${props => props.customTheme.primaryColor};
   margin-left: 3px;
 `;
@@ -92,7 +92,7 @@ const mapDispatchToProps = dispatch => ({
     ),
 });
 
-class PostComments extends Component {
+class PostComments extends React.PureComponent {
   static propTypes = {
     navigation: PropTypes.shape(),
     fetchComments: PropTypes.func.isRequired,
@@ -161,7 +161,7 @@ class PostComments extends Component {
 
   handleNavigateToReply() {
     const { postData } = this.props;
-    this.props.navigation.navigate(navigationConstants.REPLY, {
+    this.props.navigation.push(navigationConstants.REPLY, {
       parentPost: postData,
       successCreateReply: this.handleSuccessReply,
     });

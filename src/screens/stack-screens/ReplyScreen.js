@@ -2,9 +2,15 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components/native';
 import { connect } from 'react-redux';
-import { Dimensions, KeyboardAvoidingView, Keyboard, TouchableWithoutFeedback } from 'react-native';
+import {
+  Dimensions,
+  KeyboardAvoidingView,
+  Keyboard,
+  TouchableWithoutFeedback,
+  Platform,
+} from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
-import { COLORS, MATERIAL_ICONS, ICON_SIZES } from 'constants/styles';
+import { COLORS, MATERIAL_ICONS, ICON_SIZES, FONTS } from 'constants/styles';
 import { getReputation } from 'util/steemitFormatters';
 import Header from 'components/common/Header';
 import { FormInput } from 'react-native-elements';
@@ -226,7 +232,7 @@ class ReplyScreen extends Component {
           </TouchableWithoutFeedback>
         </Header>
         <KeyboardAvoidingView behavior="padding">
-          <ReplyContentContainer>
+          <ReplyContentContainer removeClippedSubviews={Platform.OS === 'ios'}>
             <CommentContainer customTheme={customTheme}>
               <CommentContentContainer>
                 <AvatarContainer>
@@ -250,7 +256,7 @@ class ReplyScreen extends Component {
                 placeholder={intl.reply_placeholder}
                 multiline
                 value={replyText}
-                inputStyle={{ width: '100%', color }}
+                inputStyle={{ width: '100%', color, fontFamily: FONTS.PRIMARY }}
                 placeholderTextColor={color}
               />
               <ReplyButtonContainer>

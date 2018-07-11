@@ -1,39 +1,37 @@
 import React, { Component } from 'react';
-import { TouchableOpacity } from 'react-native';
+import { TouchableOpacity, StyleSheet, View } from 'react-native';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
-import styled from 'styled-components/native';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { connect } from 'react-redux';
 import { getCustomTheme } from 'state/rootReducer';
 import { MATERIAL_ICONS, MATERIAL_COMMUNITY_ICONS, ICON_SIZES } from 'constants/styles';
 import SmallLoading from 'components/common/SmallLoading';
-import { sortVotes } from '../../util/sortUtils';
-import { getUpvotes } from '../../util/voteUtils';
-import { calculatePayout } from '../../util/steemitUtils';
+import PrimaryText from 'components/common/text/PrimaryText';
+import { sortVotes } from 'util/sortUtils';
+import { getUpvotes } from 'util/voteUtils';
+import { calculatePayout } from 'util/steemitUtils';
 
-const Container = styled.View`
-  flex-direction: row;
-  padding: 10px 16px;
-`;
-
-const FooterValue = styled.Text`
-  margin-right: 16px;
-  margin-left: 5px;
-  font-size: 14px;
-  font-weight: 700;
-  color: ${props => props.customTheme.tertiaryColor};
-  align-self: center;
-`;
-
-const Payout = styled.Text`
-  margin-left: auto;
-  font-size: 14px;
-  font-weight: 700;
-  color: ${props => props.customTheme.tertiaryColor};
-  align-self: center;
-  ${props => (props.payoutIsDeclined ? 'text-decoration-line: line-through' : '')};
-`;
+const styles = StyleSheet.create({
+  container: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    paddingHorizontal: 5,
+    paddingBottom: 10,
+  },
+  footerValue: {
+    marginRight: 16,
+    marginLeft: 5,
+    fontSize: 15,
+    alignSelf: 'center',
+  },
+  payout: {
+    marginLeft: 'auto',
+    fontSize: 15,
+    alignSelf: 'center',
+  },
+});
 
 const mapStateToProps = state => ({
   customTheme: getCustomTheme(state),
@@ -116,11 +114,13 @@ class Footer extends Component {
 
     if (isReblogged) {
       return (
-        <MaterialCommunityIcons
-          name={MATERIAL_COMMUNITY_ICONS.reblog}
-          size={ICON_SIZES.footerActionIcon}
-          color={customTheme.primaryColor}
-        />
+        <View>
+          <MaterialCommunityIcons
+            name={MATERIAL_COMMUNITY_ICONS.reblog}
+            size={ICON_SIZES.footerActionIcon}
+            color={customTheme.primaryColor}
+          />
+        </View>
       );
     }
 
@@ -156,32 +156,46 @@ class Footer extends Component {
     const payoutIsDeclined = _.get(payout, 'isPayoutDeclined', false);
 
     return (
-      <Container>
-        {this.renderVoteButton()}
+      <View style={styles.container}>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          {this.renderVoteButton()}
+          <TouchableOpacity onPress={onPressVote}>
+            <PrimaryText style={[styles.footerValue, { color: customTheme.tertiaryColor }]}>
+              {upVotes.length}
+            </PrimaryText>
+          </TouchableOpacity>
+        </View>
         <TouchableOpacity
-          onPress={onPressVote}
-          style={{ justifyContent: 'center', alignItems: 'center' }}
+          onPress={handleNavigateToComments}
+          style={{ flexDirection: 'row', alignItems: 'center' }}
         >
-          <FooterValue customTheme={customTheme}>{upVotes.length}</FooterValue>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={handleNavigateToComments} style={{ flexDirection: 'row' }}>
           <MaterialCommunityIcons
             name={MATERIAL_COMMUNITY_ICONS.comment}
             size={ICON_SIZES.footerActionIcon}
             color={customTheme.tertiaryColor}
           />
-          <FooterValue customTheme={customTheme}>{children}</FooterValue>
+          <PrimaryText
+            style={[styles.footerValue, { color: customTheme.tertiaryColor, marginBottom: 3 }]}
+          >
+            {children}
+          </PrimaryText>
         </TouchableOpacity>
         {this.renderReblogLink()}
-        <TouchableOpacity
-          onPress={handleNavigateToVotes}
-          style={{ marginLeft: 'auto', alignItems: 'center' }}
-        >
-          <Payout customTheme={customTheme} payoutIsDeclined={payoutIsDeclined}>
+        <TouchableOpacity onPress={handleNavigateToVotes}>
+          <PrimaryText
+            style={[
+              styles.payout,
+              {
+                color: customTheme.tertiaryColor,
+                textDecorationLine: payoutIsDeclined ? 'line-through' : 'none',
+                marginBottom: 3,
+              },
+            ]}
+          >
             ${formattedDisplayedPayout}
-          </Payout>
+          </PrimaryText>
         </TouchableOpacity>
-      </Container>
+      </View>
     );
   }
 }

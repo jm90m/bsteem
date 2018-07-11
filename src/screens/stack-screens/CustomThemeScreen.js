@@ -13,7 +13,6 @@ import {
   TouchableOpacity,
   Platform,
 } from 'react-native';
-import { SlidersColorPicker } from 'react-native-color';
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import {
   COLORS,
@@ -33,6 +32,8 @@ import BackButton from 'components/common/BackButton';
 import tinycolor from 'tinycolor2';
 import Header from 'components/common/Header';
 import TitleText from 'components/common/TitleText';
+
+let SliderColorPicker = null;
 
 const Container = styled.View`
   flex: 1;
@@ -247,6 +248,10 @@ class CustomThemeScreen extends Component {
     modalVisible,
     selectedColorSetting = COLOR_SETTINGS.primaryColor,
   ) => () => {
+    if (modalVisible && SliderColorPicker === null) {
+      const { SlidersColorPicker } = require('react-native-color');
+      SliderColorPicker = SlidersColorPicker;
+    }
     this.setState(
       {
         selectedColorSetting,
@@ -375,7 +380,7 @@ class CustomThemeScreen extends Component {
             );
           })}
           {modalVisible && (
-            <SlidersColorPicker
+            <SliderColorPicker
               visible={modalVisible}
               color={tinycolor(currentColor).toHexString()}
               returnMode="hex"

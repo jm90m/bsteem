@@ -3,6 +3,7 @@ import { takeLatest, call, put, all, takeEvery } from 'redux-saga/effects';
 import _ from 'lodash';
 import API from 'api/api';
 import * as appActions from 'state/actions/appActions';
+import * as usersActions from 'state/actions/usersActions';
 import * as homeActions from 'state/actions/homeActions';
 import * as authActions from 'state/actions/authActions';
 import * as firebaseSaga from 'state/sagas/firebaseSaga';
@@ -18,12 +19,7 @@ import {
   FETCH_CRYPTO_PRICE_HISTORY,
   FETCH_REWARD_FUND,
 } from 'state/actions/actionTypes';
-import {
-  AUTH_EXPIRATION,
-  AUTH_MAX_EXPIRATION_AGE,
-  AUTH_USERNAME,
-  STEEM_ACCESS_TOKEN,
-} from 'constants/asyncStorageKeys';
+import * as asyncStorageKeys from 'constants/asyncStorageKeys';
 import sc2 from 'api/sc2';
 import * as settingsSaga from './settingsSaga';
 
@@ -67,15 +63,22 @@ const fetchNetworkConnection = function*() {
 };
 
 const authenticateUser = function*() {
-  const accessToken = yield call(AsyncStorage.getItem, STEEM_ACCESS_TOKEN);
-  const username = yield call(AsyncStorage.getItem, AUTH_USERNAME);
-  const expiresIn = yield call(AsyncStorage.getItem, AUTH_EXPIRATION);
-  const maxAge = yield call(AsyncStorage.getItem, AUTH_MAX_EXPIRATION_AGE);
+  const isFirebaseLogin = yield call(AsyncStorage.getItem, asyncStorageKeys.IS_FIREBASE_LOGIN);
+  const accessToken = yield call(AsyncStorage.getItem, asyncStorageKeys.STEEM_ACCESS_TOKEN);
+  const username = yield call(AsyncStorage.getItem, asyncStorageKeys.AUTH_USERNAME);
+  const expiresIn = yield call(AsyncStorage.getItem, asyncStorageKeys.AUTH_EXPIRATION);
+  const maxAge = yield call(AsyncStorage.getItem, asyncStorageKeys.AUTH_MAX_EXPIRATION_AGE);
   const isAuthenticated = accessToken && expiresIn && !_.isEmpty(username);
+
+  if (isFirebaseLogin) {
+    yield put(authActions.authenticateUser.action({ accessToken, username }));
+    return;
+  }
 
   if (isAuthenticated) {
     sc2.setAccessToken(accessToken);
     yield put(authActions.authenticateUser.action({ accessToken, expiresIn, username, maxAge }));
+    yield put(usersActions.fetchUser.action({ username }));
   }
 };
 

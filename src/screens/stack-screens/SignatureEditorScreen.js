@@ -31,6 +31,7 @@ import TitleText from 'components/common/TitleText';
 import StyledViewPrimaryBackground from 'components/common/StyledViewPrimaryBackground';
 import PrimaryButton from 'components/common/PrimaryButton';
 import SmallLoading from 'components/common/SmallLoading';
+import PrimaryText from 'components/common/text/PrimaryText';
 
 const { width: deviceWidth } = Dimensions.get('screen');
 
@@ -83,7 +84,7 @@ const StatusContent = styled.View`
   background: ${props => props.customTheme.primaryBackgroundColor};
 `;
 
-const StatusText = styled.Text`
+const StatusText = styled(PrimaryText)`
   margin-left: 5px;
   color: ${props => props.customTheme.secondaryColor};
 `;

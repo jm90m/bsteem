@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components/native';
-import { ListView, RefreshControl } from 'react-native';
+import { ListView, RefreshControl, View } from 'react-native';
 import _ from 'lodash';
 import { connect } from 'react-redux';
 import {
@@ -18,19 +18,15 @@ import {
   fetchMoreUserAccountHistory,
   fetchUserAccountHistory,
 } from 'state/actions/userActivityActions';
+import commonStyles from 'styles/common';
 import LargeLoading from 'components/common/LargeLoading';
 import Header from 'components/common/Header';
 import TitleText from 'components/common/TitleText';
 import UserAction from 'components/activity/UserAction';
 import BackButton from 'components/common/BackButton';
+import StyledListView from 'components/common/StyledListView';
 
 const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
-
-const Container = styled.View``;
-
-const StyledListView = styled.ListView`
-  background-color: ${props => props.customTheme.listBackgroundColor};
-`;
 
 const FilterTouchable = styled.TouchableOpacity`
   padding: 10px;
@@ -128,7 +124,7 @@ class UserActivityScreen extends Component {
     const userAccountHistoryDataSource = _.get(usersAccountHistory, username, []);
 
     return (
-      <Container>
+      <View style={commonStyles.container}>
         <Header>
           <BackButton navigateBack={this.navigateBack} />
           <TitleText>{`${username} activity`}</TitleText>
@@ -155,7 +151,7 @@ class UserActivityScreen extends Component {
           }
         />
         {loadingFetchMoreUserAccountHistory && <LargeLoading />}
-      </Container>
+      </View>
     );
   }
 }

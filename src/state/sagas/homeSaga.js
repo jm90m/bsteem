@@ -9,6 +9,7 @@ import {
   fetchMoreDiscussionsSuccess,
   fetchMoreDiscussionsFail,
 } from '../actions/homeActions';
+import { addPostsToPostMap } from '../actions/postsActions';
 
 const fetchTags = function*() {
   try {
@@ -34,6 +35,7 @@ const fetchDiscussions = function*(action) {
       yield put(fetchDiscussionsFail(result.error));
     } else {
       yield put(fetchDiscussionsSuccess(result.result));
+      yield put(addPostsToPostMap(result.result));
     }
   } catch (error) {
     yield put(fetchDiscussionsFail(error));
@@ -55,6 +57,7 @@ const fetchMoreDiscussions = function*(action) {
       yield put(fetchMoreDiscussionsFail(result.error));
     } else {
       yield put(fetchMoreDiscussionsSuccess(result.result));
+      yield put(addPostsToPostMap(result.result));
     }
   } catch (error) {
     yield put(fetchMoreDiscussionsFail(error));

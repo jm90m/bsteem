@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Keyboard, KeyboardAvoidingView, TouchableWithoutFeedback } from 'react-native';
+import { Keyboard, KeyboardAvoidingView, Platform, TouchableWithoutFeedback } from 'react-native';
 import styled from 'styled-components/native';
 import { connect } from 'react-redux';
 import _ from 'lodash';
@@ -181,6 +181,7 @@ class EditReplyScreen extends Component {
     const color = tinycolor(customTheme.primaryBackgroundColor).isDark()
       ? COLORS.LIGHT_TEXT_COLOR
       : COLORS.DARK_TEXT_COLOR;
+
     return (
       <Container>
         <Header>
@@ -204,7 +205,7 @@ class EditReplyScreen extends Component {
           </TouchableWithoutFeedback>
         </Header>
         <KeyboardAvoidingView behavior="padding">
-          <ReplyContentContainer>
+          <ReplyContentContainer removeClippedSubviews={Platform.OS === 'ios'}>
             <ReplyInputContainer customTheme={customTheme}>
               <FormInput
                 onChangeText={this.onChangeReplyText}

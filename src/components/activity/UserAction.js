@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 import styled from 'styled-components/native';
+import { View } from 'react-native';
 import TimeAgo from 'components/common/TimeAgo';
 import WalletTransaction from 'components/wallet/WalletTransaction';
 import { isWalletTransaction } from 'util/apiUtils';
@@ -13,16 +14,10 @@ import UserActionMessage from './UserActionMessage';
 const Container = styled.View`
   flex-direction: row;
   background-color: ${props => props.customTheme.primaryBackgroundColor};
-  margin-top: 2px;
-  margin-bottom: 2px;
-  border-top-color: ${props => props.customTheme.primaryBorderColor};
   border-bottom-color: ${props => props.customTheme.primaryBorderColor};
-  border-top-width: 1px;
   border-bottom-width: 1px;
   padding: 5px;
 `;
-
-const MessageContainer = styled.View``;
 
 const UserAction = ({
   action,
@@ -34,6 +29,7 @@ const UserAction = ({
 }) => {
   const actionType = _.get(action.op, 0, '');
   const actionDetails = _.get(action.op, 1, {});
+  const timeAgoStyle = { marginLeft: 10 };
 
   if (isWalletTransaction(actionType)) {
     return (
@@ -54,7 +50,7 @@ const UserAction = ({
         actionDetails={actionDetails}
         currentUsername={currentUsername}
       />
-      <MessageContainer>
+      <View>
         <UserActionMessage
           actionType={actionType}
           actionDetails={actionDetails}
@@ -63,8 +59,8 @@ const UserAction = ({
           totalVestingFundSteem={totalVestingFundSteem}
           totalVestingShares={totalVestingShares}
         />
-        <TimeAgo created={action.timestamp} style={{ marginLeft: 10 }} />
-      </MessageContainer>
+        <TimeAgo created={action.timestamp} style={timeAgoStyle} />
+      </View>
     </Container>
   );
 };

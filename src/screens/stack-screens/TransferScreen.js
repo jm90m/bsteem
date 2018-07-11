@@ -17,6 +17,7 @@ import { fetchUserTransferHistory } from 'state/actions/userActivityActions';
 import StyledViewPrimaryBackground from 'components/common/StyledViewPrimaryBackground';
 import Text from 'components/common/StyledTextByBackground';
 import TitleText from 'components/common/TitleText';
+import PrimaryText from 'components/common/text/PrimaryText';
 import tinycolor from 'tinycolor2';
 import {
   getAuthUsername,
@@ -42,7 +43,7 @@ const MenuIconContainer = styled.View`
   padding: 5px;
 `;
 
-const DisclaimerText = styled.Text`
+const DisclaimerText = styled(PrimaryText)`
   color: ${props => props.customTheme.tertiaryColor};
   padding: 15px;
 `;
@@ -56,11 +57,11 @@ const BalanceContainer = styled.View`
   padding: 15px 20px;
 `;
 
-const Field = styled.Text`
+const Field = styled(PrimaryText)`
   color: ${props => props.customTheme.tertiaryColor};
 `;
 
-const Value = styled.Text`
+const Value = styled(PrimaryText)`
   color: ${props => props.customTheme.secondaryColor};
 `;
 

@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components/native';
 import _ from 'lodash';
+import PrimaryText from 'components/common/text/PrimaryText';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { MATERIAL_COMMUNITY_ICONS, MATERIAL_ICONS, ICON_SIZES } from 'constants/styles';
 import { sortVotes } from 'util/sortUtils';
@@ -16,19 +17,17 @@ const Container = styled.View`
   padding: 10px 16px;
 `;
 
-const FooterValue = styled.Text`
+const FooterValue = styled(PrimaryText)`
   margin-right: 16px;
   margin-left: 5px;
   font-size: 14px;
-  font-weight: 700;
   color: ${props => props.customTheme.tertiaryColor};
   align-self: center;
 `;
 
-const Payout = styled.Text`
+const Payout = styled(PrimaryText)`
   margin-left: auto;
   font-size: 14px;
-  font-weight: 700;
   color: ${props => props.customTheme.tertiaryColor};
   align-self: center;
 `;

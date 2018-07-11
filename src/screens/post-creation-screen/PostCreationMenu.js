@@ -1,16 +1,20 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { TouchableWithoutFeedback } from 'react-native';
-import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { MaterialIcons } from '@expo/vector-icons';
 import styled from 'styled-components/native';
 import { ICON_SIZES, MATERIAL_ICONS, MATERIAL_COMMUNITY_ICONS } from 'constants/styles';
 import MenuModalButton from 'components/common/menu/MenuModalButton';
 import { connect } from 'react-redux';
 import { CheckBox } from 'react-native-elements';
 import MenuWrapper from 'components/common/menu/MenuWrapper';
+import MenuText from 'components/common/menu/MenuText';
+import MenuModalContents from 'components/common/menu/MenuModalContents';
+import MenuIcon from 'components/common/menu/MenuIcon';
 import BSteemModal from 'components/common/BSteemModal';
 import SmallLoading from 'components/common/SmallLoading';
 import { updateEnableUserSignature } from 'state/actions/settingsActions';
+import PrimaryText from 'components/common/text/PrimaryText';
 import { getCustomTheme, getIntl, getEnableSignature } from '../../state/rootReducer';
 
 const Container = styled.View`
@@ -19,25 +23,12 @@ const Container = styled.View`
   align-items: center;
 `;
 
-const MenuModalContents = styled.View`
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-`;
-
 const StatusContent = styled(MenuModalContents)`
   padding: 10px;
-  margin-top: 4px;
   background: ${props => props.customTheme.primaryBackgroundColor};
 `;
 
-const MenuText = styled.Text`
-  margin-left: 5px;
-  color: ${props => props.customTheme.primaryColor};
-  font-weight: bold;
-`;
-
-const StatusText = styled.Text`
+const StatusText = styled(PrimaryText)`
   margin-left: 5px;
   color: ${props => props.customTheme.secondaryColor};
 `;
@@ -118,7 +109,6 @@ class PostCreationMenu extends Component {
       hideMenu,
       handleShowPreview,
       handleSavePost,
-      customTheme,
       intl,
       handleEditSignature,
       enableSignature,
@@ -131,36 +121,24 @@ class PostCreationMenu extends Component {
             <MenuWrapper>
               <MenuModalButton onPress={handleShowPreview}>
                 <MenuModalContents>
-                  <MaterialCommunityIcons
-                    size={ICON_SIZES.menuModalOptionIcon}
-                    color={customTheme.primaryColor}
-                    name={MATERIAL_COMMUNITY_ICONS.magnify}
-                  />
-                  <MenuText customTheme={customTheme}>{intl.post_preview}</MenuText>
+                  <MenuIcon name={MATERIAL_COMMUNITY_ICONS.magnify} />
+                  <MenuText>{intl.post_preview}</MenuText>
                 </MenuModalContents>
               </MenuModalButton>
               <MenuModalButton onPress={handleSavePost}>
                 <MenuModalContents>
-                  <MaterialIcons
-                    size={ICON_SIZES.menuModalOptionIcon}
-                    color={customTheme.primaryColor}
-                    name={MATERIAL_ICONS.save}
-                  />
-                  <MenuText customTheme={customTheme}>{intl.save_post}</MenuText>
+                  <MenuIcon isMaterialIcon name={MATERIAL_ICONS.save} />
+                  <MenuText>{intl.save_post}</MenuText>
                 </MenuModalContents>
               </MenuModalButton>
               {this.renderSavePostStatus()}
               <MenuModalButton onPress={handleEditSignature}>
                 <MenuModalContents>
-                  <MaterialCommunityIcons
-                    size={ICON_SIZES.menuModalOptionIcon}
-                    color={customTheme.primaryColor}
-                    name={MATERIAL_COMMUNITY_ICONS.approval}
-                  />
-                  <MenuText customTheme={customTheme}>{intl.edit_signature}</MenuText>
+                  <MenuIcon name={MATERIAL_COMMUNITY_ICONS.approval} />
+                  <MenuText>{intl.edit_signature}</MenuText>
                 </MenuModalContents>
               </MenuModalButton>
-              <MenuModalButton>
+              <MenuModalButton onPress={this.handleToggleSignature}>
                 <MenuModalContents>
                   <CheckBox
                     title={intl.use_signature}
@@ -169,14 +147,10 @@ class PostCreationMenu extends Component {
                   />
                 </MenuModalContents>
               </MenuModalButton>
-              <MenuModalButton onPress={handleErasePost} style={{ marginTop: 20 }}>
+              <MenuModalButton onPress={handleErasePost} isLastElement>
                 <MenuModalContents>
-                  <MaterialCommunityIcons
-                    size={ICON_SIZES.menuModalOptionIcon}
-                    color={customTheme.primaryColor}
-                    name={MATERIAL_COMMUNITY_ICONS.eraser}
-                  />
-                  <MenuText customTheme={customTheme}>{intl.erase_post}</MenuText>
+                  <MenuIcon name={MATERIAL_COMMUNITY_ICONS.eraser} />
+                  <MenuText>{intl.erase_post}</MenuText>
                 </MenuModalContents>
               </MenuModalButton>
             </MenuWrapper>

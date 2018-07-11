@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Dimensions, Image } from 'react-native';
-import { Image as ExpoImage } from 'react-native-expo-image-cache';
 import _ from 'lodash';
 import { getValidImageUrl } from 'util/imageUtils';
 import SmallLoading from '../common/SmallLoading';
@@ -102,12 +101,12 @@ class PostImage extends Component {
     }
 
     return (
-      <ExpoImage
+      <Image
         style={{
           width: imageWidth - widthOffset,
           height: imageHeight,
         }}
-        uri={imageUrl}
+        source={{ uri: imageUrl }}
         resizeMode={Image.resizeMode.cover}
         onError={onErrorHandler}
       />
