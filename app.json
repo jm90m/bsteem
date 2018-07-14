@@ -5,7 +5,7 @@
     "slug": "bsteem",
     "privacy": "public",
     "sdkVersion": "23.0.0",
-    "version": "1.0.40",
+    "version": "1.0.41",
     "orientation": "portrait",
     "primaryColor": "#ffffff",
     "icon": "./assets/bsteem-icon.png",
